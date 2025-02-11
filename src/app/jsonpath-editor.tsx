@@ -5,10 +5,10 @@ import CodeMirrorEditor from "./codemirror/codemirror-editor";
 import { getJSONPath, jsonPathLanguage } from "./codemirror/jsonpath/jsonpath-language";
 import { jsonPathLintSource } from "./codemirror/jsonpath/jsonpath-lint-source";
 import { jsonPathTooltips } from "./codemirror/jsonpath/jsonpath-tooltips";
-import { JSONPathParser } from "./parser/jsonpath-parser";
+import { JSONPathParser } from "./parser/parser";
 import { createSyntaxTree } from "./parser/utils";
-import { JSONPath } from "./parser/expression";
-import { JSONPathDiagnostics } from "./parser/jsonpath-diagnostics";
+import { JSONPath } from "./parser/syntax-tree";
+import { JSONPathDiagnostics } from "./parser/diagnostics";
 import { syntaxTree } from "@codemirror/language";
 
 export default function JSONPathEditor({value, onValueChanged, onParsed, onDiagnosticsCreated}: 

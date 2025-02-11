@@ -5,11 +5,12 @@ import { Accordion, AppShell, Box, Burger, Divider, Flex, Grid, Group, Stack, Ta
 import { useDisclosure } from '@mantine/hooks';
 import { IconBraces, IconEqual, IconExclamationCircle, IconFunction, IconHelp, IconListTree, IconMathFunction, IconRoute, IconRoute2, IconRouteAltLeft, IconRouteSquare } from '@tabler/icons-react';
 import JSONEditor from "./json-editor";
-import { useState } from "react";
-import { JSONPath } from "./parser/expression";
+import { useMemo, useState } from "react";
+import { JSONPath } from "./parser/syntax-tree";
 import { Diagnostics } from "next/dist/build/swc/types";
-import { JSONPathDiagnostics } from "./parser/jsonpath-diagnostics";
+import { JSONPathDiagnostics } from "./parser/diagnostics";
 import DiagnosticsView from "./components/diagnostics-view";
+import { defaultJSONPathOptions, JSONPathOptions, JSONPathType } from "./parser/options";
 
 const testJson = `{
   "store": {
@@ -49,10 +50,20 @@ const testJson = `{
 }`;
 
 export default function Home() {
+    const [inputValue, setInputValue] = useState(testJson);
     const [editorValue, setEditorValue] = useState("$.books[?@.author == \"George Orwell\" && count(true, 25) > 42].title");
     const [jsonPath, setJsonPath] = useState<JSONPath>();
     const [diagnostics, setDiagnostics] = useState<readonly JSONPathDiagnostics[]>([]);
     const [opened, { toggle }] = useDisclosure();
+    const result = useMemo(() => {
+        if (jsonPath === undefined)
+            return "";
+        const value = JSON.parse(inputValue);
+        const time = performance.now();
+        const nodes = jsonPath.select(value, defaultJSONPathOptions).nodes;
+        console.log("QUERY TIME:", performance.now() - time, "ms");
+        return JSON.stringify(nodes, null, 4);
+    }, [inputValue, jsonPath])
 
     return (
         <AppShell
@@ -98,7 +109,7 @@ export default function Home() {
                 <Stack gap={0} h="100%">
                     <JSONPathEditor value={editorValue} onValueChanged={setEditorValue} onParsed={setJsonPath} onDiagnosticsCreated={setDiagnostics} />
                     <Flex flex="1 1 0">
-                        <Tabs defaultValue="json" flex="1" display="flex" style={{flexDirection: "column"}}>
+                        <Tabs defaultValue="json" flex="1" miw={0} display="flex" style={{flexDirection: "column"}}>
                             <Tabs.List>
                                 <Tabs.Tab value="json" leftSection={<IconBraces size={20} />}>
                                     JSON
@@ -108,14 +119,14 @@ export default function Home() {
                                 </Tabs.Tab>
                             </Tabs.List>
                             <Tabs.Panel value="json" flex="1 1 0" mih={0}>
-                                <JSONEditor value={testJson} onValueChanged={() => {}} />
+                                <JSONEditor value={inputValue} onValueChanged={setInputValue} />
                             </Tabs.Panel>
                             <Tabs.Panel value="jsonSchema">
                                 Messages tab content
                             </Tabs.Panel>
                         </Tabs>
                         <Divider size="xs" orientation="vertical" />
-                        <Tabs defaultValue="errors" flex="1" display="flex" style={{flexDirection: "column"}}>
+                        <Tabs defaultValue="errors" flex="1" miw={0} display="flex" style={{flexDirection: "column"}}>
                             <Tabs.List>
                                 <Tabs.Tab value="errors" leftSection={<IconExclamationCircle size={20} />}>
                                     Errors
@@ -136,8 +147,8 @@ export default function Home() {
                             <Tabs.Panel value="outline">
                                 Messages tab content
                             </Tabs.Panel>
-                            <Tabs.Panel value="values">
-                                Messages tab content
+                            <Tabs.Panel value="values" flex="1 1 0" mih={0}>
+                                <JSONEditor value={result} onValueChanged={() => {}} />
                             </Tabs.Panel>
                             <Tabs.Panel value="paths">
                                 Messages tab content

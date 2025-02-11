@@ -1,6 +1,6 @@
-import { JSONPath, JSONPathAndExpression, JSONPathBooleanLiteral, JSONPathComparisonExpression, JSONPathFilterExpression, JSONPathFilterQueryExpression, JSONPathFunctionExpression, JSONPathNode, JSONPathNotExpression, JSONPathNullLiteral, JSONPathNumberLiteral, JSONPathOrExpression, JSONPathParanthesisExpression, JSONPathQuery, JSONPathStringLiteral, JSONPathSyntaxTree } from "./expression";
-import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "./jsonpath-diagnostics";
-import { JSONPathOptions, JSONPathType } from "./jsonpath-options";
+import { JSONPath, JSONPathAndExpression, JSONPathBooleanLiteral, JSONPathComparisonExpression, JSONPathFilterExpression, JSONPathFilterQueryExpression, JSONPathFunctionExpression, JSONPathNode, JSONPathNotExpression, JSONPathNullLiteral, JSONPathNumberLiteral, JSONPathOrExpression, JSONPathParanthesisExpression, JSONPathQuery, JSONPathStringLiteral, JSONPathSyntaxTree } from "./syntax-tree";
+import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "./diagnostics";
+import { JSONPathOptions, JSONPathType } from "./options";
 import { TextRange } from "./text-range";
 
 export class TypeChecker {

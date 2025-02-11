@@ -1,7 +1,7 @@
 import { Diagnostics } from "next/dist/build/swc/types";
-import { JSONPath, JSONPathAndExpression, JSONPathBooleanLiteral, JSONPathComparisonExpression, JSONPathFilterExpression, JSONPathFilterQueryExpression, JSONPathFilterSelector, JSONPathFunctionExpression, JSONPathIndexSelector, JSONPathNameSelector, JSONPathNotExpression, JSONPathNullLiteral, JSONPathNumberLiteral, JSONPathOrExpression, JSONPathParanthesisExpression, JSONPathQuery, JSONPathSegment, JSONPathSelector, JSONPathSliceSelector, JSONPathStringLiteral, JSONPathSyntaxTreeType, JSONPathToken, JSONPathWildcardSelector } from "./expression";
+import { JSONPath, JSONPathAndExpression, JSONPathBooleanLiteral, JSONPathComparisonExpression, JSONPathFilterExpression, JSONPathFilterQueryExpression, JSONPathFilterSelector, JSONPathFunctionExpression, JSONPathIndexSelector, JSONPathNameSelector, JSONPathNotExpression, JSONPathNullLiteral, JSONPathNumberLiteral, JSONPathOrExpression, JSONPathParanthesisExpression, JSONPathQuery, JSONPathSegment, JSONPathSelector, JSONPathSliceSelector, JSONPathStringLiteral, JSONPathSyntaxTreeType, JSONPathToken, JSONPathWildcardSelector } from "./syntax-tree";
 import { TextRange } from "./text-range";
-import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "./jsonpath-diagnostics";
+import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "./diagnostics";
 
 export class JSONPathParser {
     parse(input: string): JSONPath {
@@ -185,13 +185,15 @@ export class JSONPathParser {
         const questionMarkToken = context.collect(JSONPathSyntaxTreeType.questionMarkToken);
         this.skipWhitespace(context);
         const filter = this.parseFilterExpression(context);
-        if (filter !== null) this.checkFilterExpression(filter, context);
+        if (filter !== null) {
+            this.checkLogicalExpressionOperand(filter, context);
+            this.checkFilterExpression(filter, context);
+        }
         // TODO: If null, skip to '[', ']', '.', ',', '(', ')'
         return new JSONPathFilterSelector(questionMarkToken, filter);
     }
 
     private parseFilterExpression(context: ParserContext): JSONPathFilterExpression | null {
-        // TODO: Validate it is according to the grammar.
         return this.parseOrExpression(context);
     }
 
@@ -373,13 +375,16 @@ export class JSONPathParser {
         const quote = context.current;
         context.goNext();
         let escaped = false;
-        while (context.current !== quote && context.current !== null || escaped) {
+        while (context.current !== null && (context.current !== quote || escaped)) {
             escaped = context.current === "\\" && !escaped;
             context.goNext();
         }
-        context.goNext();
+        const hasClosingQuote = context.current !== null;
+        if (hasClosingQuote)
+            context.goNext();
         const token = context.collect(JSONPathSyntaxTreeType.stringToken);
-        return { token, value: token.text.substring(1) }; // TODO: Remove last quote.
+        const value = token.text.substring(1, hasClosingQuote ? token.text.length - 1 : token.text.length);
+        return { token, value };
     }
 
     private parseInteger(context: ParserContext): { token: JSONPathToken, value: number } {
@@ -402,7 +407,8 @@ export class JSONPathParser {
             context.goNext();
 
         const token = context.collect(JSONPathSyntaxTreeType.numberToken);
-        return { token, value: parseInt(token.text) };
+        const value = parseInt(token.text);
+        return { token, value };
     }
 
     private skipWhitespace(context: ParserContext, allowed = true) {

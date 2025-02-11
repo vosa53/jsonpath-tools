@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { JSONPathParser } from './jsonpath-parser';
-import { JSONPathNode, JSONPathSyntaxTree, JSONPathToken } from './expression';
+import { JSONPathParser } from './parser';
+import { JSONPathNode, JSONPathSyntaxTree, JSONPathToken } from './syntax-tree';
 import { createSyntaxTree } from './utils';
 
 describe("parser", () => {

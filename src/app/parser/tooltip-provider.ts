@@ -1,4 +1,4 @@
-import { JSONPath, JSONPathSyntaxTreeType, JSONPathToken } from "./expression";
+import { JSONPath, JSONPathSyntaxTreeType, JSONPathToken } from "./syntax-tree";
 import { TextRange } from "./text-range";
 
 export class TooltipProvider {

@@ -1,5 +1,5 @@
 import { List, ThemeIcon } from "@mantine/core";
-import { JSONPathDiagnostics } from "../parser/jsonpath-diagnostics";
+import { JSONPathDiagnostics } from "../parser/diagnostics";
 import { IconError404, IconExclamationCircle } from "@tabler/icons-react";
 
 export default function DiagnosticsView({ diagnostics }: { diagnostics: readonly JSONPathDiagnostics[] }) {

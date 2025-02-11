@@ -1,8 +1,8 @@
 import { defineLanguageFacet, Language, languageDataProp } from "@codemirror/language";
 import { Input, NodeProp, NodeSet, NodeType, Parser, PartialParse, Tree, TreeFragment } from "@lezer/common";
 import { styleTags, tags as t } from "@lezer/highlight";
-import { JSONPath, JSONPathNode, JSONPathSyntaxTree, JSONPathSyntaxTreeType, JSONPathToken } from "../../parser/expression";
-import { JSONPathParser } from "../../parser/jsonpath-parser";
+import { JSONPath, JSONPathNode, JSONPathSyntaxTree, JSONPathSyntaxTreeType, JSONPathToken } from "../../parser/syntax-tree";
+import { JSONPathParser } from "../../parser/parser";
 import { jsonPathCompletionSource } from "./jsonpath-completion-source";
 
 const treeToJSONPath = new WeakMap<Tree, JSONPath>();

@@ -1,19 +1,9 @@
 import { syntaxTree } from "@codemirror/language";
 import { LintSource } from "@codemirror/lint";
-import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "../../parser/jsonpath-diagnostics";
+import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "../../parser/diagnostics";
 import { getJSONPath } from "./jsonpath-language";
 import { TypeChecker } from "@/app/parser/type-checker";
-import { JSONPathOptions, JSONPathType } from "@/app/parser/jsonpath-options";
-
-const jsonPathOptions: JSONPathOptions = {
-    functions: {
-        "length": {
-            handler: () => { },
-            parameterTypes: [JSONPathType.valueType],
-            returnType: JSONPathType.valueType
-        }
-    }
-};
+import { defaultJSONPathOptions, JSONPathOptions, JSONPathType } from "@/app/parser/options";
 
 export function jsonPathLintSource(options: { onDiagnosticsCreated?: (diagnostics: readonly JSONPathDiagnostics[]) => void } = {}): LintSource {
     return view => {
@@ -21,7 +11,7 @@ export function jsonPathLintSource(options: { onDiagnosticsCreated?: (diagnostic
         const typeChecker = new TypeChecker();
         const diagnostics = [
             ...jsonPath.syntaxDiagnostics,
-            ...typeChecker.check(jsonPath, jsonPathOptions)
+            ...typeChecker.check(jsonPath, defaultJSONPathOptions)
         ];
         options.onDiagnosticsCreated?.(diagnostics);
 
