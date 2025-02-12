@@ -124,8 +124,7 @@ export class JSONPath extends JSONPathNode {
 
     get type() { return JSONPathSyntaxTreeType.root; }
 
-    select(value: JSONPathJSONValue, options: JSONPathOptions): JSONPathNodeList {
-        const queryContext: JSONPathQueryContext = { rootNode: value, options };
+    select(queryContext: JSONPathQueryContext): JSONPathNodeList {
         return this.query.select(queryContext, null);
     }
 }
@@ -175,6 +174,8 @@ export class JSONPathSegment extends JSONPathNode {
     get type() { return JSONPathSyntaxTreeType.segment; }
 
     select(input: JSONPathJSONValue, output: PushOnlyArray<JSONPathJSONValue>, queryContext: JSONPathQueryContext) {
+        queryContext.segmentInstrumentationCallback?.(this, input);
+        
         for (const selector of this.selectors) {
             if (selector.selector != null)
                 selector.selector.select(input, output, queryContext);
@@ -630,6 +631,7 @@ function evaluateAs(expression: JSONPathFilterExpression | null, type: JSONPathT
 export interface JSONPathQueryContext {
     readonly rootNode: JSONPathJSONValue;
     readonly options: JSONPathOptions;
+    readonly segmentInstrumentationCallback?: (segment: JSONPathSegment, input: JSONPathJSONValue) => void;
 }
 
 export interface JSONPathFilterExpressionContext {

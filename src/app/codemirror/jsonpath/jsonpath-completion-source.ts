@@ -1,16 +1,22 @@
-import {CompletionContext, CompletionResult} from "@codemirror/autocomplete"
+import { syntaxTree } from "@codemirror/language";
+import { CompletionContext, CompletionResult } from "@codemirror/autocomplete"
+import { getJSONPath } from "./jsonpath-language";
+import { CompletionProvider } from "@/app/parser/completion-provider";
+import { testJson } from "@/app/page";
 
 export function jsonPathCompletionSource(context: CompletionContext): CompletionResult | null {
-    console.log("Autocomplete at: " + context.pos);
-    let word = context.matchBefore(/\w*/)!
-    if (word.from == word.to && !context.explicit)
-        return null
+    const jsonPath = getJSONPath(syntaxTree(context.state));
+    const completions = CompletionProvider.provideCompletions(jsonPath, context.pos, JSON.parse(testJson));
+
+    const word = context.matchBefore(/\w*/)!;
+    if (word.from === word.to && !context.explicit)
+        return null;
+
     return {
         from: word.from,
-        options: [
-            { label: "match", type: "keyword" },
-            { label: "hello", type: "variable", info: "(World)" },
-            { label: "magic", type: "text", apply: "⠁⭒*.✩.*⭒⠁", detail: "macro" }
-        ]
-    }
+        options: completions.map(c => ({
+            label: c.text,
+            type: "variable"
+        }))
+    };
 }

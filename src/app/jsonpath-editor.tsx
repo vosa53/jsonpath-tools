@@ -20,7 +20,8 @@ export default function JSONPathEditor({value, onValueChanged, onParsed, onDiagn
             jsonPathTooltips,
             linter(jsonPathLintSource({ onDiagnosticsCreated })),
             EditorView.theme({
-                "&": { fontSize: "18px" }
+                "&": { fontSize: "18px !important" },
+                "& .cm-content": { padding: "10px 0" }
             }),
             EditorView.updateListener.of(u => {
                 if (u.docChanged) {

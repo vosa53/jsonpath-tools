@@ -10,7 +10,7 @@ export default function DiagnosticsView({ diagnostics }: { diagnostics: readonly
             size="sm"
             center
             icon={
-                <ThemeIcon color="red" size={24} radius="xl">
+                <ThemeIcon color="red.7" size={24} radius="xl">
                     <IconExclamationCircle size={16} />
                 </ThemeIcon>
             }>

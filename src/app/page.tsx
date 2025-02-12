@@ -1,55 +1,57 @@
 "use client"
 
 import JSONPathEditor from "./jsonpath-editor";
-import { Accordion, AppShell, Box, Burger, Divider, Flex, Grid, Group, Stack, Tabs, Title } from '@mantine/core';
+import { Accordion, ActionIcon, AppShell, Box, Burger, Divider, Flex, Grid, Group, Stack, Tabs, Title, useMantineColorScheme } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconBraces, IconEqual, IconExclamationCircle, IconFunction, IconHelp, IconListTree, IconMathFunction, IconRoute, IconRoute2, IconRouteAltLeft, IconRouteSquare } from '@tabler/icons-react';
+import { IconAdjustments, IconBraces, IconEqual, IconExclamationCircle, IconFunction, IconHelp, IconListTree, IconMathFunction, IconMoon, IconRoute, IconRoute2, IconRouteAltLeft, IconRouteSquare, IconSun } from '@tabler/icons-react';
 import JSONEditor from "./json-editor";
 import { useMemo, useState } from "react";
-import { JSONPath } from "./parser/syntax-tree";
+import { JSONPath, JSONPathQueryContext } from "./parser/syntax-tree";
 import { Diagnostics } from "next/dist/build/swc/types";
 import { JSONPathDiagnostics } from "./parser/diagnostics";
 import DiagnosticsView from "./components/diagnostics-view";
 import { defaultJSONPathOptions, JSONPathOptions, JSONPathType } from "./parser/options";
+import classes from "./page.module.css";
 
-const testJson = `{
-  "store": {
-    "books": [
-      {
-        "category": "reference",
-        "author": "Nigel Rees",
-        "title": "Sayings of the Century",
-        "price": 8.95
-      },
-      {
-        "category": "fiction",
-        "author": "Evelyn Waugh",
-        "title": "Sword of Honour",
-        "price": 12.99
-      },
-      {
-        "category": "fiction",
-        "author": "Herman Melville",
-        "title": "Moby Dick",
-        "isbn": "0-553-21311-3",
-        "price": 8.99
-      },
-      {
-        "category": "fiction",
-        "author": "J. R. R. Tolkien",
-        "title": "The Lord of the Rings",
-        "isbn": "0-395-19395-8",
-        "price": 22.99
-      }
-    ],
-    "bicycle": {
-      "color": "red",
-      "price": 399
+export const testJson = `{
+    "store": {
+        "books": [
+            {
+                "category": "reference",
+                "author": "Nigel Rees",
+                "title": "Sayings of the Century",
+                "price": 8.95
+            },
+            {
+                "category": "fiction",
+                "author": "Evelyn Waugh",
+                "title": "Sword of Honour",
+                "price": 12.99
+            },
+            {
+                "category": "fiction",
+                "author": "Herman Melville",
+                "title": "Moby Dick",
+                "isbn": "0-553-21311-3",
+                "price": 8.99
+            },
+            {
+                "category": "fiction",
+                "author": "J. R. R. Tolkien",
+                "title": "The Lord of the Rings",
+                "isbn": "0-395-19395-8",
+                "price": 22.99
+            }
+        ],
+        "bicycle": {
+            "color": "red",
+            "price": 399
+        }
     }
-  }
 }`;
 
 export default function Home() {
+    const colorScheme = useMantineColorScheme();
     const [inputValue, setInputValue] = useState(testJson);
     const [editorValue, setEditorValue] = useState("$.books[?@.author == \"George Orwell\" && count(true, 25) > 42].title");
     const [jsonPath, setJsonPath] = useState<JSONPath>();
@@ -60,7 +62,8 @@ export default function Home() {
             return "";
         const value = JSON.parse(inputValue);
         const time = performance.now();
-        const nodes = jsonPath.select(value, defaultJSONPathOptions).nodes;
+        const queryContext: JSONPathQueryContext = { rootNode: value, options: defaultJSONPathOptions };
+        const nodes = jsonPath.select(queryContext).nodes;
         console.log("QUERY TIME:", performance.now() - time, "ms");
         return JSON.stringify(nodes, null, 4);
     }, [inputValue, jsonPath])
@@ -69,35 +72,46 @@ export default function Home() {
         <AppShell
             header={{ height: 55 }}
             navbar={{
-                width: 300,
-                breakpoint: "sm",
+                width: { base: 250, lg: 300 },
+                breakpoint: "md",
                 collapsed: { mobile: !opened },
             }}
             padding="0">
-            <AppShell.Header bg="teal.2">
-                <Group p="xs" c="dark.8" gap={0}>
-                    <Burger
-                        opened={opened}
-                        onClick={toggle}
-                        hiddenFrom="sm"
-                        size="sm"
-                        color="white" />
-                    <IconRoute size={35} stroke={3}/>
-                    <Title order={1} size="25" pl="xs" fw="normal">JSONPath Playground</Title>
-                </Group>
+            <AppShell.Header className={classes.header}>
+                <Flex justify="space-between">
+                    <Group p="xs" c="violet.4" gap={0}>
+                        <Burger
+                            opened={opened}
+                            onClick={toggle}
+                            hiddenFrom="md"
+                            size="sm"
+                            color="violet.4" />
+                        <IconRoute size={33} stroke={2} />
+                        <Title order={1} size="24" pl="xs" fw="600">JSONPath Playground</Title>
+                    </Group>
+                    <Group pr="xs">
+                        <ActionIcon variant="subtle" color="violet" size="lg" aria-label="Set dark color scheme" darkHidden onClick={() => colorScheme.setColorScheme("dark")}>
+                            <IconMoon style={{ width: "70%", height: "70%" }} stroke={1.5} />
+                        </ActionIcon>
+                        <ActionIcon variant="subtle" color="violet" size="lg" aria-label="Set light color scheme" lightHidden onClick={() => colorScheme.setColorScheme("light")}>
+                            <IconSun style={{ width: "70%", height: "70%" }} stroke={1.5} />
+                        </ActionIcon>
+                    </Group>
+                </Flex>
             </AppShell.Header>
 
-            <AppShell.Navbar bg="gray.1">
+            <AppShell.Navbar className={classes.navbar}>
                 <Accordion>
                     <Accordion.Item value="reference">
-                        <Accordion.Control icon={<IconHelp size={20}/>}>
+                        <Accordion.Control icon={<IconHelp size={20} />}>
                             Language Reference
                         </Accordion.Control>
-                        <Accordion.Panel>Content</Accordion.Panel>
+                        <Accordion.Panel>JSONPath defines a string syntax for selecting and extracting JSON
+                            (RFC 8259) values from within a given JSON value.</Accordion.Panel>
                     </Accordion.Item>
 
                     <Accordion.Item value="print">
-                        <Accordion.Control icon={<IconMathFunction size={20}/>}>
+                        <Accordion.Control icon={<IconMathFunction size={20} />}>
                             Custom Functions
                         </Accordion.Control>
                         <Accordion.Panel>Content</Accordion.Panel>
@@ -105,11 +119,12 @@ export default function Home() {
                 </Accordion>
             </AppShell.Navbar>
 
-            <AppShell.Main bg="gray.1" h="100vh">
+            <AppShell.Main className={classes.navbar} h="100vh">
                 <Stack gap={0} h="100%">
                     <JSONPathEditor value={editorValue} onValueChanged={setEditorValue} onParsed={setJsonPath} onDiagnosticsCreated={setDiagnostics} />
-                    <Flex flex="1 1 0">
-                        <Tabs defaultValue="json" flex="1" miw={0} display="flex" style={{flexDirection: "column"}}>
+                    <Divider size="xs" />
+                    <Flex flex="1 1 0" direction={{ sm: "row", base: "column" }}>
+                        <Tabs defaultValue="json" flex="1" miw={0} display="flex" style={{ flexDirection: "column" }}>
                             <Tabs.List>
                                 <Tabs.Tab value="json" leftSection={<IconBraces size={20} />}>
                                     JSON
@@ -126,31 +141,31 @@ export default function Home() {
                             </Tabs.Panel>
                         </Tabs>
                         <Divider size="xs" orientation="vertical" />
-                        <Tabs defaultValue="errors" flex="1" miw={0} display="flex" style={{flexDirection: "column"}}>
+                        <Tabs defaultValue="result" flex="1" miw={0} display="flex" style={{ flexDirection: "column" }}>
                             <Tabs.List>
+                                <Tabs.Tab value="result" leftSection={<IconEqual size={20} />}>
+                                    Result
+                                </Tabs.Tab>
+                                <Tabs.Tab value="paths" leftSection={<IconRouteSquare size={20} />}>
+                                    Paths
+                                </Tabs.Tab>
                                 <Tabs.Tab value="errors" leftSection={<IconExclamationCircle size={20} />}>
                                     Errors
                                 </Tabs.Tab>
                                 <Tabs.Tab value="outline" leftSection={<IconListTree size={20} />}>
                                     Outline
                                 </Tabs.Tab>
-                                <Tabs.Tab value="values" leftSection={<IconEqual size={20} />}>
-                                    Values
-                                </Tabs.Tab>
-                                <Tabs.Tab value="paths" leftSection={<IconRouteSquare size={20} />}>
-                                    Paths
-                                </Tabs.Tab>
                             </Tabs.List>
-                            <Tabs.Panel value="errors" flex="1 1 0">
-                                <DiagnosticsView diagnostics={diagnostics}/>
-                            </Tabs.Panel>
-                            <Tabs.Panel value="outline">
-                                Messages tab content
-                            </Tabs.Panel>
-                            <Tabs.Panel value="values" flex="1 1 0" mih={0}>
-                                <JSONEditor value={result} onValueChanged={() => {}} />
+                            <Tabs.Panel value="result" flex="1 1 0" mih={0}>
+                                <JSONEditor value={result} onValueChanged={() => { }} />
                             </Tabs.Panel>
                             <Tabs.Panel value="paths">
+                                Messages tab content
+                            </Tabs.Panel>
+                            <Tabs.Panel value="errors" flex="1 1 0">
+                                <DiagnosticsView diagnostics={diagnostics} />
+                            </Tabs.Panel>
+                            <Tabs.Panel value="outline">
                                 Messages tab content
                             </Tabs.Panel>
                         </Tabs>

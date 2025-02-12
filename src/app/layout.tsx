@@ -1,7 +1,16 @@
 import type { Metadata } from "next";
-import "./globals.css";
 import '@mantine/core/styles.css';
-import { ColorSchemeScript, MantineProvider, createTheme, mantineHtmlProps, useMantineTheme } from '@mantine/core';
+import "./globals.css";
+import { Accordion, ColorSchemeScript, MantineProvider, createTheme, mantineHtmlProps, useMantineTheme } from '@mantine/core';
+import localFont from 'next/font/local';
+
+export const cascadiaMonoFont = localFont({
+  src: [
+    {
+      path: './CascadiaMono.woff2'
+    }
+  ],
+});
 
 export const metadata: Metadata = {
     title: "JSONPath Playground",
@@ -9,8 +18,9 @@ export const metadata: Metadata = {
 };
 
 const theme = createTheme({
-    fontFamily: 'Segoe UI',
-    primaryColor: "teal"
+    fontFamily: "Segoe UI",
+    fontFamilyMonospace: cascadiaMonoFont.style.fontFamily,
+    primaryColor: "violet"
   });
 
 export default function RootLayout({
@@ -24,7 +34,7 @@ export default function RootLayout({
                 <ColorSchemeScript />
             </head>
             <body>
-                <MantineProvider theme={theme} defaultColorScheme="light">{children}</MantineProvider>
+                <MantineProvider theme={theme} defaultColorScheme="auto">{children}</MantineProvider>
             </body>
         </html>
     );
