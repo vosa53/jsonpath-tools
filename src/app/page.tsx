@@ -1,17 +1,17 @@
 "use client"
 
-import JSONPathEditor from "./jsonpath-editor";
-import { Accordion, ActionIcon, AppShell, Box, Burger, Divider, Flex, Grid, Group, Stack, Tabs, Title, useMantineColorScheme } from '@mantine/core';
+import { Accordion, ActionIcon, AppShell, Burger, Divider, Flex, Group, Stack, Tabs, Title, useMantineColorScheme } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconAdjustments, IconBraces, IconEqual, IconExclamationCircle, IconFunction, IconHelp, IconListTree, IconMathFunction, IconMoon, IconRoute, IconRoute2, IconRouteAltLeft, IconRouteSquare, IconSun } from '@tabler/icons-react';
-import JSONEditor from "./json-editor";
+import { IconBraces, IconEqual, IconExclamationCircle, IconHelp, IconListTree, IconMathFunction, IconMoon, IconRoute, IconRouteSquare, IconSun } from '@tabler/icons-react';
 import { useMemo, useState } from "react";
-import { JSONPath, JSONPathQueryContext } from "./parser/syntax-tree";
-import { Diagnostics } from "next/dist/build/swc/types";
-import { JSONPathDiagnostics } from "./parser/diagnostics";
+import { JSONPathDiagnostics } from "../jsonpath-tools/diagnostics";
+import { defaultJSONPathOptions } from "../jsonpath-tools/options";
+import { JSONPathQueryContext } from "@/jsonpath-tools/query/evaluation";
+import { JSONPath } from "@/jsonpath-tools/query/json-path";
 import DiagnosticsView from "./components/diagnostics-view";
-import { defaultJSONPathOptions, JSONPathOptions, JSONPathType } from "./parser/options";
-import classes from "./page.module.css";
+import JSONEditor from "./components/json-editor";
+import JSONPathEditor from "./components/jsonpath-editor";
+import classes from "./styles/page.module.css";
 
 export const testJson = `{
     "store": {

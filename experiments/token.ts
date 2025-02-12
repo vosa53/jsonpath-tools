@@ -1,4 +1,4 @@
-import { TextPosition } from "../src/app/parser/text-range";
+import { TextPosition } from "../src/jsonpath-tools/text-range";
 import { TokenType } from "./token-type";
 
 export class Token {
