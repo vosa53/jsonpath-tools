@@ -1,10 +1,10 @@
 import { JSONPathDiagnostics } from "../diagnostics";
 import { JSONPathNodeList } from "../types";
+import { JSONPathQueryContext } from "./evaluation";
 import { JSONPathNode } from "./node";
+import { JSONPathQuery } from "./query";
 import { JSONPathSyntaxTreeType } from "./syntax-tree-type";
 import { JSONPathToken } from "./token";
-import { JSONPathQuery } from "./query";
-import { JSONPathQueryContext } from "./evaluation";
 
 
 export class JSONPath extends JSONPathNode {

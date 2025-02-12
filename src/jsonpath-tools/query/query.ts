@@ -1,12 +1,11 @@
-import { JSONPathNodeList, JSONPathJSONValue } from "../types";
+import { JSONPathJSONValue, JSONPathNodeList } from "../types";
+import { JSONPathFilterExpressionContext, JSONPathQueryContext } from "./evaluation";
 import { JSONPathNode } from "./node";
-import { JSONPathSyntaxTreeType } from "./syntax-tree-type";
-import { JSONPathToken } from "./token";
-import { JSONPathFilterExpressionContext } from "./evaluation";
-import { JSONPathQueryContext } from "./evaluation";
+import { JSONPathSegment } from "./segment";
 import { JSONPathIndexSelector } from "./selectors/index-selector";
 import { JSONPathNameSelector } from "./selectors/name-selector";
-import { JSONPathSegment } from "./segment";
+import { JSONPathSyntaxTreeType } from "./syntax-tree-type";
+import { JSONPathToken } from "./token";
 
 
 export class JSONPathQuery extends JSONPathNode {

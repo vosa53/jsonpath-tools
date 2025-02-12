@@ -1,6 +1,6 @@
-import { KeyBinding } from "@codemirror/view";
-import { indentMore, indentLess } from "@codemirror/commands";
 import { acceptCompletion } from "@codemirror/autocomplete";
+import { indentLess, indentMore } from "@codemirror/commands";
+import { KeyBinding } from "@codemirror/view";
 
 export const tabKeymap: readonly KeyBinding[] = [
     {

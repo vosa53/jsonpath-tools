@@ -1,10 +1,9 @@
 import { defaultJSONPathOptions } from "../options";
 import { JSONPathQueryContext } from "../query/evaluation";
-import { JSONPathSegment } from "../query/segment";
 import { JSONPath } from "../query/json-path";
-import { JSONPathSyntaxTree } from "../query/syntax-tree";
+import { JSONPathSegment } from "../query/segment";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
-import { JSONPathJSONValue, JSONPathValueType } from "../types";
+import { JSONPathJSONValue } from "../types";
 
 export class CompletionProvider {
     static provideCompletions(jsonPath: JSONPath, position: number, value: JSONPathJSONValue): CompletionItem[] {

@@ -1,9 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { JSONPathParser } from './parser';
-import { JSONPathToken } from "../query/token";
-import { JSONPathNode } from "../query/node";
-import { JSONPathSyntaxTree } from "../query/syntax-tree";
+import { describe, expect, it } from 'vitest';
 import { createSyntaxTree } from '../utils';
+import { JSONPathParser } from './parser';
 
 describe("parser", () => {
     it("should parse", () => {

@@ -1,9 +1,9 @@
+import { defaultJSONPathOptions } from "@/jsonpath-tools/options";
+import { TypeChecker } from "@/jsonpath-tools/semantic-analysis/type-checker";
 import { syntaxTree } from "@codemirror/language";
 import { LintSource } from "@codemirror/lint";
 import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "../../../../jsonpath-tools/diagnostics";
 import { getJSONPath } from "./jsonpath-language";
-import { TypeChecker } from "@/jsonpath-tools/semantic-analysis/type-checker";
-import { defaultJSONPathOptions, JSONPathOptions, JSONPathType } from "@/jsonpath-tools/options";
 
 export function jsonPathLintSource(options: { onDiagnosticsCreated?: (diagnostics: readonly JSONPathDiagnostics[]) => void } = {}): LintSource {
     return view => {

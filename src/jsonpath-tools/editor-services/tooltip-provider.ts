@@ -1,5 +1,4 @@
 import { JSONPath } from "../query/json-path";
-import { JSONPathToken } from "../query/token";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
 import { TextRange } from "../text-range";
 

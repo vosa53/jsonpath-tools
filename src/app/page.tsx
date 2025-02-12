@@ -1,13 +1,13 @@
 "use client"
 
+import { JSONPathQueryContext } from "@/jsonpath-tools/query/evaluation";
+import { JSONPath } from "@/jsonpath-tools/query/json-path";
 import { Accordion, ActionIcon, AppShell, Burger, Divider, Flex, Group, Stack, Tabs, Title, useMantineColorScheme } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconBraces, IconEqual, IconExclamationCircle, IconHelp, IconListTree, IconMathFunction, IconMoon, IconRoute, IconRouteSquare, IconSun } from '@tabler/icons-react';
 import { useMemo, useState } from "react";
 import { JSONPathDiagnostics } from "../jsonpath-tools/diagnostics";
 import { defaultJSONPathOptions } from "../jsonpath-tools/options";
-import { JSONPathQueryContext } from "@/jsonpath-tools/query/evaluation";
-import { JSONPath } from "@/jsonpath-tools/query/json-path";
 import DiagnosticsView from "./components/diagnostics-view";
 import JSONEditor from "./components/json-editor";
 import JSONPathEditor from "./components/jsonpath-editor";

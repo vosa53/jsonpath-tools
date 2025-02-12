@@ -1,10 +1,9 @@
-import { JSONPathFilterValue, JSONPathLogicalTrue, JSONPathLogicalFalse, JSONPathValueType, JSONPathNothing } from "../../types";
-import { JSONPathFilterExpression } from "./filter-expression";
+import { JSONPathFilterValue, JSONPathLogicalFalse, JSONPathLogicalTrue, JSONPathNothing, JSONPathValueType } from "../../types";
+import { JSONPathFilterExpressionContext, JSONPathQueryContext } from "../evaluation";
+import { evaluateAsValueType } from "../helpers";
 import { JSONPathSyntaxTreeType } from "../syntax-tree-type";
 import { JSONPathToken } from "../token";
-import { evaluateAsValueType } from "../helpers";
-import { JSONPathFilterExpressionContext } from "../evaluation";
-import { JSONPathQueryContext } from "../evaluation";
+import { JSONPathFilterExpression } from "./filter-expression";
 
 
 export class JSONPathComparisonExpression extends JSONPathFilterExpression {

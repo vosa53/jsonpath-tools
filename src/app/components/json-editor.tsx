@@ -1,7 +1,6 @@
-import { json, jsonLanguage, jsonParseLinter } from "@codemirror/lang-json";
-import CodeMirrorEditor from "./codemirror/codemirror-editor";
-import { useState } from "react";
+import { json, jsonParseLinter } from "@codemirror/lang-json";
 import { linter } from "@codemirror/lint";
+import CodeMirrorEditor from "./codemirror/codemirror-editor";
 
 export default function JSONEditor({value, onValueChanged}: { value: string, onValueChanged: (value: string) => void }) {
     const onEditorExtensionsRequested = () => {

@@ -1,10 +1,9 @@
 import { JSONPathJSONValue } from "../types";
+import { JSONPathQueryContext, PushOnlyArray } from "./evaluation";
 import { JSONPathNode } from "./node";
+import { JSONPathSelector } from "./selectors/selector";
 import { JSONPathSyntaxTreeType } from "./syntax-tree-type";
 import { JSONPathToken } from "./token";
-import { PushOnlyArray } from "./evaluation";
-import { JSONPathQueryContext } from "./evaluation";
-import { JSONPathSelector } from "./selectors/selector";
 
 
 export class JSONPathSegment extends JSONPathNode {

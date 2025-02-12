@@ -1,5 +1,4 @@
-import { JSONPath } from "./query/json-path";
-import { isNodesType, isValueType, JSONPathFilterValue, JSONPathLogicalFalse, JSONPathLogicalTrue, JSONPathNodesType, JSONPathNothing, JSONPathValueType } from "./types";
+import { isNodesType, isValueType, JSONPathFilterValue, JSONPathLogicalFalse, JSONPathLogicalTrue, JSONPathNothing } from "./types";
 
 export interface JSONPathOptions {
     readonly functions: { [name: string]: JSONPathFunction };

@@ -1,8 +1,8 @@
-import { syntaxTree } from "@codemirror/language";
-import { CompletionContext, CompletionResult } from "@codemirror/autocomplete"
-import { getJSONPath } from "./jsonpath-language";
-import { CompletionProvider } from "@/jsonpath-tools/editor-services/completion-provider";
 import { testJson } from "@/app/page";
+import { CompletionProvider } from "@/jsonpath-tools/editor-services/completion-provider";
+import { CompletionContext, CompletionResult } from "@codemirror/autocomplete";
+import { syntaxTree } from "@codemirror/language";
+import { getJSONPath } from "./jsonpath-language";
 
 export function jsonPathCompletionSource(context: CompletionContext): CompletionResult | null {
     const jsonPath = getJSONPath(syntaxTree(context.state));

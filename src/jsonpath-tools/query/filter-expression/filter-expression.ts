@@ -1,7 +1,6 @@
 import { JSONPathFilterValue } from "../../types";
+import { JSONPathFilterExpressionContext, JSONPathQueryContext } from "../evaluation";
 import { JSONPathNode } from "../node";
-import { JSONPathFilterExpressionContext } from "../evaluation";
-import { JSONPathQueryContext } from "../evaluation";
 
 
 export abstract class JSONPathFilterExpression extends JSONPathNode {

@@ -1,29 +1,28 @@
-import { Diagnostics } from "next/dist/build/swc/types";
-import { JSONPathNullLiteral } from "../query/filter-expression/null-literal";
-import { JSONPathBooleanLiteral } from "../query/filter-expression/boolean-literal";
-import { JSONPathStringLiteral } from "../query/filter-expression/string-literal";
-import { JSONPathNumberLiteral } from "../query/filter-expression/number-literal";
-import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
-import { JSONPathFilterQueryExpression } from "../query/filter-expression/filter-query-expression";
-import { JSONPathComparisonExpression } from "../query/filter-expression/comparison-expression";
-import { JSONPathParanthesisExpression } from "../query/filter-expression/paranthesis-expression";
-import { JSONPathNotExpression } from "../query/filter-expression/not-expression";
+import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "../diagnostics";
 import { JSONPathAndExpression } from "../query/filter-expression/and-expression";
-import { JSONPathOrExpression } from "../query/filter-expression/or-expression";
+import { JSONPathBooleanLiteral } from "../query/filter-expression/boolean-literal";
+import { JSONPathComparisonExpression } from "../query/filter-expression/comparison-expression";
 import { JSONPathFilterExpression } from "../query/filter-expression/filter-expression";
+import { JSONPathFilterQueryExpression } from "../query/filter-expression/filter-query-expression";
+import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
+import { JSONPathNotExpression } from "../query/filter-expression/not-expression";
+import { JSONPathNullLiteral } from "../query/filter-expression/null-literal";
+import { JSONPathNumberLiteral } from "../query/filter-expression/number-literal";
+import { JSONPathOrExpression } from "../query/filter-expression/or-expression";
+import { JSONPathParanthesisExpression } from "../query/filter-expression/paranthesis-expression";
+import { JSONPathStringLiteral } from "../query/filter-expression/string-literal";
+import { JSONPath } from "../query/json-path";
+import { JSONPathQuery } from "../query/query";
+import { JSONPathSegment } from "../query/segment";
 import { JSONPathFilterSelector } from "../query/selectors/filter-selector";
 import { JSONPathIndexSelector } from "../query/selectors/index-selector";
-import { JSONPathSliceSelector } from "../query/selectors/slice-selector";
-import { JSONPathWildcardSelector } from "../query/selectors/wildcard-selector";
 import { JSONPathNameSelector } from "../query/selectors/name-selector";
 import { JSONPathSelector } from "../query/selectors/selector";
-import { JSONPathSegment } from "../query/segment";
-import { JSONPathQuery } from "../query/query";
-import { JSONPath } from "../query/json-path";
-import { JSONPathToken } from "../query/token";
+import { JSONPathSliceSelector } from "../query/selectors/slice-selector";
+import { JSONPathWildcardSelector } from "../query/selectors/wildcard-selector";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
+import { JSONPathToken } from "../query/token";
 import { TextRange } from "../text-range";
-import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "../diagnostics";
 
 export class JSONPathParser {
     parse(input: string): JSONPath {

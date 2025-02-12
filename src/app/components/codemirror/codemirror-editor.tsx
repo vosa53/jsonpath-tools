@@ -1,11 +1,11 @@
-import { basicSetup, EditorView } from "codemirror";
-import { Extension } from "@codemirror/state";
-import { CSSProperties, useEffect, useRef, useState } from "react";
-import { HighlightStyle, indentUnit, syntaxHighlighting } from "@codemirror/language";
-import { tags as t } from "@lezer/highlight";
-import { tabKeymap } from "./tab-keymap";
-import { keymap } from "@codemirror/view";
 import { defaultKeymap } from "@codemirror/commands";
+import { HighlightStyle, indentUnit, syntaxHighlighting } from "@codemirror/language";
+import { Extension } from "@codemirror/state";
+import { keymap } from "@codemirror/view";
+import { tags as t } from "@lezer/highlight";
+import { basicSetup, EditorView } from "codemirror";
+import { CSSProperties, useEffect, useRef, useState } from "react";
+import { tabKeymap } from "./tab-keymap";
 
 const highlightStyle = HighlightStyle.define([
     { tag: t.keyword, color: "var(--mantine-color-blue-text)" },

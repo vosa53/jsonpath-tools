@@ -1,8 +1,7 @@
 import { JSONPathType } from "../options";
 import { isLogicalType, isNodesType, isValueType, JSONPathFilterValue, JSONPathLogicalFalse, JSONPathLogicalTrue, JSONPathLogicalType, JSONPathNodeList, JSONPathNodesType, JSONPathNothing, JSONPathValueType } from "../types";
+import { JSONPathFilterExpressionContext, JSONPathQueryContext } from "./evaluation";
 import { JSONPathFilterExpression } from "./filter-expression/filter-expression";
-import { JSONPathQueryContext } from "./evaluation";
-import { JSONPathFilterExpressionContext } from "./evaluation";
 
 export function evaluateAsLogicalType(expression: JSONPathFilterExpression | null, queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathLogicalType {
     const value = expression?.evaluate(queryContext, filterExpressionContext);

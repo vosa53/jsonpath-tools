@@ -1,4 +1,3 @@
-
 export enum JSONPathSyntaxTreeType {
     dollarToken = "DollarToken",
     atToken = "AtToken",

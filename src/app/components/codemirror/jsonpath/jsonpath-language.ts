@@ -1,11 +1,11 @@
-import { defineLanguageFacet, Language, languageDataProp } from "@codemirror/language";
-import { Input, NodeProp, NodeSet, NodeType, Parser, PartialParse, Tree, TreeFragment } from "@lezer/common";
-import { styleTags, tags as t } from "@lezer/highlight";
 import { JSONPath } from "@/jsonpath-tools/query/json-path";
-import { JSONPathToken } from "@/jsonpath-tools/query/token";
 import { JSONPathNode } from "@/jsonpath-tools/query/node";
 import { JSONPathSyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "@/jsonpath-tools/query/syntax-tree-type";
+import { JSONPathToken } from "@/jsonpath-tools/query/token";
+import { defineLanguageFacet, Language, languageDataProp } from "@codemirror/language";
+import { Input, NodeProp, NodeSet, NodeType, Parser, PartialParse, Tree, TreeFragment } from "@lezer/common";
+import { styleTags, tags as t } from "@lezer/highlight";
 import { JSONPathParser } from "../../../../jsonpath-tools/syntax-analysis/parser";
 import { jsonPathCompletionSource } from "./jsonpath-completion-source";
 

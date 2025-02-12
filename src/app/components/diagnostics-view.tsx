@@ -1,6 +1,6 @@
 import { List, ThemeIcon } from "@mantine/core";
+import { IconExclamationCircle } from "@tabler/icons-react";
 import { JSONPathDiagnostics } from "../../jsonpath-tools/diagnostics";
-import { IconError404, IconExclamationCircle } from "@tabler/icons-react";
 
 export default function DiagnosticsView({ diagnostics }: { diagnostics: readonly JSONPathDiagnostics[] }) {
     return (

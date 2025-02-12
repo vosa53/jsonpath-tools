@@ -1,6 +1,6 @@
-import { JSONPathToken } from "./query/token";
 import { JSONPathNode } from "./query/node";
 import { JSONPathSyntaxTree } from "./query/syntax-tree";
+import { JSONPathToken } from "./query/token";
 
 export function createSyntaxTree(syntaxTree: JSONPathSyntaxTree, colored = false, indentationLevel = 0): string {
     let text = ' '.repeat(indentationLevel * 4);

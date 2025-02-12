@@ -1,8 +1,8 @@
+import { TooltipProvider } from "@/jsonpath-tools/editor-services/tooltip-provider";
 import { syntaxTree } from "@codemirror/language";
 import { Decoration, hoverTooltip } from "@codemirror/view";
 import { EditorView } from "codemirror";
 import { getJSONPath } from "./jsonpath-language";
-import { TooltipProvider } from "@/jsonpath-tools/editor-services/tooltip-provider";
 
 const hoveredRangeDecoration = Decoration.mark({ class: "cm-hovered-range" });
 

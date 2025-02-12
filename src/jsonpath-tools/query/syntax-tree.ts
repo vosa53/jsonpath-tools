@@ -1,7 +1,6 @@
 import { TextRange } from "../text-range";
-import { JSONPathSyntaxTreeType } from "./syntax-tree-type";
 import { JSONPathNode } from "./node";
-
+import { JSONPathSyntaxTreeType } from "./syntax-tree-type";
 
 export abstract class JSONPathSyntaxTree {
     constructor(
@@ -22,7 +21,8 @@ export abstract class JSONPathSyntaxTree {
             return [];
 
         const path: JSONPathSyntaxTree[] = [this];
-        while (path[path.length - 1] instanceof JSONPathNode) {
+        // @ts-ignore
+        while (path[path.length - 1].children !== undefined) {
             const currentNode = path[path.length - 1] as JSONPathNode;
             for (const child of currentNode.children) {
                 if (child.position + child.length > position) {

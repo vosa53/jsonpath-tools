@@ -1,9 +1,8 @@
 import { JSONPathFilterValue } from "../../types";
-import { JSONPathFilterExpression } from "./filter-expression";
+import { JSONPathFilterExpressionContext, JSONPathQueryContext } from "../evaluation";
 import { JSONPathSyntaxTreeType } from "../syntax-tree-type";
 import { JSONPathToken } from "../token";
-import { JSONPathFilterExpressionContext } from "../evaluation";
-import { JSONPathQueryContext } from "../evaluation";
+import { JSONPathFilterExpression } from "./filter-expression";
 
 
 export class JSONPathNumberLiteral extends JSONPathFilterExpression {
