@@ -9,9 +9,10 @@ const unicodeCategories = new Map<string, Set<string>>([
 ]);
 
 export class IRegexpParser {
-    parse(iregexp: string): boolean {
+    parse(iregexp: string): { isSuccess: boolean, dotIndices: number[] } {
         const context = new ParserContext(iregexp);
-        return this.parseIRegexp(context);
+        const isSuccess = this.parseIRegexp(context);
+        return { isSuccess, dotIndices: context.dotIndices };
     }
 
     parseIRegexp(context: ParserContext): boolean {
@@ -120,6 +121,7 @@ export class IRegexpParser {
     }
 
     parseDot(context: ParserContext): boolean {
+        context.addDotIndex();
         context.goNext();
         return true;
     }
@@ -237,6 +239,7 @@ export class IRegexpParser {
 
 class ParserContext {
     private _currentIndex = 0;
+    private _dotIndices: number[] = [];
 
     constructor(readonly input: string) {
 
@@ -258,7 +261,15 @@ class ParserContext {
             : null;
     }
 
+    get dotIndices(): number[] {
+        return this._dotIndices;
+    }
+
     goNext() {
         this._currentIndex++;
+    }
+
+    addDotIndex() {
+        this._dotIndices.push(this._currentIndex);
     }
 }
