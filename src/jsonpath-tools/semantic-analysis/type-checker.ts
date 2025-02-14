@@ -14,7 +14,10 @@ import { JSONPathParanthesisExpression } from "../query/filter-expression/parant
 import { JSONPathStringLiteral } from "../query/filter-expression/string-literal";
 import { JSONPath } from "../query/json-path";
 import { JSONPathNode } from "../query/node";
+import { JSONPathIndexSelector } from "../query/selectors/index-selector";
+import { JSONPathSliceSelector } from "../query/selectors/slice-selector";
 import { JSONPathSyntaxTree } from "../query/syntax-tree";
+import { JSONPathToken } from "../query/token";
 import { TextRange } from "../text-range";
 
 export class TypeChecker {
@@ -43,6 +46,13 @@ export class TypeChecker {
                     if (arg != null) this.checkType(arg, parameterType, context);
                 }
             }
+        }
+        if (tree instanceof JSONPathIndexSelector)
+            this.checkIntegerRange(tree.index, tree.indexToken, context);
+        if (tree instanceof JSONPathSliceSelector) {
+            if (tree.start !== null && tree.startToken !== null) this.checkIntegerRange(tree.start, tree.startToken, context);
+            if (tree.end !== null && tree.endToken !== null) this.checkIntegerRange(tree.end, tree.endToken, context);
+            if (tree.step !== null && tree.stepToken !== null) this.checkIntegerRange(tree.step, tree.stepToken, context);
         }
 
         for (const child of tree.children) {
@@ -83,6 +93,11 @@ export class TypeChecker {
     private isAssignableTo(typeFrom: JSONPathType, typeTo: JSONPathType) {
         return typeFrom === typeTo || 
             typeFrom === JSONPathType.nodesType && typeTo === JSONPathType.logicalType; // Implicit conversion.
+    }
+
+    private checkIntegerRange(number: number, numberToken: JSONPathToken, context: TypeCheckerContext) {
+        if (!Number.isSafeInteger(number))
+            context.addError("Integer has to be within interval [-(2^53)+1, (2^53)-1].", numberToken.textRange);
     }
 }
 

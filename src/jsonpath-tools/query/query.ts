@@ -22,7 +22,7 @@ export class JSONPathQuery extends JSONPathNode {
 
     get isSingular() {
         // TODO: Disallow spaces 
-        return this.segments.every(s => s.selectors.length === 1 && (s.selectors[0].selector instanceof JSONPathNameSelector || s.selectors[0].selector instanceof JSONPathIndexSelector));
+        return this.segments.every(s => !s.isRecursive && s.selectors.length === 1 && (s.selectors[0].selector instanceof JSONPathNameSelector || s.selectors[0].selector instanceof JSONPathIndexSelector));
     }
 
     select(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext | null): JSONPathNodeList {

@@ -164,6 +164,8 @@ export class IRegexpParser {
 
         // @ts-ignore
         if (context.current !== "}") return false;
+        context.goNext();
+        
         if (!unicodeCategories.has(first)) return false;
         if (second !== null && !unicodeCategories.get(first)!.has(second)) return false;
         return true;

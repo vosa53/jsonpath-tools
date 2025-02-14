@@ -30,6 +30,7 @@ export class JSONPathParser {
         const query = this.parseQuery(context, false);
         const endOfFileToken = context.collectToken(JSONPathSyntaxTreeType.endOfFileToken);
 
+        if (endOfFileToken.skippedTextBefore.length !== 0) context.addError("Whitespace is not allowed here", endOfFileToken.textRange);
         return new JSONPath(query, endOfFileToken, context.diagnostics);
     }
 
@@ -54,15 +55,13 @@ export class JSONPathParser {
             // If not global, look whether it is . or [.
             if (allowedRelative && context.current !== "." && context.current !== "[")
                 break;
-            while (context.current !== "." && context.current !== "[" && !this.isNameFirstCharacter(context.current) && context.current !== null) 
-                context.skip();
+            context.skipWhile(c => c !== "." && c !== "[" && !this.isNameFirstCharacter(c), "Invalid characters.");
             if (context.current !== null) {
                 const segment = this.parseSegment(context);
                 segments.push(segment);
             }
         }
 
-        // TODO: Disallow space.
         return new JSONPathQuery(identifier, segments, isRelative);
     }
 
@@ -132,8 +131,7 @@ export class JSONPathParser {
     }
 
     private skipToSelector(context: ParserContext) {
-        while (context.current !== null && context.current !== "[" && context.current !== "." && context.current !== "]" && context.current !== ",")
-            context.skip();
+        context.skipWhile(c => c !== "[" && c !== "." && c !== "]" && c !== ",", "Invalid characters");
     }
 
     private parseSelector(context: ParserContext): JSONPathSelector | null {
@@ -174,11 +172,13 @@ export class JSONPathParser {
             context.goNext();
             firstColonToken = context.collectToken(JSONPathSyntaxTreeType.colonToken);
         }
-        else 
+        else {
+            if (indexOrStart !== null) this.checkIsInteger(indexOrStart.token, context);
             return new JSONPathIndexSelector(indexOrStart!.token, indexOrStart!.value);
+        }
         this.skipWhitespace(context);
         // @ts-ignore
-        const end = context.current !== null && (this.isDigit(context.current) || context.current === "-") ? this.parseNumber(context) : null;
+        const end = this.isDigit(context.current) || context.current === "-" ? this.parseNumber(context) : null;
         this.skipWhitespace(context);
         let secondColonToken: JSONPathToken | null = null;
         let step: { token: JSONPathToken, value: number } | null = null;
@@ -186,7 +186,8 @@ export class JSONPathParser {
             context.goNext();
             secondColonToken = context.collectToken(JSONPathSyntaxTreeType.colonToken);
             this.skipWhitespace(context);
-            step = this.parseNumber(context);
+            // @ts-ignore
+            step = this.isDigit(context.current) || context.current === "-" ? this.parseNumber(context) : null
         }
 
         if (indexOrStart !== null) this.checkIsInteger(indexOrStart.token, context);
@@ -357,7 +358,7 @@ export class JSONPathParser {
 
     private parseFunctionOrLiteral(context: ParserContext): JSONPathFilterExpression {
         const name = this.parseName(context);
-        this.skipWhitespace(context);
+        this.skipWhitespace(context, false);
 
         let openingParanthesisToken: JSONPathToken | null = null;
         let args: { arg: JSONPathFilterExpression | null, commaToken: JSONPathToken | null }[] = [];
@@ -443,8 +444,10 @@ export class JSONPathParser {
                 else
                     context.addError("Invalid escape sequence.");
             }
-            else
+            else if (this.isStringCharacter(context.current))
                 value += context.current;
+            else
+                context.addError("Invalid character in string.");
             context.goNext();
         }
         const hasClosingQuote = context.current === quote;
@@ -457,11 +460,6 @@ export class JSONPathParser {
     }
 
     private parseNumber(context: ParserContext): { token: JSONPathToken, value: number } {
-        if (context.current === "0") {
-            context.goNext();
-            return { token: context.collectToken(JSONPathSyntaxTreeType.numberToken), value: 0};
-        }
-
         if (context.current === "-")
             context.goNext();
 
@@ -469,8 +467,9 @@ export class JSONPathParser {
             context.addError("Expected a digit.");
             return { token: context.collectToken(JSONPathSyntaxTreeType.numberToken), value: 0 };
         }
-        if (context.current === "0")
+        if (context.current === "0" && this.isDigit(context.next))
             context.addError("Leading zeros are not allowed.");
+
         while (this.isDigit(context.current))
             context.goNext();
 
@@ -483,6 +482,7 @@ export class JSONPathParser {
             else
                 context.addError("Expected a digit.");
         }
+
         if (context.current === "e" || context.current === "E") {
             context.goNext();
             // @ts-ignore
@@ -497,16 +497,12 @@ export class JSONPathParser {
         }
 
         const token = context.collectToken(JSONPathSyntaxTreeType.numberToken);
-        const value = parseInt(token.text);
+        const value = parseFloat(token.text);
         return { token, value };
     }
 
     private skipWhitespace(context: ParserContext, allowed = true) {
-        const startPosition = context.currentIndex;
-        while (this.isBlank(context.current))
-            context.skip();
-        if (!allowed && context.currentIndex !== startPosition)
-            context.addError("Whitespace is not allowed here.", new TextRange(startPosition, context.currentIndex - startPosition));
+        context.skipWhile(c => this.isBlank(c), allowed ? null : "Whitespace is not allowed here.");
     }
 
     private isBlank(character: string | null) {
@@ -544,6 +540,10 @@ export class JSONPathParser {
         return this.isFunctionNameFirstCharacter(character)  || character === "_" || this.isDigit(character);
     }
 
+    private isStringCharacter(character: string | null) {
+        return character !== null && character !== "\\" && character >= "\u0020";
+    }
+
     private changeTokenType(token: JSONPathToken, newType: JSONPathSyntaxTreeType): JSONPathToken {
         return new JSONPathToken(newType, token.position, token.text, token.skippedTextBefore);
     }
@@ -566,6 +566,8 @@ export class JSONPathParser {
     }
 
     private checkIsInteger(numberToken: JSONPathToken, context: ParserContext) {
+        if (numberToken.text === "-0")
+            context.addError("Negative zero is not allowed"), numberToken.textRange;
         if (numberToken.text.includes("."))
             context.addError("Only integers are allowed here.", numberToken.textRange);
         if (numberToken.text.includes("e") || numberToken.text.includes("E"))
@@ -615,6 +617,14 @@ class ParserContext {
             throw new Error("Cannot skip when collecting.");
         this._skippedCount++;
         this._currentIndex++;
+    }
+
+    skipWhile(predicate: (character: string) => boolean, errorMessage: string | null) {
+        const startPosition = this.currentIndex;
+        while (this.current !== null && predicate(this.current))
+            this.skip();
+        if (errorMessage !== null && this.currentIndex !== startPosition)
+            this.addError(errorMessage, new TextRange(startPosition, this.currentIndex - startPosition));
     }
 
     goNext() {
