@@ -1,3 +1,4 @@
+import { IRegexp } from "./syntax-analysis/iregexp";
 import { isNodesType, isValueType, JSONPathFilterValue, JSONPathLogicalFalse, JSONPathLogicalTrue, JSONPathNothing } from "./types";
 
 export interface JSONPathOptions {
@@ -43,9 +44,15 @@ export const defaultJSONPathOptions: JSONPathOptions = {
             handler: (text: JSONPathFilterValue, pattern: JSONPathFilterValue) => {
                 if (!isValueType(text)) throw new Error();
                 if (!isValueType(pattern)) throw new Error();
-                if (typeof text !== "string" || typeof pattern !== "string" || !isRFC9485Regex(pattern)) return JSONPathLogicalFalse;
+                if (typeof text !== "string" || typeof pattern !== "string") return JSONPathLogicalFalse;
 
-                return new RegExp(pattern).test(text) ? JSONPathLogicalTrue : JSONPathLogicalFalse
+                try {
+                    const regex = IRegexp.convertToECMAScriptRegExp(pattern, true);
+                    return regex.test(text) ? JSONPathLogicalTrue : JSONPathLogicalFalse;
+                }
+                catch {
+                    return JSONPathLogicalFalse;
+                }
             },
             parameterTypes: [JSONPathType.valueType, JSONPathType.valueType],
             returnType: JSONPathType.logicalType
@@ -54,9 +61,15 @@ export const defaultJSONPathOptions: JSONPathOptions = {
             handler: (text: JSONPathFilterValue, pattern: JSONPathFilterValue) => {
                 if (!isValueType(text)) throw new Error();
                 if (!isValueType(pattern)) throw new Error();
-                if (typeof text !== "string" || typeof pattern !== "string" || !isRFC9485Regex(pattern)) return JSONPathLogicalFalse;
+                if (typeof text !== "string" || typeof pattern !== "string") return JSONPathLogicalFalse;
 
-                return new RegExp(pattern).test(text) ? JSONPathLogicalTrue : JSONPathLogicalFalse
+                try {
+                    const regex = IRegexp.convertToECMAScriptRegExp(pattern, false);
+                    return regex.test(text) ? JSONPathLogicalTrue : JSONPathLogicalFalse;
+                }
+                catch {
+                    return JSONPathLogicalFalse;
+                }
             },
             parameterTypes: [JSONPathType.valueType, JSONPathType.valueType],
             returnType: JSONPathType.logicalType
@@ -73,8 +86,3 @@ export const defaultJSONPathOptions: JSONPathOptions = {
         }
     }
 };
-
-function isRFC9485Regex(pattern: string): boolean {
-    // TODO: Implement RFC 9485 regex validation.
-    return true;
-}

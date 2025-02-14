@@ -2,7 +2,7 @@
 
 import { JSONPathQueryContext } from "@/jsonpath-tools/query/evaluation";
 import { JSONPath } from "@/jsonpath-tools/query/json-path";
-import { Accordion, ActionIcon, AppShell, Burger, Divider, Flex, Group, Stack, Tabs, Title, useMantineColorScheme } from '@mantine/core';
+import { Accordion, ActionIcon, AppShell, Burger, Divider, Flex, Group, Indicator, Stack, Tabs, Title, useMantineColorScheme } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconBraces, IconEqual, IconExclamationCircle, IconHelp, IconListTree, IconMathFunction, IconMoon, IconRoute, IconRouteSquare, IconSun } from '@tabler/icons-react';
 import { useMemo, useState } from "react";
@@ -12,6 +12,7 @@ import DiagnosticsView from "./components/diagnostics-view";
 import JSONEditor from "./components/json-editor";
 import JSONPathEditor from "./components/jsonpath-editor";
 import classes from "./styles/page.module.css";
+import OutlineView from "./components/outline-view";
 
 export const testJson = `{
     "store": {
@@ -150,7 +151,9 @@ export default function Home() {
                                     Paths
                                 </Tabs.Tab>
                                 <Tabs.Tab value="errors" leftSection={<IconExclamationCircle size={20} />}>
-                                    Errors
+                                    <Indicator color="red" label={diagnostics.length} size={16} offset={-4} disabled={diagnostics.length === 0}>
+                                        Errors
+                                    </Indicator>
                                 </Tabs.Tab>
                                 <Tabs.Tab value="outline" leftSection={<IconListTree size={20} />}>
                                     Outline
@@ -159,14 +162,14 @@ export default function Home() {
                             <Tabs.Panel value="result" flex="1 1 0" mih={0}>
                                 <JSONEditor value={result} onValueChanged={() => { }} />
                             </Tabs.Panel>
-                            <Tabs.Panel value="paths">
+                            <Tabs.Panel value="paths" flex="1 1 0" mih={0}>
                                 Messages tab content
                             </Tabs.Panel>
-                            <Tabs.Panel value="errors" flex="1 1 0">
+                            <Tabs.Panel value="errors" flex="1 1 0" mih={0} style={{ overflow: "auto" }}>
                                 <DiagnosticsView diagnostics={diagnostics} />
                             </Tabs.Panel>
-                            <Tabs.Panel value="outline">
-                                Messages tab content
+                            <Tabs.Panel value="outline" flex="1 1 0" mih={0} style={{ overflow: "auto" }}>
+                                { jsonPath !== undefined && <OutlineView tree={jsonPath}/> }
                             </Tabs.Panel>
                         </Tabs>
                     </Flex>
