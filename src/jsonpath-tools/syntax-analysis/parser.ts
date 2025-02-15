@@ -414,10 +414,21 @@ export class JSONPathParser {
     }
 
     private parseString(context: ParserContext): { token: JSONPathToken, value: string } {
+        type HexCharacterLiteral = { range: TextRange, value: string };
+        const checkSurrogates = (previous: HexCharacterLiteral | null, current: HexCharacterLiteral | null) => {
+            const errorMessage = "Unpaired surrogate.";
+            if (current !== null && this.isLowSurrogate(current.value) && (previous === null || !this.isHighSurrogate(previous.value)))
+                context.addError(errorMessage, current.range);
+            if (previous !== null && this.isHighSurrogate(previous.value) && (current === null || !this.isLowSurrogate(current.value)))
+                context.addError(errorMessage, previous.range);
+        };
+
         const quote = context.current;
         context.goNext();
         let value = "";
+        let previousHexCharacterLiteral: HexCharacterLiteral | null = null;
         while (context.current !== null && context.current !== quote) {
+            let currentHexCharacterLiteral: HexCharacterLiteral | null = null;
             if (context.current === "\\") {
                 context.goNext();
                 if (context.current === "b") value += "\b";
@@ -438,7 +449,9 @@ export class JSONPathParser {
                     }
                     if (characterCodeString.length === 4) {
                         const characterCode = parseInt(characterCodeString, 16);
-                        value += String.fromCharCode(characterCode);
+                        const character = String.fromCharCode(characterCode);
+                        value += character;
+                        currentHexCharacterLiteral = { range: new TextRange(context.currentIndex - 4, 5), value: character };
                     }
                 }
                 else
@@ -449,7 +462,10 @@ export class JSONPathParser {
             else
                 context.addError("Invalid character in string.");
             context.goNext();
+            checkSurrogates(previousHexCharacterLiteral, currentHexCharacterLiteral);
+            previousHexCharacterLiteral = currentHexCharacterLiteral;
         }
+        checkSurrogates(previousHexCharacterLiteral, null);
         const hasClosingQuote = context.current === quote;
         if (hasClosingQuote)
             context.goNext();
@@ -457,6 +473,14 @@ export class JSONPathParser {
             context.addError(`Expected '${quote}'.`);
         const token = context.collectToken(JSONPathSyntaxTreeType.stringToken);
         return { token, value };
+    }
+
+    private isHighSurrogate(character: string) {
+        return character >= "\uD800" && character <= "\uDBFF";
+    }
+
+    private isLowSurrogate(character: string) {
+        return character >= "\uDC00" && character <= "\uDFFF";
     }
 
     private parseNumber(context: ParserContext): { token: JSONPathToken, value: number } {
