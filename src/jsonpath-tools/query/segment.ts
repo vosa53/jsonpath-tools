@@ -10,7 +10,7 @@ export class JSONPathSegment extends JSONPathNode {
     constructor(
         readonly dotToken: JSONPathToken | null,
         readonly openingBracketToken: JSONPathToken | null,
-        readonly selectors: readonly { selector: JSONPathSelector | null; commaToken: JSONPathToken | null; }[],
+        readonly selectors: readonly { selector: JSONPathSelector; commaToken: JSONPathToken | null; }[],
         readonly closingBracketToken: JSONPathToken | null,
 
         readonly isRecursive: boolean

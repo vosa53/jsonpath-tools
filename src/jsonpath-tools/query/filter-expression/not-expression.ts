@@ -9,7 +9,7 @@ import { JSONPathFilterExpression } from "./filter-expression";
 export class JSONPathNotExpression extends JSONPathFilterExpression {
     constructor(
         readonly exlamationMarkToken: JSONPathToken,
-        readonly expression: JSONPathFilterExpression | null
+        readonly expression: JSONPathFilterExpression
     ) {
         super([exlamationMarkToken, expression]);
     }

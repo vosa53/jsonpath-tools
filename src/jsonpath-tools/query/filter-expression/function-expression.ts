@@ -10,7 +10,7 @@ export class JSONPathFunctionExpression extends JSONPathFilterExpression {
     constructor(
         readonly nameToken: JSONPathToken,
         readonly openingParanthesisToken: JSONPathToken | null,
-        readonly args: readonly { arg: JSONPathFilterExpression | null; commaToken: JSONPathToken | null; }[],
+        readonly args: readonly { arg: JSONPathFilterExpression; commaToken: JSONPathToken | null; }[],
         readonly closingParanthesisToken: JSONPathToken | null,
 
         readonly name: string

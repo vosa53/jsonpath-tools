@@ -8,7 +8,7 @@ import { JSONPathFilterExpression } from "./filter-expression";
 export class JSONPathParanthesisExpression extends JSONPathFilterExpression {
     constructor(
         readonly openingParanthesisToken: JSONPathToken,
-        readonly expression: JSONPathFilterExpression | null,
+        readonly expression: JSONPathFilterExpression,
         readonly closingParanthesisToken: JSONPathToken | null
     ) {
         super([openingParanthesisToken, expression, closingParanthesisToken]);

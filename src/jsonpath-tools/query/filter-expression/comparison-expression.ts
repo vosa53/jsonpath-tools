@@ -8,9 +8,9 @@ import { JSONPathFilterExpression } from "./filter-expression";
 
 export class JSONPathComparisonExpression extends JSONPathFilterExpression {
     constructor(
-        readonly left: JSONPathFilterExpression | null,
+        readonly left: JSONPathFilterExpression,
         readonly operatorToken: JSONPathToken,
-        readonly right: JSONPathFilterExpression | null,
+        readonly right: JSONPathFilterExpression,
 
         readonly operator: string
     ) {

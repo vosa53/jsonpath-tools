@@ -8,7 +8,7 @@ import { JSONPathFilterExpression } from "./filter-expression";
 
 export class JSONPathOrExpression extends JSONPathFilterExpression {
     constructor(
-        readonly expressions: { expression: JSONPathFilterExpression | null; orToken: JSONPathToken | null; }[]
+        readonly expressions: { expression: JSONPathFilterExpression; orToken: JSONPathToken | null; }[]
     ) {
         super(expressions.flatMap(e => [e.expression, e.orToken]));
     }

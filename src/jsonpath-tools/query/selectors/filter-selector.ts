@@ -12,7 +12,7 @@ import { JSONPathFilterExpression } from "../filter-expression/filter-expression
 export class JSONPathFilterSelector extends JSONPathSelector {
     constructor(
         readonly questionMarkToken: JSONPathToken,
-        readonly expression: JSONPathFilterExpression | null
+        readonly expression: JSONPathFilterExpression
     ) {
         super([questionMarkToken, expression]);
     }
