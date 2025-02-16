@@ -6,6 +6,7 @@ import { JSONPathComparisonExpression } from "../query/filter-expression/compari
 import { JSONPathFilterExpression } from "../query/filter-expression/filter-expression";
 import { JSONPathFilterQueryExpression } from "../query/filter-expression/filter-query-expression";
 import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
+import { JSONPathMissingExpression } from "../query/filter-expression/missing-expression";
 import { JSONPathNotExpression } from "../query/filter-expression/not-expression";
 import { JSONPathNullLiteral } from "../query/filter-expression/null-literal";
 import { JSONPathNumberLiteral } from "../query/filter-expression/number-literal";
@@ -87,6 +88,7 @@ export class TypeChecker {
         else if (expression instanceof JSONPathStringLiteral) return JSONPathType.valueType;
         else if (expression instanceof JSONPathNumberLiteral) return JSONPathType.valueType;
         else if (expression instanceof JSONPathNullLiteral) return JSONPathType.valueType;
+        else if (expression instanceof JSONPathMissingExpression) return null;
         throw new Error("Unknown filter expression type.");
     }
 

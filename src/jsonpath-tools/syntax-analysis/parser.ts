@@ -76,9 +76,8 @@ export class JSONPathParser {
 
         this.skipWhitespace(context, false);
 
-        if (!hasDot && context.current !== "[") {
+        if (!hasDot && context.current !== "[")
             context.addError("Expected '.' or '..' or '['.");
-        }
 
         if (context.current === "[") {
             if (hasDot && !isRecursive) context.addError("'.' is not allowed before '['.", dotToken!.textRange);
@@ -94,7 +93,8 @@ export class JSONPathParser {
         }
         else {
             context.addError("Expected a selector/selectors.");
-            return new JSONPathSegment(dotToken, null, [], null, isRecursive);
+            const missingSelector = new JSONPathMissingSelector(context.collectToken(JSONPathSyntaxTreeType.missingToken));
+            return new JSONPathSegment(dotToken, null, [{ selector: missingSelector, commaToken: null }], null, isRecursive);
         }
     }
 
@@ -147,7 +147,7 @@ export class JSONPathParser {
             return this.parseFilterSelector(context);
         else {
             context.addError("Expected selector.");
-            return new JSONPathMissingSelector(context.currentIndex);
+            return new JSONPathMissingSelector(context.collectToken(JSONPathSyntaxTreeType.missingToken));
         }
     }
 
@@ -312,7 +312,7 @@ export class JSONPathParser {
             return this.parseFunctionOrLiteral(context);
         else {
             context.addError("Expected expression.");
-            return new JSONPathMissingExpression(context.currentIndex);
+            return new JSONPathMissingExpression(context.collectToken(JSONPathSyntaxTreeType.missingToken));
         }
     }
 

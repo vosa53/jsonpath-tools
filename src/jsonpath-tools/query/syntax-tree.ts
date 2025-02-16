@@ -35,4 +35,26 @@ export abstract class JSONPathSyntaxTree {
         }
         return path;
     }
+
+    getTouchingAtPosition(position: number): JSONPathSyntaxTree[][] {
+        const results: JSONPathSyntaxTree[][] = [];
+        this.getTouchingAtPositionRecursive(position, [], results);
+        return results;
+    }
+
+    private getTouchingAtPositionRecursive(position: number, currentPath: JSONPathSyntaxTree[], results: JSONPathSyntaxTree[][]): void {
+        if (this.position > position || this.position + this.length < position)
+            return;
+
+        currentPath.push(this);
+        // @ts-ignore
+        if (this.children !== undefined) {
+            // @ts-ignore
+            for (const child of (this as JSONPathNode).children)
+                child.getTouchingAtPositionRecursive(position, currentPath, results);
+        }
+        else
+            results.push([...currentPath]);
+        currentPath.pop();
+    }
 }

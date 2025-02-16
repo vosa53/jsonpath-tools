@@ -27,6 +27,7 @@ export enum JSONPathSyntaxTreeType {
     openingBracketToken = "OpeningBracketToken",
     closingBracketToken = "ClosingBracketToken",
     endOfFileToken = "EndOfFileToken",
+    missingToken = "MissingToken",
     root = "Root",
     query = "Query",
     segment = "Segment",
@@ -35,6 +36,7 @@ export enum JSONPathSyntaxTreeType {
     sliceSelector = "SliceSelector",
     indexSelector = "IndexSelector",
     filterSelector = "FilterSelector",
+    missingSelector = "MissingSelector",
     orExpression = "OrExpression",
     andExpression = "AndExpression",
     notExpression = "NotExpression",
@@ -45,5 +47,6 @@ export enum JSONPathSyntaxTreeType {
     numberLiteral = "NumberLiteral",
     stringLiteral = "StringLiteral",
     booleanLiteral = "BooleanLiteral",
-    nullLiteral = "NullLiteral"
+    nullLiteral = "NullLiteral",
+    missingExpression = "MissingExpression"
 }

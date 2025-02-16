@@ -36,7 +36,6 @@ export class JSONPathComparisonExpression extends JSONPathFilterExpression {
             result = this.isLower(leftValue, rightValue) || this.isEqual(leftValue, rightValue);
         else if (this.operatorToken.type === JSONPathSyntaxTreeType.greaterThanEqualsToken)
             result = this.isLower(rightValue, leftValue) || this.isEqual(leftValue, rightValue);
-
         else
             throw new Error("Unknown operator.");
         return result ? JSONPathLogicalTrue : JSONPathLogicalFalse;

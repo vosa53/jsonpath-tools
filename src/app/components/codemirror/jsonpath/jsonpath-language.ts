@@ -41,6 +41,7 @@ const { nodeSet, treeTypeToNodeId } = createNodeSet([
     JSONPathSyntaxTreeType.sliceSelector,  
     JSONPathSyntaxTreeType.indexSelector,  
     JSONPathSyntaxTreeType.filterSelector,  
+    JSONPathSyntaxTreeType.missingSelector,
     JSONPathSyntaxTreeType.orExpression,  
     JSONPathSyntaxTreeType.andExpression,  
     JSONPathSyntaxTreeType.notExpression,  
@@ -52,6 +53,7 @@ const { nodeSet, treeTypeToNodeId } = createNodeSet([
     JSONPathSyntaxTreeType.stringLiteral,  
     JSONPathSyntaxTreeType.booleanLiteral,  
     JSONPathSyntaxTreeType.nullLiteral,
+    JSONPathSyntaxTreeType.missingExpression,
     JSONPathSyntaxTreeType.dollarToken,  
     JSONPathSyntaxTreeType.atToken,  
     JSONPathSyntaxTreeType.starToken,  
@@ -79,7 +81,8 @@ const { nodeSet, treeTypeToNodeId } = createNodeSet([
     JSONPathSyntaxTreeType.closingParanthesisToken,  
     JSONPathSyntaxTreeType.openingBracketToken,  
     JSONPathSyntaxTreeType.closingBracketToken,  
-    JSONPathSyntaxTreeType.endOfFileToken
+    JSONPathSyntaxTreeType.endOfFileToken,
+    JSONPathSyntaxTreeType.missingToken
 ]);
 
 class CodeMirrorJSONPathParser extends Parser {

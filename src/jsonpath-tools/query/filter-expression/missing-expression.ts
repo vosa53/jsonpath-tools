@@ -1,15 +1,18 @@
 import { JSONPathFilterValue, JSONPathNothing } from "../../types";
 import { JSONPathFilterExpressionContext, JSONPathQueryContext } from "../evaluation";
 import { JSONPathSyntaxTreeType } from "../syntax-tree-type";
+import { JSONPathToken } from "../token";
 import { JSONPathFilterExpression } from "./filter-expression";
 
 
 export class JSONPathMissingExpression extends JSONPathFilterExpression {
-    constructor(position: number) {
-        super([], position);
+    constructor(
+        readonly missingToken: JSONPathToken
+    ) {
+        super([missingToken]);
     }
 
-    get type() { return JSONPathSyntaxTreeType.notExpression; }
+    get type() { return JSONPathSyntaxTreeType.missingExpression; }
 
     evaluate(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
         return JSONPathNothing;
