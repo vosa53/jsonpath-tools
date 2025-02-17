@@ -8,8 +8,8 @@ import { getJSONPath, jsonPathLanguage } from "./codemirror/jsonpath/jsonpath-la
 import { jsonPathLintSource } from "./codemirror/jsonpath/jsonpath-lint-source";
 import { jsonPathTooltips } from "./codemirror/jsonpath/jsonpath-tooltips";
 
-export default function JSONPathEditor({value, onValueChanged, onParsed, onDiagnosticsCreated}: 
-    { value: string, onValueChanged: (value: string) => void, onParsed?: (jsonPath: JSONPath) => void, onDiagnosticsCreated?: (diagnostics: readonly JSONPathDiagnostics[]) => void }) {
+export default function JSONPathEditor({value, readonly = false, onValueChanged, onParsed, onDiagnosticsCreated}: 
+    { value: string, readonly?: boolean, onValueChanged: (value: string) => void, onParsed?: (jsonPath: JSONPath) => void, onDiagnosticsCreated?: (diagnostics: readonly JSONPathDiagnostics[]) => void }) {
 
     const onEditorExtensionsRequested = () => {
         return [
@@ -30,6 +30,6 @@ export default function JSONPathEditor({value, onValueChanged, onParsed, onDiagn
     };
 
     return (
-        <CodeMirrorEditor value={value} onValueChanged={onValueChanged} onExtensionsRequested={onEditorExtensionsRequested} style={{maxHeight: "150px"}} />
+        <CodeMirrorEditor value={value} readonly={readonly} onValueChanged={onValueChanged} onExtensionsRequested={onEditorExtensionsRequested} style={{maxHeight: "150px"}} />
     );
 }

@@ -17,8 +17,6 @@ export class JSONPathParanthesisExpression extends JSONPathFilterExpression {
     get type() { return JSONPathSyntaxTreeType.paranthesisExpression; }
 
     evaluate(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
-        if (this.expression === null)
-            return JSONPathLogicalFalse;
         return this.expression.evaluate(queryContext, filterExpressionContext);
     }
 }

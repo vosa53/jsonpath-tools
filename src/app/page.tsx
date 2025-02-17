@@ -65,7 +65,7 @@ export default function Home() {
         const time = performance.now();
         const queryContext: JSONPathQueryContext = { rootNode: value, options: defaultJSONPathOptions };
         const nodes = jsonPath.select(queryContext).nodes;
-        console.log("QUERY TIME:", performance.now() - time, "ms");
+        console.log("QUERY TIME:", performance.now() - time, "ms", jsonPath);
         return JSON.stringify(nodes, null, 4);
     }, [inputValue, jsonPath])
 
@@ -160,10 +160,10 @@ export default function Home() {
                                 </Tabs.Tab>
                             </Tabs.List>
                             <Tabs.Panel value="result" flex="1 1 0" mih={0}>
-                                <JSONEditor value={result} onValueChanged={() => { }} />
+                                <JSONEditor value={result} readonly onValueChanged={() => { }} />
                             </Tabs.Panel>
                             <Tabs.Panel value="paths" flex="1 1 0" mih={0}>
-                                Messages tab content
+                                <JSONEditor value="" readonly onValueChanged={() => { }} />
                             </Tabs.Panel>
                             <Tabs.Panel value="errors" flex="1 1 0" mih={0} style={{ overflow: "auto" }}>
                                 <DiagnosticsView diagnostics={diagnostics} />

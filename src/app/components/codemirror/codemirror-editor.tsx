@@ -1,11 +1,12 @@
 import { defaultKeymap } from "@codemirror/commands";
 import { HighlightStyle, indentUnit, syntaxHighlighting } from "@codemirror/language";
-import { Extension } from "@codemirror/state";
+import { Compartment, EditorState, Extension } from "@codemirror/state";
 import { keymap } from "@codemirror/view";
 import { tags as t } from "@lezer/highlight";
 import { basicSetup, EditorView } from "codemirror";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { tabKeymap } from "./tab-keymap";
+import { MantineColorScheme, useMantineColorScheme } from "@mantine/core";
 
 const highlightStyle = HighlightStyle.define([
     { tag: t.keyword, color: "var(--mantine-color-blue-text)" },
@@ -19,11 +20,37 @@ const highlightStyle = HighlightStyle.define([
     { tag: t.annotation, color: "var(--mantine-color-violet-text)" }
 ]);
 
-export default function CodeMirrorEditor({ value, style, onValueChanged: onValueChanged, onExtensionsRequested }:
-    { value: string, style?: CSSProperties, onValueChanged: (value: string) => void, onExtensionsRequested: () => Extension[] }) {
+const themeCompartment = new Compartment();
+const readonlyCompartment = new Compartment();
+const lightTheme = EditorView.theme({}, { dark: false });
+const darkTheme = EditorView.theme({}, { dark: true });
+
+function colorSchemeToTheme(colorScheme: MantineColorScheme): Extension {
+    return colorScheme === "dark" ? darkTheme : lightTheme;
+}
+
+export default function CodeMirrorEditor({ value, readonly, style, onValueChanged: onValueChanged, onExtensionsRequested }:
+    { value: string, readonly: boolean, style?: CSSProperties, onValueChanged: (value: string) => void, onExtensionsRequested: () => Extension[] }) {
     const containerElementRef = useRef<HTMLDivElement>(null);
     const [valueInEditor, setValueInEditor] = useState("");
     const [editorView, setEditorView] = useState<EditorView>();
+    const colorScheme = useMantineColorScheme();
+
+    useEffect(() => {
+        if (editorView !== undefined) {
+            editorView.dispatch({
+                effects: themeCompartment.reconfigure(colorSchemeToTheme(colorScheme.colorScheme))
+            });
+        }
+    }, [colorScheme.colorScheme]);
+
+    useEffect(() => {
+        if (editorView !== undefined) {
+            editorView.dispatch({
+                effects: readonlyCompartment.reconfigure(EditorState.readOnly.of(readonly))
+            });
+        }
+    }, [readonly]);
 
     useEffect(() => {
         const editorView = new EditorView({
@@ -56,6 +83,8 @@ export default function CodeMirrorEditor({ value, style, onValueChanged: onValue
                     "& .cm-completionIcon-function::after": { content: `url('data:image/svg+xml,<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-math-function"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 19a2 2 0 0 0 2 2c2 0 2 -4 3 -9s1 -9 3 -9a2 2 0 0 1 2 2" /><path d="M5 12h6" /><path d="M15 12l6 6" /><path d="M15 18l6 -6" /></svg>')` },
                     "& .cm-completionIcon-constant::after": { content: `url('data:image/svg+xml,<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-library"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 3m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" /><path d="M4.012 7.26a2.005 2.005 0 0 0 -1.012 1.737v10c0 1.1 .9 2 2 2h10c.75 0 1.158 -.385 1.5 -1" /><path d="M11 7h5" /><path d="M11 10h6" /><path d="M11 13h3" /></svg>')` },*/
                 }),
+                themeCompartment.of(colorSchemeToTheme(colorScheme.colorScheme)),
+                readonlyCompartment.of(EditorState.readOnly.of(readonly)),
                 EditorView.updateListener.of(u => {
                     if (u.docChanged) {
                         const newValue = u.state.doc.toString();

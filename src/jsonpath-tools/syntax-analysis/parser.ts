@@ -468,14 +468,6 @@ export class JSONPathParser {
         return { token, value };
     }
 
-    private isHighSurrogate(character: string) {
-        return character >= "\uD800" && character <= "\uDBFF";
-    }
-
-    private isLowSurrogate(character: string) {
-        return character >= "\uDC00" && character <= "\uDFFF";
-    }
-
     private parseNumber(context: ParserContext): { token: JSONPathToken, value: number } {
         if (context.current === "-")
             context.goNext();
@@ -522,11 +514,16 @@ export class JSONPathParser {
         context.skipWhile(c => this.isBlank(c), allowed ? null : "Whitespace is not allowed here.");
     }
 
+    private isHighSurrogate(character: string) {
+        return character >= "\uD800" && character <= "\uDBFF";
+    }
+
+    private isLowSurrogate(character: string) {
+        return character >= "\uDC00" && character <= "\uDFFF";
+    }
+
     private isBlank(character: string | null) {
-        return character === " " || // \u0020
-            character === "\t" || // \u0009
-            character === "\n" || // \u000A
-            character === "\r" // \u000D
+        return character === " " || character === "\t" || character === "\n" || character === "\r";
     }
 
     private isDigit(character: string | null) {
@@ -570,9 +567,9 @@ export class JSONPathParser {
             if (!operand.query.isSingular)
                 context.addError("Query in comparison expression must be singular.", operand.textRange);
         }
-        if (operand instanceof JSONPathParanthesisExpression)
+        else if (operand instanceof JSONPathParanthesisExpression)
             context.addError("Comparison expression operand can not be in paranthesis.", operand.textRange);
-        if (operand instanceof JSONPathNotExpression)
+        else if (operand instanceof JSONPathNotExpression)
             context.addError("Comparison expression operand can not be negated.", operand.exlamationMarkToken.textRange);
     }
 

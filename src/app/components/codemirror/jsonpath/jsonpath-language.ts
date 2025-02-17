@@ -129,16 +129,17 @@ class CodeMirrorJSONPathParser extends Parser {
 
         const start = performance.now();
         const result = parser.parse(text);
+        const parseTime = performance.now() - start;
 
         const buffer: number[] = [];
-        this.convertToTree(result, buffer)
+        this.convertToTree(result, buffer);
         const tree = Tree.build({
             buffer: buffer,
             nodeSet: this.nodeSet,
             topID: treeTypeToNodeId.get(JSONPathSyntaxTreeType.root)!,
         });
-        const elapsed = performance.now() - start;
-        console.log("Time: " + elapsed);
+        const treeBuildTime = performance.now() - start - parseTime;
+        console.log("PARSE TIME:", parseTime, "ms", "TREE BUILD TIME", treeBuildTime, "ms");
         treeToJSONPath.set(tree, result);
         return new CodeMirrorJSONPathPartialParse(tree);
     }
