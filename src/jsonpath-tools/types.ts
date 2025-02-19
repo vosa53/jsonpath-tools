@@ -1,3 +1,5 @@
+import { LocatedNode } from "./query/located-node";
+
 export type JSONPathJSONValue = string | number | boolean | null | JSONPathJSONValue[] | { [key: string]: JSONPathJSONValue };
 export const JSONPathNothing: unique symbol = Symbol("Nothing");
 
@@ -6,7 +8,7 @@ export const JSONPathLogicalFalse: unique symbol = Symbol("LogicalFalse");
 
 export class JSONPathNodeList {
     constructor(
-        readonly nodes: JSONPathJSONValue[]
+        readonly nodes: LocatedNode[]
     ) { }
 
     static readonly empty = new JSONPathNodeList([]);

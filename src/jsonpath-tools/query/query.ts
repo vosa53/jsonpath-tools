@@ -1,5 +1,6 @@
 import { JSONPathJSONValue, JSONPathNodeList } from "../types";
 import { JSONPathFilterExpressionContext, JSONPathQueryContext } from "./evaluation";
+import { LocatedNode } from "./located-node";
 import { JSONPathNode } from "./node";
 import { JSONPathSegment } from "./segment";
 import { JSONPathIndexSelector } from "./selectors/index-selector";
@@ -26,8 +27,9 @@ export class JSONPathQuery extends JSONPathNode {
     }
 
     select(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext | null): JSONPathNodeList {
-        let inputNodes = [this.isRelative && filterExpressionContext !== null ? filterExpressionContext.currentNode : queryContext.rootNode];
-        let outputNodes: JSONPathJSONValue[] = [];
+        const inputNode = this.isRelative && filterExpressionContext !== null ? filterExpressionContext.currentNode : queryContext.rootNode;
+        let inputNodes = [new LocatedNode(inputNode, "", null)];
+        let outputNodes: LocatedNode[] = [];
         for (const segment of this.segments) {
             for (const inputNode of inputNodes)
                 segment.select(inputNode, outputNodes, queryContext);

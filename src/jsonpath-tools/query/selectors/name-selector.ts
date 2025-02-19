@@ -4,6 +4,7 @@ import { JSONPathSyntaxTreeType } from "../syntax-tree-type";
 import { JSONPathToken } from "../token";
 import { PushOnlyArray } from "../evaluation";
 import { JSONPathQueryContext } from "../evaluation";
+import { LocatedNode } from "../located-node";
 
 
 export class JSONPathNameSelector extends JSONPathSelector {
@@ -17,9 +18,9 @@ export class JSONPathNameSelector extends JSONPathSelector {
 
     get type() { return JSONPathSyntaxTreeType.nameSelector; }
 
-    select(input: JSONPathJSONValue, output: PushOnlyArray<JSONPathJSONValue>, queryContext: JSONPathQueryContext): void {
-        const isObject = typeof input === "object" && !Array.isArray(input) && input !== null;
-        if (isObject && input.hasOwnProperty(this.name))
-            output.push(input[this.name]);
+    select(input: LocatedNode, output: PushOnlyArray<LocatedNode>, queryContext: JSONPathQueryContext): void {
+        const isObject = typeof input.value === "object" && !Array.isArray(input.value) && input.value !== null;
+        if (isObject && input.value.hasOwnProperty(this.name))
+            output.push(new LocatedNode(input.value[this.name], this.name, input));
     }
 }

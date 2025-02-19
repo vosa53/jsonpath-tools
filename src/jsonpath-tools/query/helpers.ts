@@ -20,7 +20,7 @@ export function evaluateAsValueType(expression: JSONPathFilterExpression, queryC
 
     // Implicit conversion.
     if (isNodesType(value))
-        return value.nodes.length !== 0 ? value.nodes[0] : JSONPathNothing;
+        return value.nodes.length !== 0 ? value.nodes[0].value : JSONPathNothing;
 
     return JSONPathNothing;
 }

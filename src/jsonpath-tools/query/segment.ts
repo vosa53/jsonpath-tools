@@ -1,5 +1,6 @@
 import { JSONPathJSONValue } from "../types";
 import { JSONPathQueryContext, PushOnlyArray } from "./evaluation";
+import { LocatedNode } from "./located-node";
 import { JSONPathNode } from "./node";
 import { JSONPathSelector } from "./selectors/selector";
 import { JSONPathSyntaxTreeType } from "./syntax-tree-type";
@@ -20,8 +21,8 @@ export class JSONPathSegment extends JSONPathNode {
 
     get type() { return JSONPathSyntaxTreeType.segment; }
 
-    select(input: JSONPathJSONValue, output: PushOnlyArray<JSONPathJSONValue>, queryContext: JSONPathQueryContext) {
-        queryContext.segmentInstrumentationCallback?.(this, input);
+    select(input: LocatedNode, output: PushOnlyArray<LocatedNode>, queryContext: JSONPathQueryContext) {
+        queryContext.segmentInstrumentationCallback?.(this, input.value);
 
         for (const selector of this.selectors) {
             if (selector.selector != null)
@@ -29,11 +30,13 @@ export class JSONPathSegment extends JSONPathNode {
         }
 
         if (this.isRecursive) {
-            const isObjectOrArray = typeof input === "object" && input !== null;
-            if (isObjectOrArray) {
-                for (const value of Object.values(input)) {
-                    this.select(value, output, queryContext);
-                }
+            if (Array.isArray(input.value)) {
+                for (let i = 0; i < input.value.length; i++)
+                    this.select(new LocatedNode(input.value[i], i, input), output, queryContext);
+            }
+            else if (typeof input.value === "object" && input.value !== null) {
+                for (const entry of Object.entries(input.value))
+                    this.select(new LocatedNode(entry[1], entry[0], input), output, queryContext);
             }
         }
     }
