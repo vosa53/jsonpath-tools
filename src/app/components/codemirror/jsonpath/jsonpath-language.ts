@@ -20,8 +20,8 @@ import { JSONPathOptions } from "@/jsonpath-tools/options";
     readonly queryArgument: JSONPathJSONValue;
 }*/
 
-const updateOptionsEffect = StateEffect.define<JSONPathOptions>();
-const updateQueryArgumentEffect = StateEffect.define<JSONPathJSONValue>();
+export const updateOptionsEffect = StateEffect.define<JSONPathOptions>();
+export const updateQueryArgumentEffect = StateEffect.define<JSONPathJSONValue>();
 const configFacet = Facet.define<{a: string}>();
 
 export const workerStateField = StateField.define<JSONPathWorkerFrontend>({
@@ -35,10 +35,12 @@ export const workerStateField = StateField.define<JSONPathWorkerFrontend>({
             value.updateQuery(transaction.newDoc.toString());
         }
         for (const effect of transaction.effects) {
-            if (effect.is(updateOptionsEffect))
+            /*if (effect.is(updateOptionsEffect))
                 value.updateOption(effect.value);
-            else if (effect.is(updateQueryArgumentEffect))
+            else */if (effect.is(updateQueryArgumentEffect)) {
+                console.log("UPDATE QUERY ARGUMENT", effect.value);
                 value.updateQueryArgument(effect.value);
+            }
         }
 
         return value;

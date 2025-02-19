@@ -13,6 +13,7 @@ import JSONEditor from "./components/json-editor";
 import JSONPathEditor from "./components/jsonpath-editor";
 import classes from "./styles/page.module.css";
 import OutlineView from "./components/outline-view";
+import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 
 export const testJson = `{
     "store": {
@@ -59,15 +60,24 @@ export default function Home() {
     const [diagnostics, setDiagnostics] = useState<readonly JSONPathDiagnostics[]>([]);
     const [opened, { toggle }] = useDisclosure();
     const result = useMemo(() => {
-        if (jsonPath === undefined)
+        /*if (jsonPath === undefined)
             return "";
         const value = JSON.parse(inputValue);
         const time = performance.now();
         const queryContext: JSONPathQueryContext = { rootNode: value, options: defaultJSONPathOptions };
         const nodes = jsonPath.select(queryContext).nodes;
         console.log("QUERY TIME:", performance.now() - time, "ms", jsonPath);
-        return JSON.stringify(nodes, null, 4);
-    }, [inputValue, jsonPath])
+        return JSON.stringify(nodes, null, 4);*/
+        return "";
+    }, [inputValue, jsonPath]);
+    const queryArgument = useMemo<JSONPathJSONValue>(() => {
+        try {
+            return JSON.parse(inputValue);
+        }
+        catch {
+            return null;
+        }
+    }, [inputValue]);
 
     return (
         <AppShell
@@ -122,7 +132,7 @@ export default function Home() {
 
             <AppShell.Main className={classes.navbar} h="100vh">
                 <Stack gap={0} h="100%">
-                    <JSONPathEditor value={editorValue} onValueChanged={setEditorValue} onParsed={setJsonPath} onDiagnosticsCreated={setDiagnostics} />
+                    <JSONPathEditor value={editorValue} queryArgument={queryArgument} onValueChanged={setEditorValue} onParsed={setJsonPath} onDiagnosticsCreated={setDiagnostics} />
                     <Divider size="xs" />
                     <Flex flex="1 1 0" direction={{ sm: "row", base: "column" }}>
                         <Tabs defaultValue="json" flex="1" miw={0} display="flex" style={{ flexDirection: "column" }}>

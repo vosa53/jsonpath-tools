@@ -29,8 +29,8 @@ function colorSchemeToTheme(colorScheme: MantineColorScheme): Extension {
     return colorScheme === "dark" ? darkTheme : lightTheme;
 }
 
-export default function CodeMirrorEditor({ value, readonly, style, onValueChanged: onValueChanged, onExtensionsRequested }:
-    { value: string, readonly: boolean, style?: CSSProperties, onValueChanged: (value: string) => void, onExtensionsRequested: () => Extension[] }) {
+export default function CodeMirrorEditor({ value, readonly, style, onValueChanged: onValueChanged, onExtensionsRequested, onEditorViewCreated }:
+    { value: string, readonly: boolean, style?: CSSProperties, onValueChanged: (value: string) => void, onExtensionsRequested: () => Extension[], onEditorViewCreated?: (view: EditorView) => void }) {
     const containerElementRef = useRef<HTMLDivElement>(null);
     const [valueInEditor, setValueInEditor] = useState("");
     const editorViewRef = useRef<EditorView>(null);
@@ -98,6 +98,7 @@ export default function CodeMirrorEditor({ value, readonly, style, onValueChange
         });
         setValueInEditor(value);
         editorViewRef.current = editorView;
+        onEditorViewCreated?.(editorView);
 
         return () => {
             editorView.destroy();

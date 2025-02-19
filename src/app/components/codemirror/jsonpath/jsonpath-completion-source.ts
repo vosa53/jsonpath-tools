@@ -4,26 +4,33 @@ import { CompletionContext, CompletionResult } from "@codemirror/autocomplete";
 import { syntaxTree } from "@codemirror/language";
 import { getJSONPath, workerStateField } from "./jsonpath-language";
 import { defaultJSONPathOptions } from "@/jsonpath-tools/options";
+import { OperationCancelledError } from "./cancellation";
 
 export async function jsonPathCompletionSource(context: CompletionContext): Promise<CompletionResult | null> {
     const word = context.matchBefore(/\w*/)!;
     if (context.explicit || word.from !== word.to || context.matchBefore(/\.|,\s?|\[/)) {
         const worker = context.state.field(workerStateField);
-        const completions = await worker.getCompletions(context.pos);
+        try {
+            const completions = await worker.getCompletions(context.pos);
 
-        /*const completionProvider = new CompletionProvider(defaultJSONPathOptions);
-        const jsonPath = getJSONPath(syntaxTree(context.state));
-        const completions = completionProvider.provideCompletions(jsonPath, JSON.parse(testJson), context.pos);*/
+            /*const completionProvider = new CompletionProvider(defaultJSONPathOptions);
+            const jsonPath = getJSONPath(syntaxTree(context.state));
+            const completions = completionProvider.provideCompletions(jsonPath, JSON.parse(testJson), context.pos);*/
 
-        return {
-            from: word.from,
-            options: completions.map(c => ({
-                label: c.text,
-                type: convertCompletionItemTypeToCodemirrorType(c.type),
-                detail: "aa",
-                info: "Further description."
-            })),
-        };
+            return {
+                from: word.from,
+                options: completions.map(c => ({
+                    label: c.text,
+                    type: convertCompletionItemTypeToCodemirrorType(c.type),
+                    detail: "aa",
+                    info: "Further description."
+                })),
+            };
+        }
+        catch (error) {
+            if (error instanceof OperationCancelledError) return null;
+            else throw error;
+        }
     }
     else
         return null;

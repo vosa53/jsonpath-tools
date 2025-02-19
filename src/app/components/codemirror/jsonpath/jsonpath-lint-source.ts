@@ -4,6 +4,7 @@ import { syntaxTree } from "@codemirror/language";
 import { LintSource } from "@codemirror/lint";
 import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "../../../../jsonpath-tools/diagnostics";
 import { getJSONPath, workerStateField } from "./jsonpath-language";
+import { OperationCancelledError } from "./cancellation";
 
 export function jsonPathLintSource(options: { onDiagnosticsCreated?: (diagnostics: readonly JSONPathDiagnostics[]) => void } = {}): LintSource {
     return async view => {
@@ -16,15 +17,20 @@ export function jsonPathLintSource(options: { onDiagnosticsCreated?: (diagnostic
         options.onDiagnosticsCreated?.(diagnostics);*/
 
         const worker = view.state.field(workerStateField);
-        debugger;
-        const diagnostics = await worker.getDiagnostics();
-        options.onDiagnosticsCreated?.(diagnostics);
+        try {
+            const diagnostics = await worker.getDiagnostics();
+            options.onDiagnosticsCreated?.(diagnostics);
 
-        return diagnostics.map(d => ({
-            from: d.textRange.position,
-            to: d.textRange.position + d.textRange.length,
-            severity: d.type === JSONPathDiagnosticsType.error ? "error" : "warning",
-            message: d.message
-        }));
+            return diagnostics.map(d => ({
+                from: d.textRange.position,
+                to: d.textRange.position + d.textRange.length,
+                severity: d.type === JSONPathDiagnosticsType.error ? "error" : "warning",
+                message: d.message
+            }));
+        }
+        catch (error) {
+            if (error instanceof OperationCancelledError) return [];
+            else throw error;
+        }
     }
 }

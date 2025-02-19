@@ -8,14 +8,14 @@ import { JSONPathToken } from "@/jsonpath-tools/query/token";
 export default function OutlineView({ tree }: { tree: JSONPathSyntaxTree }) {
     return (
         <div>
-            <TreeLabel tree={tree} />
+            {/* <TreeLabel tree={tree} />
             {tree instanceof JSONPathNode && (
                 <div className={classes.children}>
                     {tree.children.map((c, i) => (
                         <OutlineView key={i} tree={c} />
                     ))}
                 </div>
-            )}
+            )} */}
         </div>
     );
 }

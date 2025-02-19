@@ -60,7 +60,7 @@ export class JSONPathWorkerBackend {
         const result = this.jsonPath.select(context);
 
         return {
-            nodes: result.nodes
+            nodes: result.nodes.map(n => n.value)
         };
     }
 
