@@ -1,18 +1,32 @@
+import { defaultJSONPathOptions, JSONPathOptions } from "@/jsonpath-tools/options";
 import { JSONPath } from "@/jsonpath-tools/query/json-path";
+import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 import { syntaxTree } from "@codemirror/language";
-import { linter } from "@codemirror/lint";
 import { EditorView } from "codemirror";
+import { useEffect, useRef } from "react";
 import { JSONPathDiagnostics } from "../../jsonpath-tools/diagnostics";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
-import { getJSONPath, jsonPathLanguage, updateOptionsEffect, updateQueryArgumentEffect } from "./codemirror/jsonpath/jsonpath-language";
-import { jsonPathLintSource } from "./codemirror/jsonpath/jsonpath-lint-source";
-import { jsonPathTooltips } from "./codemirror/jsonpath/jsonpath-tooltips";
-import { useEffect, useRef } from "react";
-import { defaultJSONPathOptions, JSONPathOptions } from "@/jsonpath-tools/options";
-import { JSONPathJSONValue } from "@/jsonpath-tools/types";
+import { jsonPath } from "./codemirror/jsonpath-codemirror/jsonpath-language";
+import { getJSONPath } from "./codemirror/jsonpath-codemirror/jsonpath-parser";
+import { updateOptionsEffect, updateQueryArgumentEffect } from "./codemirror/jsonpath-codemirror/jsonpath-state";
 
-export default function JSONPathEditor({value, options = defaultJSONPathOptions, queryArgument = {}, readonly = false, onValueChanged, onParsed, onDiagnosticsCreated}: 
-    { value: string, options?: JSONPathOptions, queryArgument?: JSONPathJSONValue, readonly?: boolean, onValueChanged: (value: string) => void, onParsed?: (jsonPath: JSONPath) => void, onDiagnosticsCreated?: (diagnostics: readonly JSONPathDiagnostics[]) => void }) {
+export default function JSONPathEditor({
+    value,
+    options = defaultJSONPathOptions,
+    queryArgument = {},
+    readonly = false,
+    onValueChanged,
+    onParsed,
+    onDiagnosticsCreated
+}: {
+    value: string,
+    options?: JSONPathOptions,
+    queryArgument?: JSONPathJSONValue,
+    readonly?: boolean,
+    onValueChanged: (value: string) => void,
+    onParsed?: (jsonPath: JSONPath) => void,
+    onDiagnosticsCreated?: (diagnostics: readonly JSONPathDiagnostics[]) => void
+}) {
 
     const editorViewRef = useRef<EditorView>(null);
 
@@ -28,9 +42,7 @@ export default function JSONPathEditor({value, options = defaultJSONPathOptions,
 
     const onEditorExtensionsRequested = () => {
         return [
-            jsonPathLanguage,
-            jsonPathTooltips,
-            linter(jsonPathLintSource({ onDiagnosticsCreated })),
+            jsonPath({ onDiagnosticsCreated }),
             EditorView.theme({
                 "&": { fontSize: "18px !important" },
                 "& .cm-content": { padding: "10px 0" }
@@ -50,12 +62,12 @@ export default function JSONPathEditor({value, options = defaultJSONPathOptions,
     };
 
     return (
-        <CodeMirrorEditor 
-            value={value} 
-            readonly={readonly} 
-            onValueChanged={onValueChanged} 
+        <CodeMirrorEditor
+            value={value}
+            readonly={readonly}
+            onValueChanged={onValueChanged}
             onExtensionsRequested={onEditorExtensionsRequested}
             onEditorViewCreated={onEditorViewCreated}
-            style={{maxHeight: "150px"}} />
+            style={{ maxHeight: "150px" }} />
     );
 }

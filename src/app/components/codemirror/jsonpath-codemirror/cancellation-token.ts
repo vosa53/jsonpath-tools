@@ -1,6 +1,4 @@
-import { CancellationToken, OperationCancelledError } from "./cancellation";
-
-export class CancelToken implements CancellationToken {
+export class CancellationToken {
     private _isCancelled = false;
 
     get isCancelled() {
@@ -14,5 +12,11 @@ export class CancelToken implements CancellationToken {
 
     cancel() {
         this._isCancelled = true;
+    }
+}
+
+export class OperationCancelledError extends Error { 
+    constructor(message = "Operation was cancelled.") {
+        super(message);
     }
 }

@@ -1,32 +1,31 @@
 import { JSONPathDiagnostics } from "@/jsonpath-tools/diagnostics";
 import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-provider";
-import { WebWorkerRPC, WebWorkerRPCTopic } from "./web-worker-rpc";
 import { JSONPathOptions } from "@/jsonpath-tools/options";
-import { GetCompletionsWorkerMessage, GetCompletionsWorkerMessageResponse, GetDiagnosticsWorkerMessage, GetDiagnosticsWorkerMessageResponse, GetResultWorkerMessage, GetResultWorkerMessageResponse, UpdateOptionsWorkerMessage, UpdateQueryArgumentWorkerMessage, UpdateQueryWorkerMessage } from "./worker-messages";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
-import { SharedArrayBufferCancellationToken } from "./shared-array-buffer-cancellation-token";
-import { CancellationToken } from "./cancellation";
-import { CancelToken } from "./cancellation-token";
+import { CancellationToken } from "../cancellation-token";
+import { GetCompletionsWorkerMessage, GetCompletionsWorkerMessageResponse, GetDiagnosticsWorkerMessage, GetDiagnosticsWorkerMessageResponse, GetResultWorkerMessage, GetResultWorkerMessageResponse, UpdateOptionsWorkerMessage, UpdateQueryArgumentWorkerMessage, UpdateQueryWorkerMessage } from "./worker-messages";
+import { WebWorkerRPCTopic, WorkerRPC } from "./worker-rpc";
 
-export class JSONPathWorkerFrontend {
+
+export class WorkerFrontend {
     private static readonly worker = this.createWorker();
     private static readonly rpc = this.createRPC(this.worker);
-    private cancellationToken = new CancelToken();
+    private cancellationToken = new CancellationToken();
     private taskQueue: Promise<any> = Promise.resolve();
 
     private constructor(private readonly rpcTopic: WebWorkerRPCTopic) { }
 
-    static connectNew(): JSONPathWorkerFrontend {
+    static connectNew(): WorkerFrontend {
         return this.rpc.createHandler();
     }
 
     private static createWorker(): Worker {
-        const worker = new Worker(new URL("./jsonpath-worker.ts", import.meta.url));
+        const worker = new Worker(new URL("./worker-script.ts", import.meta.url));
         return worker;
     }
 
-    private static createRPC(worker: Worker): WebWorkerRPC<JSONPathWorkerFrontend> {
-        const rpc = new WebWorkerRPC<JSONPathWorkerFrontend>(i => worker.postMessage(i), t => new JSONPathWorkerFrontend(t));
+    private static createRPC(worker: Worker): WorkerRPC<WorkerFrontend> {
+        const rpc = new WorkerRPC<WorkerFrontend>(i => worker.postMessage(i), t => new WorkerFrontend(t));
         worker.addEventListener("message", e => rpc.receive(e.data));
         return rpc;
     }
@@ -78,7 +77,7 @@ export class JSONPathWorkerFrontend {
 
     private cancelQueue() {
         this.cancellationToken.cancel();
-        this.cancellationToken = new CancelToken();
+        this.cancellationToken = new CancellationToken();
         this.taskQueue = Promise.resolve();
     }
 

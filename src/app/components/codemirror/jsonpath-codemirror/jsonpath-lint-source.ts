@@ -1,10 +1,9 @@
-import { defaultJSONPathOptions } from "@/jsonpath-tools/options";
-import { TypeChecker } from "@/jsonpath-tools/semantic-analysis/type-checker";
-import { syntaxTree } from "@codemirror/language";
 import { LintSource } from "@codemirror/lint";
+import { ViewUpdate } from "@codemirror/view";
 import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "../../../../jsonpath-tools/diagnostics";
-import { getJSONPath, workerStateField } from "./jsonpath-language";
-import { OperationCancelledError } from "./cancellation";
+import { OperationCancelledError } from "./cancellation-token";
+import { updateOptionsEffect, updateQueryArgumentEffect, workerStateField } from "./jsonpath-state";
+
 
 export function jsonPathLintSource(options: { onDiagnosticsCreated?: (diagnostics: readonly JSONPathDiagnostics[]) => void } = {}): LintSource {
     return async view => {
@@ -34,3 +33,11 @@ export function jsonPathLintSource(options: { onDiagnosticsCreated?: (diagnostic
         }
     }
 }
+
+export const jsonPathLintSourceNeedsRefresh = (update: ViewUpdate): boolean => {
+    for (const transaction of update.transactions) {
+        if (transaction.effects.some(e => e.is(updateOptionsEffect) || e.is(updateQueryArgumentEffect))) 
+            return true;
+    }
+    return false;
+};

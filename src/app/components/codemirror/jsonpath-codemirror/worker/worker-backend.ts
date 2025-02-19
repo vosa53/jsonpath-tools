@@ -1,14 +1,14 @@
 import { CompletionProvider } from "@/jsonpath-tools/editor-services/completion-provider";
 import { defaultJSONPathOptions } from "@/jsonpath-tools/options";
+import { JSONPathQueryContext } from "@/jsonpath-tools/query/evaluation";
 import { JSONPath } from "@/jsonpath-tools/query/json-path";
 import { TypeChecker } from "@/jsonpath-tools/semantic-analysis/type-checker";
 import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
-import { WebWorkerRPCTopic } from "./web-worker-rpc";
 import { DisconnectWorkerMessage, GetCompletionsWorkerMessage, GetCompletionsWorkerMessageResponse, GetDiagnosticsWorkerMessage, GetDiagnosticsWorkerMessageResponse, GetResultWorkerMessage, GetResultWorkerMessageResponse, UpdateOptionsWorkerMessage, UpdateQueryArgumentWorkerMessage, UpdateQueryWorkerMessage } from "./worker-messages";
-import { JSONPathQueryContext } from "@/jsonpath-tools/query/evaluation";
+import { WebWorkerRPCTopic } from "./worker-rpc";
 
-export class JSONPathWorkerBackend {
+export class WorkerBackend {
     private readonly parser: JSONPathParser;
     private checker: TypeChecker;
     private completionProvider: CompletionProvider;

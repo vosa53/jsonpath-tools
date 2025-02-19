@@ -1,8 +1,8 @@
-import { JSONPathWorkerBackend } from "./json-path-worker-backend";
-import { WebWorkerRPC } from "./web-worker-rpc";
+import { WorkerBackend } from "./worker-backend";
+import { WorkerRPC } from "./worker-rpc";
 import { DisconnectWorkerMessage, GetCompletionsWorkerMessage, GetDiagnosticsWorkerMessage, GetResultWorkerMessage, UpdateOptionsWorkerMessage, UpdateQueryArgumentWorkerMessage, UpdateQueryWorkerMessage } from "./worker-messages";
 
-const rpc = new WebWorkerRPC<JSONPathWorkerBackend>(i => postMessage(i), t => new JSONPathWorkerBackend(t));
+const rpc = new WorkerRPC<WorkerBackend>(i => postMessage(i), t => new WorkerBackend(t));
 addEventListener("message", e => rpc.receive(e.data));
 
 rpc.addHandlerAction("updateOptions", (h, message: UpdateOptionsWorkerMessage) => h.updateOptions(message));

@@ -3,74 +3,11 @@ import { JSONPathNode } from "@/jsonpath-tools/query/node";
 import { JSONPathSyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "@/jsonpath-tools/query/syntax-tree-type";
 import { JSONPathToken } from "@/jsonpath-tools/query/token";
-import { defineLanguageFacet, Language, languageDataProp } from "@codemirror/language";
+import { defineLanguageFacet, languageDataProp } from "@codemirror/language";
 import { Input, NodeProp, NodeSet, NodeType, Parser, PartialParse, Tree, TreeFragment } from "@lezer/common";
 import { styleTags, tags as t } from "@lezer/highlight";
 import { JSONPathParser } from "../../../../jsonpath-tools/syntax-analysis/parser";
 import { jsonPathCompletionSource } from "./jsonpath-completion-source";
-import { StateField, StateEffect, Facet } from "@codemirror/state";
-import { EditorView, ViewPlugin, PluginValue, ViewUpdate } from "@codemirror/view";
-import { JSONPathWorkerFrontend } from "./json-path-worker-frontend";
-import { JSONPathJSONValue } from "@/jsonpath-tools/types";
-import { JSONPathOptions } from "@/jsonpath-tools/options";
-
-/*interface JSONPathEditorState {
-    readonly worker: JSONPathWorkerFrontend;
-    readonly options: JSONPathOptions;
-    readonly queryArgument: JSONPathJSONValue;
-}*/
-
-export const updateOptionsEffect = StateEffect.define<JSONPathOptions>();
-export const updateQueryArgumentEffect = StateEffect.define<JSONPathJSONValue>();
-const configFacet = Facet.define<{a: string}>();
-
-export const workerStateField = StateField.define<JSONPathWorkerFrontend>({
-    create(state) {
-        const worker = JSONPathWorkerFrontend.connectNew();
-        worker.updateQuery(state.doc.toString());
-        return worker;
-    },
-    update(value, transaction) {
-        if (transaction.docChanged) {
-            value.updateQuery(transaction.newDoc.toString());
-        }
-        for (const effect of transaction.effects) {
-            /*if (effect.is(updateOptionsEffect))
-                value.updateOption(effect.value);
-            else */if (effect.is(updateQueryArgumentEffect)) {
-                console.log("UPDATE QUERY ARGUMENT", effect.value);
-                value.updateQueryArgument(effect.value);
-            }
-        }
-
-        return value;
-    }
-});
-
-class JSONPathPlugin implements PluginValue {
-    private readonly worker: JSONPathWorkerFrontend;
-
-    constructor(private readonly view: EditorView) {
-        this.worker = view.state.field(workerStateField);
-        /*this.worker.updateDiagnostics = diagnostics => {
-            const bb = view.state.facet(configFacet);
-            console.log("Received diagnostics", diagnostics);
-        };*/
-        // TODO: Result.
-    }
-
-    update(update: ViewUpdate): void {
-        
-    }
-
-    destroy(): void {
-        this.worker.dispose();
-    }
-}
-
-const jsonPathPlugin = ViewPlugin.fromClass(JSONPathPlugin, { provide(plugin) {
-    return workerStateField;
-}, });
 
 const treeToJSONPath = new WeakMap<Tree, JSONPath>();
 
@@ -237,9 +174,5 @@ class CodeMirrorJSONPathPartialParse implements PartialParse {
     stopAt(pos: number): void { }
 }
 
-const jsonPathLanguageFacet = defineLanguageFacet({
-    autocomplete: jsonPathCompletionSource
-});
-const jsonPathParser = new CodeMirrorJSONPathParser();
-export const jsonPathLanguage = [new Language(jsonPathLanguageFacet, jsonPathParser), jsonPathPlugin];
-
+export const jsonPathLanguageFacet = defineLanguageFacet();
+export const jsonPathParser = new CodeMirrorJSONPathParser();

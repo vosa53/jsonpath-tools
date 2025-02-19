@@ -1,6 +1,6 @@
-import { CancellationToken, OperationCancelledError } from "./cancellation";
+import { OperationCancelledError } from "@/app/components/codemirror/jsonpath-codemirror/cancellation-token";
 
-export class SharedArrayBufferCancellationToken implements CancellationToken {
+export class SharedArrayBufferCancellationToken {
     private readonly array: Int32Array;
 
     constructor(readonly buffer: SharedArrayBuffer = new SharedArrayBuffer(4)) {

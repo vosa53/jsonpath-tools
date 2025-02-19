@@ -2,14 +2,12 @@ import { TooltipProvider } from "@/jsonpath-tools/editor-services/tooltip-provid
 import { syntaxTree } from "@codemirror/language";
 import { Decoration, hoverTooltip } from "@codemirror/view";
 import { EditorView } from "codemirror";
-import { getJSONPath } from "./jsonpath-language";
-
-const hoveredRangeDecoration = Decoration.mark({ class: "cm-hovered-range" });
+import { getJSONPath } from "./jsonpath-parser";
 
 const tooltip = hoverTooltip((view, pos, side) => {
     const jsonPath = getJSONPath(syntaxTree(view.state));
     const tooltip = TooltipProvider.provideTooltip(jsonPath, pos);
-    if (tooltip === null) 
+    if (tooltip === null)
         return null;
 
     return {
@@ -29,7 +27,9 @@ const tooltip = hoverTooltip((view, pos, side) => {
     };
 });
 
-export const jsonPathTooltips = [
+const hoveredRangeDecoration = Decoration.mark({ class: "cm-hovered-range" });
+
+export const jsonPathTooltip = [
     tooltip,
     EditorView.baseTheme({
         "& .cm-hovered-range": { background: "rgba(0, 0, 0, 0.07)", outline: "solid 2px lightgray" }

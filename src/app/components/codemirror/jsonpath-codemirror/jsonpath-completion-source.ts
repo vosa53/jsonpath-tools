@@ -1,10 +1,8 @@
-import { testJson } from "@/app/page";
-import { CompletionItemType, CompletionProvider } from "@/jsonpath-tools/editor-services/completion-provider";
+import { CompletionItemType } from "@/jsonpath-tools/editor-services/completion-provider";
 import { CompletionContext, CompletionResult } from "@codemirror/autocomplete";
-import { syntaxTree } from "@codemirror/language";
-import { getJSONPath, workerStateField } from "./jsonpath-language";
-import { defaultJSONPathOptions } from "@/jsonpath-tools/options";
-import { OperationCancelledError } from "./cancellation";
+import { OperationCancelledError } from "./cancellation-token";
+import { workerStateField } from "./jsonpath-state";
+
 
 export async function jsonPathCompletionSource(context: CompletionContext): Promise<CompletionResult | null> {
     const word = context.matchBefore(/\w*/)!;
