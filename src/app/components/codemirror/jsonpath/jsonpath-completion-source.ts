@@ -2,16 +2,19 @@ import { testJson } from "@/app/page";
 import { CompletionItemType, CompletionProvider } from "@/jsonpath-tools/editor-services/completion-provider";
 import { CompletionContext, CompletionResult } from "@codemirror/autocomplete";
 import { syntaxTree } from "@codemirror/language";
-import { getJSONPath } from "./jsonpath-language";
+import { getJSONPath, workerStateField } from "./jsonpath-language";
 import { defaultJSONPathOptions } from "@/jsonpath-tools/options";
 
-export function jsonPathCompletionSource(context: CompletionContext): CompletionResult | null {
-    const completionProvider = new CompletionProvider(defaultJSONPathOptions);
-    const jsonPath = getJSONPath(syntaxTree(context.state));
-    const completions = completionProvider.provideCompletions(jsonPath, JSON.parse(testJson), context.pos);
-    
+export async function jsonPathCompletionSource(context: CompletionContext): Promise<CompletionResult | null> {
     const word = context.matchBefore(/\w*/)!;
     if (context.explicit || word.from !== word.to || context.matchBefore(/\.|,\s?|\[/)) {
+        const worker = context.state.field(workerStateField);
+        const completions = await worker.getCompletions(context.pos);
+
+        /*const completionProvider = new CompletionProvider(defaultJSONPathOptions);
+        const jsonPath = getJSONPath(syntaxTree(context.state));
+        const completions = completionProvider.provideCompletions(jsonPath, JSON.parse(testJson), context.pos);*/
+
         return {
             from: word.from,
             options: completions.map(c => ({

@@ -33,20 +33,20 @@ export default function CodeMirrorEditor({ value, readonly, style, onValueChange
     { value: string, readonly: boolean, style?: CSSProperties, onValueChanged: (value: string) => void, onExtensionsRequested: () => Extension[] }) {
     const containerElementRef = useRef<HTMLDivElement>(null);
     const [valueInEditor, setValueInEditor] = useState("");
-    const [editorView, setEditorView] = useState<EditorView>();
+    const editorViewRef = useRef<EditorView>(null);
     const colorScheme = useMantineColorScheme();
 
     useEffect(() => {
-        if (editorView !== undefined) {
-            editorView.dispatch({
+        if (editorViewRef.current !== null) {
+            editorViewRef.current.dispatch({
                 effects: themeCompartment.reconfigure(colorSchemeToTheme(colorScheme.colorScheme))
             });
         }
     }, [colorScheme.colorScheme]);
 
     useEffect(() => {
-        if (editorView !== undefined) {
-            editorView.dispatch({
+        if (editorViewRef.current !== null) {
+            editorViewRef.current.dispatch({
                 effects: readonlyCompartment.reconfigure(EditorState.readOnly.of(readonly))
             });
         }
@@ -97,14 +97,18 @@ export default function CodeMirrorEditor({ value, readonly, style, onValueChange
             parent: containerElementRef.current!
         });
         setValueInEditor(value);
-        setEditorView(editorView);
+        editorViewRef.current = editorView;
+
+        return () => {
+            editorView.destroy();
+        };
     }, []);
 
     useEffect(() => {
-        if (editorView !== undefined && value !== valueInEditor) {
+        if (editorViewRef.current !== null && value !== valueInEditor) {
             setValueInEditor(value);
-            editorView.dispatch({
-                changes: { from: 0, to: editorView.state.doc.length, insert: value },
+            editorViewRef.current.dispatch({
+                changes: { from: 0, to: editorViewRef.current.state.doc.length, insert: value },
             });
         }
     }, [value]);

@@ -648,7 +648,7 @@ class ParserContext {
 
     addError(message: string, textRange?: TextRange) {
         textRange ??= new TextRange(this._currentIndex, this.currentIndex < this.input.length ? 1 : 0);
-        const diagnostics = new JSONPathDiagnostics(JSONPathDiagnosticsType.error, message, textRange);
+        const diagnostics: JSONPathDiagnostics = { type: JSONPathDiagnosticsType.error, message, textRange };
         this._diagnostics.push(diagnostics);
     }
 

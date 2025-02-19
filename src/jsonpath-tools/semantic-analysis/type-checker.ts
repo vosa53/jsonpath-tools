@@ -22,15 +22,19 @@ import { JSONPathToken } from "../query/token";
 import { TextRange } from "../text-range";
 
 export class TypeChecker {
+    constructor (private readonly options: JSONPathOptions) {
+
+    }
+
     check(query: JSONPath, options: JSONPathOptions): readonly JSONPathDiagnostics[] {
-        const context = new TypeCheckerContext(options);
+        const context = new TypeCheckerContext();
         this.checkRecursive(query, null, context);
         return context.diagnostics;
     }
 
     private checkRecursive(tree: JSONPathNode, parent: JSONPathSyntaxTree | null, context: TypeCheckerContext) {
         if (tree instanceof JSONPathFunctionExpression) {
-            const functionDefinition = context.options.functions[tree.name];
+            const functionDefinition = this.options.functions[tree.name];
             if (functionDefinition === undefined)
                 context.addError(`Function '${tree.name}' is not defined.`, tree.nameToken.textRange);
             else {
@@ -71,7 +75,7 @@ export class TypeChecker {
 
     private getType(targetType: JSONPathType | null, expression: JSONPathFilterExpression, context: TypeCheckerContext): JSONPathType | null {
         if (expression instanceof JSONPathFunctionExpression) {
-            const functionDefinition = context.options.functions[expression.name];
+            const functionDefinition = this.options.functions[expression.name];
             if (functionDefinition === undefined) return null;
             else return functionDefinition.returnType;
         }
@@ -106,12 +110,8 @@ export class TypeChecker {
 class TypeCheckerContext {
     private _diagnostics: JSONPathDiagnostics[] = [];
 
-    constructor(
-        readonly options: JSONPathOptions
-    ) { }
-
     addError(message: string, textRange: TextRange) {
-        const diagnostics = new JSONPathDiagnostics(JSONPathDiagnosticsType.error, message, textRange);
+        const diagnostics: JSONPathDiagnostics = { type: JSONPathDiagnosticsType.error, message, textRange };
         this._diagnostics.push(diagnostics);
     }
 

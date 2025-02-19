@@ -5,7 +5,7 @@ import { JSONPath } from "@/jsonpath-tools/query/json-path";
 import { Accordion, ActionIcon, AppShell, Burger, Divider, Flex, Group, Indicator, Stack, Tabs, Title, useMantineColorScheme } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconBraces, IconEqual, IconExclamationCircle, IconHelp, IconListTree, IconMathFunction, IconMoon, IconRoute, IconRouteSquare, IconSun } from '@tabler/icons-react';
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { JSONPathDiagnostics } from "../jsonpath-tools/diagnostics";
 import { defaultJSONPathOptions } from "../jsonpath-tools/options";
 import DiagnosticsView from "./components/diagnostics-view";
