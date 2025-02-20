@@ -1,6 +1,6 @@
 import { JSONPathOptions } from "@/jsonpath-tools/options";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
-import { Facet, StateEffect, StateField } from "@codemirror/state";
+import { EditorState, Facet, StateEffect, StateField } from "@codemirror/state";
 import { EditorView, PluginValue, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { WorkerFrontend } from "./worker/worker-frontend";
 
@@ -63,3 +63,8 @@ export const jsonPathPlugin = ViewPlugin.fromClass(JSONPathPlugin, {
         return workerStateField;
     },
 });
+
+export function getResult(state: EditorState): Promise<{ nodes: readonly JSONPathJSONValue[], paths: readonly (string | number)[][] }> {
+    const worker = state.field(workerStateField);
+    return worker.getResult();
+}

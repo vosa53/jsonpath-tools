@@ -60,7 +60,8 @@ export class WorkerBackend {
         const result = this.jsonPath.select(context);
 
         return {
-            nodes: result.nodes.map(n => n.value)
+            nodes: result.nodes.map(n => n.value),
+            paths: result.nodes.map(n => n.buildPath())
         };
     }
 

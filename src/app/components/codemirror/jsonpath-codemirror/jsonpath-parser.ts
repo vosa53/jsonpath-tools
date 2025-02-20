@@ -7,13 +7,14 @@ import { defineLanguageFacet, languageDataProp } from "@codemirror/language";
 import { Input, NodeProp, NodeSet, NodeType, Parser, PartialParse, Tree, TreeFragment } from "@lezer/common";
 import { styleTags, tags as t } from "@lezer/highlight";
 import { JSONPathParser } from "../../../../jsonpath-tools/syntax-analysis/parser";
+import {continuedIndent, indentNodeProp, foldNodeProp, foldInside, LRLanguage, LanguageSupport} from "@codemirror/language"
 import { jsonPathCompletionSource } from "./jsonpath-completion-source";
 
 const treeToJSONPath = new WeakMap<Tree, JSONPath>();
 
 export function getJSONPath(tree: Tree): JSONPath {
     const jsonPath = treeToJSONPath.get(tree);
-    if (jsonPath === undefined) 
+    if (jsonPath === undefined)
         throw new Error("The given Lezer tree does not have a corresponding JSONPath.");
     return jsonPath;
 }
@@ -33,54 +34,54 @@ function createNodeSet(types: JSONPathSyntaxTreeType[]): { nodeSet: NodeSet, tre
 }
 
 const { nodeSet, treeTypeToNodeId } = createNodeSet([
-    JSONPathSyntaxTreeType.root,  
-    JSONPathSyntaxTreeType.query,  
-    JSONPathSyntaxTreeType.segment,  
-    JSONPathSyntaxTreeType.nameSelector,  
-    JSONPathSyntaxTreeType.wildcardSelector,  
-    JSONPathSyntaxTreeType.sliceSelector,  
-    JSONPathSyntaxTreeType.indexSelector,  
-    JSONPathSyntaxTreeType.filterSelector,  
+    JSONPathSyntaxTreeType.root,
+    JSONPathSyntaxTreeType.query,
+    JSONPathSyntaxTreeType.segment,
+    JSONPathSyntaxTreeType.nameSelector,
+    JSONPathSyntaxTreeType.wildcardSelector,
+    JSONPathSyntaxTreeType.sliceSelector,
+    JSONPathSyntaxTreeType.indexSelector,
+    JSONPathSyntaxTreeType.filterSelector,
     JSONPathSyntaxTreeType.missingSelector,
-    JSONPathSyntaxTreeType.orExpression,  
-    JSONPathSyntaxTreeType.andExpression,  
-    JSONPathSyntaxTreeType.notExpression,  
-    JSONPathSyntaxTreeType.paranthesisExpression,  
-    JSONPathSyntaxTreeType.comparisonExpression,  
-    JSONPathSyntaxTreeType.filterQueryExpression,  
-    JSONPathSyntaxTreeType.functionExpression,  
-    JSONPathSyntaxTreeType.numberLiteral,  
-    JSONPathSyntaxTreeType.stringLiteral,  
-    JSONPathSyntaxTreeType.booleanLiteral,  
+    JSONPathSyntaxTreeType.orExpression,
+    JSONPathSyntaxTreeType.andExpression,
+    JSONPathSyntaxTreeType.notExpression,
+    JSONPathSyntaxTreeType.paranthesisExpression,
+    JSONPathSyntaxTreeType.comparisonExpression,
+    JSONPathSyntaxTreeType.filterQueryExpression,
+    JSONPathSyntaxTreeType.functionExpression,
+    JSONPathSyntaxTreeType.numberLiteral,
+    JSONPathSyntaxTreeType.stringLiteral,
+    JSONPathSyntaxTreeType.booleanLiteral,
     JSONPathSyntaxTreeType.nullLiteral,
     JSONPathSyntaxTreeType.missingExpression,
-    JSONPathSyntaxTreeType.dollarToken,  
-    JSONPathSyntaxTreeType.atToken,  
-    JSONPathSyntaxTreeType.starToken,  
-    JSONPathSyntaxTreeType.questionMarkToken,  
-    JSONPathSyntaxTreeType.dotToken,  
-    JSONPathSyntaxTreeType.doubleDotToken,  
-    JSONPathSyntaxTreeType.commaToken,  
-    JSONPathSyntaxTreeType.colonToken,  
-    JSONPathSyntaxTreeType.doubleAmpersandToken,  
-    JSONPathSyntaxTreeType.doubleBarToken,  
-    JSONPathSyntaxTreeType.exclamationMarkToken,  
-    JSONPathSyntaxTreeType.doubleEqualsToken,  
-    JSONPathSyntaxTreeType.exclamationMarkEqualsToken,  
-    JSONPathSyntaxTreeType.lessThanEqualsToken,  
-    JSONPathSyntaxTreeType.greaterThanEqualsToken,  
-    JSONPathSyntaxTreeType.lessThanToken,  
-    JSONPathSyntaxTreeType.greaterThanToken,  
-    JSONPathSyntaxTreeType.trueToken,  
-    JSONPathSyntaxTreeType.falseToken,  
-    JSONPathSyntaxTreeType.nullToken,  
-    JSONPathSyntaxTreeType.stringToken,  
-    JSONPathSyntaxTreeType.numberToken,  
-    JSONPathSyntaxTreeType.nameToken,  
-    JSONPathSyntaxTreeType.openingParanthesisToken,  
-    JSONPathSyntaxTreeType.closingParanthesisToken,  
-    JSONPathSyntaxTreeType.openingBracketToken,  
-    JSONPathSyntaxTreeType.closingBracketToken,  
+    JSONPathSyntaxTreeType.dollarToken,
+    JSONPathSyntaxTreeType.atToken,
+    JSONPathSyntaxTreeType.starToken,
+    JSONPathSyntaxTreeType.questionMarkToken,
+    JSONPathSyntaxTreeType.dotToken,
+    JSONPathSyntaxTreeType.doubleDotToken,
+    JSONPathSyntaxTreeType.commaToken,
+    JSONPathSyntaxTreeType.colonToken,
+    JSONPathSyntaxTreeType.doubleAmpersandToken,
+    JSONPathSyntaxTreeType.doubleBarToken,
+    JSONPathSyntaxTreeType.exclamationMarkToken,
+    JSONPathSyntaxTreeType.doubleEqualsToken,
+    JSONPathSyntaxTreeType.exclamationMarkEqualsToken,
+    JSONPathSyntaxTreeType.lessThanEqualsToken,
+    JSONPathSyntaxTreeType.greaterThanEqualsToken,
+    JSONPathSyntaxTreeType.lessThanToken,
+    JSONPathSyntaxTreeType.greaterThanToken,
+    JSONPathSyntaxTreeType.trueToken,
+    JSONPathSyntaxTreeType.falseToken,
+    JSONPathSyntaxTreeType.nullToken,
+    JSONPathSyntaxTreeType.stringToken,
+    JSONPathSyntaxTreeType.numberToken,
+    JSONPathSyntaxTreeType.nameToken,
+    JSONPathSyntaxTreeType.openingParanthesisToken,
+    JSONPathSyntaxTreeType.closingParanthesisToken,
+    JSONPathSyntaxTreeType.openingBracketToken,
+    JSONPathSyntaxTreeType.closingBracketToken,
     JSONPathSyntaxTreeType.endOfFileToken,
     JSONPathSyntaxTreeType.missingToken
 ]);
@@ -94,18 +95,25 @@ class CodeMirrorJSONPathParser extends Parser {
             styleTags({
                 [JSONPathSyntaxTreeType.openingBracketToken]: t.bracket,
                 [JSONPathSyntaxTreeType.closingBracketToken]: t.bracket,
-                [JSONPathSyntaxTreeType.dollarToken]: t.lineComment,
-                [JSONPathSyntaxTreeType.atToken]: t.lineComment,
-                [JSONPathSyntaxTreeType.starToken]: t.annotation,
-                [JSONPathSyntaxTreeType.questionMarkToken]: t.annotation,
+                [JSONPathSyntaxTreeType.dollarToken]: t.variableName,
+                [JSONPathSyntaxTreeType.atToken]: t.variableName,
+                [JSONPathSyntaxTreeType.starToken]: t.controlOperator,
+                [JSONPathSyntaxTreeType.questionMarkToken]: t.controlOperator,
+                [JSONPathSyntaxTreeType.colonToken]: t.controlOperator,
                 [JSONPathSyntaxTreeType.numberToken]: t.number,
                 [JSONPathSyntaxTreeType.stringToken]: t.string,
-                [JSONPathSyntaxTreeType.greaterThanToken]: t.operator,
-                [JSONPathSyntaxTreeType.doubleAmpersandToken]: t.operator,
-                [JSONPathSyntaxTreeType.doubleEqualsToken]: t.operator,
-                [JSONPathSyntaxTreeType.trueToken]: t.keyword,
-                [JSONPathSyntaxTreeType.falseToken]: t.keyword,
-                [JSONPathSyntaxTreeType.nullToken]: t.keyword,
+                [JSONPathSyntaxTreeType.greaterThanToken]: t.compareOperator,
+                [JSONPathSyntaxTreeType.greaterThanEqualsToken]: t.compareOperator,
+                [JSONPathSyntaxTreeType.lessThanToken]: t.compareOperator,
+                [JSONPathSyntaxTreeType.lessThanEqualsToken]: t.compareOperator,
+                [JSONPathSyntaxTreeType.doubleEqualsToken]: t.compareOperator,
+                [JSONPathSyntaxTreeType.exclamationMarkEqualsToken]: t.compareOperator,
+                [JSONPathSyntaxTreeType.exclamationMarkToken]: t.logicOperator,
+                [JSONPathSyntaxTreeType.doubleAmpersandToken]: t.logicOperator,
+                [JSONPathSyntaxTreeType.doubleBarToken]: t.logicOperator,
+                [JSONPathSyntaxTreeType.trueToken]: t.bool,
+                [JSONPathSyntaxTreeType.falseToken]: t.bool,
+                [JSONPathSyntaxTreeType.nullToken]: t.null,
                 [JSONPathSyntaxTreeType.nameToken]: t.propertyName,
                 [JSONPathSyntaxTreeType.functionExpression + "/" + JSONPathSyntaxTreeType.nameToken]: t.className
             }),
@@ -117,6 +125,10 @@ class CodeMirrorJSONPathParser extends Parser {
                 [JSONPathSyntaxTreeType.closingParanthesisToken]: [JSONPathSyntaxTreeType.openingParanthesisToken],
                 [JSONPathSyntaxTreeType.closingBracketToken]: [JSONPathSyntaxTreeType.openingBracketToken]
             })),
+            foldNodeProp.add({
+                [JSONPathSyntaxTreeType.paranthesisExpression]: foldInside
+                // TODO: Other foldings.
+            }),
             languageDataProp.add(NodeType.match({
                 [JSONPathSyntaxTreeType.root]: jsonPathLanguageFacet
             }))

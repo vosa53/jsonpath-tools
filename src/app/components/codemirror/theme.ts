@@ -11,7 +11,7 @@ export const theme = EditorView.theme({
     "& .cm-tooltip-autocomplete .cm-completionDetail": { marginLeft: "auto", fontStyle: "normal", color: "var(--mantine-color-dimmed)" },
     "& .cm-completionMatchedText": { textDecoration: "none", color: "var(--mantine-primary-color-filled)" },
     "& .cm-activeLine": { backgroundColor: "transparent", outline: "2px solid var(--mantine-color-default-hover)" },
-    "& .cm-gutters": { backgroundColor: "transparent", borderRight: "none", padding: "0 5px 0 5px" },
+    "& .cm-gutters": { backgroundColor: "var(--mantine-color-body)", borderRight: "none", padding: "0 5px 0 5px" },
     "& .cm-lineNumbers .cm-gutterElement": { color: "var(--mantine-color-dimmed)" },
     "& .cm-lineNumbers .cm-gutterElement.cm-activeLineGutter": { color: "var(--mantine-color-text)" },
     "& .cm-gutterElement.cm-activeLineGutter": { backgroundColor: "transparent" },

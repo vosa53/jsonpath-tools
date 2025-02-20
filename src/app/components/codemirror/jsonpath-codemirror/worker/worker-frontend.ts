@@ -64,10 +64,10 @@ export class WorkerFrontend {
         return response.diagnostics;
     }
 
-    async getResult(): Promise<readonly JSONPathJSONValue[]> {
+    async getResult(): Promise<{ nodes: readonly JSONPathJSONValue[], paths: readonly (string | number)[][] }> {
         const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetResultWorkerMessage, GetResultWorkerMessageResponse>("getResult", {
         }), this.cancellationToken);
-        return response.nodes;
+        return response;
     }
 
     dispose() {

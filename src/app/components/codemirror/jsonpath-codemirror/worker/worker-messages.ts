@@ -47,6 +47,7 @@ export interface GetResultWorkerMessage {
 
 export interface GetResultWorkerMessageResponse {
     readonly nodes: readonly JSONPathJSONValue[];
+    readonly paths: readonly (string | number)[][];
 }
 
 export interface DisconnectWorkerMessage {
