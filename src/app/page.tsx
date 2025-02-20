@@ -14,6 +14,8 @@ import JSONPathEditor from "./components/jsonpath-editor";
 import classes from "./styles/page.module.css";
 import OutlineView from "./components/outline-view";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
+import { CustomFunction } from "./models/custom-function";
+import CustomFunctionsView from "./components/custom-functions-view";
 
 export const testJson = `{
     "store": {
@@ -55,6 +57,7 @@ export const testJson = `{
 export default function Home() {
     const colorScheme = useMantineColorScheme();
     const [opened, { toggle }] = useDisclosure();
+    const [customFunctions, setCustomFunctions] = useState<readonly CustomFunction[]>([]);
 
     const [queryText, setQueryText] = useState("$.books[?@.author == \"George Orwell\" && count(true, 25) > 42].title");
     const [query, setQuery] = useState<JSONPath>();
@@ -131,7 +134,9 @@ export default function Home() {
                         <Accordion.Control icon={<IconMathFunction size={20} />}>
                             Custom Functions
                         </Accordion.Control>
-                        <Accordion.Panel>Content</Accordion.Panel>
+                        <Accordion.Panel>
+                            <CustomFunctionsView customFunctions={customFunctions} onCustomFunctionsChanged={setCustomFunctions} />
+                        </Accordion.Panel>
                     </Accordion.Item>
                 </Accordion>
             </AppShell.Navbar>
