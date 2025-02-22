@@ -1,3 +1,11 @@
 .mantine-Accordion-label {
     font-weight: 500;
 }
+
+.mantine-Table-th {
+    font-weight: 500;
+}
+
+strong {
+    font-weight: 500;
+}

@@ -11,5 +11,5 @@
 }
 
 [data-mantine-color-scheme=dark] .navbar, [data-mantine-color-scheme=dark] .main {
-    background: var(--mantine-color-dark-9);
+    background: var(--mantine-color-dark-8);
 }

@@ -1,4 +1,4 @@
-import { OperationCancelledError } from "@/app/components/codemirror/jsonpath-codemirror/cancellation-token";
+import { OperationCancelledError } from "@/app/components/code-editors/codemirror/jsonpath-codemirror/cancellation-token";
 
 export class SharedArrayBufferCancellationToken {
     private readonly array: Int32Array;

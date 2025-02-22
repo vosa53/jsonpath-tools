@@ -1,8 +1,38 @@
-import { Box, List, Table, ThemeIcon } from "@mantine/core";
+import { JSONPathDiagnostics } from "@/jsonpath-tools/diagnostics";
+import { Box, Checkbox, Group, List, Table, ThemeIcon } from "@mantine/core";
 import { IconExclamationCircle } from "@tabler/icons-react";
-import { JSONPathDiagnostics } from "../../jsonpath-tools/diagnostics";
+import PanelShell from "../panel-shell";
+import { memo } from "react";
 
-export default function DiagnosticsView({ diagnostics }: { diagnostics: readonly JSONPathDiagnostics[] }) {
+const DiagnosticsPanel = memo(({ 
+    diagnostics 
+}: { 
+    diagnostics: readonly JSONPathDiagnostics[] 
+}) => {
+    return (
+        <PanelShell
+            toolbar={
+                <Group gap="xs">
+                    <Checkbox
+                        variant="outline"
+                        defaultChecked
+                        label="Errors"
+                    />
+                    <Checkbox
+                        variant="outline"
+                        defaultChecked
+                        label="Warnings"
+                    />
+                </Group>
+            }
+        >
+            <DiagnosticsView diagnostics={diagnostics} />
+        </PanelShell>
+    );
+});
+export default DiagnosticsPanel;
+
+function DiagnosticsView({ diagnostics }: { diagnostics: readonly JSONPathDiagnostics[] }) {
     return (
         <Table>
             <Table.Thead>

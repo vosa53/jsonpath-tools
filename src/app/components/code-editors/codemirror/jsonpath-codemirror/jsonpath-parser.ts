@@ -6,9 +6,9 @@ import { JSONPathToken } from "@/jsonpath-tools/query/token";
 import { defineLanguageFacet, languageDataProp } from "@codemirror/language";
 import { Input, NodeProp, NodeSet, NodeType, Parser, PartialParse, Tree, TreeFragment } from "@lezer/common";
 import { styleTags, tags as t } from "@lezer/highlight";
-import { JSONPathParser } from "../../../../jsonpath-tools/syntax-analysis/parser";
 import {continuedIndent, indentNodeProp, foldNodeProp, foldInside, LRLanguage, LanguageSupport} from "@codemirror/language"
 import { jsonPathCompletionSource } from "./jsonpath-completion-source";
+import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
 
 const treeToJSONPath = new WeakMap<Tree, JSONPath>();
 

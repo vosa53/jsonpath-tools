@@ -1,0 +1,40 @@
+import { ActionIcon, Burger, Flex, Group, Title, useMantineColorScheme } from "@mantine/core";
+import { IconBrandGithub, IconMoon, IconRoute, IconSun } from "@tabler/icons-react";
+import { memo } from "react";
+
+const Header = memo(({
+    navbarOpened,
+    onNavbarOpenedChanged
+}: {
+    navbarOpened: boolean,
+    onNavbarOpenedChanged: (opened: boolean) => void
+}) => {
+    const colorScheme = useMantineColorScheme();
+
+    return (
+        <Flex justify="space-between">
+            <Group p="xs" c="violet.4" gap={0}>
+                <Burger
+                    opened={navbarOpened}
+                    onClick={() => onNavbarOpenedChanged(!navbarOpened)}
+                    hiddenFrom="md"
+                    size="sm"
+                    color="violet.4" />
+                <IconRoute size={33} stroke={2} />
+                <Title order={1} size="24" pl="xs" fw="600">JSONPath Playground</Title>
+            </Group>
+            <Group pr="xs">
+                <ActionIcon variant="subtle" color="violet" size="lg" aria-label="Set dark color scheme" visibleFrom="xs">
+                    <IconBrandGithub style={{ width: "70%", height: "70%" }} stroke={1.5} />
+                </ActionIcon>
+                <ActionIcon variant="subtle" color="violet" size="lg" aria-label="Set dark color scheme" darkHidden onClick={() => colorScheme.setColorScheme("dark")}>
+                    <IconMoon style={{ width: "70%", height: "70%" }} stroke={1.5} />
+                </ActionIcon>
+                <ActionIcon variant="subtle" color="violet" size="lg" aria-label="Set light color scheme" lightHidden onClick={() => colorScheme.setColorScheme("light")}>
+                    <IconSun style={{ width: "70%", height: "70%" }} stroke={1.5} />
+                </ActionIcon>
+            </Group>
+        </Flex>
+    );
+});
+export default Header;

@@ -21,3 +21,11 @@ export function createSyntaxTree(syntaxTree: JSONPathSyntaxTree, colored = false
     }
     return text;
 }
+
+export function logPerformance<TResult>(label: string, action: () => TResult) {
+    const startMilliseconds = performance.now();
+    const result = action();
+    const elapsedMilliseconds = performance.now() - startMilliseconds;
+    console.log(`'${label}' took ${elapsedMilliseconds.toFixed(4)} "ms`);
+    return result;
+}

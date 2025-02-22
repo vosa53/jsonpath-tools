@@ -1,6 +1,3 @@
-import { javascript } from "@codemirror/lang-javascript";
-import CodeMirrorEditor from "./codemirror/codemirror-editor";
-import FunctionEditor from "./custom-function-editor";
 import { CustomFunction } from "../models/custom-function";
 import { useDisclosure } from "@mantine/hooks";
 import { Button, Modal } from "@mantine/core";

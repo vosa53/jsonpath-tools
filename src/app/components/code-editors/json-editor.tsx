@@ -14,7 +14,7 @@ export default function JSONEditor({
     const onEditorExtensionsRequested = () => {
         return [
             json(),
-            linter(jsonParseLinter())
+            linter(jsonParseLinter()) // TODO: Disable in readonly editor.
         ];
     };
 

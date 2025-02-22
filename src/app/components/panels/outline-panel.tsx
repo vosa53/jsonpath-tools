@@ -2,10 +2,26 @@ import { JSONPath } from "@/jsonpath-tools/query/json-path";
 import { JSONPathNode } from "@/jsonpath-tools/query/node";
 import { JSONPathSyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
 import { Group, Paper, Text } from "@mantine/core";
-import classes from "./outline-view.module.css"
+import classes from "./outline-panel.module.css"
 import { JSONPathToken } from "@/jsonpath-tools/query/token";
+import PanelShell from "../panel-shell";
+import { memo } from "react";
 
-export default function OutlineView({ tree }: { tree: JSONPathSyntaxTree }) {
+const OutlinePanel = memo(({ query }: { query: JSONPath }) => {
+    return (
+        <PanelShell
+            toolbar={
+                <Group gap="xs">
+                </Group>
+            }
+        >
+            {query !== undefined && <OutlineView tree={query} />}
+        </PanelShell>
+    );
+});
+export default OutlinePanel;
+
+function OutlineView({ tree }: { tree: JSONPathSyntaxTree }) {
     return (
         <div>
             {/* <TreeLabel tree={tree} />

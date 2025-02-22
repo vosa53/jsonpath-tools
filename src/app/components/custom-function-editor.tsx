@@ -1,7 +1,5 @@
-import { javascript } from "@codemirror/lang-javascript";
-import CodeMirrorEditor from "./codemirror/codemirror-editor";
 import { CustomFunction } from "../models/custom-function";
-import JavaScriptEditor from "./javascript-editor";
+import JavaScriptEditor from "./code-editors/javascript-editor";
 import { Input, TextInput } from "@mantine/core";
 
 export default function CustomFunctionEditor({

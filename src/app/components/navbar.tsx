@@ -1,0 +1,39 @@
+import { Accordion, Divider, Flex, Text } from "@mantine/core";
+import { IconHelp, IconMathFunction } from "@tabler/icons-react";
+import { memo } from "react";
+import { CustomFunction } from "../models/custom-function";
+import CustomFunctionsView from "./custom-functions-view";
+
+const Navbar = memo(({
+    customFunctions,
+    onCustomFunctionsChanged
+}: {
+    customFunctions: readonly CustomFunction[],
+    onCustomFunctionsChanged: (customFunctions: readonly CustomFunction[]) => void
+}) => {
+    return (
+        <Flex direction="column" h="100%">
+            <Accordion>
+                <Accordion.Item value="reference">
+                    <Accordion.Control icon={<IconHelp size={20} />}>
+                        Language Reference
+                    </Accordion.Control>
+                    <Accordion.Panel>JSONPath defines a string syntax for selecting and extracting JSON
+                        (RFC 8259) values from within a given JSON value.</Accordion.Panel>
+                </Accordion.Item>
+
+                <Accordion.Item value="print">
+                    <Accordion.Control icon={<IconMathFunction size={20} />}>
+                        Custom Functions
+                    </Accordion.Control>
+                    <Accordion.Panel>
+                        <CustomFunctionsView customFunctions={customFunctions} onCustomFunctionsChanged={onCustomFunctionsChanged} />
+                    </Accordion.Panel>
+                </Accordion.Item>
+            </Accordion>
+            <Divider mt="auto" />
+            <Text p="xs" c="dimmed">Do you like this application?</Text>
+        </Flex>
+    );
+});
+export default Navbar;

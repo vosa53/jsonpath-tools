@@ -7,6 +7,7 @@ import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 import { DisconnectWorkerMessage, GetCompletionsWorkerMessage, GetCompletionsWorkerMessageResponse, GetDiagnosticsWorkerMessage, GetDiagnosticsWorkerMessageResponse, GetResultWorkerMessage, GetResultWorkerMessageResponse, UpdateOptionsWorkerMessage, UpdateQueryArgumentWorkerMessage, UpdateQueryWorkerMessage } from "./worker-messages";
 import { WebWorkerRPCTopic } from "./worker-rpc";
+import { logPerformance } from "@/jsonpath-tools/utils";
 
 export class WorkerBackend {
     private readonly parser: JSONPathParser;
@@ -57,7 +58,7 @@ export class WorkerBackend {
 
     getResult(message: GetResultWorkerMessage): GetResultWorkerMessageResponse {
         const context: JSONPathQueryContext = { rootNode: this.queryArgument, options: defaultJSONPathOptions };
-        const result = this.jsonPath.select(context);
+        const result = logPerformance("query", () => this.jsonPath.select(context));
 
         return {
             nodes: result.nodes.map(n => n.value),

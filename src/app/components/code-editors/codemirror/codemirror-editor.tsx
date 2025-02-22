@@ -8,6 +8,7 @@ import { CSSProperties, useEffect, useRef, useState } from "react";
 import { tabKeymap } from "./tab-keymap";
 import { highlightStyle } from "./highlight-style";
 import { theme } from "./theme";
+import { logPerformance } from "@/jsonpath-tools/utils";
 
 
 export default function CodeMirrorEditor({
@@ -59,7 +60,7 @@ export default function CodeMirrorEditor({
                 readonlyCompartment.of(EditorState.readOnly.of(readonly)),
                 EditorView.updateListener.of(u => {
                     if (u.docChanged) {
-                        const newValue = u.state.doc.toString();
+                        const newValue = logPerformance("editor doc.toString", () => u.state.doc.toString());
                         valueInEditorRef.current = newValue;
                         onValueChanged(newValue);
                     }
@@ -80,8 +81,10 @@ export default function CodeMirrorEditor({
     useEffect(() => {
         if (editorViewRef.current !== null && value !== valueInEditorRef.current) {
             valueInEditorRef.current = value;
-            editorViewRef.current.dispatch({
-                changes: { from: 0, to: editorViewRef.current.state.doc.length, insert: value },
+            logPerformance("editor set value", () => {
+                editorViewRef.current!.dispatch({
+                    changes: { from: 0, to: editorViewRef.current!.state.doc.length, insert: value },
+                });
             });
         }
     }, [value]);
