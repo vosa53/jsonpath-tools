@@ -35,7 +35,7 @@ const ResultPanel = memo(({
                         value={operation.type}
                         onChange={value => onOperationChanged({ ...operation, type: value as OperationType })}
                     />
-                    {operation.type === OperationType.replace && <Button variant="subtle" size="compact-sm" onClick={() => open()}>Configure Replacement</Button>}
+                    {operation.type === OperationType.replace && <Button variant="subtle" size="compact-sm" onClick={() => open()}>Edit Replacement</Button>}
                 </Group>
             }
         >

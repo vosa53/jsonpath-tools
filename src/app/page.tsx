@@ -21,6 +21,7 @@ import { CustomFunction } from "./models/custom-function";
 import { Operation, OperationType } from "./models/operation";
 import { PathType } from "./models/path-type";
 import classes from "./styles/page.module.css";
+import { JSONPathNormalizedPath } from "@/jsonpath-tools/transformations";
 
 export default function Home() {
     const [navbarOpened, setNavbarOpened] = useState(false);
@@ -50,8 +51,10 @@ export default function Home() {
         resultTimeoutRef.current = window.setTimeout(async () => {
             try {
                 const result = await getResultRef.current!();
+                setResultPaths(result.paths);
                 setResultText(JSON.stringify(result.nodes, undefined, 4));
                 setResultPathsText(JSON.stringify(result.paths, undefined, 4));
+                setCurrentResultPathIndex(0);
             }
             catch (error) {
                 if (!(error instanceof OperationCancelledError)) throw error;
@@ -59,8 +62,10 @@ export default function Home() {
         }, 500);
     }, [queryText, queryArgument, getResultRef.current]);
 
+    const [resultPaths, setResultPaths] = useState<readonly JSONPathNormalizedPath[]>([]);
     const [resultText, setResultText] = useState("");
     const [resultPathsText, setResultPathsText] = useState("");
+    const [currentResultPathIndex, setCurrentResultPathIndex] = useState<number>(0);
     const [diagnostics, setDiagnostics] = useState<readonly JSONPathDiagnostics[]>([]);
 
     return (
@@ -124,7 +129,13 @@ export default function Home() {
                                 </Tabs.Tab>
                             </Tabs.List>
                             <Tabs.Panel value="json" flex="1 1 0" mih={0}>
-                                <JSONPanel queryArgumentText={queryArgumentText} onQueryArgumentTextChanged={setQueryArgumentText} />
+                                <JSONPanel 
+                                    queryArgumentText={queryArgumentText} 
+                                    paths={resultPaths} 
+                                    currentPathIndex={currentResultPathIndex} 
+                                    onQueryArgumentTextChanged={setQueryArgumentText}
+                                    onCurrentPathIndexChanged={setCurrentResultPathIndex}
+                                />
                             </Tabs.Panel>
                             <Tabs.Panel value="jsonSchema" flex="1 1 0" mih={0}>
                                 <JSONSchemaPanel queryArgumentSchemaText="" onQueryArgumentSchemaTextChanged={() => {}} />

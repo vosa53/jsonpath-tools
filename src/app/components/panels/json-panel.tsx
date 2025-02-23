@@ -1,28 +1,38 @@
-import { JSONPathSyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
-import { Group, ActionIcon, Divider, Menu, Button, Text } from "@mantine/core";
-import { IconArrowUp, IconArrowDown, IconRouteSquare, IconChevronDown } from "@tabler/icons-react";
+import { JSONPathNormalizedPath } from "@/jsonpath-tools/transformations";
+import { ActionIcon, Button, Divider, Group, Menu, Text } from "@mantine/core";
+import { IconArrowDown, IconArrowUp, IconChevronDown, IconRouteSquare } from "@tabler/icons-react";
+import { memo } from "react";
 import JSONEditor from "../code-editors/json-editor";
 import PanelShell from "../panel-shell";
-import { memo } from "react";
 
 const JSONPanel = memo(({
     queryArgumentText,
-    onQueryArgumentTextChanged
+    paths,
+    currentPathIndex,
+    onQueryArgumentTextChanged,
+    onCurrentPathIndexChanged
 }: {
     queryArgumentText: string,
-    onQueryArgumentTextChanged: (queryArgumentText: string) => void
+    paths: readonly JSONPathNormalizedPath[],
+    currentPathIndex: number,
+    onQueryArgumentTextChanged: (queryArgumentText: string) => void,
+    onCurrentPathIndexChanged: (currentPathIndex: number) => void
 }) => {
     return (
         <PanelShell
             toolbar={
                 <Group gap="xs" w="100%">
-                    <Text>1 of <strong>256</strong></Text>
-                    <ActionIcon variant="default" aria-label="Settings">
+                    <ActionIcon variant="default" aria-label="Settings" disabled={paths.length === 0} onClick={() => onCurrentPathIndexChanged((paths.length + currentPathIndex - 1) % paths.length )}>
                         <IconArrowUp style={{ width: '70%', height: '70%' }} stroke={1.5} />
                     </ActionIcon>
-                    <ActionIcon variant="default" aria-label="Settings">
+                    <ActionIcon variant="default" aria-label="Settings" disabled={paths.length === 0} onClick={() => onCurrentPathIndexChanged((paths.length + currentPathIndex + 1) % paths.length )}>
                         <IconArrowDown style={{ width: '70%', height: '70%' }} stroke={1.5} />
                     </ActionIcon>
+                    {paths.length > 0 ? (
+                        <Text>{currentPathIndex + 1} of <strong>{paths.length}</strong></Text>
+                    ) : (
+                        <Text>No Results</Text>
+                    )}
                     <ActionIcon variant="default" aria-label="Settings" ml="auto">
                         <IconRouteSquare style={{ width: '70%', height: '70%' }} stroke={1.5} />
                     </ActionIcon>
@@ -40,7 +50,11 @@ const JSONPanel = memo(({
                 </Group>
             }
         >
-            <JSONEditor value={queryArgumentText} onValueChanged={onQueryArgumentTextChanged} />
+            <JSONEditor 
+                value={queryArgumentText}
+                paths={paths}
+                currentPath={currentPathIndex < paths.length ? paths[currentPathIndex] : []}
+                onValueChanged={onQueryArgumentTextChanged} />
         </PanelShell>
     );
 });

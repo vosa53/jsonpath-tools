@@ -1,5 +1,5 @@
-import { Accordion, Divider, Flex, Text } from "@mantine/core";
-import { IconHelp, IconMathFunction } from "@tabler/icons-react";
+import { Accordion, Divider, Flex, Stack, Switch, Text } from "@mantine/core";
+import { IconHelp, IconMathFunction, IconSettings } from "@tabler/icons-react";
 import { memo } from "react";
 import { CustomFunction } from "../models/custom-function";
 import CustomFunctionsView from "./custom-functions-view";
@@ -18,8 +18,10 @@ const Navbar = memo(({
                     <Accordion.Control icon={<IconHelp size={20} />}>
                         Language Reference
                     </Accordion.Control>
-                    <Accordion.Panel>JSONPath defines a string syntax for selecting and extracting JSON
-                        (RFC 8259) values from within a given JSON value.</Accordion.Panel>
+                    <Accordion.Panel>
+                        JSONPath defines a string syntax for selecting and extracting JSON
+                        (RFC 8259) values from within a given JSON value.
+                    </Accordion.Panel>
                 </Accordion.Item>
 
                 <Accordion.Item value="print">
@@ -28,6 +30,24 @@ const Navbar = memo(({
                     </Accordion.Control>
                     <Accordion.Panel>
                         <CustomFunctionsView customFunctions={customFunctions} onCustomFunctionsChanged={onCustomFunctionsChanged} />
+                    </Accordion.Panel>
+                </Accordion.Item>
+
+                <Accordion.Item value="settings">
+                    <Accordion.Control icon={<IconSettings size={20} />}>
+                        Settings
+                    </Accordion.Control>
+                    <Accordion.Panel>
+                        <Stack>
+                            <Switch
+                                defaultChecked
+                                label="Auto Run"
+                            />
+                            <Switch
+                                defaultChecked
+                                label="Auto Save"
+                            />
+                        </Stack>
                     </Accordion.Panel>
                 </Accordion.Item>
             </Accordion>

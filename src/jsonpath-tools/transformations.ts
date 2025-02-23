@@ -1,6 +1,6 @@
 import { JSONPathJSONValue } from "./types";
 
-type JSONPathNormalizedPath = (string | number)[];
+export type JSONPathNormalizedPath = (string | number)[];
 
 export function replace(value: JSONPathJSONValue, paths: readonly JSONPathNormalizedPath[], replacement: JSONPathJSONValue): JSONPathJSONValue {
     if (paths.length === 0)
