@@ -1,10 +1,11 @@
+import { JSONPathNormalizedPath } from "@/jsonpath-tools/transformations";
 import { json, jsonParseLinter } from "@codemirror/lang-json";
 import { linter } from "@codemirror/lint";
-import CodeMirrorEditor from "./codemirror/codemirror-editor";
-import { matchHighlighter, updatePathsHighlightEffect } from "./path-highlighter";
+import { StateEffect } from "@codemirror/state";
 import { EditorView } from "codemirror";
 import { useEffect, useRef } from "react";
-import { JSONPathNormalizedPath } from "@/jsonpath-tools/transformations";
+import CodeMirrorEditor from "./codemirror/codemirror-editor";
+import { getNodeAtPath, matchHighlighter, updateCurrentPathHighlightEffect, updatePathsHighlightEffect } from "./path-highlighter";
 
 export default function JSONEditor({
     value,
@@ -23,8 +24,17 @@ export default function JSONEditor({
 
     useEffect(() => {
         if (editorViewRef.current !== null)
-            editorViewRef.current.dispatch({ effects: updatePathsHighlightEffect.of({ paths: paths, currentPath: currentPath }) });
-    }, [paths, currentPath]);
+            editorViewRef.current.dispatch({ effects: updatePathsHighlightEffect.of(paths) });
+    }, [paths]);
+
+    useEffect(() => {
+        if (editorViewRef.current !== null) {
+            const effects: StateEffect<any>[] = [updateCurrentPathHighlightEffect.of(currentPath)];
+            const node = getNodeAtPath(currentPath, editorViewRef.current.state);
+            if (node !== null) effects.push(EditorView.scrollIntoView(node.from, { x: "center", y: "center" }));
+            editorViewRef.current.dispatch({ effects });
+        }
+    }, [currentPath]);
 
     const onEditorExtensionsRequested = () => {
         return [
@@ -39,7 +49,7 @@ export default function JSONEditor({
     };
 
     const onEditorViewCreated = (view: EditorView) => {
-        view.dispatch({ effects: updatePathsHighlightEffect.of({ paths: paths, currentPath: currentPath }) });
+        view.dispatch({ effects: [updatePathsHighlightEffect.of(paths), updateCurrentPathHighlightEffect.of(currentPath)] });
         editorViewRef.current = view;
     };
 

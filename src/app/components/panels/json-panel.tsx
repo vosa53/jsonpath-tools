@@ -29,7 +29,7 @@ const JSONPanel = memo(({
                         <IconArrowDown style={{ width: '70%', height: '70%' }} stroke={1.5} />
                     </ActionIcon>
                     {paths.length > 0 ? (
-                        <Text>{currentPathIndex + 1} of <strong>{paths.length}</strong></Text>
+                        <Text>{(currentPathIndex + 1).toLocaleString("en-US")} of <strong>{paths.length.toLocaleString("en-US")}</strong></Text>
                     ) : (
                         <Text>No Results</Text>
                     )}
