@@ -60,7 +60,7 @@ export default function CodeMirrorEditor({
                 readonlyCompartment.of(EditorState.readOnly.of(readonly)),
                 EditorView.updateListener.of(u => {
                     if (u.docChanged) {
-                        const newValue = logPerformance("editor doc.toString", () => u.state.doc.toString());
+                        const newValue = /*logPerformance("editor doc.toString", () => */u.state.doc.toString()/*)*/;
                         valueInEditorRef.current = newValue;
                         onValueChanged(newValue);
                     }
@@ -78,16 +78,14 @@ export default function CodeMirrorEditor({
         };
     }, []);
 
-    useEffect(() => {
-        if (editorViewRef.current !== null && value !== valueInEditorRef.current) {
-            valueInEditorRef.current = value;
-            logPerformance("editor set value", () => {
-                editorViewRef.current!.dispatch({
-                    changes: { from: 0, to: editorViewRef.current!.state.doc.length, insert: value },
-                });
+    if (editorViewRef.current !== null && value !== valueInEditorRef.current) {
+        valueInEditorRef.current = value;
+        //logPerformance("editor set value", () => {
+            editorViewRef.current!.dispatch({
+                changes: { from: 0, to: editorViewRef.current!.state.doc.length, insert: value },
             });
-        }
-    }, [value]);
+        //});
+    }
 
     return (
         <div ref={containerElementRef} style={style}></div>

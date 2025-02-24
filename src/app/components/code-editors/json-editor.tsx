@@ -31,7 +31,8 @@ export default function JSONEditor({
         if (editorViewRef.current !== null) {
             const effects: StateEffect<any>[] = [updateCurrentPathHighlightEffect.of(currentPath)];
             const node = getNodeAtPath(currentPath, editorViewRef.current.state);
-            if (node !== null) effects.push(EditorView.scrollIntoView(node.from, { x: "center", y: "center" }));
+            if (node !== null) effects.push(EditorView.scrollIntoView(node.from, { y: "center" }));
+            console.log(node?.from ?? "UNKNOWN POSITION");
             editorViewRef.current.dispatch({ effects });
         }
     }, [currentPath]);
@@ -42,8 +43,8 @@ export default function JSONEditor({
             linter(jsonParseLinter()), // TODO: Disable in readonly editor.
             matchHighlighter,
             EditorView.baseTheme({
-                "& .cm-path": { background: "#fff3bf" },
-                "& .cm-path-current": { background: "#ffc078" }
+                "& .cm-path": { background: "#fff9db" },
+                "& .cm-path-current": { background: "#ffe8cc" }
             })
         ];
     };

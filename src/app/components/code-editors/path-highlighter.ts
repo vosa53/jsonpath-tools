@@ -3,9 +3,9 @@ import { logPerformance } from "@/jsonpath-tools/utils";
 import { ensureSyntaxTree, syntaxTree } from "@codemirror/language";
 import { EditorState, Range, StateEffect, StateField, Text } from "@codemirror/state";
 import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
-import { SyntaxNode, SyntaxNodeRef, Tree, TreeCursor } from "@lezer/common";
+import { SyntaxNode, TreeCursor } from "@lezer/common";
 
-const values = new Set(["True", "False", "Null", "Number", "String", "Object", "Array"]);
+const valueNodeNames = new Set(["True", "False", "Null", "Number", "String", "Object", "Array"]);
 const arrayContext = ["Array"];
 
 const currentPathDecoration = Decoration.mark({ class: "cm-path-current" });
@@ -29,7 +29,6 @@ export const matchHighlighter = ViewPlugin.fromClass(class {
 
     constructor(view: EditorView) {
         this._decorationSet = this.getDecorations(view);
-        view.scrollSnapshot()
     }
 
     get decorationSet(): DecorationSet {
@@ -70,9 +69,9 @@ export const matchHighlighter = ViewPlugin.fromClass(class {
                 to: visibleRange.to,
                 enter: (node) => {
                     if (path.length !== 0 && path[path.length - 1] === -1)
-                        path[path.length - 1] = getArrayIndexAt(node.node.cursor(), view.state);
+                        path[path.length - 1] = getArrayIndexAtCursor(node.node.cursor(), view.state);
 
-                    if (values.has(node.name)) {
+                    if (valueNodeNames.has(node.name)) {
                         const pathString = JSON.stringify(path);
                         //console.log(node.name, pathString);
                         if (this.serializedCurrentPath === pathString)
@@ -89,7 +88,7 @@ export const matchHighlighter = ViewPlugin.fromClass(class {
                     else if (node.name === "Array") path.push(-1);
                 },
                 leave: (node) => {
-                    if (values.has(node.name) && node.matchContext(arrayContext)) (path[path.length - 1] as number)++;
+                    if (valueNodeNames.has(node.name) && node.matchContext(arrayContext)) (path[path.length - 1] as number)++;
 
                     if (node.name === "Property") path.pop();
                     else if (node.name === "Array") path.pop();
@@ -107,13 +106,13 @@ export const matchHighlighter = ViewPlugin.fromClass(class {
     provide: v => arrayIndexCacheStateField
 });
 
-function getArrayIndexAt(cursor: TreeCursor, state: EditorState): number {
+function getArrayIndexAtCursor(cursor: TreeCursor, state: EditorState): number {
     const arrayIndexCache = state.field(arrayIndexCacheStateField);
     const startingPosition = cursor.from;
     let index = 0;
     let endIndex = 0;
     while (cursor.prevSibling()) {
-        const isValue = values.has(cursor.name);
+        const isValue = valueNodeNames.has(cursor.name);
         if (isValue) {
             index++;
             const cachedIndex = arrayIndexCache.get(cursor.from);
@@ -125,7 +124,7 @@ function getArrayIndexAt(cursor: TreeCursor, state: EditorState): number {
         }
     }
     while (cursor.from !== startingPosition) {
-        const isValue = values.has(cursor.name);
+        const isValue = valueNodeNames.has(cursor.name);
         if (isValue) {
             arrayIndexCache.set(cursor.from, endIndex);
             endIndex++;
@@ -135,10 +134,10 @@ function getArrayIndexAt(cursor: TreeCursor, state: EditorState): number {
     return index;
 }
 
-export function getPathAt(cursor: TreeCursor, state: EditorState): JSONPathNormalizedPath {
+export function getPathAtCursor(cursor: TreeCursor, state: EditorState): JSONPathNormalizedPath {
     const path: JSONPathNormalizedPath = [];
 
-    while (!values.has(cursor.name) && cursor.parent());
+    while (!valueNodeNames.has(cursor.name) && cursor.parent());
 
     do {
         if (cursor.name === "Property") {
@@ -149,7 +148,7 @@ export function getPathAt(cursor: TreeCursor, state: EditorState): JSONPathNorma
             cursor.parent();
         }
         if (cursor.matchContext(arrayContext)) {
-            const index = getArrayIndexAt(cursor, state);
+            const index = getArrayIndexAtCursor(cursor, state);
             path.push(index);
         }
     } while (cursor.parent());
@@ -167,7 +166,7 @@ export function getNodeAtPath(path: JSONPathNormalizedPath, state: EditorState):
                 if (!cursor.nextSibling()) return null;
             }
             cursor.firstChild();
-            while (!values.has(cursor.name)) {
+            while (!valueNodeNames.has(cursor.name)) {
                 if (!cursor.nextSibling()) return null;
             }
         }
@@ -175,7 +174,7 @@ export function getNodeAtPath(path: JSONPathNormalizedPath, state: EditorState):
             cursor.firstChild();
             let index = -1;
             while (true) {
-                if (values.has(cursor.name)) index++;
+                if (valueNodeNames.has(cursor.name)) index++;
                 if (index < pathSegment) {
                     if (!cursor.nextSibling()) return null;
                 }
@@ -184,6 +183,7 @@ export function getNodeAtPath(path: JSONPathNormalizedPath, state: EditorState):
         }
         else return null;
     }
+    console.log(state.doc.sliceString(cursor.from, cursor.to));
     return cursor.node;
 }
 
