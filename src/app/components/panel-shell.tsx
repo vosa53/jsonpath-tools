@@ -14,7 +14,7 @@ export default function PanelShell({
                 {toolbar}
             </Flex>
             <Divider />
-            <div style={{ flex: "1 1 0", minHeight: 0 }}>
+            <div style={{ flex: "1 1 0", minHeight: 0 , overflow: "auto"}}>
                 {children}
             </div>
         </Flex>

@@ -48,8 +48,8 @@ export default function JSONEditor({
             linter(jsonParseLinter()), // TODO: Disable in readonly editor.
             matchHighlighter,
             EditorView.baseTheme({
-                "& .cm-path": { background: "#fff9db" },
-                "& .cm-path-current": { background: "#ffe8cc" }
+                "& .cm-path": { background: "#ffe06630" },
+                "& .cm-path-current": { background: "#ff922b30" }
             }),
             ensureParsed({ onParsingProgressChanged: (inProgress: boolean) => onParsingProgressChanged?.(inProgress) })
         ];

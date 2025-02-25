@@ -5,3 +5,99 @@
 .children {
     margin-left: 20px;
 }
+
+.query {
+    background: var(--mantine-color-pink-light);
+    border-color: var(--mantine-color-pink-light-color);
+    color: var(--mantine-color-pink-light-color);
+}
+
+.query:hover {
+    background: var(--mantine-color-pink-light-hover);
+}
+
+.functionExpression {
+    background: var(--mantine-color-yellow-light);
+    border-color: var(--mantine-color-yellow-light-color);
+    color: var(--mantine-color-yellow-light-color);
+}
+
+.functionExpression:hover {
+    background: var(--mantine-color-yellow-light-hover);
+}
+
+.segment {
+    background: var(--mantine-color-grape-light);
+    border-color: var(--mantine-color-grape-light-color);
+    color: var(--mantine-color-grape-light-color);
+}
+
+.segment:hover {
+    background: var(--mantine-color-grape-light-hover);
+}
+
+.selector {
+    background: var(--mantine-color-indigo-light);
+    border-color: var(--mantine-color-indigo-light-color);
+    color: var(--mantine-color-indigo-light-color);
+}
+
+.selector:hover {
+    background: var(--mantine-color-indigo-light-hover);
+}
+
+.logicalOperator {
+    background: var(--mantine-color-cyan-light);
+    border-color: var(--mantine-color-cyan-light-color);
+    color: var(--mantine-color-cyan-light-color);
+}
+
+.logicalOperator:hover {
+    background: var(--mantine-color-cyan-light-hover);
+}
+
+.comparisonOperator {
+    background: var(--mantine-color-teal-light);
+    border-color: var(--mantine-color-teal-light-color);
+    color: var(--mantine-color-teal-light-color);
+}
+
+.comparisonOperator:hover {
+    background: var(--mantine-color-teal-light-hover);
+}
+
+.literal {
+    background: var(--mantine-color-orange-light);
+    border-color: var(--mantine-color-orange-light-color);
+    color: var(--mantine-color-orange-light-color);
+}
+
+.literal:hover {
+    background: var(--mantine-color-orange-light-hover);
+}
+
+.filterQueryExpression {
+    background: var(--mantine-color-violet-light);
+    border-color: var(--mantine-color-violet-light-color);
+    color: var(--mantine-color-violet-light-color);
+}
+
+.filterQueryExpression:hover {
+    background: var(--mantine-color-violet-light-hover);
+}
+
+/*export const highlightStyle = HighlightStyle.define([
+    { tag: t.keyword, color: "var(--mantine-color-blue-text)" },
+    { tag: t.bool, color: "var(--mantine-color-blue-text)" },
+    { tag: t.null, color: "var(--mantine-color-blue-text)" },
+    { tag: t.operator, color: "var(--mantine-color-cyan-text)" },
+    { tag: t.compareOperator, color: "var(--mantine-color-cyan-text)" },
+    { tag: t.logicOperator, color: "var(--mantine-color-cyan-text)" },
+    { tag: t.variableName, color: "var(--mantine-color-pink-text)" },
+    { tag: t.number, color: "var(--mantine-color-teal-text)" },
+    { tag: t.className, color: "var(--mantine-color-yellow-text)" },
+    { tag: t.string, color: "var(--mantine-color-orange-text)" },
+    { tag: t.propertyName, color: "var(--mantine-color-indigo-text)" },
+    { tag: t.bracket, color: "var(--mantine-color-grape-text)" },
+    { tag: t.controlOperator, color: "var(--mantine-color-violet-text)" }
+]);*/

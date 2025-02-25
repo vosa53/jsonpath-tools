@@ -105,11 +105,11 @@ export default function Home() {
                                     pathType={viewModel.pathType} 
                                     onPathTypeChanged={viewModel.onPathTypeChanged} />
                             </Tabs.Panel>
-                            <Tabs.Panel value="errors" flex="1 1 0" mih={0} style={{ overflow: "auto" }}>
+                            <Tabs.Panel value="errors" flex="1 1 0" mih={0}>
                                 <DiagnosticsPanel 
                                     diagnostics={viewModel.diagnostics} />
                             </Tabs.Panel>
-                            <Tabs.Panel value="outline" flex="1 1 0" mih={0} style={{ overflow: "auto" }}>
+                            <Tabs.Panel value="outline" flex="1 1 0" mih={0}>
                                 <OutlinePanel 
                                     query={viewModel.query} />
                             </Tabs.Panel>
