@@ -40,7 +40,7 @@ export const matchHighlighter = ViewPlugin.fromClass(class {
         for (const transaction of update.transactions) {
             for (const effect of transaction.effects) {
                 if (effect.is(updatePathsHighlightEffect)) {
-                    logPerformance("Serialize", () => {
+                    logPerformance("Serialize result paths for highlighting", () => {
                         this.serializedPaths = new Set(effect.value.map(p => JSON.stringify(p)));
                         pathsUpdated = true;
                     });
@@ -56,50 +56,48 @@ export const matchHighlighter = ViewPlugin.fromClass(class {
     }
 
     getDecorations(view: EditorView) {
-        if (this.serializedPaths.size === 0) return Decoration.none;
-        const start = performance.now();
-        const tree = ensureSyntaxTree(view.state, view.state.doc.length, Number.POSITIVE_INFINITY)!;
-        //const tree = syntaxTree(view.state);
-        const decorations: Range<Decoration>[] = [];
-        for (const visibleRange of view.visibleRanges) {
-            const path: JSONPathNormalizedPath = [];
+        return logPerformance("Highlighting result paths", () => {
+            if (this.serializedPaths.size === 0) return Decoration.none;
+            //const tree = ensureSyntaxTree(view.state, view.state.doc.length, Number.POSITIVE_INFINITY)!;
+            const tree = syntaxTree(view.state);
+            const decorations: Range<Decoration>[] = [];
+            for (const visibleRange of view.visibleRanges) {
+                const path: (string | number)[] = [];
 
-            tree.iterate({
-                from: visibleRange.from,
-                to: visibleRange.to,
-                enter: (node) => {
-                    if (path.length !== 0 && path[path.length - 1] === -1)
-                        path[path.length - 1] = getArrayIndexAtCursor(node.node.cursor(), view.state);
+                tree.iterate({
+                    from: visibleRange.from,
+                    to: visibleRange.to,
+                    enter: (node) => {
+                        if (path.length !== 0 && path[path.length - 1] === -1)
+                            path[path.length - 1] = getArrayIndexAtCursor(node.node.cursor(), view.state);
 
-                    if (valueNodeNames.has(node.name)) {
-                        const pathString = JSON.stringify(path);
-                        //console.log(node.name, pathString);
-                        if (this.serializedCurrentPath === pathString)
-                            decorations.push(currentPathDecoration.range(node.from, node.to));
-                        else if (this.serializedPaths.has(pathString))
-                            decorations.push(pathDecoration.range(node.from, node.to));
+                        if (valueNodeNames.has(node.name)) {
+                            const pathString = JSON.stringify(path);
+                            //console.log(node.name, pathString);
+                            if (this.serializedCurrentPath === pathString)
+                                decorations.push(currentPathDecoration.range(node.from, node.to));
+                            else if (this.serializedPaths.has(pathString))
+                                decorations.push(pathDecoration.range(node.from, node.to));
+                        }
+
+                        if (node.name === "Property") {
+                            const propertyNameNode = node.node.firstChild!; // TODO: return false
+                            if (propertyNameNode === null || propertyNameNode.name !== "PropertyName") return false;
+                            path.push(JSON.parse(view.state.doc.sliceString(propertyNameNode.from, propertyNameNode.to))); // TODO: Invalid property name.
+                        }
+                        else if (node.name === "Array") path.push(-1);
+                    },
+                    leave: (node) => {
+                        if (valueNodeNames.has(node.name) && node.matchContext(arrayContext)) (path[path.length - 1] as number)++;
+
+                        if (node.name === "Property") path.pop();
+                        else if (node.name === "Array") path.pop();
+
                     }
-
-                    if (node.name === "Property") {
-                        const propertyNameNode = node.node.firstChild!; // TODO: return false
-                        if (propertyNameNode === null || propertyNameNode.name !== "PropertyName") return false;
-                        path.push(JSON.parse(view.state.doc.sliceString(propertyNameNode.from, propertyNameNode.to))); // TODO: Invalid property name.
-                    }
-                    else if (node.name === "Array") path.push(-1);
-                },
-                leave: (node) => {
-                    if (valueNodeNames.has(node.name) && node.matchContext(arrayContext)) (path[path.length - 1] as number)++;
-
-                    if (node.name === "Property") path.pop();
-                    else if (node.name === "Array") path.pop();
-
-                }
-            });
-        }
-        const result = Decoration.set(decorations);
-        const elapsed = performance.now() - start;
-        console.log("Highlighting took", elapsed, "ms");
-        return result;
+                });
+            }
+            return Decoration.set(decorations);
+        });
     }
 }, {
     decorations: v => v.decorationSet,
@@ -135,7 +133,7 @@ function getArrayIndexAtCursor(cursor: TreeCursor, state: EditorState): number {
 }
 
 export function getPathAtCursor(cursor: TreeCursor, state: EditorState): JSONPathNormalizedPath {
-    const path: JSONPathNormalizedPath = [];
+    const path: (string | number)[] = [];
 
     while (!valueNodeNames.has(cursor.name) && cursor.parent());
 
@@ -183,7 +181,6 @@ export function getNodeAtPath(path: JSONPathNormalizedPath, state: EditorState):
         }
         else return null;
     }
-    console.log(state.doc.sliceString(cursor.from, cursor.to));
     return cursor.node;
 }
 

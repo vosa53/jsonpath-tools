@@ -3,13 +3,19 @@ import { IconHelp, IconMathFunction, IconSettings } from "@tabler/icons-react";
 import { memo } from "react";
 import { CustomFunction } from "../models/custom-function";
 import CustomFunctionsView from "./custom-functions-view";
+import { Settings } from "../models/settings";
+import SettingsEditor from "./settings-editor";
 
 const Navbar = memo(({
     customFunctions,
-    onCustomFunctionsChanged
+    settings,
+    onCustomFunctionsChanged,
+    onSettingsChanged
 }: {
     customFunctions: readonly CustomFunction[],
-    onCustomFunctionsChanged: (customFunctions: readonly CustomFunction[]) => void
+    settings: Settings,
+    onCustomFunctionsChanged: (customFunctions: readonly CustomFunction[]) => void,
+    onSettingsChanged: (settings: Settings) => void
 }) => {
     return (
         <Flex direction="column" h="100%">
@@ -38,16 +44,7 @@ const Navbar = memo(({
                         Settings
                     </Accordion.Control>
                     <Accordion.Panel>
-                        <Stack>
-                            <Switch
-                                defaultChecked
-                                label="Auto Run"
-                            />
-                            <Switch
-                                defaultChecked
-                                label="Auto Save"
-                            />
-                        </Stack>
+                        <SettingsEditor settings={settings} onSettingsChanged={onSettingsChanged} />
                     </Accordion.Panel>
                 </Accordion.Item>
             </Accordion>

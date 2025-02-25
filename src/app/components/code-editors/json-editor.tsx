@@ -6,12 +6,13 @@ import { EditorView } from "codemirror";
 import { useEffect, useRef } from "react";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
 import { getNodeAtPath, matchHighlighter, updateCurrentPathHighlightEffect, updatePathsHighlightEffect } from "./path-highlighter";
+import { EMPTY_ARRAY, logPerformance } from "@/jsonpath-tools/utils";
 
 export default function JSONEditor({
     value,
     readonly = false,
-    paths = [],
-    currentPath = [],
+    paths = EMPTY_ARRAY,
+    currentPath = EMPTY_ARRAY,
     onValueChanged
 }: {
     value: string,
@@ -29,11 +30,12 @@ export default function JSONEditor({
 
     useEffect(() => {
         if (editorViewRef.current !== null) {
-            const effects: StateEffect<any>[] = [updateCurrentPathHighlightEffect.of(currentPath)];
-            const node = getNodeAtPath(currentPath, editorViewRef.current.state);
-            if (node !== null) effects.push(EditorView.scrollIntoView(node.from, { y: "center" }));
-            console.log(node?.from ?? "UNKNOWN POSITION");
-            editorViewRef.current.dispatch({ effects });
+            logPerformance("Change current highlighted path", () => {
+                const effects: StateEffect<any>[] = [updateCurrentPathHighlightEffect.of(currentPath)];
+                const node = getNodeAtPath(currentPath, editorViewRef.current!.state);
+                if (node !== null) effects.push(EditorView.scrollIntoView(node.from, { y: "center" }));
+                editorViewRef.current!.dispatch({ effects });
+            });
         }
     }, [currentPath]);
 

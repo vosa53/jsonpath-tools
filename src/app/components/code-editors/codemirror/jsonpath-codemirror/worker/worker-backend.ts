@@ -58,7 +58,7 @@ export class WorkerBackend {
 
     getResult(message: GetResultWorkerMessage): GetResultWorkerMessageResponse {
         const context: JSONPathQueryContext = { rootNode: this.queryArgument, options: defaultJSONPathOptions };
-        const result = logPerformance("query", () => this.jsonPath.select(context));
+        const result = logPerformance("Execute query (on worker)", () => this.jsonPath.select(context));
 
         return {
             nodes: result.nodes.map(n => n.value),

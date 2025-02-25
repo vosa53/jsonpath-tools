@@ -1,10 +1,12 @@
+import { logPerformance } from "@/jsonpath-tools/utils";
+
 export class WorkerRPC<THandler> {
     private readonly messageTypeToHandlerActions = new Map<string, (handler: THandler, data: any) => any>();
     private readonly messageIDToPromiseActions = new Map<string, { resolve: (data: any) => void, reject: (error: Error) => void }>();
     private readonly topicIDToHandlers = new Map<string, THandler>();
 
     constructor(private readonly send: (input: any) => void, private readonly handlerFactory: (topic: WebWorkerRPCTopic) => THandler) {
-
+        this.send = (input: any) => logPerformance("Sending worker message", () => send(input));
     }
 
     addHandlerAction<TData, TResult>(messageID: string, handler: (handler: THandler, data: TData) => TResult) {

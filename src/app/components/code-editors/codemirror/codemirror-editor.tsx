@@ -61,8 +61,11 @@ export default function CodeMirrorEditor({
                 EditorView.updateListener.of(u => {
                     if (u.docChanged) {
                         const newValue = /*logPerformance("editor doc.toString", () => */u.state.doc.toString()/*)*/;
+                        //console.log("FROM EDITOR:",newValue);
+                        const isFromParent = valueInEditorRef.current === newValue;
                         valueInEditorRef.current = newValue;
-                        onValueChanged(newValue);
+                        if (!isFromParent)
+                            onValueChanged(newValue);
                     }
                 }),
                 ...onExtensionsRequested()
@@ -78,14 +81,19 @@ export default function CodeMirrorEditor({
         };
     }, []);
 
-    if (editorViewRef.current !== null && value !== valueInEditorRef.current) {
-        valueInEditorRef.current = value;
-        //logPerformance("editor set value", () => {
-            editorViewRef.current!.dispatch({
-                changes: { from: 0, to: editorViewRef.current!.state.doc.length, insert: value },
-            });
-        //});
-    }
+    //useEffect(() => {
+        if (editorViewRef.current !== null && value !== valueInEditorRef.current) {
+            //console.log("FROM PARENT:",value, valueInEditorRef.current);
+            //logPerformance("editor set value", () => {
+                queueMicrotask(() => {
+                    valueInEditorRef.current = value;
+                    editorViewRef.current!.dispatch({
+                        changes: { from: 0, to: editorViewRef.current!.state.doc.length, insert: value },
+                    });
+                });
+            //});
+        }
+    //}, [value]);
 
     return (
         <div ref={containerElementRef} style={style}></div>
