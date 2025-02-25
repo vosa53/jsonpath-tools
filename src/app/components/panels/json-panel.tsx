@@ -1,7 +1,7 @@
 import { JSONPathNormalizedPath } from "@/jsonpath-tools/transformations";
-import { ActionIcon, Button, Divider, Group, Menu, Text } from "@mantine/core";
+import { ActionIcon, Button, Divider, Group, Loader, Menu, Progress, Text } from "@mantine/core";
 import { IconArrowDown, IconArrowUp, IconChevronDown, IconRouteSquare } from "@tabler/icons-react";
-import { memo } from "react";
+import { memo, useState } from "react";
 import JSONEditor from "../code-editors/json-editor";
 import PanelShell from "../panel-shell";
 
@@ -18,6 +18,8 @@ const JSONPanel = memo(({
     onQueryArgumentTextChanged: (queryArgumentText: string) => void,
     onCurrentPathIndexChanged: (currentPathIndex: number) => void
 }) => {
+    const [isParsingInProgress, setIsParsingInProgress] = useState(false);
+
     return (
         <PanelShell
             toolbar={
@@ -32,6 +34,13 @@ const JSONPanel = memo(({
                         <Text>{(currentPathIndex + 1).toLocaleString("en-US")} of <strong>{paths.length.toLocaleString("en-US")}</strong></Text>
                     ) : (
                         <Text>No Results</Text>
+                    )}
+                    {isParsingInProgress && (
+                        <>
+                        <Divider orientation="vertical" />
+                        <Loader size="sm" />
+                        <Text>Parsing...</Text>
+                        </>
                     )}
                     <ActionIcon variant="default" aria-label="Settings" ml="auto">
                         <IconRouteSquare style={{ width: '70%', height: '70%' }} stroke={1.5} />
@@ -54,7 +63,8 @@ const JSONPanel = memo(({
                 value={queryArgumentText}
                 paths={paths}
                 currentPath={currentPathIndex < paths.length ? paths[currentPathIndex] : []}
-                onValueChanged={onQueryArgumentTextChanged} />
+                onValueChanged={onQueryArgumentTextChanged}
+                onParsingProgressChanged={setIsParsingInProgress} />
         </PanelShell>
     );
 });

@@ -7,19 +7,22 @@ import { useEffect, useRef } from "react";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
 import { getNodeAtPath, matchHighlighter, updateCurrentPathHighlightEffect, updatePathsHighlightEffect } from "./path-highlighter";
 import { EMPTY_ARRAY, logPerformance } from "@/jsonpath-tools/utils";
+import { ensureParsed } from "./codemirror/ensure-parsed";
 
 export default function JSONEditor({
     value,
     readonly = false,
     paths = EMPTY_ARRAY,
     currentPath = EMPTY_ARRAY,
-    onValueChanged
+    onValueChanged,
+    onParsingProgressChanged
 }: {
     value: string,
     readonly?: boolean,
     paths?: readonly JSONPathNormalizedPath[],
     currentPath?: JSONPathNormalizedPath,
-    onValueChanged: (value: string) => void
+    onValueChanged: (value: string) => void,
+    onParsingProgressChanged?: (inProgress: boolean) => void
 }) {
     const editorViewRef = useRef<EditorView>(null);
 
@@ -47,7 +50,8 @@ export default function JSONEditor({
             EditorView.baseTheme({
                 "& .cm-path": { background: "#fff9db" },
                 "& .cm-path-current": { background: "#ffe8cc" }
-            })
+            }),
+            ensureParsed({ onParsingProgressChanged: (inProgress: boolean) => onParsingProgressChanged?.(inProgress) })
         ];
     };
 
