@@ -1,7 +1,7 @@
 import { JSONPathDiagnostics } from "@/jsonpath-tools/diagnostics";
 import { JSONPath } from "@/jsonpath-tools/query/json-path";
 import { JSONPathNormalizedPath, remove, replace, toJSONPointer, toNormalizedPath } from "@/jsonpath-tools/transformations";
-import { JSONPathJSONValue } from "@/jsonpath-tools/types";
+import { JSONPathJSONValue, JSONPathNothing } from "@/jsonpath-tools/types";
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { OperationCancelledError } from "./components/code-editors/codemirror/jsonpath-codemirror/cancellation-token";
 import { CustomFunction } from "./models/custom-function";
@@ -10,6 +10,7 @@ import { PathType } from "./models/path-type";
 import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
 import { Settings } from "./models/settings";
 import { logPerformance } from "@/jsonpath-tools/utils";
+import { defaultJSONPathOptions, JSONPathOptions } from "@/jsonpath-tools/options";
 
 interface State {
     customFunctions: readonly CustomFunction[];
@@ -36,6 +37,15 @@ export function usePageViewModel() {
             return null;
         }
     }, [queryArgumentText]);
+    const options = useMemo<JSONPathOptions>(() => {
+        return {
+            ...defaultJSONPathOptions,
+            functions: {
+                ...defaultJSONPathOptions.functions,
+                ...Object.fromEntries(customFunctions.map(f => [f.name, { returnType: f.returnType, parameterTypes: f.parameters.map(p => p.type), handler: () => JSONPathNothing }]))
+            }
+        };
+    }, [customFunctions, ]);
     const [result, setResult] = useState<readonly JSONPathJSONValue[]>([]);
     const [resultPaths, setResultPaths] = useState<readonly JSONPathNormalizedPath[]>([]);
     const resultText = useMemo(() => {
@@ -133,6 +143,7 @@ export function usePageViewModel() {
         pathType,
         query,
         queryArgument,
+        options,
         resultPaths,
         resultText,
         resultPathsText,
@@ -184,7 +195,10 @@ const testSettings: Settings = {
 };
 const testOperation: Operation = {
     type: OperationType.select,
-    replacement: { replacement: {} }
+    replacement: { 
+        replacement: {},
+        replacementText: "{}"
+    }
 };
 const testQueryText = "$.books[?@.author == \"George Orwell\" && count(true, 25) > 42].title";
 const testQuery = new JSONPathParser().parse(testQueryText);

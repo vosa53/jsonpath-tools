@@ -44,6 +44,7 @@ export default function Home() {
                 <Stack gap={0} h="100%">
                     <JSONPathEditor
                         value={viewModel.queryText}
+                        options={viewModel.options}
                         queryArgument={viewModel.queryArgument}
                         onValueChanged={viewModel.onQueryTextChanged}
                         onParsed={viewModel.onQueryParsed}

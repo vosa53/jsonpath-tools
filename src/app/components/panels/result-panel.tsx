@@ -1,8 +1,11 @@
-import { Operation, OperationType } from "@/app/models/operation";
-import { Button, Group, Modal, Select } from "@mantine/core";
+import { Operation, OperationType, ReplaceOperationReplacement } from "@/app/models/operation";
+import { Button, Group, Modal, Select, Stack } from "@mantine/core";
+import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
+import { IconDeviceFloppy } from "@tabler/icons-react";
 import { memo } from "react";
 import JSONEditor from "../code-editors/json-editor";
+import { EditorFormAdapter } from "../editor-form-adapter";
 import PanelShell from "../panel-shell";
 
 const ResultPanel = memo(({
@@ -16,13 +19,19 @@ const ResultPanel = memo(({
 }) => {
     const [modalOpened, { open, close }] = useDisclosure(false);
 
+    const onReplacementChanged = (replacement: ReplaceOperationReplacement) => {
+        onOperationChanged({ ...operation, replacement });
+        close();
+    }
+
     return (
         <PanelShell
             toolbar={
                 <Group gap="xs">
                     <Modal opened={modalOpened} onClose={close} title={"Edit replacement value"} size="xl">
-                        <JSONEditor value={""} onValueChanged={() => { }} />
-                        <Button>Save</Button>
+                        <ReplacementEditor 
+                            replacement={operation.replacement} 
+                            onReplacementChanged={onReplacementChanged} />
                     </Modal>
                     <Select
                         size="xs"
@@ -35,7 +44,9 @@ const ResultPanel = memo(({
                         value={operation.type}
                         onChange={value => onOperationChanged({ ...operation, type: value as OperationType })}
                     />
-                    {operation.type === OperationType.replace && <Button variant="subtle" size="compact-sm" onClick={() => open()}>Edit Replacement</Button>}
+                    {operation.type === OperationType.replace &&
+                        <Button
+                            variant="subtle" size="compact-sm" onClick={() => open()}>Edit Replacement</Button>}
                 </Group>
             }
         >
@@ -44,3 +55,65 @@ const ResultPanel = memo(({
     );
 });
 export default ResultPanel;
+
+function ReplacementEditor({
+    replacement,
+    onReplacementChanged
+}: {
+    replacement: ReplaceOperationReplacement,
+    onReplacementChanged: (replacement: ReplaceOperationReplacement) => void
+}) {
+    const form = useForm({
+        mode: "uncontrolled",
+        validateInputOnBlur: true,
+        initialValues: {
+            replacementText: replacement.replacementText
+        },
+        validate: {
+            replacementText: (value) => validateJSONString(value)
+        }
+    });
+    /*const [previousCustomFunction, setPreviousCustomFunction] = useState(customFunction);
+    if (previousCustomFunction !== customFunction) {
+        setPreviousCustomFunction(customFunction);
+        form.reset();
+    }*/
+    const onFormSubmit = (values: typeof form.values) => {
+        onReplacementChanged({
+            replacement: JSON.parse(values.replacementText),
+            replacementText: values.replacementText
+        });
+    };
+
+    return (
+        <form onSubmit={form.onSubmit(onFormSubmit)}>
+            <Stack>
+                <EditorFormAdapter
+                    editor={(value, onValueChange) =>
+                        <JSONEditor
+                            value={value}
+                            onValueChanged={onValueChange} />
+                    }
+                    style={{ width: "100%" }}
+                    label="Replacement JSON"
+                    key={form.key("replacementText")}
+                    {...form.getInputProps("replacementText")}
+                />
+                <Group justify="end">
+                    <Button variant="default" type="button">Cancel</Button>
+                    <Button type="submit" leftSection={<IconDeviceFloppy size={14} />}>Save</Button>
+                </Group>
+            </Stack>
+        </form>
+    );
+}
+
+function validateJSONString(value: string): string | null {
+    try {
+        JSON.parse(value);
+        return null;
+    }
+    catch (e) {
+        return "Invalid JSON: " + e;
+    }
+}

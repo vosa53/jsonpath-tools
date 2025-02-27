@@ -12,5 +12,6 @@ export enum OperationType {
 }
 
 export interface ReplaceOperationReplacement {
-    readonly replacement: JSONPathJSONValue
+    readonly replacement: JSONPathJSONValue;
+    readonly replacementText: string;
 }

@@ -12,7 +12,9 @@
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.3",
     "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/lang-markdown": "^6.3.2",
     "@mantine/core": "^7.16.2",
+    "@mantine/form": "^7.17.0",
     "@mantine/hooks": "^7.16.2",
     "@tabler/icons-react": "^3.29.0",
     "codemirror": "^6.0.1",

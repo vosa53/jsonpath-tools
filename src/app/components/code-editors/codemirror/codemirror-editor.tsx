@@ -1,15 +1,16 @@
-import { defaultKeymap } from "@codemirror/commands";
-import { indentUnit, syntaxHighlighting } from "@codemirror/language";
+import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap } from "@codemirror/autocomplete";
+import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+import { bracketMatching, foldGutter, foldKeymap, indentOnInput, indentUnit, syntaxHighlighting } from "@codemirror/language";
+import { lintKeymap } from "@codemirror/lint";
+import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { Compartment, EditorState, Extension } from "@codemirror/state";
-import { keymap } from "@codemirror/view";
+import { crosshairCursor, drawSelection, dropCursor, highlightActiveLine, highlightActiveLineGutter, highlightSpecialChars, keymap, lineNumbers, rectangularSelection } from "@codemirror/view";
 import { MantineColorScheme, useMantineColorScheme } from "@mantine/core";
-import { basicSetup, EditorView } from "codemirror";
-import { CSSProperties, useEffect, useRef, useState } from "react";
-import { tabKeymap } from "./tab-keymap";
+import { EditorView } from "codemirror";
+import { CSSProperties, useEffect, useRef } from "react";
 import { highlightStyle } from "./highlight-style";
+import { tabKeymap } from "./tab-keymap";
 import { theme } from "./theme";
-import { logPerformance } from "@/jsonpath-tools/utils";
-
 
 export default function CodeMirrorEditor({
     value,
@@ -51,14 +52,39 @@ export default function CodeMirrorEditor({
         const editorView = new EditorView({
             doc: value,
             extensions: [
-                basicSetup,
-                keymap.of([...defaultKeymap, ...tabKeymap]),
+                lineNumbers(),
+                foldGutter(),
+                highlightActiveLine(),
+                highlightActiveLineGutter(),
+                highlightSelectionMatches(),
+                highlightSpecialChars(),
+                drawSelection(),
+                dropCursor(),
+                bracketMatching(),
+                closeBrackets(),
+                indentOnInput(),
+                history(),
+                EditorState.allowMultipleSelections.of(true),
+                rectangularSelection(),
+                crosshairCursor(),
+                autocompletion(),
+                keymap.of([
+                    ...closeBracketsKeymap,
+                    ...defaultKeymap,
+                    ...searchKeymap,
+                    ...historyKeymap,
+                    ...foldKeymap,
+                    ...completionKeymap,
+                    ...lintKeymap,
+                    ...tabKeymap
+                ]),
                 indentUnit.of("    "),
                 theme,
                 themeCompartment.of(colorSchemeToTheme(colorScheme.colorScheme)),
                 syntaxHighlighting(highlightStyle),
                 readonlyCompartment.of(EditorState.readOnly.of(readonly)),
                 EditorView.updateListener.of(u => {
+                    console.log(u.focusChanged);
                     if (u.docChanged) {
                         const newValue = /*logPerformance("editor doc.toString", () => */u.state.doc.toString()/*)*/;
                         //console.log("FROM EDITOR:",newValue);
@@ -82,17 +108,17 @@ export default function CodeMirrorEditor({
     }, []);
 
     //useEffect(() => {
-        if (editorViewRef.current !== null && value !== valueInEditorRef.current) {
-            //console.log("FROM PARENT:",value, valueInEditorRef.current);
-            //logPerformance("editor set value", () => {
-                queueMicrotask(() => {
-                    valueInEditorRef.current = value;
-                    editorViewRef.current!.dispatch({
-                        changes: { from: 0, to: editorViewRef.current!.state.doc.length, insert: value },
-                    });
-                });
-            //});
-        }
+    if (editorViewRef.current !== null && value !== valueInEditorRef.current) {
+        //console.log("FROM PARENT:",value, valueInEditorRef.current);
+        //logPerformance("editor set value", () => {
+        queueMicrotask(() => {
+            valueInEditorRef.current = value;
+            editorViewRef.current!.dispatch({
+                changes: { from: 0, to: editorViewRef.current!.state.doc.length, insert: value },
+            });
+        });
+        //});
+    }
     //}, [value]);
 
     return (

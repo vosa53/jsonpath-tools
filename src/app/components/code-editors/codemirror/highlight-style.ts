@@ -15,5 +15,24 @@ export const highlightStyle = HighlightStyle.define([
     { tag: t.string, color: "var(--mantine-color-orange-text)" },
     { tag: t.propertyName, color: "var(--mantine-color-indigo-text)" },
     { tag: t.bracket, color: "var(--mantine-color-grape-text)" },
-    { tag: t.controlOperator, color: "var(--mantine-color-violet-text)" }
+    { tag: t.controlOperator, color: "var(--mantine-color-violet-text)" },
+
+    // TODO: Adapt to the application style.
+    { tag: t.meta, color: "#404740" },
+    { tag: t.link, textDecoration: "underline" },
+    { tag: t.heading, textDecoration: "underline", fontWeight: "bold" },
+    { tag: t.emphasis, fontStyle: "italic" },
+    { tag: t.strong, fontWeight: "bold" },
+    { tag: t.strikethrough, textDecoration: "line-through" },
+    { tag: [t.atom, t.url, t.contentSeparator, t.labelName], color: "#219" },
+    { tag: [t.literal, t.inserted], color: "#164" },
+    { tag: [t.deleted], color: "#a11" },
+    { tag: [t.regexp, t.escape, t.special(t.string)], color: "#e40" },
+    { tag: t.definition(t.variableName), color: "#00f" },
+    { tag: t.local(t.variableName), color: "#30a" },
+    { tag: [t.typeName, t.namespace], color: "#085" },
+    { tag: [t.special(t.variableName), t.macroName], color: "#256" },
+    { tag: t.definition(t.propertyName), color: "#00c" },
+    { tag: t.comment, color: "#940" },
+    { tag: t.invalid, color: "#f00" }
 ]);
