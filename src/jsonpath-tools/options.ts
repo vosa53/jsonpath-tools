@@ -8,8 +8,10 @@ export interface JSONPathOptions {
 export interface JSONPathFunction {
     parameterTypes: readonly JSONPathType[];
     returnType: JSONPathType;
-    handler: (...args: JSONPathFilterValue[]) => JSONPathFilterValue;
+    handler: JSONPathFunctionHandler;
 }
+
+export type JSONPathFunctionHandler = (...args: JSONPathFilterValue[]) => JSONPathFilterValue;
 
 export enum JSONPathType {
     valueType = "ValueType",

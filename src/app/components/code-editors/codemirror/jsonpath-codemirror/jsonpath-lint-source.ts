@@ -1,23 +1,15 @@
 import { LintSource } from "@codemirror/lint";
 import { ViewUpdate } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";
-import { updateOptionsEffect, updateQueryArgumentEffect, workerStateField } from "./jsonpath-state";
+import { updateOptionsEffect, updateQueryArgumentEffect, languageServiceSessionStateField } from "./jsonpath-state";
 import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "@/jsonpath-tools/diagnostics";
 
 
 export function jsonPathLintSource(options: { onDiagnosticsCreated?: (diagnostics: readonly JSONPathDiagnostics[]) => void } = {}): LintSource {
     return async view => {
-        /*const jsonPath = getJSONPath(syntaxTree(view.state));
-        const typeChecker = new TypeChecker();
-        const diagnostics = [
-            ...jsonPath.syntaxDiagnostics,
-            ...typeChecker.check(jsonPath, defaultJSONPathOptions)
-        ];
-        options.onDiagnosticsCreated?.(diagnostics);*/
-
-        const worker = view.state.field(workerStateField);
+        const languageServiceSession = view.state.field(languageServiceSessionStateField);
         try {
-            const diagnostics = await worker.getDiagnostics();
+            const diagnostics = await languageServiceSession.getDiagnostics();
             options.onDiagnosticsCreated?.(diagnostics);
 
             return diagnostics.map(d => ({

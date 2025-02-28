@@ -26,7 +26,7 @@ export class TypeChecker {
 
     }
 
-    check(query: JSONPath, options: JSONPathOptions): readonly JSONPathDiagnostics[] {
+    check(query: JSONPath): readonly JSONPathDiagnostics[] {
         const context = new TypeCheckerContext();
         this.checkRecursive(query, null, context);
         return context.diagnostics;

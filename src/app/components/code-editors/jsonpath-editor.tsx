@@ -9,11 +9,13 @@ import CodeMirrorEditor from "./codemirror/codemirror-editor";
 import { jsonPath } from "./codemirror/jsonpath-codemirror/jsonpath-language";
 import { getJSONPath } from "./codemirror/jsonpath-codemirror/jsonpath-parser";
 import { getResult, updateOptionsEffect, updateQueryArgumentEffect } from "./codemirror/jsonpath-codemirror/jsonpath-state";
+import { LanguageService } from "./codemirror/jsonpath-codemirror/worker/language-service";
 
 export default function JSONPathEditor({
     value,
     options = defaultJSONPathOptions,
     queryArgument = {},
+    languageService,
     readonly = false,
     onValueChanged,
     onParsed,
@@ -21,8 +23,9 @@ export default function JSONPathEditor({
     onGetResultAvailable
 }: {
     value: string,
-    options?: JSONPathOptions,
-    queryArgument?: JSONPathJSONValue,
+    options: JSONPathOptions,
+    queryArgument: JSONPathJSONValue,
+    languageService: LanguageService
     readonly?: boolean,
     onValueChanged: (value: string) => void,
     onParsed?: (jsonPath: JSONPath) => void,
@@ -59,7 +62,10 @@ export default function JSONPathEditor({
 
     const onEditorExtensionsRequested = () => {
         return [
-            jsonPath({ onDiagnosticsCreated }),
+            jsonPath({
+                languageService,
+                onDiagnosticsCreated 
+            }),
             EditorView.theme({
                 "&": { fontSize: "18px !important" },
                 "& .cm-content": { padding: "10px 0" }

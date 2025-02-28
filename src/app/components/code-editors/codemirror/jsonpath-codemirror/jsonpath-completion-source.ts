@@ -1,19 +1,15 @@
 import { CompletionItemType } from "@/jsonpath-tools/editor-services/completion-provider";
 import { CompletionContext, CompletionResult } from "@codemirror/autocomplete";
 import { OperationCancelledError } from "./cancellation-token";
-import { workerStateField } from "./jsonpath-state";
+import { languageServiceSessionStateField } from "./jsonpath-state";
 
 
 export async function jsonPathCompletionSource(context: CompletionContext): Promise<CompletionResult | null> {
     const word = context.matchBefore(/\w*/)!;
     if (context.explicit || word.from !== word.to || context.matchBefore(/\.|,\s?|\[/)) {
-        const worker = context.state.field(workerStateField);
+        const languageServiceSession = context.state.field(languageServiceSessionStateField);
         try {
-            const completions = await worker.getCompletions(context.pos);
-
-            /*const completionProvider = new CompletionProvider(defaultJSONPathOptions);
-            const jsonPath = getJSONPath(syntaxTree(context.state));
-            const completions = completionProvider.provideCompletions(jsonPath, JSON.parse(testJson), context.pos);*/
+            const completions = await languageServiceSession.getCompletions(context.pos);
 
             return {
                 from: word.from,

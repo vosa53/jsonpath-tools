@@ -3,69 +3,63 @@ import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-prov
 import { JSONPathOptions } from "@/jsonpath-tools/options";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 import { CancellationToken } from "../cancellation-token";
-import { GetCompletionsWorkerMessage, GetCompletionsWorkerMessageResponse, GetDiagnosticsWorkerMessage, GetDiagnosticsWorkerMessageResponse, GetResultWorkerMessage, GetResultWorkerMessageResponse, UpdateOptionsWorkerMessage, UpdateQueryArgumentWorkerMessage, UpdateQueryWorkerMessage } from "./worker-messages";
-import { WebWorkerRPCTopic, WorkerRPC } from "./worker-rpc";
+import { GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, SerializableJSONPathOptions, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
+import { SimpleRPCTopic } from "./simple-rpc";
 
 
-export class WorkerFrontend {
-    private static readonly worker = this.createWorker();
-    private static readonly rpc = this.createRPC(this.worker);
+export class LanguageServiceSession {
     private cancellationToken = new CancellationToken();
     private taskQueue: Promise<any> = Promise.resolve();
 
-    private constructor(private readonly rpcTopic: WebWorkerRPCTopic) { }
+    constructor(readonly rpcTopic: SimpleRPCTopic) { }
 
-    static connectNew(): WorkerFrontend {
-        return this.rpc.createHandler();
-    }
+    updateOptions(newOptions: JSONPathOptions) {
+        const serializableFunctions = Object.entries(newOptions.functions).map(([name, f]) => [
+            name,
+            {
+                returnType: f.returnType,
+                parameterTypes: f.parameterTypes
+            }
+        ]);
+        const serializableNewOptions: SerializableJSONPathOptions = {
+            functions: Object.fromEntries(serializableFunctions)
+        };
 
-    private static createWorker(): Worker {
-        const worker = new Worker(new URL("./worker-script.ts", import.meta.url));
-        return worker;
-    }
-
-    private static createRPC(worker: Worker): WorkerRPC<WorkerFrontend> {
-        const rpc = new WorkerRPC<WorkerFrontend>(i => worker.postMessage(i), t => new WorkerFrontend(t));
-        worker.addEventListener("message", e => rpc.receive(e.data));
-        return rpc;
-    }
-
-    updateOption(newOptions: JSONPathOptions) {
         this.cancelQueue();
-        this.rpcTopic.sendNotification<UpdateOptionsWorkerMessage>("updateOptions", { 
-            newOptions: newOptions 
+        this.rpcTopic.sendNotification<UpdateOptionsLanguageServiceMessage>("updateOptions", { 
+            newOptions: serializableNewOptions
         });
     }
 
     updateQuery(newQuery: string) {
         this.cancelQueue();
-        this.rpcTopic.sendNotification<UpdateQueryWorkerMessage>("updateQuery", {
+        this.rpcTopic.sendNotification<UpdateQueryLanguageServiceMessage>("updateQuery", {
             newQuery: newQuery
         });
     }
 
     updateQueryArgument(newQueryArgument: JSONPathJSONValue) {
         this.cancelQueue();
-        this.rpcTopic.sendNotification<UpdateQueryArgumentWorkerMessage>("updateQueryArgument", {
+        this.rpcTopic.sendNotification<UpdateQueryArgumentLanguageServiceMessage>("updateQueryArgument", {
             newQueryArgument: newQueryArgument
         });
     }
 
     async getCompletions(position: number): Promise<readonly CompletionItem[]> {
-        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetCompletionsWorkerMessage, GetCompletionsWorkerMessageResponse>("getCompletions", {
+        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse>("getCompletions", {
             position: position
         }), this.cancellationToken);
         return response.completions;
     }
 
     async getDiagnostics(): Promise<readonly JSONPathDiagnostics[]> {
-        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetDiagnosticsWorkerMessage, GetDiagnosticsWorkerMessageResponse>("getDiagnostics", { 
+        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse>("getDiagnostics", { 
         }), this.cancellationToken);
         return response.diagnostics;
     }
 
     async getResult(): Promise<{ nodes: readonly JSONPathJSONValue[], paths: readonly (string | number)[][] }> {
-        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetResultWorkerMessage, GetResultWorkerMessageResponse>("getResult", {
+        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse>("getResult", {
         }), this.cancellationToken);
         return response;
     }

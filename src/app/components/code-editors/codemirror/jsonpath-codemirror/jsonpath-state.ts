@@ -2,51 +2,43 @@ import { JSONPathOptions } from "@/jsonpath-tools/options";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 import { EditorState, Facet, StateEffect, StateField } from "@codemirror/state";
 import { EditorView, PluginValue, ViewPlugin, ViewUpdate } from "@codemirror/view";
-import { WorkerFrontend } from "./worker/worker-frontend";
+import { LanguageServiceSession } from "./worker/language-service-session";
+import { LanguageService } from "./worker/language-service";
 
-/*interface JSONPathEditorState {
-    readonly worker: JSONPathWorkerFrontend;
-    readonly options: JSONPathOptions;
-    readonly queryArgument: JSONPathJSONValue;
-}*/
 
 export const updateOptionsEffect = StateEffect.define<JSONPathOptions>();
 export const updateQueryArgumentEffect = StateEffect.define<JSONPathJSONValue>();
-const configFacet = Facet.define<{ a: string }>();
+export const jsonPathConfigFacet = Facet.define<{
+    languageService: LanguageService
+}>();
 
-export const workerStateField = StateField.define<WorkerFrontend>({
+export const languageServiceSessionStateField = StateField.define<LanguageServiceSession>({
     create(state) {
-        const worker = WorkerFrontend.connectNew();
-        worker.updateQuery(state.doc.toString());
-        return worker;
-    },
-    update(value, transaction) {
-        if (transaction.docChanged) {
-            value.updateQuery(transaction.newDoc.toString());
-        }
-        for (const effect of transaction.effects) {
-            /*if (effect.is(updateOptionsEffect))
-                value.updateOption(effect.value);
-            else */if (effect.is(updateQueryArgumentEffect)) {
-                console.log("UPDATE QUERY ARGUMENT", effect.value);
-                value.updateQueryArgument(effect.value);
-            }
-        }
+        const configFacet = state.facet(jsonPathConfigFacet);
+        if (configFacet.length !== 1) throw new Error("Expected exactly one config.");
 
-        return value;
+        const languageServiceSession = configFacet[0].languageService.createSession();
+        languageServiceSession.updateQuery(state.doc.toString());
+        return languageServiceSession;
+    },
+    update(languageServiceSession, transaction) {
+        if (transaction.docChanged)
+            languageServiceSession.updateQuery(transaction.newDoc.toString());
+        for (const effect of transaction.effects) {
+            if (effect.is(updateOptionsEffect))
+                languageServiceSession.updateOptions(effect.value);
+            else if (effect.is(updateQueryArgumentEffect))
+                languageServiceSession.updateQueryArgument(effect.value);
+        }
+        return languageServiceSession;
     }
 });
 
 class JSONPathPlugin implements PluginValue {
-    private readonly worker: WorkerFrontend;
+    private readonly languageServiceSession: LanguageServiceSession;
 
     constructor(private readonly view: EditorView) {
-        this.worker = view.state.field(workerStateField);
-        /*this.worker.updateDiagnostics = diagnostics => {
-            const bb = view.state.facet(configFacet);
-            console.log("Received diagnostics", diagnostics);
-        };*/
-        // TODO: Result.
+        this.languageServiceSession = view.state.field(languageServiceSessionStateField);
     }
 
     update(update: ViewUpdate): void {
@@ -54,17 +46,17 @@ class JSONPathPlugin implements PluginValue {
     }
 
     destroy(): void {
-        this.worker.dispose();
+        this.languageServiceSession.dispose();
     }
 }
 
 export const jsonPathPlugin = ViewPlugin.fromClass(JSONPathPlugin, {
     provide(plugin) {
-        return workerStateField;
+        return languageServiceSessionStateField;
     },
 });
 
 export function getResult(state: EditorState): Promise<{ nodes: readonly JSONPathJSONValue[], paths: readonly (string | number)[][] }> {
-    const worker = state.field(workerStateField);
-    return worker.getResult();
+    const languageServiceSession = state.field(languageServiceSessionStateField);
+    return languageServiceSession.getResult();
 }

@@ -46,6 +46,7 @@ export default function Home() {
                         value={viewModel.queryText}
                         options={viewModel.options}
                         queryArgument={viewModel.queryArgument}
+                        languageService={viewModel.languageService}
                         onValueChanged={viewModel.onQueryTextChanged}
                         onParsed={viewModel.onQueryParsed}
                         onDiagnosticsCreated={viewModel.onDiagnosticsPublished}

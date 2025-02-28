@@ -1,11 +1,11 @@
 import { logPerformance } from "@/jsonpath-tools/utils";
 
-export class WorkerRPC<THandler> {
+export class SimpleRPC<THandler> {
     private readonly messageTypeToHandlerActions = new Map<string, (handler: THandler, data: any) => any>();
     private readonly messageIDToPromiseActions = new Map<string, { resolve: (data: any) => void, reject: (error: Error) => void }>();
     private readonly topicIDToHandlers = new Map<string, THandler>();
 
-    constructor(private readonly send: (input: any) => void, private readonly handlerFactory: (topic: WebWorkerRPCTopic) => THandler) {
+    constructor(private readonly send: (input: any) => void, private readonly handlerFactory: (topic: SimpleRPCTopic) => THandler) {
         this.send = (input: any) => logPerformance("Sending worker message", () => send(input));
     }
 
@@ -28,8 +28,8 @@ export class WorkerRPC<THandler> {
         this.sendMessage(type, topicID, data);
     }
 
-    private sendMessage(type: string, topicID: string, data: any): JSONPathWorkerMessage {
-        const message: JSONPathWorkerMessage = {
+    private sendMessage(type: string, topicID: string, data: any): SimpleRPCMessage {
+        const message: SimpleRPCMessage = {
             type: type,
             id: crypto.randomUUID(),
             topicID: topicID,
@@ -40,7 +40,7 @@ export class WorkerRPC<THandler> {
     }
 
     private sendResponse(messageID: string, data: any) {
-        const response: JSONPathWorkerMessageResponse = {
+        const response: SimpleRPCMessageResponse = {
             id: messageID,
             data: data
         };
@@ -48,7 +48,7 @@ export class WorkerRPC<THandler> {
     }
 
     receive(input: any) {
-        const message = input as JSONPathWorkerMessage | JSONPathWorkerMessageResponse;
+        const message = input as SimpleRPCMessage | SimpleRPCMessageResponse;
         const isResponse = !("type" in message);
         if (isResponse) {
             const promiseActions = this.messageIDToPromiseActions.get(message.id);
@@ -74,15 +74,15 @@ export class WorkerRPC<THandler> {
     private getOrCreateHandler(topicID: string): THandler {
         let handler = this.topicIDToHandlers.get(topicID);
         if (handler === undefined) {
-            handler = this.handlerFactory(new WebWorkerRPCTopic(topicID, this));
+            handler = this.handlerFactory(new SimpleRPCTopic(topicID, this));
             this.topicIDToHandlers.set(topicID, handler);
         }
         return handler;
     }
 }
 
-export class WebWorkerRPCTopic {
-    constructor(private readonly topicID: string, private readonly rpc: WorkerRPC<any>) {
+export class SimpleRPCTopic {
+    constructor(private readonly topicID: string, private readonly rpc: SimpleRPC<any>) {
 
     }
 
@@ -99,14 +99,14 @@ export class WebWorkerRPCTopic {
     }
 }
 
-interface JSONPathWorkerMessage {
+interface SimpleRPCMessage {
     readonly type: string;
     readonly id: string;
     readonly topicID: string;
     readonly data: any;
 }
 
-interface JSONPathWorkerMessageResponse {
+interface SimpleRPCMessageResponse {
     readonly id: string;
     readonly data: any;
 }

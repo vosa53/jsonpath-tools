@@ -11,6 +11,8 @@ import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
 import { Settings } from "./models/settings";
 import { logPerformance } from "@/jsonpath-tools/utils";
 import { defaultJSONPathOptions, JSONPathOptions } from "@/jsonpath-tools/options";
+import { LanguageService } from "./components/code-editors/codemirror/jsonpath-codemirror/worker/language-service";
+import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";
 
 interface State {
     customFunctions: readonly CustomFunction[];
@@ -45,7 +47,7 @@ export function usePageViewModel() {
                 ...Object.fromEntries(customFunctions.map(f => [f.name, { returnType: f.returnType, parameterTypes: f.parameters.map(p => p.type), handler: () => JSONPathNothing }]))
             }
         };
-    }, [customFunctions, ]);
+    }, [customFunctions]);
     const [result, setResult] = useState<readonly JSONPathJSONValue[]>([]);
     const [resultPaths, setResultPaths] = useState<readonly JSONPathNormalizedPath[]>([]);
     const resultText = useMemo(() => {
@@ -69,6 +71,12 @@ export function usePageViewModel() {
     const resultTimeoutRef = useRef<number | null>(null);
 
     const onCustomFunctionsChanged = useCallback((customFunctions: readonly CustomFunction[]) => {
+        const customFunctionsForWorker = customFunctions.map(f => ({
+            name: f.name,
+            parameterNames: f.parameters.map(p => p.name),
+            code: f.code
+        } as CustomLanguageServiceFunction));
+        worker.postMessage({ type: "updateCustomFunctions", customFunctions: customFunctionsForWorker } as CustomLanguageServiceWorkerMessage);
         setCustomFunctions(customFunctions);
     }, []);
 
@@ -148,7 +156,8 @@ export function usePageViewModel() {
         resultText,
         resultPathsText,
         currentResultPathIndex,
-        diagnostics
+        diagnostics,
+        languageService
     };
 }
 
@@ -195,7 +204,7 @@ const testSettings: Settings = {
 };
 const testOperation: Operation = {
     type: OperationType.select,
-    replacement: { 
+    replacement: {
         replacement: {},
         replacementText: "{}"
     }
@@ -213,3 +222,13 @@ function executeOperation(operation: Operation, queryArgument: JSONPathJSONValue
     else
         throw new Error(`Unknown operation type: ${operation.type}.`);
 }
+
+const worker = new Worker(new URL("./custom-language-service-worker.ts", import.meta.url));
+const languageService = new LanguageService(data => worker.postMessage({ type: "languageServiceData", data } as CustomLanguageServiceWorkerMessage));
+worker.addEventListener("message", e => {
+    const message = e.data as CustomLanguageServiceWorkerMessage;
+    if (message.type === "languageServiceData")
+        languageService.receiveFromBackend(message.data);
+    else
+        throw new Error(`Unexpected message type.`);
+});
