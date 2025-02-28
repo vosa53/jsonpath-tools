@@ -10,11 +10,14 @@ import { jsonPath } from "./codemirror/jsonpath-codemirror/jsonpath-language";
 import { getJSONPath } from "./codemirror/jsonpath-codemirror/jsonpath-parser";
 import { getResult, updateOptionsEffect, updateQueryArgumentEffect } from "./codemirror/jsonpath-codemirror/jsonpath-state";
 import { LanguageService } from "./codemirror/jsonpath-codemirror/worker/language-service";
+import { TextRange } from "@/jsonpath-tools/text-range";
+import { highlightRange, setHighlightedRangeEffect } from "./codemirror/highlight-range";
 
 export default function JSONPathEditor({
     value,
     options = defaultJSONPathOptions,
     queryArgument = {},
+    highlightedRange = null,
     languageService,
     readonly = false,
     onValueChanged,
@@ -25,7 +28,8 @@ export default function JSONPathEditor({
     value: string,
     options: JSONPathOptions,
     queryArgument: JSONPathJSONValue,
-    languageService: LanguageService
+    languageService: LanguageService,
+    highlightedRange: TextRange | null,
     readonly?: boolean,
     onValueChanged: (value: string) => void,
     onParsed?: (jsonPath: JSONPath) => void,
@@ -60,15 +64,22 @@ export default function JSONPathEditor({
             editorViewRef.current.dispatch({ effects: updateQueryArgumentEffect.of(queryArgument) });
     }, [queryArgument]);
 
+    useEffect(() => {
+        if (editorViewRef.current !== null)
+            editorViewRef.current.dispatch({ effects: setHighlightedRangeEffect.of(highlightedRange) });
+    }, [highlightedRange]);
+
     const onEditorExtensionsRequested = () => {
         return [
             jsonPath({
                 languageService,
                 onDiagnosticsCreated 
             }),
+            highlightRange,
             EditorView.theme({
                 "&": { fontSize: "18px !important" },
-                "& .cm-content": { padding: "10px 0" }
+                "& .cm-content": { padding: "10px 0" },
+                "& .cm-highlighted": { background: "#ff922b30" }
             }),
             EditorView.updateListener.of(u => {
                 if (u.docChanged) {
@@ -80,7 +91,7 @@ export default function JSONPathEditor({
     };
 
     const onEditorViewCreated = (view: EditorView) => {
-        view.dispatch({ effects: [updateOptionsEffect.of(options), updateQueryArgumentEffect.of(queryArgument)] });
+        view.dispatch({ effects: [updateOptionsEffect.of(options), updateQueryArgumentEffect.of(queryArgument), setHighlightedRangeEffect.of(highlightedRange)] });
         editorViewRef.current = view;
         onGetResultAvailable?.(() => getResult(view.state));
     };

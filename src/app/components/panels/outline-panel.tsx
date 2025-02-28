@@ -18,7 +18,13 @@ import { JSONPathComparisonExpression } from "@/jsonpath-tools/query/filter-expr
 import { JSONPathFunctionExpression } from "@/jsonpath-tools/query/filter-expression/function-expression";
 import { JSONPathFilterQueryExpression } from "@/jsonpath-tools/query/filter-expression/filter-query-expression";
 
-const OutlinePanel = memo(({ query }: { query: JSONPath }) => {
+const OutlinePanel = memo(({
+    query,
+    onSelectedNodeChanged
+}: {
+    query: JSONPath,
+    onSelectedNodeChanged: (node: JSONPathSyntaxTree | null) => void
+}) => {
     return (
         <PanelShell
             toolbar={
@@ -27,22 +33,40 @@ const OutlinePanel = memo(({ query }: { query: JSONPath }) => {
             }
         >
             <Box m="sm">
-                {query !== undefined && <OutlineView tree={query.query} />}
+                {query !== undefined && <OutlineView tree={query.query} onSelectedNodeChanged={onSelectedNodeChanged} />}
             </Box>
         </PanelShell>
     );
 });
 export default OutlinePanel;
 
-function OutlineView({ tree }: { tree: JSONPathSyntaxTree }) {
+function OutlineView({
+    tree,
+    onSelectedNodeChanged
+}: {
+    tree: JSONPathSyntaxTree,
+    onSelectedNodeChanged: (node: JSONPathSyntaxTree | null) => void
+}) {
     if (tree instanceof JSONPathToken) return (<></>);
     return (
-        <Paper p="xs" className={getClassName(tree)} withBorder>
+        <Paper
+            p="xs"
+            className={getClassName(tree)}
+            withBorder
+            onMouseOver={e => {
+                e.stopPropagation();
+                onSelectedNodeChanged(tree);
+            }}
+            onMouseOut={e => {
+                e.stopPropagation();
+                onSelectedNodeChanged(null);
+            }}
+        >
             <TreeLabel tree={tree} />
             {tree instanceof JSONPathNode && tree.children.length > 0 && (
                 <Stack className={classes.children} mt="xs" bg="var(--mantine-color-body)" gap="xs">
                     {tree.children.map((c, i) => (
-                        <OutlineView key={i} tree={c} />
+                        <OutlineView key={i} tree={c} onSelectedNodeChanged={onSelectedNodeChanged} />
                     ))}
                 </Stack>
             )}

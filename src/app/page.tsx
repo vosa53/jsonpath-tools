@@ -2,7 +2,7 @@
 
 import { AppShell, Divider, Flex, Indicator, Stack, Tabs } from '@mantine/core';
 import { IconBraces, IconEqual, IconExclamationCircle, IconListTree, IconRouteSquare } from '@tabler/icons-react';
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import JSONPathEditor from "./components/code-editors/jsonpath-editor";
 import Header from "./components/header";
 import Navbar from "./components/navbar";
@@ -14,10 +14,14 @@ import PathsPanel from "./components/panels/paths-panel";
 import ResultPanel from "./components/panels/result-panel";
 import { usePageViewModel } from "./page-view-model";
 import classes from "./styles/page.module.css";
+import { JSONPathDiagnosticsType } from '@/jsonpath-tools/diagnostics';
 
 export default function Home() {
     const [navbarOpened, setNavbarOpened] = useState(false);
     const viewModel = usePageViewModel();
+    const errorCount = useMemo(() => {
+        return viewModel.diagnostics.filter(d => d.type === JSONPathDiagnosticsType.error).length;
+    }, [viewModel.diagnostics]);
     
     return (
         <AppShell
@@ -46,6 +50,7 @@ export default function Home() {
                         value={viewModel.queryText}
                         options={viewModel.options}
                         queryArgument={viewModel.queryArgument}
+                        highlightedRange={viewModel.highlightedRange}
                         languageService={viewModel.languageService}
                         onValueChanged={viewModel.onQueryTextChanged}
                         onParsed={viewModel.onQueryParsed}
@@ -87,7 +92,7 @@ export default function Home() {
                                     Paths
                                 </Tabs.Tab>
                                 <Tabs.Tab value="errors" leftSection={<IconExclamationCircle size={20} />}>
-                                    <Indicator color="red" label={viewModel.diagnostics.length} size={16} offset={-4} disabled={viewModel.diagnostics.length === 0}>
+                                    <Indicator color="red" label={errorCount} size={16} offset={-4} disabled={errorCount === 0}>
                                         Errors
                                     </Indicator>
                                 </Tabs.Tab>
@@ -109,11 +114,13 @@ export default function Home() {
                             </Tabs.Panel>
                             <Tabs.Panel value="errors" flex="1 1 0" mih={0}>
                                 <DiagnosticsPanel 
-                                    diagnostics={viewModel.diagnostics} />
+                                    diagnostics={viewModel.diagnostics}
+                                    onSelectedDiagnosticsChanged={viewModel.onSelectedDiagnosticsChanged} />
                             </Tabs.Panel>
                             <Tabs.Panel value="outline" flex="1 1 0" mih={0}>
                                 <OutlinePanel 
-                                    query={viewModel.query} />
+                                    query={viewModel.query}
+                                    onSelectedNodeChanged={viewModel.onSelectedNodeChanged} />
                             </Tabs.Panel>
                         </Tabs>
                     </Flex>

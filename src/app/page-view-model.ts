@@ -13,6 +13,8 @@ import { logPerformance } from "@/jsonpath-tools/utils";
 import { defaultJSONPathOptions, JSONPathOptions } from "@/jsonpath-tools/options";
 import { LanguageService } from "./components/code-editors/codemirror/jsonpath-codemirror/worker/language-service";
 import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";
+import { TextRange } from "@/jsonpath-tools/text-range";
+import { JSONPathSyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
 
 interface State {
     customFunctions: readonly CustomFunction[];
@@ -67,6 +69,7 @@ export function usePageViewModel() {
     }, [resultPaths, pathType]);
     const [currentResultPathIndex, setCurrentResultPathIndex] = useState<number>(0);
     const [diagnostics, setDiagnostics] = useState<readonly JSONPathDiagnostics[]>([]);
+    const [highlightedRange, setHighlightedRange] = useState<TextRange | null>(null);
     const getResultRef = useRef<() => Promise<{ nodes: readonly JSONPathJSONValue[], paths: readonly (string | number)[][] }>>(null);
     const resultTimeoutRef = useRef<number | null>(null);
 
@@ -116,6 +119,14 @@ export function usePageViewModel() {
         getResultRef.current = getResult;
     }, []);
 
+    const onSelectedDiagnosticsChanged = useCallback((diagnostics: JSONPathDiagnostics | null) => {
+        setHighlightedRange(diagnostics === null ? null : diagnostics.textRange);
+    }, []);
+
+    const onSelectedNodeChanged = useCallback((tree: JSONPathSyntaxTree | null) => {
+        setHighlightedRange(tree === null ? null : tree.textRange);
+    }, []);
+
     useEffect(() => {
         if (getResultRef.current === null) return;
         if (resultTimeoutRef.current !== null) window.clearTimeout(resultTimeoutRef.current);
@@ -143,6 +154,8 @@ export function usePageViewModel() {
         onCurrentResultPathIndexChanged,
         onDiagnosticsPublished,
         onGetResultAvailable,
+        onSelectedDiagnosticsChanged,
+        onSelectedNodeChanged,
         customFunctions,
         settings,
         queryText,
@@ -157,6 +170,7 @@ export function usePageViewModel() {
         resultPathsText,
         currentResultPathIndex,
         diagnostics,
+        highlightedRange,
         languageService
     };
 }

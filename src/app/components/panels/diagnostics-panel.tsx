@@ -1,13 +1,15 @@
-import { JSONPathDiagnostics } from "@/jsonpath-tools/diagnostics";
-import { Box, Checkbox, Group, List, Table, ThemeIcon } from "@mantine/core";
+import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "@/jsonpath-tools/diagnostics";
+import { Checkbox, DefaultMantineColor, Group, Table, ThemeIcon } from "@mantine/core";
 import { IconExclamationCircle } from "@tabler/icons-react";
+import { memo, ReactNode } from "react";
 import PanelShell from "../panel-shell";
-import { memo } from "react";
 
-const DiagnosticsPanel = memo(({ 
-    diagnostics 
-}: { 
-    diagnostics: readonly JSONPathDiagnostics[] 
+const DiagnosticsPanel = memo(({
+    diagnostics,
+    onSelectedDiagnosticsChanged
+}: {
+    diagnostics: readonly JSONPathDiagnostics[],
+    onSelectedDiagnosticsChanged: (diagnostics: JSONPathDiagnostics | null) => void
 }) => {
     return (
         <PanelShell
@@ -26,13 +28,19 @@ const DiagnosticsPanel = memo(({
                 </Group>
             }
         >
-            <DiagnosticsView diagnostics={diagnostics} />
+            <DiagnosticsView diagnostics={diagnostics} onSelectedDiagnosticsChanged={onSelectedDiagnosticsChanged} />
         </PanelShell>
     );
 });
 export default DiagnosticsPanel;
 
-function DiagnosticsView({ diagnostics }: { diagnostics: readonly JSONPathDiagnostics[] }) {
+function DiagnosticsView({ 
+    diagnostics,
+    onSelectedDiagnosticsChanged
+}: { 
+    diagnostics: readonly JSONPathDiagnostics[],
+    onSelectedDiagnosticsChanged: (diagnostics: JSONPathDiagnostics | null) => void
+}) {
     return (
         <Table>
             <Table.Thead>
@@ -44,13 +52,9 @@ function DiagnosticsView({ diagnostics }: { diagnostics: readonly JSONPathDiagno
                 </Table.Tr>
             </Table.Thead>
             <Table.Tbody>{diagnostics.map((d, i) => (
-                <Table.Tr key={i}>
+                <Table.Tr key={i} onMouseEnter={() => onSelectedDiagnosticsChanged(d)} onMouseLeave={() => onSelectedDiagnosticsChanged(null)}>
                     <Table.Td>
-                        {
-                            <ThemeIcon color="red.7" size={24} radius="xl">
-                                <IconExclamationCircle size={16} />
-                            </ThemeIcon>
-                        }
+                        <DiagnosticsIcon diagnostics={d} />
                     </Table.Td>
                     <Table.Td>{d.message}</Table.Td>
                     <Table.Td>{d.textRange.position}</Table.Td>
@@ -58,5 +62,27 @@ function DiagnosticsView({ diagnostics }: { diagnostics: readonly JSONPathDiagno
                 </Table.Tr>
             ))}</Table.Tbody>
         </Table>
+    );
+}
+
+function DiagnosticsIcon({ diagnostics }: { diagnostics: JSONPathDiagnostics }) {
+    const ICON_SIZE = 16;
+    let iconColor: DefaultMantineColor;
+    let icon: ReactNode;
+    if (diagnostics.type === JSONPathDiagnosticsType.error) {
+        iconColor = "red.7";
+        icon = <IconExclamationCircle size={ICON_SIZE} />;
+    }
+    else if (diagnostics.type === JSONPathDiagnosticsType.warning) {
+        iconColor = "yellow.4";
+        icon = <IconExclamationCircle size={ICON_SIZE} />;
+    }
+    else
+        throw new Error("Unknown diagnostics type.");
+
+    return (
+        <ThemeIcon color={iconColor} size={24} radius="xl">
+            {icon}
+        </ThemeIcon>
     );
 }
