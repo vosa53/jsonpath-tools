@@ -1,10 +1,15 @@
+import { JSONPathOptions } from "../options";
 import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
 import { JSONPath } from "../query/json-path";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
 import { TextRange } from "../text-range";
 
 export class TooltipProvider {
-    static provideTooltip(jsonPath: JSONPath, position: number): Tooltip | null {
+    constructor(
+        private readonly options: JSONPathOptions
+    ) { }
+
+    provideTooltip(jsonPath: JSONPath, position: number): Tooltip | null {
         const nodePath = jsonPath.getAtPosition(position);
         if (nodePath.length === 0)
             return null;

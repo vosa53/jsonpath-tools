@@ -1,9 +1,9 @@
-import { Accordion, Divider, Flex, Stack, Switch, Text } from "@mantine/core";
+import { Accordion, Divider, Flex, Text } from "@mantine/core";
 import { IconHelp, IconMathFunction, IconSettings } from "@tabler/icons-react";
 import { memo } from "react";
 import { CustomFunction } from "../models/custom-function";
-import CustomFunctionsView from "./custom-functions-view";
 import { Settings } from "../models/settings";
+import CustomFunctionsView from "./custom-functions-view";
 import SettingsEditor from "./settings-editor";
 
 const Navbar = memo(({

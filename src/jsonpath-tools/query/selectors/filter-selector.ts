@@ -1,13 +1,11 @@
-import { JSONPathJSONValue, JSONPathLogicalTrue } from "../../types";
-import { JSONPathSelector } from "./selector";
+import { JSONPathLogicalTrue } from "../../types";
+import { JSONPathFilterExpressionContext, JSONPathQueryContext, PushOnlyArray } from "../evaluation";
+import { JSONPathFilterExpression } from "../filter-expression/filter-expression";
+import { evaluateAsLogicalType } from "../helpers";
+import { LocatedNode } from "../located-node";
 import { JSONPathSyntaxTreeType } from "../syntax-tree-type";
 import { JSONPathToken } from "../token";
-import { evaluateAsLogicalType } from "../helpers";
-import { PushOnlyArray } from "../evaluation";
-import { JSONPathFilterExpressionContext } from "../evaluation";
-import { JSONPathQueryContext } from "../evaluation";
-import { JSONPathFilterExpression } from "../filter-expression/filter-expression";
-import { LocatedNode } from "../located-node";
+import { JSONPathSelector } from "./selector";
 
 
 export class JSONPathFilterSelector extends JSONPathSelector {

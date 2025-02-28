@@ -1,4 +1,4 @@
-import { JSONPathJSONValue, JSONPathNodeList } from "../types";
+import { JSONPathNodeList } from "../types";
 import { JSONPathFilterExpressionContext, JSONPathQueryContext } from "./evaluation";
 import { LocatedNode } from "./located-node";
 import { JSONPathNode } from "./node";

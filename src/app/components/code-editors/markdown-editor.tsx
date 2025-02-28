@@ -1,7 +1,6 @@
-import {markdown} from "@codemirror/lang-markdown";
-import {javascriptLanguage} from "@codemirror/lang-javascript";
-import CodeMirrorEditor from "./codemirror/codemirror-editor";
+import { markdown } from "@codemirror/lang-markdown";
 import { EditorView } from "codemirror";
+import CodeMirrorEditor from "./codemirror/codemirror-editor";
 
 export default function MarkdownEditor({
     value,
@@ -21,6 +20,11 @@ export default function MarkdownEditor({
     };
 
     return (
-        <CodeMirrorEditor value={value} readonly={false} onValueChanged={onValueChanged} onExtensionsRequested={onEditorExtensionsRequested} style={{ height: "100%" }} />
+        <CodeMirrorEditor 
+            value={value} 
+            readonly={false} 
+            onValueChanged={onValueChanged} 
+            onExtensionsRequested={onEditorExtensionsRequested} 
+            style={{ height: "100%" }} />
     );
 }

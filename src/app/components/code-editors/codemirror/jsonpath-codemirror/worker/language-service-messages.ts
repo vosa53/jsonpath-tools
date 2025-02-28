@@ -1,6 +1,6 @@
 import { JSONPathDiagnostics } from "@/jsonpath-tools/diagnostics";
 import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-provider";
-import { JSONPathOptions, JSONPathType } from "@/jsonpath-tools/options";
+import { JSONPathType } from "@/jsonpath-tools/options";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 
 export enum LanguageServiceMessageType {
@@ -59,6 +59,6 @@ export interface SerializableJSONPathOptions {
 }
 
 export interface SerializableJSONPathFunction {
-    parameterTypes: readonly JSONPathType[];
-    returnType: JSONPathType;
+    readonly parameterTypes: readonly JSONPathType[];
+    readonly returnType: JSONPathType;
 }

@@ -1,8 +1,6 @@
-import { JSONPathJSONValue } from "../../types";
-import { JSONPathNode } from "../node";
-import { PushOnlyArray } from "../evaluation";
-import { JSONPathQueryContext } from "../evaluation";
+import { JSONPathQueryContext, PushOnlyArray } from "../evaluation";
 import { LocatedNode } from "../located-node";
+import { JSONPathNode } from "../node";
 
 
 export abstract class JSONPathSelector extends JSONPathNode {

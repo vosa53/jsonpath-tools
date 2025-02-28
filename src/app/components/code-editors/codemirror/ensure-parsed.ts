@@ -1,8 +1,6 @@
-import { JSONPathOptions } from "@/jsonpath-tools/options";
-import { JSONPathJSONValue } from "@/jsonpath-tools/types";
-import { EditorState, Extension, Facet, StateEffect, StateField } from "@codemirror/state";
-import { EditorView, PluginValue, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { ensureSyntaxTree, syntaxTreeAvailable } from "@codemirror/language";
+import { Extension, Facet } from "@codemirror/state";
+import { EditorView, PluginValue, ViewPlugin, ViewUpdate } from "@codemirror/view";
 
 export interface EnsureParsedConfig {
     onParsingProgressChanged: (inProgress: boolean) => void;

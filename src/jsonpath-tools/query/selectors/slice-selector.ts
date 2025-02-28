@@ -1,10 +1,8 @@
-import { JSONPathJSONValue } from "../../types";
-import { JSONPathSelector } from "./selector";
+import { JSONPathQueryContext, PushOnlyArray } from "../evaluation";
+import { LocatedNode } from "../located-node";
 import { JSONPathSyntaxTreeType } from "../syntax-tree-type";
 import { JSONPathToken } from "../token";
-import { PushOnlyArray } from "../evaluation";
-import { JSONPathQueryContext } from "../evaluation";
-import { LocatedNode } from "../located-node";
+import { JSONPathSelector } from "./selector";
 
 
 export class JSONPathSliceSelector extends JSONPathSelector {

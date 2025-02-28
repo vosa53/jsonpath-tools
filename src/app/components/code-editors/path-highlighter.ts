@@ -1,6 +1,6 @@
 import { JSONPathNormalizedPath } from "@/jsonpath-tools/transformations";
 import { logPerformance } from "@/jsonpath-tools/utils";
-import { ensureSyntaxTree, syntaxTree } from "@codemirror/language";
+import { syntaxTree } from "@codemirror/language";
 import { EditorState, Range, StateEffect, StateField, Text } from "@codemirror/state";
 import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { SyntaxNode, TreeCursor } from "@lezer/common";
@@ -58,7 +58,6 @@ export const matchHighlighter = ViewPlugin.fromClass(class {
     getDecorations(view: EditorView) {
         return logPerformance("Highlighting result paths", () => {
             if (this.serializedPaths.size === 0) return Decoration.none;
-            //const tree = ensureSyntaxTree(view.state, view.state.doc.length, Number.POSITIVE_INFINITY)!;
             const tree = syntaxTree(view.state);
             const decorations: Range<Decoration>[] = [];
             for (const visibleRange of view.visibleRanges) {

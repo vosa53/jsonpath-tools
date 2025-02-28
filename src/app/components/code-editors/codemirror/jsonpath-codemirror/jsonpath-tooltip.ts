@@ -3,10 +3,13 @@ import { syntaxTree } from "@codemirror/language";
 import { Decoration, hoverTooltip } from "@codemirror/view";
 import { EditorView } from "codemirror";
 import { getJSONPath } from "./jsonpath-parser";
+import { defaultJSONPathOptions } from "@/jsonpath-tools/options";
 
 const tooltip = hoverTooltip((view, pos, side) => {
+    // TODO: Pass actual options.
+    const tooltipProvider = new TooltipProvider(defaultJSONPathOptions);
     const jsonPath = getJSONPath(syntaxTree(view.state));
-    const tooltip = TooltipProvider.provideTooltip(jsonPath, pos);
+    const tooltip = tooltipProvider.provideTooltip(jsonPath, pos);
     if (tooltip === null)
         return null;
 

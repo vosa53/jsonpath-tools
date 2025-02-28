@@ -1,5 +1,5 @@
 import { JSONPathNormalizedPath } from "@/jsonpath-tools/transformations";
-import { ActionIcon, Button, Divider, Group, Loader, Menu, Progress, Text } from "@mantine/core";
+import { ActionIcon, Button, Divider, Group, Loader, Menu, Text } from "@mantine/core";
 import { IconArrowDown, IconArrowUp, IconChevronDown, IconRouteSquare } from "@tabler/icons-react";
 import { memo, useState } from "react";
 import JSONEditor from "../code-editors/json-editor";

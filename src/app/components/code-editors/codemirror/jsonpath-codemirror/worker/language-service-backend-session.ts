@@ -1,34 +1,33 @@
+import { DynamicAnalysisResult, DynamicAnalyzer } from "@/jsonpath-tools/dynamic-analysis/dynamic-analyzer";
 import { CompletionProvider } from "@/jsonpath-tools/editor-services/completion-provider";
 import { defaultJSONPathOptions, JSONPathFunctionHandler, JSONPathOptions } from "@/jsonpath-tools/options";
-import { JSONPathQueryContext } from "@/jsonpath-tools/query/evaluation";
 import { JSONPath } from "@/jsonpath-tools/query/json-path";
 import { TypeChecker } from "@/jsonpath-tools/semantic-analysis/type-checker";
 import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
+import { logPerformance } from "@/jsonpath-tools/utils";
 import { DisconnectLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
 import { SimpleRPCTopic } from "./simple-rpc";
-import { logPerformance } from "@/jsonpath-tools/utils";
-import { DynamicAnalysisResult, DynamicAnalyzer } from "@/jsonpath-tools/dynamic-analysis/dynamic-analyzer";
 
 export class LanguageServiceBackendSession {
     private readonly parser: JSONPathParser;
     private options: JSONPathOptions;
-    private checker: TypeChecker;
+    private typeChecker: TypeChecker;
     private completionProvider: CompletionProvider;
     private dynamicAnalyzer: DynamicAnalyzer;
     private query: JSONPath;
     private queryArgument: JSONPathJSONValue;
-    private queryDynamicAnalysisResult: DynamicAnalysisResult | null;
+    private dynamicAnalysisResult: DynamicAnalysisResult | null;
 
     constructor(private readonly rpcTopic: SimpleRPCTopic, private readonly resolveFunctionHandler: (functionName: string) => JSONPathFunctionHandler) {
         this.parser = new JSONPathParser();
         this.options = defaultJSONPathOptions;
-        this.checker = new TypeChecker(this.options);
+        this.typeChecker = new TypeChecker(this.options);
         this.completionProvider = new CompletionProvider(this.options);
         this.dynamicAnalyzer = new DynamicAnalyzer(this.options);
         this.query = this.parser.parse("$"); // Replace with "",
         this.queryArgument = {};
-        this.queryDynamicAnalysisResult = null;
+        this.dynamicAnalysisResult = null;
     }
 
     updateOptions(message: UpdateOptionsLanguageServiceMessage) {
@@ -43,20 +42,20 @@ export class LanguageServiceBackendSession {
         this.options = {
             functions: Object.fromEntries(functions)
         };
-        this.checker = new TypeChecker(this.options);
+        this.typeChecker = new TypeChecker(this.options);
         this.completionProvider = new CompletionProvider(this.options);
         this.dynamicAnalyzer = new DynamicAnalyzer(this.options);
-        this.queryDynamicAnalysisResult = null;
+        this.dynamicAnalysisResult = null;
     }
 
     updateQuery(message: UpdateQueryLanguageServiceMessage) {
         this.query = this.parser.parse(message.newQuery);
-        this.queryDynamicAnalysisResult = null;
+        this.dynamicAnalysisResult = null;
     }
 
     updateQueryArgument(message: UpdateQueryArgumentLanguageServiceMessage) {
         this.queryArgument = message.newQueryArgument;
-        this.queryDynamicAnalysisResult = null;
+        this.dynamicAnalysisResult = null;
     }
 
     getCompletions(message: GetCompletionsLanguageServiceMessage): GetCompletionsLanguageServiceMessageResponse {
@@ -69,7 +68,7 @@ export class LanguageServiceBackendSession {
 
     getDiagnostics(message: GetDiagnosticsLanguageServiceMessage): GetDiagnosticsLanguageServiceMessageResponse {
         const syntaxDiagnostics = this.query.syntaxDiagnostics;
-        const typeCheckerDiagnostics = this.checker.check(this.query);
+        const typeCheckerDiagnostics = this.typeChecker.check(this.query);
         const dynamicAnalysisDiagnostics = this.getDynamicAnalysisResult().diagnostics;
         const diagnostics = [...syntaxDiagnostics, ...typeCheckerDiagnostics, ...dynamicAnalysisDiagnostics];
         diagnostics.sort((a, b) => a.textRange.position - b.textRange.position);
@@ -92,14 +91,9 @@ export class LanguageServiceBackendSession {
         this.rpcTopic.dispose();
     }
 
-    getDynamicAnalysisResult(): DynamicAnalysisResult {
-        if (this.queryDynamicAnalysisResult === null)
-            this.queryDynamicAnalysisResult = logPerformance("Execute query and anylyze (on worker)", () => this.dynamicAnalyzer.analyze(this.query, this.queryArgument));
-        return this.queryDynamicAnalysisResult;
+    private getDynamicAnalysisResult(): DynamicAnalysisResult {
+        if (this.dynamicAnalysisResult === null)
+            this.dynamicAnalysisResult = logPerformance("Execute query and anylyze (on worker)", () => this.dynamicAnalyzer.analyze(this.query, this.queryArgument));
+        return this.dynamicAnalysisResult;
     }
-
-    /*private runQuery() {
-        const context: JSONPathQueryContext = { rootNode: this.queryArgument, options: this.options };
-        const result = this.jsonPath.select(context);
-    }*/
 }

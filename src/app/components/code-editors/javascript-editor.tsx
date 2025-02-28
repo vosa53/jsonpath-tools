@@ -15,6 +15,11 @@ export default function JavaScriptEditor({
     };
 
     return (
-        <CodeMirrorEditor value={value} readonly={false} onValueChanged={onValueChanged} onExtensionsRequested={onEditorExtensionsRequested} style={{ height: "100%" }} />
+        <CodeMirrorEditor 
+            value={value} 
+            readonly={false} 
+            onValueChanged={onValueChanged} 
+            onExtensionsRequested={onEditorExtensionsRequested} 
+            style={{ height: "100%" }} />
     );
 }

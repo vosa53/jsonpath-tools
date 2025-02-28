@@ -1,4 +1,4 @@
-import { defaultJSONPathOptions, JSONPathOptions } from "../options";
+import { JSONPathOptions } from "../options";
 import { JSONPathQueryContext } from "../query/evaluation";
 import { JSONPath } from "../query/json-path";
 import { JSONPathSegment } from "../query/segment";
@@ -8,7 +8,7 @@ import { JSONPathJSONValue } from "../types";
 
 export class CompletionProvider {
     constructor(
-        readonly options: JSONPathOptions
+        private readonly options: JSONPathOptions
     ) { }
 
     provideCompletions(query: JSONPath, queryArgument: JSONPathJSONValue, position: number): CompletionItem[] {

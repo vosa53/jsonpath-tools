@@ -1,9 +1,8 @@
-import { JSONPathSyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
-import { Group, Menu, Button } from "@mantine/core";
+import { Button, Group, Menu } from "@mantine/core";
 import { IconChevronDown } from "@tabler/icons-react";
+import { memo } from "react";
 import JSONEditor from "../code-editors/json-editor";
 import PanelShell from "../panel-shell";
-import { memo } from "react";
 
 const JSONSchemaPanel = memo(({
     queryArgumentSchemaText,

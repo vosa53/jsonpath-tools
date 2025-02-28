@@ -26,7 +26,7 @@ export class LanguageServiceSession {
         };
 
         this.cancelQueue();
-        this.rpcTopic.sendNotification<UpdateOptionsLanguageServiceMessage>("updateOptions", { 
+        this.rpcTopic.sendNotification<UpdateOptionsLanguageServiceMessage>("updateOptions", {
             newOptions: serializableNewOptions
         });
     }
@@ -53,7 +53,7 @@ export class LanguageServiceSession {
     }
 
     async getDiagnostics(): Promise<readonly JSONPathDiagnostics[]> {
-        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse>("getDiagnostics", { 
+        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse>("getDiagnostics", {
         }), this.cancellationToken);
         return response.diagnostics;
     }

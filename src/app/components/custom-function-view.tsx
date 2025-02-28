@@ -1,6 +1,6 @@
+import { ActionIcon, Box, Flex, Title } from "@mantine/core";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { CustomFunction } from "../models/custom-function";
-import { ActionIcon, Flex, Title, Text, Box } from "@mantine/core";
 
 export default function CustomFunctionView({
     customFunction,

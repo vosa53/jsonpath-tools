@@ -6,9 +6,9 @@ export interface JSONPathOptions {
 }
 
 export interface JSONPathFunction {
-    parameterTypes: readonly JSONPathType[];
-    returnType: JSONPathType;
-    handler: JSONPathFunctionHandler;
+    readonly parameterTypes: readonly JSONPathType[];
+    readonly returnType: JSONPathType;
+    readonly handler: JSONPathFunctionHandler;
 }
 
 export type JSONPathFunctionHandler = (...args: JSONPathFilterValue[]) => JSONPathFilterValue;
@@ -80,7 +80,7 @@ export const defaultJSONPathOptions: JSONPathOptions = {
             handler: (nodes: JSONPathFilterValue) => {
                 if (!isNodesType(nodes)) throw new Error();
 
-                if (nodes.nodes.length === 1) return nodes.nodes[0];
+                if (nodes.nodes.length === 1) return nodes.nodes[0].value;
                 else return JSONPathNothing;
             },
             parameterTypes: [JSONPathType.nodesType],

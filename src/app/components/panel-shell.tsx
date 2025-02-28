@@ -1,4 +1,4 @@
-import { Divider, Flex, Group, Select } from "@mantine/core";
+import { Divider, Flex } from "@mantine/core";
 import { ReactNode } from "react";
 
 export default function PanelShell({

@@ -1,11 +1,11 @@
-import { CustomFunction } from "../models/custom-function";
-import { useDisclosure } from "@mantine/hooks";
+import { JSONPathType } from "@/jsonpath-tools/options";
 import { Button, Modal } from "@mantine/core";
-import { useRef, useState } from "react";
+import { useDisclosure } from "@mantine/hooks";
+import { IconPlus } from "@tabler/icons-react";
+import { useState } from "react";
+import { CustomFunction } from "../models/custom-function";
 import CustomFunctionEditor from "./custom-function-editor";
 import CustomFunctionView from "./custom-function-view";
-import { JSONPathType } from "@/jsonpath-tools/options";
-import { IconPlus } from "@tabler/icons-react";
 
 const newCustomFunction: CustomFunction = {
     name: "",
@@ -52,7 +52,9 @@ export default function CustomFunctionsView({
                     setIsCreatingNew(true);
                     open();
                 }}
-            >Create New</Button>
+            >
+                Create New
+            </Button>
             {customFunctions.map((cf, i) => (
                 <CustomFunctionView
                     key={i}

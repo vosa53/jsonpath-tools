@@ -1,4 +1,3 @@
-import { JSONPathJSONValue } from "../../types";
 import { JSONPathQueryContext, PushOnlyArray } from "../evaluation";
 import { LocatedNode } from "../located-node";
 import { JSONPathSyntaxTreeType } from "../syntax-tree-type";

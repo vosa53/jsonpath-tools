@@ -37,22 +37,6 @@ export default function JSONPathEditor({
     onGetResultAvailable?: (getResult: () => Promise<{ nodes: readonly JSONPathJSONValue[], paths: readonly (string | number)[][] }>) => void
 }) {
     const editorViewRef = useRef<EditorView>(null);
-    //const resultSetTimeoutRef = useRef<number>(null);
-
-    /*useEffect(() => {
-        if (resultSetTimeoutRef.current !== null) window.clearTimeout(resultSetTimeoutRef.current);
-        resultSetTimeoutRef.current = window.setTimeout(async () => {
-            if (onResultCreated === undefined || editorViewRef.current === null) return;
-            try {
-                const result = await getResult(editorViewRef.current.state);
-                onResultCreated(result);
-            }
-            catch (error) {
-                if (!(error instanceof OperationCancelledError)) throw error;
-            }
-        }, 500);
-    }, [value, options, queryArgument]);*/
-
 
     useEffect(() => {
         if (editorViewRef.current !== null)
