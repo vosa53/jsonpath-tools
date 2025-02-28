@@ -25,7 +25,7 @@ export class LanguageServiceBackendSession {
         this.typeChecker = new TypeChecker(this.options);
         this.completionProvider = new CompletionProvider(this.options);
         this.dynamicAnalyzer = new DynamicAnalyzer(this.options);
-        this.query = this.parser.parse("$"); // Replace with "",
+        this.query = this.parser.parse("");
         this.queryArgument = {};
         this.dynamicAnalysisResult = null;
     }

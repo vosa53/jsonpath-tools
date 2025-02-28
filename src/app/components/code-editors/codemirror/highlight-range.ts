@@ -21,7 +21,7 @@ const highlightedRangeStateField = StateField.define<DecorationSet>({
         highlightedRanges = highlightedRanges.map(transaction.changes);
         for (const effect of transaction.effects) {
             if (effect.is(setHighlightedRangeEffect)) {
-                if (effect.value === null)
+                if (effect.value === null || effect.value.length === 0)
                     highlightedRanges = Decoration.none;
                 else
                     highlightedRanges = Decoration.set(highlightedRangeDecoration.range(effect.value.position, effect.value.position + effect.value.length));
