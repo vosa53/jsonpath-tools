@@ -9,9 +9,9 @@ import { JSONPathFilterExpression } from "./filter-expression";
 export class JSONPathFunctionExpression extends JSONPathFilterExpression {
     constructor(
         readonly nameToken: JSONPathToken,
-        readonly openingParanthesisToken: JSONPathToken | null,
+        readonly openingParanthesisToken: JSONPathToken,
         readonly args: readonly { arg: JSONPathFilterExpression; commaToken: JSONPathToken | null; }[],
-        readonly closingParanthesisToken: JSONPathToken | null,
+        readonly closingParanthesisToken: JSONPathToken,
 
         readonly name: string
     ) {

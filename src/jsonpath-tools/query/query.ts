@@ -11,7 +11,7 @@ import { JSONPathToken } from "./token";
 
 export class JSONPathQuery extends JSONPathNode {
     constructor(
-        readonly identifierToken: JSONPathToken | null,
+        readonly identifierToken: JSONPathToken,
         readonly segments: readonly JSONPathSegment[],
 
         readonly isRelative: boolean

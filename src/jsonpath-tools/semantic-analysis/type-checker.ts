@@ -48,7 +48,7 @@ export class TypeChecker {
                 for (let i = 0; i < Math.min(tree.args.length, functionDefinition.parameterTypes.length); i++) {
                     const parameterType = functionDefinition.parameterTypes[i];
                     const arg = tree.args[i].arg;
-                    if (arg != null) this.checkType(arg, parameterType, context);
+                    this.checkType(arg, parameterType, context);
                 }
             }
         }

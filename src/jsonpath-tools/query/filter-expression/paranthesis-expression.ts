@@ -9,7 +9,7 @@ export class JSONPathParanthesisExpression extends JSONPathFilterExpression {
     constructor(
         readonly openingParanthesisToken: JSONPathToken,
         readonly expression: JSONPathFilterExpression,
-        readonly closingParanthesisToken: JSONPathToken | null
+        readonly closingParanthesisToken: JSONPathToken
     ) {
         super([openingParanthesisToken, expression, closingParanthesisToken]);
     }

@@ -10,7 +10,7 @@ import { JSONPathToken } from "./token";
 export class JSONPath extends JSONPathNode {
     constructor(
         readonly query: JSONPathQuery,
-        readonly endOfFileToken: JSONPathToken | null,
+        readonly endOfFileToken: JSONPathToken,
 
         readonly syntaxDiagnostics: readonly JSONPathDiagnostics[]
     ) {
