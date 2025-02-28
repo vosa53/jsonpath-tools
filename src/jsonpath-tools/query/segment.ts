@@ -22,11 +22,12 @@ export class JSONPathSegment extends JSONPathNode {
     get type() { return JSONPathSyntaxTreeType.segment; }
 
     select(input: LocatedNode, output: PushOnlyArray<LocatedNode>, queryContext: JSONPathQueryContext) {
-        queryContext.segmentInstrumentationCallback?.(this, input.value);
+        queryContext.segmentInstrumentationCallback?.(this, input);
 
         for (const selector of this.selectors) {
-            if (selector.selector != null)
-                selector.selector.select(input, output, queryContext);
+            const outputStartIndex = output.length;
+            selector.selector.select(input, output, queryContext);
+            queryContext.selectorInstrumentationCallback?.(selector.selector, input, output, outputStartIndex, output.length - outputStartIndex);
         }
 
         if (this.isRecursive) {

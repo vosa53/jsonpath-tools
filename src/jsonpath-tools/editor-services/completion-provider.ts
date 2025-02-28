@@ -9,7 +9,7 @@ import { JSONPathJSONValue } from "../types";
 export class CompletionProvider {
     constructor(
         readonly options: JSONPathOptions
-    ) { } 
+    ) { }
 
     provideCompletions(query: JSONPath, queryArgument: JSONPathJSONValue, position: number): CompletionItem[] {
         const completions: CompletionItem[] = [];
@@ -25,11 +25,11 @@ export class CompletionProvider {
 
         if (
             (
-                lastNode.type === JSONPathSyntaxTreeType.nameToken || 
-                lastNode.type === JSONPathSyntaxTreeType.dotToken || 
+                lastNode.type === JSONPathSyntaxTreeType.nameToken ||
+                lastNode.type === JSONPathSyntaxTreeType.dotToken ||
                 lastNode.type === JSONPathSyntaxTreeType.doubleDotToken
-            ) && 
-            lastButOneNode.type === JSONPathSyntaxTreeType.nameSelector || 
+            ) &&
+            lastButOneNode.type === JSONPathSyntaxTreeType.nameSelector ||
             lastButOneNode.type === JSONPathSyntaxTreeType.missingSelector
         ) {
             const segment = nodePath[nodePath.length - 3] as JSONPathSegment;
@@ -68,13 +68,17 @@ export class CompletionProvider {
         }
         return Array.from(propertyNames);
     }
-    
+
     private getAllValuesAtSegment(value: JSONPathJSONValue, jsonPath: JSONPath, segment: JSONPathSegment): JSONPathJSONValue[] {
         const values: JSONPathJSONValue[] = [];
-        const queryContext: JSONPathQueryContext = { rootNode: value, options: this.options, segmentInstrumentationCallback(s, i) {
-            if (s === segment)
-                values.push(i);
-        }, };
+        const queryContext: JSONPathQueryContext = {
+            rootNode: value, 
+            options: this.options, 
+            segmentInstrumentationCallback(s, i) {
+                if (s === segment)
+                    values.push(i.value);
+            }
+        };
         jsonPath.select(queryContext);
         return values;
     }
@@ -83,7 +87,7 @@ export class CompletionProvider {
 export class CompletionItem {
     constructor(
         readonly text: string,
-        readonly type: CompletionItemType 
+        readonly type: CompletionItemType
     ) { }
 }
 

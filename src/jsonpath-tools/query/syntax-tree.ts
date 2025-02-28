@@ -14,6 +14,8 @@ export abstract class JSONPathSyntaxTree {
         return new TextRange(this.position, this.length);
     }
 
+    abstract forEach(action: (tree: JSONPathSyntaxTree) => void): void;
+
     getAtPosition(position: number): JSONPathSyntaxTree[] {
         if (position < this.position)
             return [];

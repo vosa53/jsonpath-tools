@@ -11,4 +11,8 @@ export class JSONPathToken extends JSONPathSyntaxTree {
     ) {
         super(position, skippedTextBefore.length + text.length);
     }
+
+    forEach(action: (tree: JSONPathSyntaxTree) => void): void {
+        action(this);
+    }
 }
