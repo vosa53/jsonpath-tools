@@ -1,7 +1,7 @@
 import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "@/jsonpath-tools/diagnostics";
 import { Checkbox, DefaultMantineColor, Group, Table, ThemeIcon } from "@mantine/core";
 import { IconExclamationCircle } from "@tabler/icons-react";
-import { memo, ReactNode } from "react";
+import { memo, ReactNode, useMemo, useState } from "react";
 import PanelShell from "../panel-shell";
 
 const DiagnosticsPanel = memo(({
@@ -11,6 +11,17 @@ const DiagnosticsPanel = memo(({
     diagnostics: readonly JSONPathDiagnostics[],
     onSelectedDiagnosticsChanged: (diagnostics: JSONPathDiagnostics | null) => void
 }) => {
+    const [filters, setFilters] = useState<DiagnosticsFilters>({ showErrors: true, showWarnings: true });
+    const {filteredDiagnostics, errorCount, warningCount} = useMemo(() => {
+        const filteredDiagnostics = diagnostics.filter(d => 
+            d.type === JSONPathDiagnosticsType.error && filters.showErrors || 
+            d.type === JSONPathDiagnosticsType.warning && filters.showWarnings
+        );
+        const errorCount = diagnostics.filter(d => d.type === JSONPathDiagnosticsType.error).length;
+        const warningCount = diagnostics.filter(d => d.type === JSONPathDiagnosticsType.warning).length;
+        return { filteredDiagnostics, errorCount, warningCount };
+    }, [diagnostics, filters]);
+
     return (
         <PanelShell
             toolbar={
@@ -18,17 +29,19 @@ const DiagnosticsPanel = memo(({
                     <Checkbox
                         variant="outline"
                         defaultChecked
-                        label="Errors"
+                        label={`Errors (${errorCount})`}
+                        onChange={e => setFilters({ ...filters, showErrors: e.currentTarget.checked })}
                     />
                     <Checkbox
                         variant="outline"
                         defaultChecked
-                        label="Warnings"
+                        label={`Warnings (${warningCount})`}
+                        onChange={e => setFilters({ ...filters, showWarnings: e.currentTarget.checked })}
                     />
                 </Group>
             }
         >
-            <DiagnosticsView diagnostics={diagnostics} onSelectedDiagnosticsChanged={onSelectedDiagnosticsChanged} />
+            <DiagnosticsView diagnostics={filteredDiagnostics} onSelectedDiagnosticsChanged={onSelectedDiagnosticsChanged} />
         </PanelShell>
     );
 });
@@ -85,4 +98,9 @@ function DiagnosticsIcon({ diagnostics }: { diagnostics: JSONPathDiagnostics }) 
             {icon}
         </ThemeIcon>
     );
+}
+
+interface DiagnosticsFilters {
+    readonly showErrors: boolean;
+    readonly showWarnings: boolean;
 }
