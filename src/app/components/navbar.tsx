@@ -49,7 +49,7 @@ const Navbar = memo(({
                 </Accordion.Item>
             </Accordion>
             <Divider mt="auto" />
-            <Text p="xs" c="dimmed">Do you like this application?</Text>
+            <Text p="xs" c="dimmed">The editor component is also available as a standalone library. Same for the parser.</Text>
         </Flex>
     );
 });

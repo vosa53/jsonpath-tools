@@ -24,13 +24,13 @@ const Header = memo(({
                 <Title order={1} size="24" pl="xs" fw="600">JSONPath Playground</Title>
             </Group>
             <Group pr="xs">
-                <ActionIcon variant="subtle" color="violet" size="lg" aria-label="Set dark color scheme" visibleFrom="xs">
+                <ActionIcon variant="subtle" color="violet" size="lg" aria-label="GitHub Page" visibleFrom="xs" component="a" href="https://github.com/vosa53/jsonpath-playground" target="_blank">
                     <IconBrandGithub style={{ width: "70%", height: "70%" }} stroke={1.5} />
                 </ActionIcon>
-                <ActionIcon variant="subtle" color="violet" size="lg" aria-label="Set dark color scheme" darkHidden onClick={() => colorScheme.setColorScheme("dark")}>
+                <ActionIcon variant="subtle" color="violet" size="lg" aria-label="Set Dark Color Scheme" darkHidden onClick={() => colorScheme.setColorScheme("dark")}>
                     <IconMoon style={{ width: "70%", height: "70%" }} stroke={1.5} />
                 </ActionIcon>
-                <ActionIcon variant="subtle" color="violet" size="lg" aria-label="Set light color scheme" lightHidden onClick={() => colorScheme.setColorScheme("light")}>
+                <ActionIcon variant="subtle" color="violet" size="lg" aria-label="Set Light Color Scheme" lightHidden onClick={() => colorScheme.setColorScheme("light")}>
                     <IconSun style={{ width: "70%", height: "70%" }} stroke={1.5} />
                 </ActionIcon>
             </Group>
