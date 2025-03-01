@@ -6,7 +6,7 @@ import { JSONPathToken } from "@/jsonpath-tools/query/token";
 import { defineLanguageFacet, languageDataProp } from "@codemirror/language";
 import { Input, NodeProp, NodeSet, NodeType, Parser, PartialParse, Tree, TreeFragment } from "@lezer/common";
 import { styleTags, tags as t } from "@lezer/highlight";
-import {continuedIndent, indentNodeProp, foldNodeProp, foldInside, LRLanguage, LanguageSupport} from "@codemirror/language"
+import {continuedIndent, delimitedIndent, indentNodeProp, foldNodeProp, foldInside, LRLanguage, LanguageSupport} from "@codemirror/language"
 import { jsonPathCompletionSource } from "./jsonpath-completion-source";
 import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
 
@@ -126,8 +126,25 @@ class CodeMirrorJSONPathParser extends Parser {
                 [JSONPathSyntaxTreeType.closingBracketToken]: [JSONPathSyntaxTreeType.openingBracketToken]
             })),
             foldNodeProp.add({
-                [JSONPathSyntaxTreeType.paranthesisExpression]: foldInside
-                // TODO: Other foldings.
+                [JSONPathSyntaxTreeType.paranthesisExpression]: foldInside,
+                [JSONPathSyntaxTreeType.segment]: n => {
+                    if (n.lastChild!.name === JSONPathSyntaxTreeType.closingBracketToken)
+                        return { from: n.getChild(JSONPathSyntaxTreeType.openingBracketToken)!.to, to: n.lastChild!.from };
+                    else
+                        return null;
+                },
+                [JSONPathSyntaxTreeType.functionExpression]: n => ({ from: n.getChild(JSONPathSyntaxTreeType.openingParanthesisToken)!.to, to: n.lastChild!.from }),
+                [JSONPathSyntaxTreeType.stringToken]: (n, s) => {
+                    const hasEndingQuote = s.doc.sliceString(n.to - 1, n.to) === "\""; // Could be escaped, but we probably don't care for this purpose.
+                    return { from: n.from + 1, to: hasEndingQuote ? n.to - 1 : n.to };
+                }
+            }),
+            indentNodeProp.add({
+                [JSONPathSyntaxTreeType.query]: continuedIndent(),
+                [JSONPathSyntaxTreeType.segment]: delimitedIndent({ closing: "]", align: false }),
+                [JSONPathSyntaxTreeType.paranthesisExpression]: delimitedIndent({ closing: ")", align: false }),
+                [JSONPathSyntaxTreeType.functionExpression]: delimitedIndent({ closing: ")", align: false }),
+                [JSONPathSyntaxTreeType.stringToken]: c => 0,
             }),
             languageDataProp.add(NodeType.match({
                 [JSONPathSyntaxTreeType.root]: jsonPathLanguageFacet
