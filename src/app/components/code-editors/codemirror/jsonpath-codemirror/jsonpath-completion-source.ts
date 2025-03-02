@@ -16,7 +16,7 @@ export async function jsonPathCompletionSource(context: CompletionContext): Prom
                 options: completions.map(c => ({
                     label: c.text,
                     type: convertCompletionItemTypeToCodemirrorType(c.type),
-                    detail: "aa",
+                    detail: c.detail,
                     info: "Further description."
                 })),
             };

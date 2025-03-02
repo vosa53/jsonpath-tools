@@ -33,47 +33,60 @@ export class CompletionProvider {
             lastButOneNode.type === JSONPathSyntaxTreeType.missingSelector
         ) {
             const segment = nodePath[nodePath.length - 3] as JSONPathSegment;
-            const values = this.getAllValuesAtSegment(queryArgument, query, segment);
-            const propertyNames = this.getDistinctKeys(values);
-            for (const propertyName of propertyNames)
-                completions.push(new CompletionItem(propertyName, CompletionItemType.name));
+            this.completeSegment(completions, segment, query, queryArgument);
         }
         if (lastButOneNode.type === JSONPathSyntaxTreeType.missingSelector) {
             const segment = nodePath[nodePath.length - 3] as JSONPathSegment;
-            completions.push(new CompletionItem("*", CompletionItemType.syntax));
+            completions.push(new CompletionItem(CompletionItemType.syntax, "*"));
             if (segment.openingBracketToken !== null) {
-                completions.push(new CompletionItem("?", CompletionItemType.syntax));
-                completions.push(new CompletionItem("::", CompletionItemType.syntax));
+                completions.push(new CompletionItem(CompletionItemType.syntax, "?"));
+                completions.push(new CompletionItem(CompletionItemType.syntax, "::"));
             }
         }
         if (lastButOneNode.type === JSONPathSyntaxTreeType.missingExpression) {
-            completions.push(new CompletionItem("@", CompletionItemType.syntax));
-            completions.push(new CompletionItem("$", CompletionItemType.syntax));
-            for (const functionDefinition of Object.entries(this.options.functions))
-                completions.push(new CompletionItem(functionDefinition[0], CompletionItemType.function));
+            completions.push(new CompletionItem(CompletionItemType.syntax, "@"));
+            completions.push(new CompletionItem(CompletionItemType.syntax, "$"));
+            this.completeFunctions(completions);
         }
-        if (lastNode.type === JSONPathSyntaxTreeType.nameToken && lastButOneNode.type === JSONPathSyntaxTreeType.functionExpression) {
-            for (const functionDefinition of Object.entries(this.options.functions))
-                completions.push(new CompletionItem(functionDefinition[0], CompletionItemType.function));
-        }
+        if (lastNode.type === JSONPathSyntaxTreeType.nameToken && lastButOneNode.type === JSONPathSyntaxTreeType.functionExpression)
+            this.completeFunctions(completions);
     }
 
-    private getDistinctKeys(values: JSONPathJSONValue[]): string[] {
-        const propertyNames = new Set<string>();
+    private completeSegment(completions: CompletionItem[], segment: JSONPathSegment, query: JSONPath, queryArgument: JSONPathJSONValue) {
+        const values = this.getAllValuesAtSegment(queryArgument, query, segment);
+        const keysAndTypes = this.getDistinctKeysAndTypes(values);
+        for (const [key, types] of keysAndTypes)
+            completions.push(new CompletionItem(CompletionItemType.name, key, Array.from(types).join(" | ")));
+    }
+
+    private completeFunctions(completions: CompletionItem[]) {
+        for (const functionDefinition of Object.entries(this.options.functions))
+            completions.push(new CompletionItem(CompletionItemType.function, functionDefinition[0], functionDefinition[1].returnType));
+    }
+
+    private getDistinctKeysAndTypes(values: JSONPathJSONValue[]): Map<string, Set<string>> {
+        const keysAndTypes = new Map<string, Set<string>>();
         for (const value of values) {
             if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-                for (const propertyName of Object.keys(value))
-                    propertyNames.add(propertyName);
+                for (const [propertyName, propertyValue] of Object.entries(value)) {
+                    const type = this.getType(propertyValue);
+                    let types = keysAndTypes.get(propertyName);
+                    if (types === undefined) {
+                        types = new Set();
+                        keysAndTypes.set(propertyName, types);
+                    }
+                    types.add(type)
+                }
             }
         }
-        return Array.from(propertyNames);
+        return keysAndTypes;
     }
 
     private getAllValuesAtSegment(value: JSONPathJSONValue, jsonPath: JSONPath, segment: JSONPathSegment): JSONPathJSONValue[] {
         const values: JSONPathJSONValue[] = [];
         const queryContext: JSONPathQueryContext = {
-            rootNode: value, 
-            options: this.options, 
+            rootNode: value,
+            options: this.options,
             segmentInstrumentationCallback(s, i) {
                 if (s === segment)
                     values.push(i.value);
@@ -82,12 +95,28 @@ export class CompletionProvider {
         jsonPath.select(queryContext);
         return values;
     }
+
+    private getType(value: JSONPathJSONValue): string {
+        const javaScriptType = typeof value;
+        if (javaScriptType == "object") {
+            if (value === null)
+                return "null";
+            else if (Array.isArray(value))
+                return "array";
+            else 
+                return "object";
+        }
+        else
+            return javaScriptType;
+    }
 }
 
 export class CompletionItem {
     constructor(
+        readonly type: CompletionItemType,
         readonly text: string,
-        readonly type: CompletionItemType
+        readonly detail?: string,
+        readonly resolveDocumentation?: () => string
     ) { }
 }
 
