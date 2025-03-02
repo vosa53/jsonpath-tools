@@ -20,7 +20,7 @@ const tooltip = hoverTooltip((view, pos, side) => {
             const containerElement = document.createElement("div");
             const titleElement = document.createElement("strong");
             const textElement = document.createElement("div");
-            containerElement.style.padding = "5px";
+            containerElement.style.padding = "10px";
             titleElement.textContent = tooltip.title;
             textElement.textContent = tooltip.text;
             containerElement.appendChild(titleElement);
