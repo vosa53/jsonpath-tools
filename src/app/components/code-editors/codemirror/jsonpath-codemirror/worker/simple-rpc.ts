@@ -6,7 +6,7 @@ export class SimpleRPC<THandler> {
     private readonly topicIDToHandlers = new Map<string, THandler>();
 
     constructor(private readonly send: (input: any) => void, private readonly handlerFactory: (topic: SimpleRPCTopic) => THandler) {
-        this.send = (input: any) => logPerformance("Sending worker message", () => send(input));
+        this.send = (input: any) => logPerformance("Sending worker message: " + input.type, () => send(input));
     }
 
     addHandlerAction<TData, TResult>(messageID: string, handler: (handler: THandler, data: TData) => TResult) {

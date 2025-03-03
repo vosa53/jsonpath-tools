@@ -3,8 +3,10 @@ import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-prov
 import { JSONPathOptions } from "@/jsonpath-tools/options";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 import { CancellationToken } from "../cancellation-token";
-import { GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, SerializableJSONPathOptions, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
+import { GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, SerializableJSONPathOptions, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
 import { SimpleRPCTopic } from "./simple-rpc";
+import { Signature } from "@/jsonpath-tools/editor-services/signature-provider";
+import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-provider";
 
 
 export class LanguageServiceSession {
@@ -50,6 +52,20 @@ export class LanguageServiceSession {
             position: position
         }), this.cancellationToken);
         return response.completions;
+    }
+
+    async getSignature(position: number): Promise<Signature | null> {
+        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse>("getSignature", {
+            position: position
+        }), this.cancellationToken);
+        return response.signature;
+    }
+
+    async getTooltip(position: number): Promise<Tooltip | null> {
+        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse>("getTooltip", {
+            position: position
+        }), this.cancellationToken);
+        return response.tooltip;
     }
 
     async getDiagnostics(): Promise<readonly JSONPathDiagnostics[]> {

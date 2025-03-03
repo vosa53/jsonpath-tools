@@ -44,6 +44,28 @@ export abstract class JSONPathSyntaxTree {
         return results;
     }
 
+    getContainingAtPosition(position: number): JSONPathSyntaxTree[] {
+        if (position <= this.position)
+            return [];
+        if (position >= this.position + this.length)
+            return [];
+
+        const path: JSONPathSyntaxTree[] = [this];
+        // @ts-ignore
+        while (path[path.length - 1].children !== undefined) {
+            const currentNode = path[path.length - 1] as JSONPathNode;
+            for (const child of currentNode.children) {
+                if (position > child.position && position < child.position + child.length) {
+                    path.push(child);
+                    break;
+                }
+            }
+            if (currentNode === path[path.length - 1])
+                break;
+        }
+        return path;
+    }
+
     private getTouchingAtPositionRecursive(position: number, currentPath: JSONPathSyntaxTree[], results: JSONPathSyntaxTree[][]): void {
         if (this.position > position || this.position + this.length < position)
             return;

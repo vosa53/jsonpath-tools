@@ -8,6 +8,7 @@ import { JSONPathDiagnostics } from "@/jsonpath-tools/diagnostics";
 import { jsonPathCompletionSource } from "./jsonpath-completion-source";
 import { LanguageServices } from "./worker/language-services";
 import { LanguageService } from "./worker/language-service";
+import { signatureHelp } from "./jsonpath-signature-help";
 
 
 export const jsonPathLanguage = new Language(jsonPathLanguageFacet, jsonPathParser);
@@ -27,6 +28,7 @@ export function jsonPath(options: {
         jsonPathLanguageFacet.of({
             autocomplete: jsonPathCompletionSource
         }),
-        jsonPathTooltip
+        jsonPathTooltip,
+        signatureHelp
     ]);
 }

@@ -84,7 +84,6 @@ export default function CodeMirrorEditor({
                 syntaxHighlighting(highlightStyle),
                 readonlyCompartment.of(EditorState.readOnly.of(readonly)),
                 EditorView.updateListener.of(u => {
-                    console.log(u.focusChanged);
                     if (u.docChanged) {
                         const newValue = /*logPerformance("editor doc.toString", () => */u.state.doc.toString()/*)*/;
                         //console.log("FROM EDITOR:",newValue);
