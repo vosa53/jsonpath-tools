@@ -46,7 +46,7 @@ export class JSONPathParser {
             context.addError(`Expected $ ${allowedRelative ? "or @" : ""}.`);
         const identifier = context.collectToken(isRelative ? JSONPathSyntaxTreeType.atToken : JSONPathSyntaxTreeType.dollarToken);
         if (isRelative && !allowedRelative)
-            context.addError("Relative queries are not allowed here.", identifier!.textRange);
+            context.addError("Relative queries are not allowed here.", identifier.textRangeWithoutSkipped);
         
         const segments: JSONPathSegment[] = [];
         while (context.current !== null) {
@@ -78,7 +78,7 @@ export class JSONPathParser {
             context.addError("Expected '.' or '..' or '['.");
 
         if (context.current === "[") {
-            if (hasDot && !isRecursive) context.addError("'.' is not allowed before '['.", dotToken!.textRange);
+            if (hasDot && !isRecursive) context.addError("'.' is not allowed before '['.", dotToken!.textRangeWithoutSkipped);
             return this.parseBracketedSelection(context, dotToken, isRecursive);
         }
         else if (context.current === "*") {
@@ -286,7 +286,7 @@ export class JSONPathParser {
 
         this.checkLogicalExpressionOperand(basicExpression, context);
         if (basicExpression instanceof JSONPathNotExpression)
-            context.addError("Multiple negation is not allowed.", basicExpression.exlamationMarkToken.textRange);
+            context.addError("Multiple negation is not allowed.", basicExpression.exlamationMarkToken.textRangeWithoutSkipped);
         return new JSONPathNotExpression(exlamationMarkToken, basicExpression);
     }
 
@@ -550,33 +550,33 @@ export class JSONPathParser {
     private checkComparisionExpressionOperand(operand: JSONPathFilterExpression, context: ParserContext) {
         if (operand instanceof JSONPathFilterQueryExpression) {
             if (!operand.query.isSingular)
-                context.addError("Query in comparison expression must be singular.", operand.textRange);
+                context.addError("Query in comparison expression must be singular.", operand.textRangeWithoutSkipped);
         }
         else if (operand instanceof JSONPathParanthesisExpression)
-            context.addError("Comparison expression operand can not be in paranthesis.", operand.textRange);
+            context.addError("Comparison expression operand can not be in paranthesis.", operand.textRangeWithoutSkipped);
         else if (operand instanceof JSONPathNotExpression)
-            context.addError("Comparison expression operand can not be negated.", operand.exlamationMarkToken.textRange);
+            context.addError("Comparison expression operand can not be negated.", operand.exlamationMarkToken.textRangeWithoutSkipped);
     }
 
     private checkLogicalExpressionOperand(operand: JSONPathFilterExpression, context: ParserContext) {
         if (operand instanceof JSONPathBooleanLiteral || operand instanceof JSONPathNullLiteral || operand instanceof JSONPathStringLiteral || operand instanceof JSONPathNumberLiteral)
-            context.addError("Only logical expression is allowed here.", operand.textRange);
+            context.addError("Only logical expression is allowed here.", operand.textRangeWithoutSkipped);
     }
 
     private checkIsInteger(numberToken: JSONPathToken, context: ParserContext) {
         if (numberToken.text === "-0")
-            context.addError("Negative zero is not allowed"), numberToken.textRange;
+            context.addError("Negative zero is not allowed"), numberToken.textRangeWithoutSkipped;
         if (numberToken.text.includes("."))
-            context.addError("Only integers are allowed here.", numberToken.textRange);
+            context.addError("Only integers are allowed here.", numberToken.textRangeWithoutSkipped);
         if (numberToken.text.includes("e") || numberToken.text.includes("E"))
-            context.addError("Exponential notation (e/E) is not allowed here.", numberToken.textRange);
+            context.addError("Exponential notation (e/E) is not allowed here.", numberToken.textRangeWithoutSkipped);
     }
 
     private checkFunctionName(nameToken: JSONPathToken, context: ParserContext) {
         if (!this.isFunctionNameFirstCharacter(nameToken.text[0]))
-            context.addError("Function name must start with a lowercase ASCII letter.", nameToken.textRange);
+            context.addError("Function name must start with a lowercase ASCII letter.", nameToken.textRangeWithoutSkipped);
         if (!nameToken.text.substring(1).split("").every(c => this.isFunctionNameCharacter(c)))
-            context.addError("Function name can contain only lowercase ASCII letters, digits or '_'.", nameToken.textRange);
+            context.addError("Function name can contain only lowercase ASCII letters, digits or '_'.", nameToken.textRangeWithoutSkipped);
     }
 }
 

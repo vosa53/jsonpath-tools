@@ -20,7 +20,7 @@ export class DynamicAnalyzer {
                     selectorsThatProducedOutput.add(s);
             }
         };
-        
+
         const queryResult = query.select(queryContext);
 
         const diagnostics: JSONPathDiagnostics[] = [];
@@ -28,7 +28,7 @@ export class DynamicAnalyzer {
             if (t instanceof JSONPathSelector && !selectorsThatProducedOutput.has(t))
                 diagnostics.push({
                     message: "This selector does not produce any output.",
-                    textRange: t.textRange,
+                    textRange: t.textRangeWithoutSkipped,
                     type: JSONPathDiagnosticsType.warning
                 });
         });

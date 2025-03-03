@@ -36,14 +36,14 @@ export class TypeChecker {
         if (tree instanceof JSONPathFunctionExpression) {
             const functionDefinition = this.options.functions[tree.name];
             if (functionDefinition === undefined)
-                context.addError(`Function '${tree.name}' is not defined.`, tree.nameToken.textRange);
+                context.addError(`Function '${tree.name}' is not defined.`, tree.nameToken.textRangeWithoutSkipped);
             else {
                 if (parent instanceof JSONPathComparisonExpression) this.checkType(tree, JSONPathType.valueType, context);
                 else if (parent instanceof JSONPathFunctionExpression) { }
                 else this.checkType(tree, JSONPathType.logicalType, context);
 
                 if (functionDefinition.parameters.length !== tree.args.length)
-                    context.addError(`Function '${tree.name}' expects ${functionDefinition.parameters.length} parameter/s but ${tree.args.length} was/were provided.`, tree.nameToken.textRange);
+                    context.addError(`Function '${tree.name}' expects ${functionDefinition.parameters.length} parameter/s but ${tree.args.length} was/were provided.`, tree.nameToken.textRangeWithoutSkipped);
 
                 for (let i = 0; i < Math.min(tree.args.length, functionDefinition.parameters.length); i++) {
                     const parameterType = functionDefinition.parameters[i].type;
@@ -70,7 +70,7 @@ export class TypeChecker {
         if (expressionType === null) return;
         const isAssignable = this.isAssignableTo(expressionType, targetType);
         if (!isAssignable)
-            context.addError(`Type '${expressionType}' can not be used in the context where is expected '${targetType}'.`, expression.textRange);
+            context.addError(`Type '${expressionType}' can not be used in the context where is expected '${targetType}'.`, expression.textRangeWithoutSkipped);
     }
 
     private getType(targetType: JSONPathType | null, expression: JSONPathFilterExpression, context: TypeCheckerContext): JSONPathType | null {
@@ -103,7 +103,7 @@ export class TypeChecker {
 
     private checkIntegerRange(number: number, numberToken: JSONPathToken, context: TypeCheckerContext) {
         if (!Number.isSafeInteger(number))
-            context.addError("Integer has to be within interval [-(2^53)+1, (2^53)-1].", numberToken.textRange);
+            context.addError("Integer has to be within interval [-(2^53)+1, (2^53)-1].", numberToken.textRangeWithoutSkipped);
     }
 }
 

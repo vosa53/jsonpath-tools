@@ -124,7 +124,7 @@ export function usePageViewModel() {
     }, []);
 
     const onSelectedNodeChanged = useCallback((tree: JSONPathSyntaxTree | null) => {
-        setHighlightedRange(tree === null ? null : tree.textRange);
+        setHighlightedRange(tree === null ? null : tree.textRangeWithoutSkipped);
     }, []);
 
     useEffect(() => {
