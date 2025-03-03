@@ -2,6 +2,7 @@ import { Decoration, hoverTooltip } from "@codemirror/view";
 import { EditorView } from "codemirror";
 import { OperationCancelledError } from "./cancellation-token";
 import { languageServiceSessionStateField } from "./jsonpath-state";
+import { MarkdownRenderer } from "./markdown-renderer";
 
 const tooltip = hoverTooltip(async (view, pos, side) => {
     const languageServiceSession = view.state.field(languageServiceSessionStateField);
@@ -14,13 +15,8 @@ const tooltip = hoverTooltip(async (view, pos, side) => {
             end: tooltip.range.position + tooltip.range.length,
             create(view) {
                 const containerElement = document.createElement("div");
-                const titleElement = document.createElement("strong");
-                const textElement = document.createElement("div");
                 containerElement.style.padding = "10px";
-                titleElement.textContent = tooltip.title;
-                textElement.textContent = tooltip.text;
-                containerElement.appendChild(titleElement);
-                containerElement.appendChild(textElement);
+                containerElement.innerHTML = MarkdownRenderer.renderToHTML(tooltip.text);
                 return { dom: containerElement };
             }
         };

@@ -46,7 +46,7 @@ export function usePageViewModel() {
             ...defaultJSONPathOptions,
             functions: {
                 ...defaultJSONPathOptions.functions,
-                ...Object.fromEntries(customFunctions.map(f => [f.name, { returnType: f.returnType, parameterTypes: f.parameters.map(p => p.type), handler: () => JSONPathNothing }]))
+                ...Object.fromEntries(customFunctions.map(f => [f.name, { description: f.description, parameters: f.parameters.map(p => ({ name: p.name, description: p.description, type: p.type })), returnType: f.returnType, handler: () => JSONPathNothing }]))
             }
         };
     }, [customFunctions]);
@@ -128,7 +128,7 @@ export function usePageViewModel() {
     }, []);
 
     useEffect(() => {
-        if (getResultRef.current === null) return;
+        /*if (getResultRef.current === null) return;
         if (resultTimeoutRef.current !== null) window.clearTimeout(resultTimeoutRef.current);
         resultTimeoutRef.current = window.setTimeout(async () => {
             try {
@@ -140,7 +140,7 @@ export function usePageViewModel() {
             catch (error) {
                 if (!(error instanceof OperationCancelledError)) throw error;
             }
-        }, 500);
+        }, 500);*/
     }, [queryText, queryArgument, getResultRef.current]);
 
     return {

@@ -23,12 +23,12 @@ export class JSONPathFunctionExpression extends JSONPathFilterExpression {
     evaluate(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
         const functionDefinition = queryContext.options.functions[this.name];
         if (functionDefinition === undefined) return JSONPathNothing;
-        if (this.args.length < functionDefinition.parameterTypes.length) return JSONPathNothing;
+        if (this.args.length < functionDefinition.parameters.length) return JSONPathNothing;
 
         const argValues = [];
-        for (let i = 0; i < functionDefinition.parameterTypes.length; i++) {
+        for (let i = 0; i < functionDefinition.parameters.length; i++) {
             const arg = this.args[i].arg;
-            const argValue = evaluateAs(arg, functionDefinition.parameterTypes[i], queryContext, filterExpressionContext);
+            const argValue = evaluateAs(arg, functionDefinition.parameters[i].type, queryContext, filterExpressionContext);
             argValues.push(argValue);
         }
         const result = functionDefinition.handler(...argValues);

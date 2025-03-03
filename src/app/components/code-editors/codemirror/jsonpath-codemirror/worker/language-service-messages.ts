@@ -2,7 +2,7 @@ import { JSONPathDiagnostics } from "@/jsonpath-tools/diagnostics";
 import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-provider";
 import { Signature } from "@/jsonpath-tools/editor-services/signature-provider";
 import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-provider";
-import { JSONPathType } from "@/jsonpath-tools/options";
+import { JSONPathFunction, JSONPathType } from "@/jsonpath-tools/options";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 
 export enum LanguageServiceMessageType {
@@ -76,7 +76,4 @@ export interface SerializableJSONPathOptions {
     readonly functions: { [name: string]: SerializableJSONPathFunction };
 }
 
-export interface SerializableJSONPathFunction {
-    readonly parameterTypes: readonly JSONPathType[];
-    readonly returnType: JSONPathType;
-}
+export type SerializableJSONPathFunction = Omit<JSONPathFunction, "handler">;

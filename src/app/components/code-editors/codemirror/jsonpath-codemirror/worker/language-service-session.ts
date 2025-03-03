@@ -19,8 +19,9 @@ export class LanguageServiceSession {
         const serializableFunctions = Object.entries(newOptions.functions).map(([name, f]) => [
             name,
             {
-                returnType: f.returnType,
-                parameterTypes: f.parameterTypes
+                description: f.description,
+                parameters: f.parameters,
+                returnType: f.returnType
             }
         ]);
         const serializableNewOptions: SerializableJSONPathOptions = {

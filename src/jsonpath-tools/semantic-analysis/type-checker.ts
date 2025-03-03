@@ -42,11 +42,11 @@ export class TypeChecker {
                 else if (parent instanceof JSONPathFunctionExpression) { }
                 else this.checkType(tree, JSONPathType.logicalType, context);
 
-                if (functionDefinition.parameterTypes.length !== tree.args.length)
-                    context.addError(`Function '${tree.name}' expects ${functionDefinition.parameterTypes.length} parameter/s but ${tree.args.length} was/were provided.`, tree.nameToken.textRange);
+                if (functionDefinition.parameters.length !== tree.args.length)
+                    context.addError(`Function '${tree.name}' expects ${functionDefinition.parameters.length} parameter/s but ${tree.args.length} was/were provided.`, tree.nameToken.textRange);
 
-                for (let i = 0; i < Math.min(tree.args.length, functionDefinition.parameterTypes.length); i++) {
-                    const parameterType = functionDefinition.parameterTypes[i];
+                for (let i = 0; i < Math.min(tree.args.length, functionDefinition.parameters.length); i++) {
+                    const parameterType = functionDefinition.parameters[i].type;
                     const arg = tree.args[i].arg;
                     this.checkType(arg, parameterType, context);
                 }

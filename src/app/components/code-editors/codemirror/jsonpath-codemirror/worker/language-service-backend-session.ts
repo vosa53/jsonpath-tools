@@ -40,8 +40,9 @@ export class LanguageServiceBackendSession {
         const functions = Object.entries(message.newOptions.functions).map(([name, f]) => [
             name,
             {
+                description: f.description,
+                parameters: f.parameters,
                 returnType: f.returnType,
-                parameterTypes: f.parameterTypes,
                 handler: this.resolveFunctionHandler(name)
             }
         ]);

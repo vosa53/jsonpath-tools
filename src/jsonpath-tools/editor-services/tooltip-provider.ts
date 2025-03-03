@@ -75,13 +75,12 @@ export class TooltipProvider {
         const description = this.descriptionProvider.provideDescription(node);
         if (description === null)
             return null;
-        return new Tooltip(description.title, description.text, node.textRange);
+        return new Tooltip(`##### ${description.title}\n${description.text}`, node.textRange);
     }
 }
 
 export class Tooltip {
     constructor(
-        readonly title: string,
         readonly text: string,
         readonly range: TextRange
     ) { }

@@ -25,11 +25,12 @@ export class SignatureProvider {
 
         let text = functionExpression.name + "(";
         const parameters: SignatureParameter[] = [];
-        for (const parameterDefinition of functionDefinition.parameterTypes) {
+        for (const parameter of functionDefinition.parameters) {
             if (parameters.length !== 0)
                 text += ", ";
-            parameters.push(new SignatureParameter(new TextRange(text.length, parameterDefinition.length), ""));
-            text += parameterDefinition;
+            const parameterText = `${parameter.name}: ${parameter.type}`;
+            parameters.push(new SignatureParameter(new TextRange(text.length, parameterText.length), ""));
+            text += parameterText;
         }
         text += ")";
         const parameterIndex = this.getParameterIndex(functionExpression, position);
