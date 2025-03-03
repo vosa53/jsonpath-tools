@@ -15,11 +15,11 @@ export class DescriptionProvider {
                 return new Description("Child Segment", "Selects an object at the given index from an array.");
         }],
 
-        [JSONPathSyntaxTreeType.filterSelector, n => new Description("Filter Selector", "Selects particular children using a logical expression. Current child is represented with @.")],
-        [JSONPathSyntaxTreeType.indexSelector, n => new Description("Index Selector", "Selects an object at the given index from an array.")],
-        [JSONPathSyntaxTreeType.nameSelector, n => new Description("Name Selector", "Selects a property from the object.")],
-        [JSONPathSyntaxTreeType.sliceSelector, n => new Description("Slice Selector", "Selects a range from an array.")],
-        [JSONPathSyntaxTreeType.wildcardSelector, n => new Description("Wildcard Selector", "Selects all members from an object.")],
+        [JSONPathSyntaxTreeType.filterSelector, n => this.provideDescriptionForFilterSelector()],
+        [JSONPathSyntaxTreeType.indexSelector, n => this.provideDescriptionForIndexSelector()],
+        [JSONPathSyntaxTreeType.nameSelector, n => this.provideDescriptionForNameSelector()],
+        [JSONPathSyntaxTreeType.sliceSelector, n => this.provideDescriptionForSliceSelector()],
+        [JSONPathSyntaxTreeType.wildcardSelector, n => this.provideDescriptionForWildcardSelector()],
 
         [JSONPathSyntaxTreeType.paranthesisExpression, n => new Description("Paranthesis", "Paranthesis.")],
         [JSONPathSyntaxTreeType.andExpression, n => new Description("Logical AND", "Realizes operator AND.")],
@@ -35,8 +35,8 @@ export class DescriptionProvider {
         [JSONPathSyntaxTreeType.booleanLiteral, n => new Description("Boolean Literal", "Realizes operator NOT.")],
         [JSONPathSyntaxTreeType.nullLiteral, n => new Description("Null Literal", "Realizes operator NOT.")],
 
-        [JSONPathSyntaxTreeType.dollarToken, n => new Description("Root Identifier", "Identifies root object.")],
-        [JSONPathSyntaxTreeType.atToken, n => new Description("Current Identifier", "Identifies current object.")],
+        [JSONPathSyntaxTreeType.dollarToken, n => this.provideDescriptionForDollarToken()],
+        [JSONPathSyntaxTreeType.atToken, n => this.provideDescriptionForAtToken()]
     ]);
 
     constructor(
@@ -63,6 +63,34 @@ export class DescriptionProvider {
         }
         return new Description(`Function ${name}`, text);
     }
+
+    provideDescriptionForFilterSelector(): Description {
+        return new Description("Filter Selector", "Selects particular children using a logical expression. Current child is represented with @.");
+    }
+
+    provideDescriptionForIndexSelector(): Description {
+        return new Description("Index Selector", "Selects an object at the given index from an array.");
+    }
+
+    provideDescriptionForNameSelector(): Description {
+        return new Description("Name Selector", "Selects a property from the object.");
+    }
+
+    provideDescriptionForSliceSelector(): Description {
+        return new Description("Slice Selector", "Selects a range from an array.");
+    }
+
+    provideDescriptionForWildcardSelector(): Description {
+        return new Description("Wildcard Selector", "Selects all members from an object.");
+    }
+
+    provideDescriptionForDollarToken(): Description {
+        return new Description("Root Identifier", "Identifies root object.");
+    }
+
+    provideDescriptionForAtToken(): Description {
+        return new Description("Current Identifier", "Identifies current object.");
+    }
 }
 
 export class Description {
@@ -70,4 +98,8 @@ export class Description {
         readonly title: string,
         readonly text: string
     ) { }
+
+    toMarkdown(): string {
+        return `#### ${this.title}\n${this.text}`;
+    }
 }

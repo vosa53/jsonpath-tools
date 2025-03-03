@@ -1,12 +1,12 @@
 import { DynamicAnalysisResult, DynamicAnalyzer } from "@/jsonpath-tools/dynamic-analysis/dynamic-analyzer";
-import { CompletionProvider } from "@/jsonpath-tools/editor-services/completion-provider";
+import { CompletionItem, CompletionProvider } from "@/jsonpath-tools/editor-services/completion-provider";
 import { defaultJSONPathOptions, JSONPathFunctionHandler, JSONPathOptions } from "@/jsonpath-tools/options";
 import { JSONPath } from "@/jsonpath-tools/query/json-path";
 import { TypeChecker } from "@/jsonpath-tools/semantic-analysis/type-checker";
 import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 import { logPerformance } from "@/jsonpath-tools/utils";
-import { DisconnectLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
+import { DisconnectLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
 import { SimpleRPCTopic } from "./simple-rpc";
 import { SignatureProvider } from "@/jsonpath-tools/editor-services/signature-provider";
 import { TooltipProvider } from "@/jsonpath-tools/editor-services/tooltip-provider";
@@ -22,6 +22,7 @@ export class LanguageServiceBackendSession {
     private query: JSONPath;
     private queryArgument: JSONPathJSONValue;
     private dynamicAnalysisResult: DynamicAnalysisResult | null;
+    private lastCompletions: readonly CompletionItem[];
 
     constructor(private readonly rpcTopic: SimpleRPCTopic, private readonly resolveFunctionHandler: (functionName: string) => JSONPathFunctionHandler) {
         this.parser = new JSONPathParser();
@@ -34,6 +35,7 @@ export class LanguageServiceBackendSession {
         this.query = this.parser.parse("");
         this.queryArgument = {};
         this.dynamicAnalysisResult = null;
+        this.lastCompletions = [];
     }
 
     updateOptions(message: UpdateOptionsLanguageServiceMessage) {
@@ -69,9 +71,19 @@ export class LanguageServiceBackendSession {
 
     getCompletions(message: GetCompletionsLanguageServiceMessage): GetCompletionsLanguageServiceMessageResponse {
         const completions = this.completionProvider.provideCompletions(this.query, this.queryArgument, message.position);
+        this.lastCompletions = completions;
 
         return {
-            completions: completions
+            completions: completions.map(c => ({ type: c.type, text: c.text, detail: c.detail }))
+        };
+    }
+
+    resolveCompletion(message: ResolveCompletionLanguageServiceMessage): ResolveCompletionLanguageServiceMessageResponse {
+        const completion = this.lastCompletions[message.index];
+        const description = completion?.resolveDescription?.() ?? "";
+
+        return {
+            description: description
         };
     }
 

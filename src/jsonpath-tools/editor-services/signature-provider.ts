@@ -32,7 +32,8 @@ export class SignatureProvider {
             parameters.push(new SignatureParameter(new TextRange(text.length, parameterText.length), parameter.description));
             text += parameterText;
         }
-        text += ")";
+        text += "): ";
+        text += functionDefinition.returnType;
         const parameterIndex = this.getParameterIndex(functionExpression, position);
         return new Signature(text, parameters, parameterIndex, "");
     }

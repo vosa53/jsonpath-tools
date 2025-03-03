@@ -42,15 +42,15 @@ export class CompletionProvider {
         }
         if (lastButOneNode.type === JSONPathSyntaxTreeType.missingSelector) {
             const segment = nodePath[nodePath.length - 3] as JSONPathSegment;
-            completions.push(new CompletionItem(CompletionItemType.syntax, "*"));
+            completions.push(new CompletionItem(CompletionItemType.syntax, "*", undefined, () => this.descriptionProvider.provideDescriptionForWildcardSelector().toMarkdown()));
             if (segment.openingBracketToken !== null) {
-                completions.push(new CompletionItem(CompletionItemType.syntax, "?"));
-                completions.push(new CompletionItem(CompletionItemType.syntax, "::"));
+                completions.push(new CompletionItem(CompletionItemType.syntax, "?", undefined, () => this.descriptionProvider.provideDescriptionForFilterSelector().toMarkdown()));
+                completions.push(new CompletionItem(CompletionItemType.syntax, "::", undefined, () => this.descriptionProvider.provideDescriptionForSliceSelector().toMarkdown()));
             }
         }
         if (lastButOneNode.type === JSONPathSyntaxTreeType.missingExpression) {
-            completions.push(new CompletionItem(CompletionItemType.syntax, "@"));
-            completions.push(new CompletionItem(CompletionItemType.syntax, "$"));
+            completions.push(new CompletionItem(CompletionItemType.syntax, "@", undefined, () => this.descriptionProvider.provideDescriptionForAtToken().toMarkdown()));
+            completions.push(new CompletionItem(CompletionItemType.syntax, "$", undefined, () => this.descriptionProvider.provideDescriptionForDollarToken().toMarkdown()));
             this.completeFunctions(completions);
         }
         if (lastNode.type === JSONPathSyntaxTreeType.nameToken && lastButOneNode.type === JSONPathSyntaxTreeType.functionExpression)
@@ -65,8 +65,14 @@ export class CompletionProvider {
     }
 
     private completeFunctions(completions: CompletionItem[]) {
-        for (const functionDefinition of Object.entries(this.options.functions))
-            completions.push(new CompletionItem(CompletionItemType.function, functionDefinition[0], functionDefinition[1].returnType));
+        for (const functionDefinition of Object.entries(this.options.functions)) {
+            completions.push(new CompletionItem(
+                CompletionItemType.function, 
+                functionDefinition[0], 
+                functionDefinition[1].returnType,
+                () => this.descriptionProvider.provideDescriptionForFunction(functionDefinition[0], functionDefinition[1]).toMarkdown()
+            ));
+        }
     }
 
     private getDistinctKeysAndTypes(values: JSONPathJSONValue[]): Map<string, Set<string>> {
@@ -121,7 +127,7 @@ export class CompletionItem {
         readonly type: CompletionItemType,
         readonly text: string,
         readonly detail?: string,
-        readonly resolveDocumentation?: () => string
+        readonly resolveDescription?: () => string
     ) { }
 }
 

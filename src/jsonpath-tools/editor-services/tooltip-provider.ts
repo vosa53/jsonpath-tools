@@ -75,7 +75,7 @@ export class TooltipProvider {
         const description = this.descriptionProvider.provideDescription(node);
         if (description === null)
             return null;
-        return new Tooltip(`#### ${description.title}\n${description.text}`, node.textRangeWithoutSkipped);
+        return new Tooltip(description.toMarkdown(), node.textRangeWithoutSkipped);
     }
 }
 

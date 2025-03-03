@@ -32,7 +32,15 @@ export interface GetCompletionsLanguageServiceMessage {
 }
 
 export interface GetCompletionsLanguageServiceMessageResponse {
-    readonly completions: readonly CompletionItem[];
+    readonly completions: readonly SerializableCompletionItem[];
+}
+
+export interface ResolveCompletionLanguageServiceMessage {
+    readonly index: number;
+}
+
+export interface ResolveCompletionLanguageServiceMessageResponse {
+    readonly description: string;
 }
 
 export interface GetSignatureLanguageServiceMessage {
@@ -71,6 +79,8 @@ export interface GetResultLanguageServiceMessageResponse {
 export interface DisconnectLanguageServiceMessage {
 
 }
+
+export type SerializableCompletionItem = Omit<CompletionItem, "resolveDescription">;
 
 export interface SerializableJSONPathOptions {
     readonly functions: { [name: string]: SerializableJSONPathFunction };

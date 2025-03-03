@@ -75,30 +75,31 @@ function isTransactionTriggeringCompletion(transaction: Transaction): boolean {
 function createElementForSignature(signature: Signature): HTMLElement {
     const tooltipElement = document.createElement("div");
     tooltipElement.classList.add("cmjp-tooltip-signatureHelp");
-    const textElement = document.createElement("div");
-    tooltipElement.appendChild(textElement);
+    const signatureElement = document.createElement("div");
+    signatureElement.classList.add("cmjp-tooltip-signatureHelp-signature");
+    tooltipElement.appendChild(signatureElement);
     if (signature.activeParameterIndex < signature.parameters.length) {
         const activeParameter = signature.parameters[signature.activeParameterIndex];
 
         const beforeActiveParameterElement = document.createElement("span");
         beforeActiveParameterElement.textContent = signature.text.substring(0, activeParameter.rangeInSignatureText.position);
-        textElement.appendChild(beforeActiveParameterElement);
+        signatureElement.appendChild(beforeActiveParameterElement);
         
         const activeParameterElement = document.createElement("span");
         activeParameterElement.classList.add("cmjp-activeParameter");
         activeParameterElement.textContent = signature.text.substring(activeParameter.rangeInSignatureText.position, activeParameter.rangeInSignatureText.position + activeParameter.rangeInSignatureText.length);
-        textElement.appendChild(activeParameterElement);
+        signatureElement.appendChild(activeParameterElement);
         
         const afterActiveParameterElement = document.createElement("span");
         afterActiveParameterElement.textContent = signature.text.substring(activeParameter.rangeInSignatureText.position + activeParameter.rangeInSignatureText.length);
-        textElement.appendChild(afterActiveParameterElement);
+        signatureElement.appendChild(afterActiveParameterElement);
 
         const activeParameterDocumentationElement = document.createElement("div");
         activeParameterDocumentationElement.textContent = activeParameter.documentation;
         tooltipElement.appendChild(activeParameterDocumentationElement);
     }
     else
-        textElement.textContent = signature.text;
+        signatureElement.textContent = signature.text;
     return tooltipElement;
 }
 

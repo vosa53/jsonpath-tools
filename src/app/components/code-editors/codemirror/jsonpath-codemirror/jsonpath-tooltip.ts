@@ -10,6 +10,7 @@ const tooltip = hoverTooltip(async (view, pos, side) => {
         const tooltip = await languageServiceSession.getTooltip(pos);
         if (tooltip === null)
             return null;
+        
         return {
             pos: tooltip.range.position,
             end: tooltip.range.position + tooltip.range.length,
