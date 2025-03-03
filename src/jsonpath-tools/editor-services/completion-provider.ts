@@ -5,11 +5,16 @@ import { JSONPathSegment } from "../query/segment";
 import { JSONPathSyntaxTree } from "../query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
 import { JSONPathJSONValue } from "../types";
+import { DescriptionProvider } from "./description-provider";
 
 export class CompletionProvider {
+    private readonly descriptionProvider: DescriptionProvider;
+
     constructor(
         private readonly options: JSONPathOptions
-    ) { }
+    ) {
+        this.descriptionProvider = new DescriptionProvider(options);
+    }
 
     provideCompletions(query: JSONPath, queryArgument: JSONPathJSONValue, position: number): CompletionItem[] {
         const completions: CompletionItem[] = [];
@@ -103,7 +108,7 @@ export class CompletionProvider {
                 return "null";
             else if (Array.isArray(value))
                 return "array";
-            else 
+            else
                 return "object";
         }
         else

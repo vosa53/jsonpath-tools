@@ -92,6 +92,10 @@ function createElementForSignature(signature: Signature): HTMLElement {
         const afterActiveParameterElement = document.createElement("span");
         afterActiveParameterElement.textContent = signature.text.substring(activeParameter.rangeInSignatureText.position + activeParameter.rangeInSignatureText.length);
         textElement.appendChild(afterActiveParameterElement);
+
+        const activeParameterDocumentationElement = document.createElement("div");
+        activeParameterDocumentationElement.textContent = activeParameter.documentation;
+        tooltipElement.appendChild(activeParameterDocumentationElement);
     }
     else
         textElement.textContent = signature.text;

@@ -22,14 +22,14 @@ export class SignatureProvider {
         const functionDefinition = this.options.functions[functionExpression.name];
         if (functionDefinition === undefined)
             return null;
-
+        
         let text = functionExpression.name + "(";
         const parameters: SignatureParameter[] = [];
         for (const parameter of functionDefinition.parameters) {
             if (parameters.length !== 0)
                 text += ", ";
             const parameterText = `${parameter.name}: ${parameter.type}`;
-            parameters.push(new SignatureParameter(new TextRange(text.length, parameterText.length), ""));
+            parameters.push(new SignatureParameter(new TextRange(text.length, parameterText.length), parameter.description));
             text += parameterText;
         }
         text += ")";

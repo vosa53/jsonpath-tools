@@ -1,4 +1,4 @@
-import { JSONPathOptions } from "../options";
+import { JSONPathFunction, JSONPathOptions } from "../options";
 import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
 import { JSONPathSegment } from "../query/segment";
 import { JSONPathSyntaxTree } from "../query/syntax-tree";
@@ -11,7 +11,7 @@ export class DescriptionProvider {
             const segment = n as JSONPathSegment;
             if (segment.isRecursive)
                 return new Description("Descendant Segment", "Selects an object at the given index from an array.");
-            else 
+            else
                 return new Description("Child Segment", "Selects an object at the given index from an array.");
         }],
 
@@ -26,12 +26,15 @@ export class DescriptionProvider {
         [JSONPathSyntaxTreeType.orExpression, n => new Description("Logical OR", "Realizes operator OR.")],
         [JSONPathSyntaxTreeType.notExpression, n => new Description("Logical NOT", "Realizes operator NOT.")],
         [JSONPathSyntaxTreeType.comparisonExpression, n => new Description("Comparison", "Compares left and right.")],
-        [JSONPathSyntaxTreeType.functionExpression, n => new Description(`Function ${(n as JSONPathFunctionExpression).name}`, "Function.")],
+        [JSONPathSyntaxTreeType.functionExpression, n => {
+            const functionExpression = n as JSONPathFunctionExpression;
+            return this.provideDescriptionForFunction(functionExpression.name, this.options.functions[functionExpression.name]);
+        }],
         [JSONPathSyntaxTreeType.stringLiteral, n => new Description("String Literal", "Realizes operator NOT.")],
         [JSONPathSyntaxTreeType.numberLiteral, n => new Description("Number Literal", "Realizes operator NOT.")],
         [JSONPathSyntaxTreeType.booleanLiteral, n => new Description("Boolean Literal", "Realizes operator NOT.")],
         [JSONPathSyntaxTreeType.nullLiteral, n => new Description("Null Literal", "Realizes operator NOT.")],
-        
+
         [JSONPathSyntaxTreeType.dollarToken, n => new Description("Root Identifier", "Identifies root object.")],
         [JSONPathSyntaxTreeType.atToken, n => new Description("Current Identifier", "Identifies current object.")],
     ]);
@@ -46,6 +49,19 @@ export class DescriptionProvider {
             return descriptionProvider(node);
         else
             return null;
+    }
+
+    provideDescriptionForFunction(name: string, functionDefinition?: JSONPathFunction): Description {
+        let text = "";
+        if (functionDefinition !== undefined) {
+            text += functionDefinition.description;
+            text += "\n##### Parameters";
+            for (const parameter of functionDefinition.parameters)
+                text += `\n - \`${parameter.name}: ${parameter.type}\` ${parameter.description}`;
+            text += "\n##### Return Type";
+            text += `\n - \`${functionDefinition.returnType}\``;
+        }
+        return new Description(`Function ${name}`, text);
     }
 }
 
