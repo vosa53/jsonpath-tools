@@ -9,14 +9,14 @@ export abstract class JSONPathSyntaxTree {
     ) { }
 
     abstract readonly type: JSONPathSyntaxTreeType;
-    protected abstract readonly skippedLength: number;
+    abstract readonly skippedTextBefore: string;
 
     get textRange(): TextRange {
         return new TextRange(this.position, this.length);
     }
 
     get textRangeWithoutSkipped(): TextRange {
-        return new TextRange(this.position + this.skippedLength, this.length - this.skippedLength);
+        return new TextRange(this.position + this.skippedTextBefore.length, this.length - this.skippedTextBefore.length);
     }
 
     abstract forEach(action: (tree: JSONPathSyntaxTree) => void | boolean): void;

@@ -3,11 +3,12 @@ import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-prov
 import { JSONPathOptions } from "@/jsonpath-tools/options";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 import { CancellationToken } from "../cancellation-token";
-import { GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, SerializableCompletionItem, SerializableJSONPathOptions, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
+import { GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, SerializableCompletionItem, SerializableJSONPathOptions, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
 import { SimpleRPCTopic } from "./simple-rpc";
 import { Signature } from "@/jsonpath-tools/editor-services/signature-provider";
 import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-provider";
 import { DocumentHighlight } from "@/jsonpath-tools/editor-services/document-highlights-provider";
+import { TextChange } from "@/jsonpath-tools/text-change";
 
 
 export class LanguageServiceSession {
@@ -88,6 +89,12 @@ export class LanguageServiceSession {
         const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse>("getDiagnostics", {
         }), this.cancellationToken);
         return response.diagnostics;
+    }
+
+    async getFormattingEdits(): Promise<readonly TextChange[]> {
+        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse>("getFormattingEdits", {
+        }), this.cancellationToken);
+        return response.formattingEdits;
     }
 
     async getResult(): Promise<{ nodes: readonly JSONPathJSONValue[], paths: readonly (string | number)[][] }> {

@@ -15,9 +15,9 @@ export abstract class JSONPathNode extends JSONPathSyntaxTree {
         this.children = notNullChildren;
     }
 
-    protected get skippedLength(): number {
+    get skippedTextBefore(): string {
         // @ts-ignore
-        return this.children[0].skippedLength;
+        return this.children[0].skippedTextBefore;
     }
 
     forEach(action: (tree: JSONPathSyntaxTree) => void | boolean): void {

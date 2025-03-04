@@ -4,6 +4,7 @@ import { DocumentHighlight } from "@/jsonpath-tools/editor-services/document-hig
 import { Signature } from "@/jsonpath-tools/editor-services/signature-provider";
 import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-provider";
 import { JSONPathFunction, JSONPathType } from "@/jsonpath-tools/options";
+import { TextChange } from "@/jsonpath-tools/text-change";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 
 export enum LanguageServiceMessageType {
@@ -74,6 +75,14 @@ export interface GetDiagnosticsLanguageServiceMessage {
 
 export interface GetDiagnosticsLanguageServiceMessageResponse {
     readonly diagnostics: readonly JSONPathDiagnostics[];
+}
+
+export interface GetFormattingEditsLanguageServiceMessage {
+
+}
+
+export interface GetFormattingEditsLanguageServiceMessageResponse {
+    readonly formattingEdits: readonly TextChange[];
 }
 
 export interface GetResultLanguageServiceMessage {

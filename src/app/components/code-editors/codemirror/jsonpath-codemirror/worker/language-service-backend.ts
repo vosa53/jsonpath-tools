@@ -1,7 +1,7 @@
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 import { SimpleRPC } from "./simple-rpc";
 import { LanguageServiceBackendSession } from "./language-service-backend-session";
-import { UpdateOptionsLanguageServiceMessage, UpdateQueryLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessage, GetResultLanguageServiceMessage, DisconnectLanguageServiceMessage, GetSignatureLanguageServiceMessage, GetTooltipLanguageServiceMessage, ResolveCompletionLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessage } from "./language-service-messages";
+import { UpdateOptionsLanguageServiceMessage, UpdateQueryLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessage, GetResultLanguageServiceMessage, DisconnectLanguageServiceMessage, GetSignatureLanguageServiceMessage, GetTooltipLanguageServiceMessage, ResolveCompletionLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessage } from "./language-service-messages";
 import { defaultJSONPathOptions, JSONPathFunctionHandler } from "@/jsonpath-tools/options";
 
 export class LanguageServiceBackend {
@@ -27,6 +27,7 @@ export class LanguageServiceBackend {
         this.rpc.addHandlerAction("getDocumentHighlights", (h, message: GetDocumentHighlightsLanguageServiceMessage) => h.getDocumentHighlights(message));
         this.rpc.addHandlerAction("getTooltip", (h, message: GetTooltipLanguageServiceMessage) => h.getTooltip(message));
         this.rpc.addHandlerAction("getDiagnostics", (h, message: GetDiagnosticsLanguageServiceMessage) => h.getDiagnostics(message));
+        this.rpc.addHandlerAction("getFormattingEdits", (h, message: GetFormattingEditsLanguageServiceMessage) => h.getFormattingEdits(message));
         this.rpc.addHandlerAction("getResult", (h, message: GetResultLanguageServiceMessage) => h.getResult(message));
         this.rpc.addHandlerAction("disconnect", (h, message: DisconnectLanguageServiceMessage) => h.disconnect(message));
     }

@@ -10,6 +10,7 @@ import { LanguageServices } from "./worker/language-services";
 import { LanguageService } from "./worker/language-service";
 import { signatureHelp } from "./jsonpath-signature-help";
 import { documentHighlights } from "./jsonpath-document-highlights";
+import { formatKeyMap } from "./jsonpath-formatting";
 
 
 export const jsonPathLanguage = new Language(jsonPathLanguageFacet, jsonPathParser);
@@ -31,6 +32,7 @@ export function jsonPath(options: {
         }),
         jsonPathTooltip,
         signatureHelp,
-        documentHighlights
+        documentHighlights,
+        formatKeyMap
     ]);
 }
