@@ -6,10 +6,11 @@ import { TypeChecker } from "@/jsonpath-tools/semantic-analysis/type-checker";
 import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 import { logPerformance } from "@/jsonpath-tools/utils";
-import { DisconnectLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
+import { DisconnectLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
 import { SimpleRPCTopic } from "./simple-rpc";
 import { SignatureProvider } from "@/jsonpath-tools/editor-services/signature-provider";
 import { TooltipProvider } from "@/jsonpath-tools/editor-services/tooltip-provider";
+import { DocumentHighlightsProvider } from "@/jsonpath-tools/editor-services/document-highlights-provider";
 
 export class LanguageServiceBackendSession {
     private readonly parser: JSONPathParser;
@@ -17,6 +18,7 @@ export class LanguageServiceBackendSession {
     private typeChecker: TypeChecker;
     private completionProvider: CompletionProvider;
     private signatureProvider: SignatureProvider;
+    private documentHighlightsProvider: DocumentHighlightsProvider;
     private tooltipProvider: TooltipProvider;
     private dynamicAnalyzer: DynamicAnalyzer;
     private query: JSONPath;
@@ -30,6 +32,7 @@ export class LanguageServiceBackendSession {
         this.typeChecker = new TypeChecker(this.options);
         this.completionProvider = new CompletionProvider(this.options);
         this.signatureProvider = new SignatureProvider(this.options);
+        this.documentHighlightsProvider = new DocumentHighlightsProvider(this.options);
         this.tooltipProvider = new TooltipProvider(this.options);
         this.dynamicAnalyzer = new DynamicAnalyzer(this.options);
         this.query = this.parser.parse("");
@@ -54,6 +57,7 @@ export class LanguageServiceBackendSession {
         this.typeChecker = new TypeChecker(this.options);
         this.completionProvider = new CompletionProvider(this.options);
         this.signatureProvider = new SignatureProvider(this.options);
+        this.documentHighlightsProvider = new DocumentHighlightsProvider(this.options);
         this.tooltipProvider = new TooltipProvider(this.options);
         this.dynamicAnalyzer = new DynamicAnalyzer(this.options);
         this.dynamicAnalysisResult = null;
@@ -92,6 +96,14 @@ export class LanguageServiceBackendSession {
 
         return {
             signature: signature
+        };
+    }
+
+    getDocumentHighlights(message: GetDocumentHighlightsLanguageServiceMessage): GetDocumentHighlightsLanguageServiceMessageResponse {
+        const documentHighlights = this.documentHighlightsProvider.provideHighlights(this.query, message.position);
+
+        return {
+            documentHighlights: documentHighlights
         };
     }
 

@@ -1,5 +1,6 @@
 import { JSONPathDiagnostics } from "@/jsonpath-tools/diagnostics";
 import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-provider";
+import { DocumentHighlight } from "@/jsonpath-tools/editor-services/document-highlights-provider";
 import { Signature } from "@/jsonpath-tools/editor-services/signature-provider";
 import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-provider";
 import { JSONPathFunction, JSONPathType } from "@/jsonpath-tools/options";
@@ -49,6 +50,14 @@ export interface GetSignatureLanguageServiceMessage {
 
 export interface GetSignatureLanguageServiceMessageResponse {
     readonly signature: Signature | null;
+}
+
+export interface GetDocumentHighlightsLanguageServiceMessage {
+    readonly position: number;
+}
+
+export interface GetDocumentHighlightsLanguageServiceMessageResponse {
+    readonly documentHighlights: DocumentHighlight[];
 }
 
 export interface GetTooltipLanguageServiceMessage {

@@ -20,9 +20,11 @@ export abstract class JSONPathNode extends JSONPathSyntaxTree {
         return this.children[0].skippedLength;
     }
 
-    forEach(action: (tree: JSONPathSyntaxTree) => void): void {
-        action(this);
-        for (const child of this.children)
-            child.forEach(action);
+    forEach(action: (tree: JSONPathSyntaxTree) => void | boolean): void {
+        const shouldContinue = action(this);
+        if (shouldContinue !== false) {
+            for (const child of this.children)
+                child.forEach(action);
+        }
     }
 }

@@ -9,6 +9,7 @@ import { jsonPathCompletionSource } from "./jsonpath-completion-source";
 import { LanguageServices } from "./worker/language-services";
 import { LanguageService } from "./worker/language-service";
 import { signatureHelp } from "./jsonpath-signature-help";
+import { documentHighlights } from "./jsonpath-document-highlights";
 
 
 export const jsonPathLanguage = new Language(jsonPathLanguageFacet, jsonPathParser);
@@ -29,6 +30,7 @@ export function jsonPath(options: {
             autocomplete: jsonPathCompletionSource
         }),
         jsonPathTooltip,
-        signatureHelp
+        signatureHelp,
+        documentHighlights
     ]);
 }

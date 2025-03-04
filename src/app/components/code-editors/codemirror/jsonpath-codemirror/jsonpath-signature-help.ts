@@ -41,7 +41,7 @@ const signatureHelpPlugin = ViewPlugin.fromClass(class {
 
     update(update: ViewUpdate) {
         const currentSignature = update.view.state.field(signatureStateField);
-        const wasChange = update.transactions.some(t => t.startState.selection.main.head !== t.state.selection.main.head) || update.docChanged;
+        const wasChange = update.docChanged || update.transactions.some(t => t.startState.selection.main.head !== t.state.selection.main.head);
         if (wasChange && currentSignature !== null || update.transactions.some(t => isTransactionTriggeringCompletion(t)))
             this.updateSignature(update.state);
     }
