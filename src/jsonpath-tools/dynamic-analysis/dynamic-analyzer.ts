@@ -1,3 +1,4 @@
+import { Diagnostics } from "next/dist/build/swc/types";
 import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "../diagnostics";
 import { JSONPathOptions } from "../options";
 import { JSONPathQueryContext } from "../query/evaluation";
@@ -12,18 +13,23 @@ export class DynamicAnalyzer {
 
     analyze(query: JSONPath, queryArgument: JSONPathJSONValue): DynamicAnalysisResult {
         const selectorsThatProducedOutput = new Set<JSONPathSelector>();
+        const diagnosticsJSON = new Set<string>();
         const queryContext: JSONPathQueryContext = {
             rootNode: queryArgument, 
             options: this.options, 
             selectorInstrumentationCallback(s, i, oa, osi, ol) {
                 if (ol !== 0)
                     selectorsThatProducedOutput.add(s);
+            },
+            reportDiagnosticsCallback(d) {
+                // Far from ideal, ugly workaround because JavaScript doesn't support comparing and hashing objects in set by value.
+                const dJSON = JSON.stringify(d);
+                diagnosticsJSON.add(dJSON);
             }
         };
-
         const queryResult = query.select(queryContext);
-
-        const diagnostics: JSONPathDiagnostics[] = [];
+        
+        const diagnostics: JSONPathDiagnostics[] = Array.from(diagnosticsJSON).map(dJSON => JSON.parse(dJSON));
         query.forEach(t => {
             if (t instanceof JSONPathSelector && !selectorsThatProducedOutput.has(t))
                 diagnostics.push({

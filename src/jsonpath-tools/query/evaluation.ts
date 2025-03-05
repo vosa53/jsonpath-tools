@@ -1,3 +1,4 @@
+import { JSONPathDiagnostics } from "../diagnostics";
 import { JSONPathOptions } from "../options";
 import { JSONPathJSONValue } from "../types";
 import { LocatedNode } from "./located-node";
@@ -9,6 +10,7 @@ export interface JSONPathQueryContext {
     readonly options: JSONPathOptions;
     readonly segmentInstrumentationCallback?: (segment: JSONPathSegment, input: LocatedNode) => void;
     readonly selectorInstrumentationCallback?: (selector: JSONPathSelector, input: LocatedNode, outputArray: IndexOnlyArray<LocatedNode>, outputStartIndex: number, outputLength: number) => void;
+    readonly reportDiagnosticsCallback?: (diagnostics: JSONPathDiagnostics) => void;
 }
 
 export interface JSONPathFilterExpressionContext {
