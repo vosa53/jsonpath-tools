@@ -16,7 +16,6 @@ const tooltip = hoverTooltip(async (view, pos, side) => {
             end: tooltip.range.position + tooltip.range.length,
             create(view) {
                 const containerElement = document.createElement("div");
-                containerElement.style.padding = "10px";
                 containerElement.innerHTML = MarkdownRenderer.renderToHTML(tooltip.text);
                 return { dom: containerElement };
             }

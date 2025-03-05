@@ -1,6 +1,6 @@
 import { JSONPathNormalizedPath } from "@/jsonpath-tools/transformations";
 import { ActionIcon, Button, Divider, Group, Loader, Menu, Text } from "@mantine/core";
-import { IconArrowDown, IconArrowUp, IconChevronDown, IconRouteSquare } from "@tabler/icons-react";
+import { IconArrowDown, IconArrowUp, IconChevronDown, IconFileUpload, IconRouteSquare } from "@tabler/icons-react";
 import { memo, useState } from "react";
 import JSONEditor from "../code-editors/json-editor";
 import PanelShell from "../panel-shell";
@@ -46,6 +46,9 @@ const JSONPanel = memo(({
                         <IconRouteSquare style={{ width: '70%', height: '70%' }} stroke={1.5} />
                     </ActionIcon>
                     <Divider orientation="vertical" />
+                    <ActionIcon variant="default" aria-label="Settings">
+                        <IconFileUpload style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                    </ActionIcon>
                     <Menu shadow="md" width={200}>
                         <Menu.Target>
                             <Button variant="default" size="xs" rightSection={<IconChevronDown size={14} />}>Example Data</Button>

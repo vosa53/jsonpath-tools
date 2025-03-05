@@ -1,6 +1,6 @@
 import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "@/jsonpath-tools/diagnostics";
 import { Checkbox, DefaultMantineColor, Group, Table, ThemeIcon } from "@mantine/core";
-import { IconExclamationCircle } from "@tabler/icons-react";
+import { IconAlertTriangle, IconAlertTriangleFilled, IconExclamationCircle, IconExclamationCircleFilled } from "@tabler/icons-react";
 import { memo, ReactNode, useMemo, useState } from "react";
 import PanelShell from "../panel-shell";
 
@@ -67,7 +67,7 @@ function DiagnosticsView({
             <Table.Tbody>{diagnostics.map((d, i) => (
                 <Table.Tr key={i} onMouseEnter={() => onSelectedDiagnosticsChanged(d)} onMouseLeave={() => onSelectedDiagnosticsChanged(null)}>
                     <Table.Td>
-                        <DiagnosticsIcon diagnostics={d} />
+                        <DiagnosticsIcon diagnosticsType={d.type} />
                     </Table.Td>
                     <Table.Td>{d.message}</Table.Td>
                     <Table.Td>{d.textRange.position}</Table.Td>
@@ -78,23 +78,23 @@ function DiagnosticsView({
     );
 }
 
-function DiagnosticsIcon({ diagnostics }: { diagnostics: JSONPathDiagnostics }) {
-    const ICON_SIZE = 16;
+function DiagnosticsIcon({ diagnosticsType }: { diagnosticsType: JSONPathDiagnosticsType }) {
+    const ICON_SIZE = 20;
     let iconColor: DefaultMantineColor;
     let icon: ReactNode;
-    if (diagnostics.type === JSONPathDiagnosticsType.error) {
+    if (diagnosticsType === JSONPathDiagnosticsType.error) {
         iconColor = "red.7";
-        icon = <IconExclamationCircle size={ICON_SIZE} />;
+        icon = <IconExclamationCircleFilled size={ICON_SIZE} />;
     }
-    else if (diagnostics.type === JSONPathDiagnosticsType.warning) {
+    else if (diagnosticsType === JSONPathDiagnosticsType.warning) {
         iconColor = "yellow.4";
-        icon = <IconExclamationCircle size={ICON_SIZE} />;
+        icon = <IconAlertTriangleFilled size={ICON_SIZE} />;
     }
     else
         throw new Error("Unknown diagnostics type.");
 
     return (
-        <ThemeIcon color={iconColor} size={24} radius="xl">
+        <ThemeIcon variant="light" color={iconColor} size={28} radius="xl">
             {icon}
         </ThemeIcon>
     );

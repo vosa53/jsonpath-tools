@@ -10,11 +10,54 @@ strong {
     font-weight: 500;
 }
 
+*::selection {
+    background: var(--mantine-color-violet-light);
+}
+
 /* TODO: Move to Markdown specific styles. */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-weight: 500;
 }
 
-h1, h2, h3, h4, h5, h6, p, ul {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul {
     margin: 0;
+}
+
+code {
+    font-family: var(--mantine-font-family-monospace);
+    background: var(--mantine-color-default-border);
+    border-radius: var(--mantine-radius-default);
+    padding: 2px;
+}
+
+/* Width of the scrollbar */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+/* Track (background) */
+::-webkit-scrollbar-track {
+    background: transparent; 
+}
+
+/* Handle (the draggable part) */
+::-webkit-scrollbar-thumb {
+    background: var(--mantine-color-default-border);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--mantine-color-dimmed); 
 }

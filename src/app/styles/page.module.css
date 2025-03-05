@@ -1,9 +1,9 @@
 [data-mantine-color-scheme=light] .header {
-    background: var(--mantine-color-dark-7);
+    background: var(--mantine-color-gray-1);
 }
 
 [data-mantine-color-scheme=dark] .header {
-    background: var(--mantine-color-dark-9);
+    background: var(--mantine-color-dark-8);
 }
 
 [data-mantine-color-scheme=light] .navbar, [data-mantine-color-scheme=light] .main {

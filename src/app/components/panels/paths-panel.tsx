@@ -1,8 +1,9 @@
 import { PathType } from "@/app/models/path-type";
-import { Group, Select } from "@mantine/core";
+import { ActionIcon, Group, Select } from "@mantine/core";
 import { memo } from "react";
 import JSONEditor from "../code-editors/json-editor";
 import PanelShell from "../panel-shell";
+import { IconFileDownload } from "@tabler/icons-react";
 
 const PathsPanel = memo(({
     pathsText,
@@ -16,7 +17,7 @@ const PathsPanel = memo(({
     return (
         <PanelShell
             toolbar={
-                <Group gap="xs">
+                <Group gap="xs" w="100%">
                     <Select
                         size="xs"
                         allowDeselect={false}
@@ -27,6 +28,9 @@ const PathsPanel = memo(({
                         value={pathType}
                         onChange={value => onPathTypeChanged(value as PathType)}
                     />
+                    <ActionIcon variant="default" aria-label="Settings" ml="auto">
+                        <IconFileDownload style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                    </ActionIcon>
                 </Group>
             }
         >

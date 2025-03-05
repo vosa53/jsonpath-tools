@@ -62,7 +62,7 @@ export default function JSONPathEditor({
             highlightRange,
             EditorView.theme({
                 "&": { fontSize: "18px !important" },
-                "& .cm-content": { padding: "10px 0" },
+                "& .cm-content": { padding: "10px 2px" },
                 "& .cm-highlighted": { background: "#ff922b30" }
             }),
             EditorView.updateListener.of(u => {

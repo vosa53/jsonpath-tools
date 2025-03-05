@@ -1,8 +1,8 @@
 import { Operation, OperationType, ReplaceOperationReplacement } from "@/app/models/operation";
-import { Button, Group, Modal, Select, Stack } from "@mantine/core";
+import { ActionIcon, Button, Group, Modal, Select, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { IconDeviceFloppy } from "@tabler/icons-react";
+import { IconDeviceFloppy, IconFileDownload } from "@tabler/icons-react";
 import { memo } from "react";
 import JSONEditor from "../code-editors/json-editor";
 import { EditorFormAdapter } from "../editor-form-adapter";
@@ -27,10 +27,10 @@ const ResultPanel = memo(({
     return (
         <PanelShell
             toolbar={
-                <Group gap="xs">
+                <Group gap="xs" w="100%">
                     <Modal opened={modalOpened} onClose={close} title={"Edit replacement value"} size="xl">
-                        <ReplacementEditor 
-                            replacement={operation.replacement} 
+                        <ReplacementEditor
+                            replacement={operation.replacement}
                             onReplacementChanged={onReplacementChanged} />
                     </Modal>
                     <Select
@@ -44,9 +44,14 @@ const ResultPanel = memo(({
                         value={operation.type}
                         onChange={value => onOperationChanged({ ...operation, type: value as OperationType })}
                     />
-                    {operation.type === OperationType.replace &&
+                    {
+                        operation.type === OperationType.replace &&
                         <Button
-                            variant="subtle" size="compact-sm" onClick={() => open()}>Edit Replacement</Button>}
+                            variant="subtle" size="compact-sm" onClick={() => open()}>Edit Replacement</Button>
+                    }
+                    <ActionIcon variant="default" aria-label="Settings" ml="auto">
+                        <IconFileDownload style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                    </ActionIcon>
                 </Group>
             }
         >

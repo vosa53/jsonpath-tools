@@ -1,5 +1,5 @@
-import { Button, Group, Menu } from "@mantine/core";
-import { IconChevronDown } from "@tabler/icons-react";
+import { ActionIcon, Button, Group, Menu } from "@mantine/core";
+import { IconChevronDown, IconFileUpload } from "@tabler/icons-react";
 import { memo } from "react";
 import JSONEditor from "../code-editors/json-editor";
 import PanelShell from "../panel-shell";
@@ -15,9 +15,12 @@ const JSONSchemaPanel = memo(({
         <PanelShell
             toolbar={
                 <Group gap="xs" w="100%">
+                    <ActionIcon variant="default" aria-label="Settings" ml="auto">
+                        <IconFileUpload style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                    </ActionIcon>
                     <Menu shadow="md" width={200}>
                         <Menu.Target>
-                            <Button variant="default" size="xs" ml="auto" rightSection={<IconChevronDown size={14} />}>Example Schema</Button>
+                            <Button variant="default" size="xs" rightSection={<IconChevronDown size={14} />}>Example Schema</Button>
                         </Menu.Target>
                         <Menu.Dropdown>
                             <Menu.Item>Example 1</Menu.Item>
