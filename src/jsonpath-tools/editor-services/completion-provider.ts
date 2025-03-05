@@ -46,6 +46,7 @@ export class CompletionProvider {
             if (segment.openingBracketToken !== null) {
                 completions.push(new CompletionItem(CompletionItemType.syntax, "?", undefined, () => this.descriptionProvider.provideDescriptionForFilterSelector().toMarkdown()));
                 completions.push(new CompletionItem(CompletionItemType.syntax, "::", undefined, () => this.descriptionProvider.provideDescriptionForSliceSelector().toMarkdown()));
+                completions.push(new CompletionItem(CompletionItemType.syntax, "${start}:${end}:${step}", undefined, () => this.descriptionProvider.provideDescriptionForSliceSelector().toMarkdown(), true));
             }
         }
         if (lastButOneNode.type === JSONPathSyntaxTreeType.missingExpression) {
@@ -127,7 +128,8 @@ export class CompletionItem {
         readonly type: CompletionItemType,
         readonly text: string,
         readonly detail?: string,
-        readonly resolveDescription?: () => string
+        readonly resolveDescription?: () => string,
+        readonly isSnippet: boolean = false
     ) { }
 }
 

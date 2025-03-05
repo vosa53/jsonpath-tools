@@ -81,7 +81,7 @@ export class LanguageServiceBackendSession {
         this.lastCompletions = completions;
 
         return {
-            completions: completions.map(c => ({ type: c.type, text: c.text, detail: c.detail }))
+            completions: completions.map(c => ({ type: c.type, text: c.text, detail: c.detail, isSnippet: c.isSnippet }))
         };
     }
 

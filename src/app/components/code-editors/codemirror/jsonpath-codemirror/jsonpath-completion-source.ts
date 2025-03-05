@@ -1,5 +1,5 @@
 import { CompletionItemType } from "@/jsonpath-tools/editor-services/completion-provider";
-import { CompletionContext, CompletionResult } from "@codemirror/autocomplete";
+import { Completion, CompletionContext, CompletionResult, snippetCompletion } from "@codemirror/autocomplete";
 import { OperationCancelledError } from "./cancellation-token";
 import { languageServiceSessionStateField } from "./jsonpath-state";
 import { MarkdownRenderer } from "./markdown-renderer";
@@ -14,17 +14,22 @@ export async function jsonPathCompletionSource(context: CompletionContext): Prom
 
             return {
                 from: word.from,
-                options: completions.map((c, i) => ({
-                    label: c.text,
-                    type: convertCompletionItemTypeToCodemirrorType(c.type),
-                    detail: c.detail,
-                    info: async () => {
-                        const description = await languageServiceSession.resolveCompletion(i);
-                        const element = document.createElement("div");
-                        element.innerHTML = MarkdownRenderer.renderToHTML(description);
-                        return element;
-                    }
-                })),
+                options: completions.map((c, i) => {
+                    let completion: Completion = {
+                        label: c.text,
+                        type: convertCompletionItemTypeToCodemirrorType(c.type),
+                        detail: c.detail,
+                        info: async () => {
+                            const description = await languageServiceSession.resolveCompletion(i);
+                            const element = document.createElement("div");
+                            element.innerHTML = MarkdownRenderer.renderToHTML(description);
+                            return element;
+                        }
+                    };
+                    if (c.isSnippet)
+                        completion = snippetCompletion(c.text, completion);
+                    return completion;
+                })
             };
         }
         catch (error) {
