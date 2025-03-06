@@ -26,6 +26,7 @@ export const theme = EditorView.theme({
     "& .cm-gutterElement.cm-activeLineGutter": { backgroundColor: "transparent" },
     "& .cm-line": { padding: "0 2px 0 0" },
     "& .cm-lintRange-error": { backgroundImage: `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="6" height="3">%3Cpath%20d%3D%22m0%202.5%20l2%20-1.5%20l1%200%20l2%201.5%20l1%200%22%20stroke%3D%22%23fa5252%22%20fill%3D%22none%22%20stroke-width%3D%222%22%2F%3E</svg>')` },
+    "& .cm-lintRange-warning": { backgroundImage: `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="6" height="3">%3Cpath%20d%3D%22m0%202.5%20l2%20-1.5%20l1%200%20l2%201.5%20l1%200%22%20stroke%3D%22%23fab005%22%20fill%3D%22none%22%20stroke-width%3D%222%22%2F%3E</svg>')` },
     "& .cm-completionIcon": { display: "flex", flexDirection: "column", justifyContent: "center", marginRight: "6px" },
     "& .cm-completionIcon::after": { width: "20px", height: "20px", display: "block" },
     "& .cm-completionIcon-property::after": { content: `url('data:image/svg+xml,<svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  fill="none"  stroke="%234c6ef5"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-label"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M16.52 7h-10.52a2 2 0 0 0 -2 2v6a2 2 0 0 0 2 2h10.52a1 1 0 0 0 .78 -.375l3.7 -4.625l-3.7 -4.625a1 1 0 0 0 -.78 -.375" /></svg>')` },
