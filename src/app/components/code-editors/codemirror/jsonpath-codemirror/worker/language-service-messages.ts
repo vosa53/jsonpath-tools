@@ -29,6 +29,10 @@ export interface UpdateQueryArgumentLanguageServiceMessage {
     readonly newQueryArgument: JSONPathJSONValue;
 }
 
+export interface UpdateQueryArgumentSchemaLanguageServiceMessage {
+    readonly newQueryArgumentSchema: JSONPathJSONValue | undefined;
+}
+
 export interface GetCompletionsLanguageServiceMessage {
     readonly position: number;
 }

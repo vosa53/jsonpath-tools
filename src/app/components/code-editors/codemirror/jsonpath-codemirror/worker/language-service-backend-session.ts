@@ -6,7 +6,7 @@ import { TypeChecker } from "@/jsonpath-tools/semantic-analysis/type-checker";
 import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 import { logPerformance } from "@/jsonpath-tools/utils";
-import { DisconnectLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
+import { DisconnectLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentSchemaLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
 import { SimpleRPCTopic } from "./simple-rpc";
 import { SignatureProvider } from "@/jsonpath-tools/editor-services/signature-provider";
 import { TooltipProvider } from "@/jsonpath-tools/editor-services/tooltip-provider";
@@ -25,6 +25,7 @@ export class LanguageServiceBackendSession {
     private formatter: Formatter;
     private query: JSONPath;
     private queryArgument: JSONPathJSONValue;
+    private queryArgumentSchema: JSONPathJSONValue | undefined;
     private dynamicAnalysisResult: DynamicAnalysisResult | null;
     private lastCompletions: readonly CompletionItem[];
 
@@ -40,6 +41,7 @@ export class LanguageServiceBackendSession {
         this.formatter = new Formatter();
         this.query = this.parser.parse("");
         this.queryArgument = {};
+        this.queryArgumentSchema = undefined;
         this.dynamicAnalysisResult = null;
         this.lastCompletions = [];
     }
@@ -76,8 +78,12 @@ export class LanguageServiceBackendSession {
         this.dynamicAnalysisResult = null;
     }
 
+    updateQueryArgumentSchema(message: UpdateQueryArgumentSchemaLanguageServiceMessage) {
+        this.queryArgumentSchema = message.newQueryArgumentSchema;
+    }
+
     getCompletions(message: GetCompletionsLanguageServiceMessage): GetCompletionsLanguageServiceMessageResponse {
-        const completions = this.completionProvider.provideCompletions(this.query, this.queryArgument, message.position);
+        const completions = logPerformance("Get completions", () => this.completionProvider.provideCompletions(this.query, this.queryArgument, this.queryArgumentSchema, message.position));
         this.lastCompletions = completions;
 
         return {
@@ -87,7 +93,7 @@ export class LanguageServiceBackendSession {
 
     resolveCompletion(message: ResolveCompletionLanguageServiceMessage): ResolveCompletionLanguageServiceMessageResponse {
         const completion = this.lastCompletions[message.index];
-        const description = completion?.resolveDescription?.() ?? "";
+        const description = logPerformance("Resolve completion", () => completion?.resolveDescription?.() ?? "");
 
         return {
             description: description

@@ -1,8 +1,10 @@
 import { JSONPathFunction, JSONPathOptions } from "../options";
 import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
 import { JSONPathSegment } from "../query/segment";
+import { JSONPathNameSelector } from "../query/selectors/name-selector";
 import { JSONPathSyntaxTree } from "../query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
+import { JSONPathJSONValue } from "../types";
 
 export class DescriptionProvider {
     private readonly descriptionProviders = new Map<JSONPathSyntaxTreeType, (node: JSONPathSyntaxTree) => Description>([
@@ -17,7 +19,10 @@ export class DescriptionProvider {
 
         [JSONPathSyntaxTreeType.filterSelector, n => this.provideDescriptionForFilterSelector()],
         [JSONPathSyntaxTreeType.indexSelector, n => this.provideDescriptionForIndexSelector()],
-        [JSONPathSyntaxTreeType.nameSelector, n => this.provideDescriptionForNameSelector()],
+        [JSONPathSyntaxTreeType.nameSelector, n => {
+            const nameSelector = n as JSONPathNameSelector;
+            return this.provideDescriptionForNameSelector(nameSelector.name);
+        }],
         [JSONPathSyntaxTreeType.sliceSelector, n => this.provideDescriptionForSliceSelector()],
         [JSONPathSyntaxTreeType.wildcardSelector, n => this.provideDescriptionForWildcardSelector()],
 
@@ -72,8 +77,32 @@ export class DescriptionProvider {
         return new Description("Index Selector", "Selects an object at the given index from an array.");
     }
 
-    provideDescriptionForNameSelector(): Description {
-        return new Description("Name Selector", "Selects a property from the object.");
+    provideDescriptionForNameSelector(name: string, schemas?: JSONPathJSONValue[], types?: string[], example?: JSONPathJSONValue): Description {
+        let text = `Selects a property \`${name}\` from the object.`;
+        if (schemas !== undefined && schemas.length > 0) {
+            text += "\n\n---\n";
+            for (const schema of schemas) {
+                if (typeof schema !== "object" || Array.isArray(schema) || schema === null) 
+                    continue;
+                if (Object.hasOwn(schema, "title"))
+                    text += `\n##### ${schema.title}`;
+                if (Object.hasOwn(schema, "description"))
+                    text += `\n${schema.description}`;
+            }
+        }
+        if (types !== undefined || example !== undefined) {
+            text += "\n\n---\n";
+            if (types !== undefined)
+                text += `\n##### Type: \`${types.join(" | ")}\``;
+            if (example !== undefined) {
+                text += "\n##### Example\n";
+                text += "```json\n";
+                text += JSON.stringify(example, null, 4);
+                text += "\n```";
+            }
+        }
+
+        return new Description(`Name Selector \`${name}\``, text);
     }
 
     provideDescriptionForSliceSelector(): Description {

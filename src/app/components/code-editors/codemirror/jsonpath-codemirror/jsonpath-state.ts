@@ -8,6 +8,7 @@ import { LanguageService } from "./worker/language-service";
 
 export const updateOptionsEffect = StateEffect.define<JSONPathOptions>();
 export const updateQueryArgumentEffect = StateEffect.define<JSONPathJSONValue>();
+export const updateQueryArgumentSchemaEffect = StateEffect.define<JSONPathJSONValue | undefined>();
 export const jsonPathConfigFacet = Facet.define<{
     languageService: LanguageService
 }>();
@@ -29,6 +30,8 @@ export const languageServiceSessionStateField = StateField.define<LanguageServic
                 languageServiceSession.updateOptions(effect.value);
             else if (effect.is(updateQueryArgumentEffect))
                 languageServiceSession.updateQueryArgument(effect.value);
+            else if (effect.is(updateQueryArgumentSchemaEffect))
+                languageServiceSession.updateQueryArgumentSchema(effect.value);
         }
         return languageServiceSession;
     }

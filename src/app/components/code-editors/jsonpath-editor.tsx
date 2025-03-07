@@ -8,7 +8,7 @@ import { JSONPathDiagnostics } from "../../../jsonpath-tools/diagnostics";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
 import { jsonPath } from "./codemirror/jsonpath-codemirror/jsonpath-language";
 import { getJSONPath } from "./codemirror/jsonpath-codemirror/jsonpath-parser";
-import { getResult, updateOptionsEffect, updateQueryArgumentEffect } from "./codemirror/jsonpath-codemirror/jsonpath-state";
+import { getResult, updateOptionsEffect, updateQueryArgumentEffect, updateQueryArgumentSchemaEffect } from "./codemirror/jsonpath-codemirror/jsonpath-state";
 import { LanguageService } from "./codemirror/jsonpath-codemirror/worker/language-service";
 import { TextRange } from "@/jsonpath-tools/text-range";
 import { highlightRange, setHighlightedRangeEffect } from "./codemirror/highlight-range";
@@ -17,6 +17,7 @@ export default function JSONPathEditor({
     value,
     options = defaultJSONPathOptions,
     queryArgument = {},
+    queryArgumentSchema = undefined,
     highlightedRange = null,
     languageService,
     readonly = false,
@@ -28,6 +29,7 @@ export default function JSONPathEditor({
     value: string,
     options: JSONPathOptions,
     queryArgument: JSONPathJSONValue,
+    queryArgumentSchema: JSONPathJSONValue | undefined,
     languageService: LanguageService,
     highlightedRange: TextRange | null,
     readonly?: boolean,
@@ -47,6 +49,11 @@ export default function JSONPathEditor({
         if (editorViewRef.current !== null)
             editorViewRef.current.dispatch({ effects: updateQueryArgumentEffect.of(queryArgument) });
     }, [queryArgument]);
+
+    useEffect(() => {
+        if (editorViewRef.current !== null)
+            editorViewRef.current.dispatch({ effects: updateQueryArgumentSchemaEffect.of(queryArgumentSchema) });
+    }, [queryArgumentSchema]);
 
     useEffect(() => {
         if (editorViewRef.current !== null)
@@ -75,7 +82,12 @@ export default function JSONPathEditor({
     };
 
     const onEditorViewCreated = (view: EditorView) => {
-        view.dispatch({ effects: [updateOptionsEffect.of(options), updateQueryArgumentEffect.of(queryArgument), setHighlightedRangeEffect.of(highlightedRange)] });
+        view.dispatch({ effects: [
+            updateOptionsEffect.of(options), 
+            updateQueryArgumentEffect.of(queryArgument), 
+            updateQueryArgumentSchemaEffect.of(queryArgumentSchema), 
+            setHighlightedRangeEffect.of(highlightedRange)
+        ] });
         editorViewRef.current = view;
         onGetResultAvailable?.(() => getResult(view.state));
     };

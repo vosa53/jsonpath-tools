@@ -50,6 +50,7 @@ export default function Home() {
                         value={viewModel.queryText}
                         options={viewModel.options}
                         queryArgument={viewModel.queryArgument}
+                        queryArgumentSchema={viewModel.queryArgumentSchema}
                         highlightedRange={viewModel.highlightedRange}
                         languageService={viewModel.languageService}
                         onValueChanged={viewModel.onQueryTextChanged}
@@ -78,8 +79,8 @@ export default function Home() {
                             </Tabs.Panel>
                             <Tabs.Panel value="jsonSchema" flex="1 1 0" mih={0}>
                                 <JSONSchemaPanel 
-                                    queryArgumentSchemaText="" 
-                                    onQueryArgumentSchemaTextChanged={() => { }} />
+                                    queryArgumentSchemaText={viewModel.queryArgumentSchemaText}
+                                    onQueryArgumentSchemaTextChanged={viewModel.onQueryArgumentSchemaTextChanged} />
                             </Tabs.Panel>
                         </Tabs>
                         <Divider size="xs" orientation="vertical" />

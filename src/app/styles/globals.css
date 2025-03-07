@@ -35,29 +35,39 @@ ul {
     margin: 0;
 }
 
+hr {
+    border: none;
+    border-top: 1px solid var(--mantine-color-default-border);
+}
+
 code {
     font-family: var(--mantine-font-family-monospace);
-    background: var(--mantine-color-default-border);
+    background: /*var(--mantine-color-default-border)*/var(--mantine-color-gray-1);
     border-radius: var(--mantine-radius-default);
     padding: 2px;
 }
 
-/* Width of the scrollbar */
+pre {
+    margin: 0;
+}
+
+pre > code {
+    display: block;
+    padding: 2px 5px;
+}
+
 ::-webkit-scrollbar {
     width: 12px;
 }
 
-/* Track (background) */
 ::-webkit-scrollbar-track {
     background: transparent; 
 }
 
-/* Handle (the draggable part) */
 ::-webkit-scrollbar-thumb {
     background: var(--mantine-color-default-border);
 }
 
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: var(--mantine-color-dimmed); 
 }

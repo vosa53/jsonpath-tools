@@ -30,10 +30,11 @@ export function usePageViewModel() {
     const [settings, setSettings] = useState<Settings>(testSettings);
     const [queryText, setQueryText] = useState<string>(testQueryText);
     const [queryArgumentText, setQueryArgumentText] = useState<string>(testJson);
+    const [queryArgumentSchemaText, setQueryArgumentSchemaText] = useState<string>(testJsonSchema);
     const [operation, setOperation] = useState<Operation>(testOperation);
     const [pathType, setPathType] = useState<PathType>(PathType.normalizedPath);
     const [query, setQuery] = useState<JSONPath>(testQuery);
-    const queryArgument = useMemo(() => {
+    const queryArgument = useMemo<JSONPathJSONValue>(() => {
         try {
             return logPerformance("Parse query argument", () => JSON.parse(queryArgumentText));
         }
@@ -41,6 +42,14 @@ export function usePageViewModel() {
             return null;
         }
     }, [queryArgumentText]);
+    const queryArgumentSchema = useMemo<JSONPathJSONValue | undefined>(() => {
+        try {
+            return logPerformance("Parse query argument schema", () => JSON.parse(queryArgumentSchemaText));
+        }
+        catch {
+            return undefined;
+        }
+    }, [queryArgumentSchemaText]);
     const options = useMemo<JSONPathOptions>(() => {
         return {
             ...defaultJSONPathOptions,
@@ -93,6 +102,10 @@ export function usePageViewModel() {
 
     const onQueryArgumentTextChanged = useCallback((queryArgumentText: string) => {
         setQueryArgumentText(queryArgumentText);
+    }, []);
+
+    const onQueryArgumentSchemaTextChanged = useCallback((queryArgumentSchemaText: string) => {
+        setQueryArgumentSchemaText(queryArgumentSchemaText);
     }, []);
 
     const onOperationChanged = useCallback((operation: Operation) => {
@@ -148,6 +161,7 @@ export function usePageViewModel() {
         onSettingsChanged,
         onQueryTextChanged,
         onQueryArgumentTextChanged,
+        onQueryArgumentSchemaTextChanged,
         onOperationChanged,
         onPathTypeChanged,
         onQueryParsed,
@@ -160,10 +174,12 @@ export function usePageViewModel() {
         settings,
         queryText,
         queryArgumentText,
+        queryArgumentSchemaText,
         operation,
         pathType,
         query,
         queryArgument,
+        queryArgumentSchema,
         options,
         resultPaths,
         resultText,
@@ -210,6 +226,52 @@ export const testJson = `{
             "price": 399
         }
     }
+}`;
+
+export const testJsonSchema = `{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Store Schema",
+    "description": "Schema for a store containing books and a bicycle.",
+    "type": "object",
+    "properties": {
+        "store": {
+            "title": "Store",
+            "description": "The main store object containing books and a bicycle.",
+            "type": "object",
+            "properties": {
+                "books": {
+                    "title": "Books",
+                    "description": "A collection of books available in the store.",
+                    "type": "array",
+                    "items": {
+                        "title": "Book",
+                        "description": "Details of a single book.",
+                        "type": "object",
+                        "properties": {
+                            "category": { "title": "Category", "description": "The category of the book.", "type": "string" },
+                            "author": { "title": "Author", "description": "The author of the book.", "type": "string" },
+                            "title": { "title": "Title", "description": "The title of the book.", "type": "string" },
+                            "isbn": { "title": "ISBN", "description": "The ISBN identifier of the book.", "type": "string" },
+                            "price": { "title": "Price", "description": "The price of the book.", "type": "number" }
+                        },
+                        "required": ["category", "author", "title", "price"]
+                    }
+                },
+                "bicycle": {
+                    "title": "Bicycle",
+                    "description": "Details of a bicycle available in the store.",
+                    "type": "object",
+                    "properties": {
+                        "color": { "title": "Color", "description": "The color of the bicycle.", "type": "string" },
+                        "price": { "title": "Price", "description": "The price of the bicycle.", "type": "number" }
+                    },
+                    "required": ["color", "price"]
+                }
+            },
+            "required": ["books", "bicycle"]
+        }
+    },
+    "required": ["store"]
 }`;
 
 const testSettings: Settings = {
