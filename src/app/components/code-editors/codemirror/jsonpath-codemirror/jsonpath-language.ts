@@ -1,38 +1,43 @@
+import { JSONPathDiagnostics } from "@/jsonpath-tools/diagnostics";
 import { Language, LanguageSupport } from "@codemirror/language";
 import { linter } from "@codemirror/lint";
-import { jsonPathLanguageFacet, jsonPathParser } from "./jsonpath-parser";
-import { jsonPathConfigFacet, jsonPathPlugin } from "./jsonpath-state";
-import { jsonPathTooltip } from "./jsonpath-tooltip";
-import { jsonPathLintSource, jsonPathLintSourceNeedsRefresh } from "./jsonpath-lint-source";
-import { JSONPathDiagnostics } from "@/jsonpath-tools/diagnostics";
 import { jsonPathCompletionSource } from "./jsonpath-completion-source";
-import { LanguageServices } from "./worker/language-services";
+import { jsonPathDocumentHighlights } from "./jsonpath-document-highlights";
+import { jsonPathFormatKeyMap } from "./jsonpath-format";
+import { jsonPathLintSource, jsonPathLintSourceNeedsRefresh } from "./jsonpath-lint-source";
+import { jsonPathLanguageFacet, jsonPathParser } from "./jsonpath-parser";
+import { jsonPathSignatureHelp } from "./jsonpath-signature-help";
+import { jsonPathConfigFacet, jsonPathState } from "./jsonpath-state";
+import { jsonPathTooltip } from "./jsonpath-tooltip";
 import { LanguageService } from "./worker/language-service";
-import { signatureHelp } from "./jsonpath-signature-help";
-import { documentHighlights } from "./jsonpath-document-highlights";
-import { formatKeyMap } from "./jsonpath-formatting";
+import { LanguageServices } from "./worker/language-services";
 
 
 export const jsonPathLanguage = new Language(jsonPathLanguageFacet, jsonPathParser);
 
 export function jsonPath(options: {
     languageService?: LanguageService,
-    onDiagnosticsCreated?: (diagnostics: readonly JSONPathDiagnostics[]) => void 
+    onDiagnosticsCreated?: (diagnostics: readonly JSONPathDiagnostics[]) => void
 }): LanguageSupport {
     return new LanguageSupport(jsonPathLanguage, [
         jsonPathConfigFacet.of({
             languageService: options.languageService ?? LanguageServices.workerLanguageService
         }),
-        jsonPathPlugin,
-        linter(jsonPathLintSource({ onDiagnosticsCreated: options.onDiagnosticsCreated }), {
-            needsRefresh: jsonPathLintSourceNeedsRefresh
-        }),
+        jsonPathState(),
+        linter(
+            jsonPathLintSource({
+                onDiagnosticsCreated: options.onDiagnosticsCreated
+            }),
+            {
+                needsRefresh: jsonPathLintSourceNeedsRefresh
+            }
+        ),
         jsonPathLanguageFacet.of({
-            autocomplete: jsonPathCompletionSource
+            autocomplete: jsonPathCompletionSource()
         }),
-        jsonPathTooltip,
-        signatureHelp,
-        documentHighlights,
-        formatKeyMap
+        jsonPathTooltip(),
+        jsonPathSignatureHelp(),
+        jsonPathDocumentHighlights(),
+        jsonPathFormatKeyMap
     ]);
 }

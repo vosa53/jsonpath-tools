@@ -1,16 +1,25 @@
+import { Extension } from "@codemirror/state";
 import { Decoration, hoverTooltip } from "@codemirror/view";
 import { EditorView } from "codemirror";
 import { OperationCancelledError } from "./cancellation-token";
 import { languageServiceSessionStateField } from "./jsonpath-state";
 import { MarkdownRenderer } from "./markdown-renderer";
 
-const tooltip = hoverTooltip(async (view, pos, side) => {
+export function jsonPathTooltip(): Extension {
+    return [
+        jsonPathHoverTooltip,
+        jsonPathTooltipDecorations,
+        jsonPathTooltipBaseTheme
+    ];
+}
+
+const jsonPathHoverTooltip = hoverTooltip(async (view, pos, side) => {
     const languageServiceSession = view.state.field(languageServiceSessionStateField);
     try {
         const tooltip = await languageServiceSession.getTooltip(pos);
         if (tooltip === null)
             return null;
-        
+
         return {
             pos: tooltip.range.position,
             end: tooltip.range.position + tooltip.range.length,
@@ -27,14 +36,12 @@ const tooltip = hoverTooltip(async (view, pos, side) => {
     }
 });
 
-const hoveredRangeDecoration = Decoration.mark({ class: "cm-hovered-range" });
+const jsonPathTooltipRangeDecoration = Decoration.mark({ class: "cmjp-tooltip-range" });
 
-export const jsonPathTooltip = [
-    tooltip,
-    EditorView.baseTheme({
-        "& .cm-hovered-range": { background: "#ff922b30" /*background: "rgba(0, 0, 0, 0.07)", outline: "solid 2px lightgray"*/ }
-    }),
-    EditorView.decorations.from(tooltip.active, t => {
-        return Decoration.set(t.map(t => hoveredRangeDecoration.range(t.pos, t.end)));
-    }),
-];
+const jsonPathTooltipDecorations = EditorView.decorations.from(jsonPathHoverTooltip.active, t => {
+    return Decoration.set(t.map(t => jsonPathTooltipRangeDecoration.range(t.pos, t.end)));
+});
+
+const jsonPathTooltipBaseTheme = EditorView.baseTheme({
+    "& .cmjp-tooltip-range": { background: "orange" }
+});

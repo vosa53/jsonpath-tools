@@ -2,13 +2,20 @@ import { ensureSyntaxTree, syntaxTreeAvailable } from "@codemirror/language";
 import { Extension, Facet } from "@codemirror/state";
 import { EditorView, PluginValue, ViewPlugin, ViewUpdate } from "@codemirror/view";
 
+export function ensureParsed(config: EnsureParsedConfig): Extension {
+    return [
+        ensureParsedConfigFacet.of(config),
+        ViewPlugin.fromClass(EnsureParsedPlugin)
+    ]
+}
+
 export interface EnsureParsedConfig {
     onParsingProgressChanged: (inProgress: boolean) => void;
 }
 
-const configFacet = Facet.define<EnsureParsedConfig>();
+const ensureParsedConfigFacet = Facet.define<EnsureParsedConfig>();
 
-class JSONPathPlugin implements PluginValue {
+class EnsureParsedPlugin implements PluginValue {
     private parseTimeoutId: number | undefined = undefined;
 
     constructor(private readonly view: EditorView) {
@@ -47,7 +54,7 @@ class JSONPathPlugin implements PluginValue {
     }
 
     private report(inProgress: boolean) {
-        const configs = this.view.state.facet(configFacet);
+        const configs = this.view.state.facet(ensureParsedConfigFacet);
         for (const config of configs)
             config.onParsingProgressChanged(inProgress);
     }
@@ -65,11 +72,4 @@ class JSONPathPlugin implements PluginValue {
         }
         return (low + high) / 2;
     }*/
-}
-
-export function ensureParsed(config: EnsureParsedConfig): Extension {
-    return [
-        configFacet.of(config),
-        ViewPlugin.fromClass(JSONPathPlugin)
-    ]
 }

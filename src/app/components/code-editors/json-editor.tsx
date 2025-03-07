@@ -5,7 +5,7 @@ import { StateEffect } from "@codemirror/state";
 import { EditorView } from "codemirror";
 import { useEffect, useRef } from "react";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
-import { getNodeAtPath, matchHighlighter, updateCurrentPathHighlightEffect, updatePathsHighlightEffect } from "./path-highlighter";
+import { getNodeAtPath, pathsHighlighter, setCurrentHighlightedPathEffect, setHighlightedPathsEffect } from "./codemirror/paths-highlighter";
 import { EMPTY_ARRAY, logPerformance } from "@/jsonpath-tools/utils";
 import { ensureParsed } from "./codemirror/ensure-parsed";
 
@@ -28,13 +28,13 @@ export default function JSONEditor({
 
     useEffect(() => {
         if (editorViewRef.current !== null)
-            editorViewRef.current.dispatch({ effects: updatePathsHighlightEffect.of(paths) });
+            editorViewRef.current.dispatch({ effects: setHighlightedPathsEffect.of(paths) });
     }, [paths]);
 
     useEffect(() => {
         if (editorViewRef.current !== null) {
             logPerformance("Change current highlighted path", () => {
-                const effects: StateEffect<any>[] = [updateCurrentPathHighlightEffect.of(currentPath)];
+                const effects: StateEffect<any>[] = [setCurrentHighlightedPathEffect.of(currentPath)];
                 const node = getNodeAtPath(currentPath, editorViewRef.current!.state);
                 if (node !== null) effects.push(EditorView.scrollIntoView(node.from, { y: "center" }));
                 editorViewRef.current!.dispatch({ effects });
@@ -46,17 +46,13 @@ export default function JSONEditor({
         return [
             json(),
             linter(jsonParseLinter()), // TODO: Disable in readonly editor.
-            matchHighlighter,
-            EditorView.baseTheme({
-                "& .cm-path": { background: "#ffe06630" },
-                "& .cm-path-current": { background: "#ff922b30" }
-            }),
+            pathsHighlighter(),
             ensureParsed({ onParsingProgressChanged: (inProgress: boolean) => onParsingProgressChanged?.(inProgress) })
         ];
     };
 
     const onEditorViewCreated = (view: EditorView) => {
-        view.dispatch({ effects: [updatePathsHighlightEffect.of(paths), updateCurrentPathHighlightEffect.of(currentPath)] });
+        view.dispatch({ effects: [setHighlightedPathsEffect.of(paths), setCurrentHighlightedPathEffect.of(currentPath)] });
         editorViewRef.current = view;
     };
 

@@ -2,6 +2,13 @@ import { TextRange } from "@/jsonpath-tools/text-range";
 import { Extension, StateEffect, StateField } from "@codemirror/state";
 import { Decoration, DecorationSet, EditorView } from "@codemirror/view";
 
+export function rangeHighlighter(): Extension {
+    return [
+        highlightedRangeStateField,
+        rangeHighlighterBaseTheme
+    ];
+}
+
 export const setHighlightedRangeEffect = StateEffect.define<TextRange | null>({
     map: (textRange, change) => {
         if (textRange === null) return null;
@@ -32,6 +39,8 @@ const highlightedRangeStateField = StateField.define<DecorationSet>({
     provide: f => EditorView.decorations.from(f)
 })
 
-const highlightedRangeDecoration = Decoration.mark({ class: "cm-highlighted" });
+const highlightedRangeDecoration = Decoration.mark({ class: "cmjpp-highlighted-range" });
 
-export const highlightRange: Extension = [highlightedRangeStateField];
+const rangeHighlighterBaseTheme = EditorView.baseTheme({
+    "& .cmjpp-highlighted-range": { background: "orange" }
+});

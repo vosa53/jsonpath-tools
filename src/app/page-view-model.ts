@@ -141,7 +141,7 @@ export function usePageViewModel() {
     }, []);
 
     useEffect(() => {
-        /*if (getResultRef.current === null) return;
+        if (getResultRef.current === null) return;
         if (resultTimeoutRef.current !== null) window.clearTimeout(resultTimeoutRef.current);
         resultTimeoutRef.current = window.setTimeout(async () => {
             try {
@@ -153,7 +153,7 @@ export function usePageViewModel() {
             catch (error) {
                 if (!(error instanceof OperationCancelledError)) throw error;
             }
-        }, 500);*/
+        }, 500);
     }, [queryText, queryArgument, getResultRef.current]);
 
     return {

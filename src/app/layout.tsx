@@ -2,7 +2,7 @@ import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from "@mantine/c
 import "@mantine/core/styles.css";
 import type { Metadata } from "next";
 import "./styles/globals.css";
-import { applicationTheme } from "./theme";
+import { applicationTheme, applicationCSSVariablesResolver } from "./theme";
 
 export const metadata: Metadata = {
     title: "JSONPath Playground",
@@ -22,6 +22,7 @@ export default function RootLayout({
             <body>
                 <MantineProvider
                     theme={applicationTheme}
+                    cssVariablesResolver={applicationCSSVariablesResolver}
                     defaultColorScheme="auto">
                     {children}
                 </MantineProvider>

@@ -4,6 +4,13 @@ import { EditorView, showTooltip, ViewPlugin, ViewUpdate } from "@codemirror/vie
 import { OperationCancelledError } from "./cancellation-token";
 import { languageServiceSessionStateField } from "./jsonpath-state";
 
+export function jsonPathSignatureHelp(): Extension {
+    return [
+        signatureHelpPlugin,
+        signatureHelpBaseTheme
+    ];
+}
+
 const setSignatureEffect = StateEffect.define<Signature | null>();
 
 const signatureStateField = StateField.define<Signature | null>({
@@ -12,9 +19,9 @@ const signatureStateField = StateField.define<Signature | null>({
     },
 
     update(signature, transaction) {
-        for (const effectq of transaction.effects) {
-            if (effectq.is(setSignatureEffect))
-                return effectq.value;
+        for (const effect of transaction.effects) {
+            if (effect.is(setSignatureEffect))
+                return effect.value;
         }
         return signature;
     },
@@ -84,12 +91,12 @@ function createElementForSignature(signature: Signature): HTMLElement {
         const beforeActiveParameterElement = document.createElement("span");
         beforeActiveParameterElement.textContent = signature.text.substring(0, activeParameter.rangeInSignatureText.position);
         signatureElement.appendChild(beforeActiveParameterElement);
-        
+
         const activeParameterElement = document.createElement("span");
         activeParameterElement.classList.add("cmjp-activeParameter");
         activeParameterElement.textContent = signature.text.substring(activeParameter.rangeInSignatureText.position, activeParameter.rangeInSignatureText.position + activeParameter.rangeInSignatureText.length);
         signatureElement.appendChild(activeParameterElement);
-        
+
         const afterActiveParameterElement = document.createElement("span");
         afterActiveParameterElement.textContent = signature.text.substring(activeParameter.rangeInSignatureText.position + activeParameter.rangeInSignatureText.length);
         signatureElement.appendChild(afterActiveParameterElement);
@@ -106,5 +113,3 @@ function createElementForSignature(signature: Signature): HTMLElement {
 const signatureHelpBaseTheme = EditorView.baseTheme({
     "& .cmjp-activeParameter": { textDecoration: "underline" }
 });
-
-export const signatureHelp: Extension = [signatureHelpPlugin, signatureHelpBaseTheme];

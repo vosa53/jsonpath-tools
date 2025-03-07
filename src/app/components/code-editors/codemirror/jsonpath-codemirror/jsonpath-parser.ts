@@ -3,14 +3,10 @@ import { JSONPathNode } from "@/jsonpath-tools/query/node";
 import { JSONPathSyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "@/jsonpath-tools/query/syntax-tree-type";
 import { JSONPathToken } from "@/jsonpath-tools/query/token";
-import { defineLanguageFacet, languageDataProp } from "@codemirror/language";
+import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
+import { continuedIndent, defineLanguageFacet, delimitedIndent, foldInside, foldNodeProp, indentNodeProp, languageDataProp } from "@codemirror/language";
 import { Input, NodeProp, NodeSet, NodeType, Parser, PartialParse, Tree, TreeFragment } from "@lezer/common";
 import { styleTags, tags as t } from "@lezer/highlight";
-import {continuedIndent, delimitedIndent, indentNodeProp, foldNodeProp, foldInside, LRLanguage, LanguageSupport} from "@codemirror/language"
-import { jsonPathCompletionSource } from "./jsonpath-completion-source";
-import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
-
-const treeToJSONPath = new WeakMap<Tree, JSONPath>();
 
 export function getJSONPath(tree: Tree): JSONPath {
     const jsonPath = treeToJSONPath.get(tree);
@@ -18,6 +14,8 @@ export function getJSONPath(tree: Tree): JSONPath {
         throw new Error("The given Lezer tree does not have a corresponding JSONPath.");
     return jsonPath;
 }
+
+const treeToJSONPath = new WeakMap<Tree, JSONPath>();
 
 function createNodeSet(types: JSONPathSyntaxTreeType[]): { nodeSet: NodeSet, treeTypeToNodeId: Map<JSONPathSyntaxTreeType, number> } {
     const treeTypeToNodeId = new Map<JSONPathSyntaxTreeType, number>();

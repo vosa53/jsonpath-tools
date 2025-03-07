@@ -1,8 +1,8 @@
+import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "@/jsonpath-tools/diagnostics";
 import { LintSource } from "@codemirror/lint";
 import { ViewUpdate } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";
-import { updateOptionsEffect, updateQueryArgumentEffect, languageServiceSessionStateField } from "./jsonpath-state";
-import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "@/jsonpath-tools/diagnostics";
+import { languageServiceSessionStateField, updateOptionsEffect, updateQueryArgumentEffect } from "./jsonpath-state";
 
 
 export function jsonPathLintSource(options: { onDiagnosticsCreated?: (diagnostics: readonly JSONPathDiagnostics[]) => void } = {}): LintSource {

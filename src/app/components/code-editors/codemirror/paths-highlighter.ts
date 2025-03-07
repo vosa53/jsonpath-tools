@@ -1,17 +1,79 @@
 import { JSONPathNormalizedPath } from "@/jsonpath-tools/transformations";
 import { logPerformance } from "@/jsonpath-tools/utils";
 import { syntaxTree } from "@codemirror/language";
-import { EditorState, Range, StateEffect, StateField, Text } from "@codemirror/state";
+import { EditorState, Extension, Range, StateEffect, StateField, Text } from "@codemirror/state";
 import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { SyntaxNode, TreeCursor } from "@lezer/common";
 
+export function pathsHighlighter(): Extension {
+    return [
+        pathsHighlighterPlugin,
+        pathsHighlighterBaseTheme
+    ];
+}
+
+export const setCurrentHighlightedPathEffect = StateEffect.define<JSONPathNormalizedPath>();
+export const setHighlightedPathsEffect = StateEffect.define<readonly JSONPathNormalizedPath[]>();
+
+export function getPathAtTreeCursor(cursor: TreeCursor, state: EditorState): JSONPathNormalizedPath {
+    const path: (string | number)[] = [];
+
+    while (!valueNodeNames.has(cursor.name) && cursor.parent());
+
+    do {
+        if (cursor.name === "Property") {
+            cursor.firstChild();
+            const nameString = state.doc.sliceString(cursor.from, cursor.to);
+            const name = JSON.parse(nameString); // TODO: Invalid property name.
+            path.push(name);
+            cursor.parent();
+        }
+        if (cursor.matchContext(inArrayContext)) {
+            const index = getArrayIndexAtTreeCursor(cursor, state);
+            path.push(index);
+        }
+    } while (cursor.parent());
+    path.reverse();
+    return path;
+}
+
+export function getNodeAtPath(path: JSONPathNormalizedPath, state: EditorState): SyntaxNode | null {
+    const cursor = syntaxTree(state).cursor();
+    cursor.firstChild();
+    for (const pathSegment of path) {
+        if (cursor.name === "Object" && typeof pathSegment === "string") {
+            cursor.firstChild();
+            while (!isPropertyWithNameAtTreeCursor(cursor, state.doc, pathSegment)) {
+                if (!cursor.nextSibling()) return null;
+            }
+            cursor.firstChild();
+            while (!valueNodeNames.has(cursor.name)) {
+                if (!cursor.nextSibling()) return null;
+            }
+        }
+        else if (cursor.name === "Array" && typeof pathSegment === "number") {
+            cursor.firstChild();
+            let index = -1;
+            while (true) {
+                if (valueNodeNames.has(cursor.name)) index++;
+                if (index < pathSegment) {
+                    if (!cursor.nextSibling()) return null;
+                }
+                else break;
+            }
+        }
+        else return null;
+    }
+    return cursor.node;
+}
+
 const valueNodeNames = new Set(["True", "False", "Null", "Number", "String", "Object", "Array"]);
-const arrayContext = ["Array"];
+const inArrayContext = ["Array"];
 
-const currentPathDecoration = Decoration.mark({ class: "cm-path-current" });
-const pathDecoration = Decoration.mark({ class: "cm-path" });
+const currentHighlightedPathDecoration = Decoration.mark({ class: "cmjpp-highlighted-path-current" });
+const highlightedPathDecoration = Decoration.mark({ class: "cmjpp-highlighted-path" });
 
-export const arrayIndexCacheStateField = StateField.define<Map<number, number>>({
+const arrayIndexCacheStateField = StateField.define<Map<number, number>>({
     create: state => new Map(),
     update: (value, transaction) => {
         if (transaction.docChanged) value.clear();
@@ -19,10 +81,7 @@ export const arrayIndexCacheStateField = StateField.define<Map<number, number>>(
     }
 });
 
-export const updateCurrentPathHighlightEffect = StateEffect.define<JSONPathNormalizedPath>();
-export const updatePathsHighlightEffect = StateEffect.define<readonly JSONPathNormalizedPath[]>();
-
-export const matchHighlighter = ViewPlugin.fromClass(class {
+const pathsHighlighterPlugin = ViewPlugin.fromClass(class {
     private _decorationSet: DecorationSet;
     private serializedPaths: Set<string> = new Set<string>();
     private serializedCurrentPath = "[]";
@@ -39,13 +98,13 @@ export const matchHighlighter = ViewPlugin.fromClass(class {
         let pathsUpdated = false;
         for (const transaction of update.transactions) {
             for (const effect of transaction.effects) {
-                if (effect.is(updatePathsHighlightEffect)) {
+                if (effect.is(setHighlightedPathsEffect)) {
                     logPerformance("Serialize result paths for highlighting", () => {
                         this.serializedPaths = new Set(effect.value.map(p => JSON.stringify(p)));
                         pathsUpdated = true;
                     });
                 }
-                if (effect.is(updateCurrentPathHighlightEffect)) {
+                if (effect.is(setCurrentHighlightedPathEffect)) {
                     this.serializedCurrentPath = JSON.stringify(effect.value);
                     pathsUpdated = true;
                 }
@@ -68,15 +127,14 @@ export const matchHighlighter = ViewPlugin.fromClass(class {
                     to: visibleRange.to,
                     enter: (node) => {
                         if (path.length !== 0 && path[path.length - 1] === -1)
-                            path[path.length - 1] = getArrayIndexAtCursor(node.node.cursor(), view.state);
+                            path[path.length - 1] = getArrayIndexAtTreeCursor(node.node.cursor(), view.state);
 
                         if (valueNodeNames.has(node.name)) {
                             const pathString = JSON.stringify(path);
-                            //console.log(node.name, pathString);
                             if (this.serializedCurrentPath === pathString)
-                                decorations.push(currentPathDecoration.range(node.from, node.to));
+                                decorations.push(currentHighlightedPathDecoration.range(node.from, node.to));
                             else if (this.serializedPaths.has(pathString))
-                                decorations.push(pathDecoration.range(node.from, node.to));
+                                decorations.push(highlightedPathDecoration.range(node.from, node.to));
                         }
 
                         if (node.name === "Property") {
@@ -87,7 +145,7 @@ export const matchHighlighter = ViewPlugin.fromClass(class {
                         else if (node.name === "Array") path.push(-1);
                     },
                     leave: (node) => {
-                        if (valueNodeNames.has(node.name) && node.matchContext(arrayContext)) (path[path.length - 1] as number)++;
+                        if (valueNodeNames.has(node.name) && node.matchContext(inArrayContext)) (path[path.length - 1] as number)++;
 
                         if (node.name === "Property") path.pop();
                         else if (node.name === "Array") path.pop();
@@ -103,7 +161,7 @@ export const matchHighlighter = ViewPlugin.fromClass(class {
     provide: v => arrayIndexCacheStateField
 });
 
-function getArrayIndexAtCursor(cursor: TreeCursor, state: EditorState): number {
+function getArrayIndexAtTreeCursor(cursor: TreeCursor, state: EditorState): number {
     const arrayIndexCache = state.field(arrayIndexCacheStateField);
     const startingPosition = cursor.from;
     let index = 0;
@@ -131,59 +189,7 @@ function getArrayIndexAtCursor(cursor: TreeCursor, state: EditorState): number {
     return index;
 }
 
-export function getPathAtCursor(cursor: TreeCursor, state: EditorState): JSONPathNormalizedPath {
-    const path: (string | number)[] = [];
-
-    while (!valueNodeNames.has(cursor.name) && cursor.parent());
-
-    do {
-        if (cursor.name === "Property") {
-            cursor.firstChild();
-            const nameString = state.doc.sliceString(cursor.from, cursor.to);
-            const name = JSON.parse(nameString); // TODO: Invalid property name.
-            path.push(name);
-            cursor.parent();
-        }
-        if (cursor.matchContext(arrayContext)) {
-            const index = getArrayIndexAtCursor(cursor, state);
-            path.push(index);
-        }
-    } while (cursor.parent());
-    path.reverse();
-    return path;
-}
-
-export function getNodeAtPath(path: JSONPathNormalizedPath, state: EditorState): SyntaxNode | null {
-    const cursor = syntaxTree(state).cursor();
-    cursor.firstChild();
-    for (const pathSegment of path) {
-        if (cursor.name === "Object" && typeof pathSegment === "string") {
-            cursor.firstChild();
-            while (!isPropertyWithName(cursor, state.doc, pathSegment)) {
-                if (!cursor.nextSibling()) return null;
-            }
-            cursor.firstChild();
-            while (!valueNodeNames.has(cursor.name)) {
-                if (!cursor.nextSibling()) return null;
-            }
-        }
-        else if (cursor.name === "Array" && typeof pathSegment === "number") {
-            cursor.firstChild();
-            let index = -1;
-            while (true) {
-                if (valueNodeNames.has(cursor.name)) index++;
-                if (index < pathSegment) {
-                    if (!cursor.nextSibling()) return null;
-                }
-                else break;
-            }
-        }
-        else return null;
-    }
-    return cursor.node;
-}
-
-function isPropertyWithName(cursor: TreeCursor, document: Text, name: string): boolean {
+function isPropertyWithNameAtTreeCursor(cursor: TreeCursor, document: Text, name: string): boolean {
     if (cursor.name !== "Property") return false;
     cursor.firstChild();
     // @ts-ignore
@@ -196,3 +202,8 @@ function isPropertyWithName(cursor: TreeCursor, document: Text, name: string): b
     cursor.parent();
     return foundName === name;
 }
+
+const pathsHighlighterBaseTheme = EditorView.baseTheme({
+    "& .cmjpp-highlighted-path": { background: "yellow" },
+    "& .cmjpp-highlighted-path-current": { background: "orange" }
+});

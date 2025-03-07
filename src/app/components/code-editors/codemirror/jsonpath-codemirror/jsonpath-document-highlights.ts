@@ -4,9 +4,16 @@ import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate } from "@
 import { OperationCancelledError } from "./cancellation-token";
 import { languageServiceSessionStateField } from "./jsonpath-state";
 
-const setHighlightsEffect = StateEffect.define<DecorationSet>();
+export function jsonPathDocumentHighlights(): Extension {
+    return [
+        documentsHighlightsPlugin,
+        documentHighlightsBaseTheme
+    ];
+}
 
-const documentHighlightDecoration = Decoration.mark({ class: "cm-document-highlight" });
+const setDocumentHighlightsEffect = StateEffect.define<DecorationSet>();
+
+const documentHighlightDecoration = Decoration.mark({ class: "cmjp-document-highlight" });
 
 const documentHighlightsStateField = StateField.define<DecorationSet>({
     create(state) {
@@ -15,7 +22,7 @@ const documentHighlightsStateField = StateField.define<DecorationSet>({
 
     update(documentHighlights, transaction) {
         for (const effect of transaction.effects) {
-            if (effect.is(setHighlightsEffect))
+            if (effect.is(setDocumentHighlightsEffect))
                 return effect.value;
         }
 
@@ -49,7 +56,7 @@ const documentsHighlightsPlugin = ViewPlugin.fromClass(class {
         try {
             const documentHighlights = await languageServiceSession.getDocumentHighlights(state.selection.main.head);
             const decorations = this.createDecorations(documentHighlights);
-            this.view.dispatch({ effects: setHighlightsEffect.of(decorations) });
+            this.view.dispatch({ effects: setDocumentHighlightsEffect.of(decorations) });
         }
         catch (error) {
             if (!(error instanceof OperationCancelledError))
@@ -72,7 +79,5 @@ const documentsHighlightsPlugin = ViewPlugin.fromClass(class {
 });
 
 const documentHighlightsBaseTheme = EditorView.baseTheme({
-    "& .cm-document-highlight": { background: "#328c8252" }
+    "& .cmjp-document-highlight": { background: "#328c8252" }
 });
-
-export const documentHighlights: Extension = [documentsHighlightsPlugin, documentHighlightsBaseTheme];
