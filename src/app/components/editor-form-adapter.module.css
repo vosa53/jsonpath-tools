@@ -1,0 +1,8 @@
+.input {
+    
+}
+
+[data-mantine-color-scheme="dark"] .input {
+    --application-color-code-background: var(--mantine-color-dark-6);
+    background: var(--application-color-code-background);
+}

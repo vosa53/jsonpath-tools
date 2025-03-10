@@ -30,6 +30,7 @@ export const applicationCSSVariablesResolver: CSSVariablesResolver = (theme) => 
     light: {
         "--application-color-text-selection": alpha(theme.colors.violet[6], 0.2),
         "--application-color-code-block": theme.colors.gray[1],
+        "--application-color-code-background": "var(--mantine-color-body)",
         "--application-color-code-highlighted": alpha(theme.colors.yellow[3], 0.2),
         "--application-color-code-highlighted-current": alpha(theme.colors.yellow[9], 0.2),
         "--application-color-code-highlighted-match": "#4dabf740"
@@ -37,6 +38,7 @@ export const applicationCSSVariablesResolver: CSSVariablesResolver = (theme) => 
     dark: {
         "--application-color-text-selection": alpha(theme.colors.violet[4], 0.3),
         "--application-color-code-block": theme.colors.gray[8],
+        "--application-color-code-background": "var(--mantine-color-body)",
         "--application-color-code-highlighted": alpha(theme.colors.yellow[9], 0.2),
         "--application-color-code-highlighted-current": alpha(theme.colors.yellow[3], 0.3),
         "--application-color-code-highlighted-match": "#d0ebff40"

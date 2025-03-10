@@ -1,13 +1,13 @@
 import { EditorView } from "codemirror";
 
 export const theme = EditorView.theme({
-    "&": { background: "var(--mantine-color-body)", color: "var(--mantine-color-text)", height: "100%", fontSize: "14px" },
+    "&": { background: "var(--application-color-code-background)", color: "var(--mantine-color-text)", height: "100%", fontSize: "14px" },
     "&.cm-focused": { outline: "none" },
     "& .cm-content": { fontFamily: "var(--mantine-font-family-monospace)", paddingLeft: "2px", paddingRight: "2px" },
 
     // Lines.
     "& .cm-activeLine": { backgroundColor: "transparent", outline: "2px solid var(--mantine-color-default-hover)" },
-    "& .cm-gutters": { fontFamily: "var(--mantine-font-family-monospace)", backgroundColor: "var(--mantine-color-body)", borderRight: "none", padding: "0 5px 0 5px" },
+    "& .cm-gutters": { fontFamily: "var(--mantine-font-family-monospace)", backgroundColor: "var(--application-color-code-background)", borderRight: "none", padding: "0 5px 0 5px" },
     "& .cm-lineNumbers .cm-gutterElement": { color: "var(--mantine-color-dimmed)" },
     "& .cm-lineNumbers .cm-gutterElement.cm-activeLineGutter": { color: "var(--mantine-color-text)" },
     "& .cm-gutterElement.cm-activeLineGutter": { backgroundColor: "transparent" },

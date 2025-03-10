@@ -1,6 +1,7 @@
-import { Input, Paper } from "@mantine/core";
+import { Input, InputWrapper, Paper } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
 import { CSSProperties, FocusEvent, ReactNode } from "react";
+import classes from "./editor-form-adapter.module.css";
 
 export function EditorFormAdapter({
     editor,
@@ -31,10 +32,10 @@ export function EditorFormAdapter({
     });
 
     return (
-        <Input.Wrapper label={label} error={error} style={style}>
-            <Paper withBorder p="3px 0" style={{ maxHeight: "200px", overflow: "auto" }}>
+        <InputWrapper label={label} error={error} style={style}>
+            <Paper withBorder p="3px 0" className={classes.input}>
                 {editor(_value, handleChange)}
             </Paper>
-        </Input.Wrapper>
+        </InputWrapper>
     );
 }
