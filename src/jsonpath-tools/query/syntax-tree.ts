@@ -8,6 +8,9 @@ export abstract class JSONPathSyntaxTree {
         readonly length: number
     ) { }
 
+    // TODO
+    parent!: JSONPathNode;
+
     abstract readonly type: JSONPathSyntaxTreeType;
     abstract readonly skippedTextBefore: string;
 

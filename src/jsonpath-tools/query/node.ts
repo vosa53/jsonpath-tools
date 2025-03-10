@@ -13,6 +13,8 @@ export abstract class JSONPathNode extends JSONPathSyntaxTree {
             throw new Error("Expected at least one non null child.");
         super(notNullChildren[0].position, notNullChildren.reduce((p, c) => p + c.length, 0));
         this.children = notNullChildren;
+        for (const child of this.children)
+            child.parent = this;
     }
 
     get skippedTextBefore(): string {
