@@ -1,37 +1,44 @@
+import { JSONPathNothing } from "@/jsonpath-tools/types";
 import { JSONPathNormalizedPath } from "../../transformations";
+
+export enum TypeUsageContext {
+    expression,
+    query
+}
 
 export abstract class Type {
     abstract getChildrenType(): Type;
-    abstract getTypeAtProperty(propertyName: string): Type;
-    abstract getTypeAtIndex(index: number): Type;
-    abstract simplify(): Type;
+    abstract getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type;
 
-    getTypeAtPath(path: JSONPathNormalizedPath): Type {
+    getTypeAtPath(path: JSONPathNormalizedPath, usageContext: TypeUsageContext): Type {
         let current = this as Type;
         for (const pathSegment of path) {
-            if (typeof pathSegment === "string")
-                current = current.getTypeAtProperty(pathSegment);
-            else
-                current = current.getTypeAtIndex(pathSegment);
+            current = current.getTypeAtPathSegment(pathSegment, usageContext);
         }
         return current;
     }
 
-    abstract setTypeAtPath(path: JSONPathNormalizedPath, type: Type): Type;
+    abstract changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: Type) => Type): Type;
+    abstract setPathExistence(path: JSONPathNormalizedPath): Type;
 }
 
 export enum PrimitiveTypeType {
     number = "number",
     string = "string",
     boolean = "boolean",
-    null = "null"
+    null = "null",
+    nothing = "nothing"
 }
 
 export class LiteralType extends Type {
-    constructor(
+    private constructor(
         readonly value: string | number | boolean
     ) {
         super();
+    }
+
+    static create(value: string | number | boolean): LiteralType {
+        return new LiteralType(value);
     }
 
     get type(): PrimitiveTypeType {
@@ -42,103 +49,100 @@ export class LiteralType extends Type {
         else if (typeof this.value === "boolean")
             return PrimitiveTypeType.boolean;
         else
-            return PrimitiveTypeType.null;
+            throw new Error("Unknown literal type.");
     }
 
     getChildrenType(): Type {
-        return NeverType.instance;
+        return NeverType.create();
     }
 
-    getTypeAtProperty(propertyName: string): Type {
-        return NeverType.instance;
-    }
-
-    getTypeAtIndex(index: number): Type {
-        return NeverType.instance;
-    }
-
-    simplify(): Type {
-        return this;
+    getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
+        if (usageContext === TypeUsageContext.query)
+            return NeverType.create();
+        else
+            return PrimitiveType.create(PrimitiveTypeType.nothing);
     }
 
     toString(): string {
         return JSON.stringify(this.value);
     }
 
-    setTypeAtPath(path: JSONPathNormalizedPath, type: Type): Type {
-        if (path.length === 0) return type;
-        else return this;
+    changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: Type) => Type): Type {
+        return path.length === 0 ? operation(this) : this;
+    }
+
+    setPathExistence(path: JSONPathNormalizedPath): Type {
+        return path.length === 0 ? this : NeverType.create();
     }
 }
 
 export class PrimitiveType extends Type {
-    constructor(
+    private constructor(
         readonly type: PrimitiveTypeType
     ) {
         super();
     }
 
+    static create(type: PrimitiveTypeType): PrimitiveType {
+        return new PrimitiveType(type);
+    }
+
     getChildrenType(): Type {
-        return NeverType.instance;
+        return NeverType.create();
     }
 
-    getTypeAtProperty(propertyName: string): Type {
-        return NeverType.instance;
-    }
-
-    getTypeAtIndex(index: number): Type {
-        return NeverType.instance;
-    }
-
-    simplify(): Type {
-        return this;
+    getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
+        if (usageContext === TypeUsageContext.query)
+            return NeverType.create();
+        else
+            return PrimitiveType.create(PrimitiveTypeType.nothing);
     }
 
     toString(): string {
         return this.type;
     }
 
-    setTypeAtPath(path: JSONPathNormalizedPath, type: Type): Type {
-        if (path.length === 0) return type;
-        else return this;
+    changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: Type) => Type): Type {
+        return path.length === 0 ? operation(this) : this;
     }
-} 
+
+    setPathExistence(path: JSONPathNormalizedPath): Type {
+        return path.length === 0 ? this : NeverType.create();
+    }
+}
 
 export class ObjectType extends Type {
-    constructor(
-        readonly propertyTypes: Map<string, Type>,
+    private constructor(
+        readonly propertyTypes: ReadonlyMap<string, Type>,
         readonly restPropertyType: Type,
-        readonly requiredProperties: Set<string>
+        readonly requiredProperties: ReadonlySet<string>
     ) {
         super();
     }
 
+    static create(propertyTypes: ReadonlyMap<string, Type>, restPropertyType: Type, requiredProperties: ReadonlySet<string>): ObjectType | NeverType {
+        const isSomeRequiredPropertyNever = propertyTypes.entries().some(([name, type]) => type instanceof NeverType && requiredProperties.has(name));
+        if (isSomeRequiredPropertyNever)
+            return NeverType.create();
+
+        return new ObjectType(propertyTypes, restPropertyType, requiredProperties);
+    }
+
     getChildrenType(): Type {
-        return new UnionType([...this.propertyTypes.values(), this.restPropertyType]).simplify();
+        return UnionType.create([...this.propertyTypes.values(), this.restPropertyType]);
     }
 
-    getTypeAtProperty(propertyName: string): Type {
-        const propertyType = this.propertyTypes.get(propertyName);
-        if (propertyType !== undefined)
-            return propertyType;
-        else
-            return this.restPropertyType;
-    }
+    getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
+        if (typeof segment === "number")
+            return usageContext === TypeUsageContext.query ? NeverType.create() : PrimitiveType.create(PrimitiveTypeType.nothing);
+        
+        let type = this.propertyTypes.get(segment);
+        if (type === undefined)
+            type = this.restPropertyType;
 
-    getTypeAtIndex(index: number): Type {
-        return NeverType.instance;
-    }
-
-    simplify(): Type {
-        const simplifiedPropertyTypes = new Map<string, Type>();
-        const simplifiedRestPropertyType = this.restPropertyType.simplify();
-        for (const [propertyName, propertyType] of this.propertyTypes) {
-            const simplifiedPropertyType = propertyType.simplify();
-            simplifiedPropertyTypes.set(propertyName, simplifiedPropertyType);
-            if (simplifiedPropertyType instanceof NeverType && this.requiredProperties.has(propertyName))
-                return NeverType.instance;
-        }
-        return new ObjectType(simplifiedPropertyTypes, simplifiedRestPropertyType, this.requiredProperties);
+        if (!this.requiredProperties.has(segment) && usageContext === TypeUsageContext.expression)
+            type = UnionType.create([type, PrimitiveType.create(PrimitiveTypeType.nothing)]);
+        return type;
     }
 
     toString(): string {
@@ -146,196 +150,213 @@ export class ObjectType extends Type {
         return `{${propertyTypeStrings.join(", ")}, ...: ${this.restPropertyType}}`;
     }
 
-    setTypeAtPath(path: JSONPathNormalizedPath, type: Type): Type {
+    changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: Type) => Type): Type {
+        if (path.length === 0)
+            return operation(this)
         if (typeof path[0] === "number" || !this.propertyTypes.has(path[0]))
             return this;
-
+        
         const newPropertyTypes = new Map(this.propertyTypes);
-        newPropertyTypes.set(path[0], newPropertyTypes.get(path[0])!.setTypeAtPath(path.slice(1), type));
-        return new ObjectType(newPropertyTypes, this.restPropertyType, this.requiredProperties).simplify();
+        newPropertyTypes.set(path[0], newPropertyTypes.get(path[0])!.changeTypeAtPath(path.slice(1), operation));
+        return ObjectType.create(newPropertyTypes, this.restPropertyType, this.requiredProperties);
+    }
+
+    setPathExistence(path: JSONPathNormalizedPath): Type {
+        if (path.length === 0)
+            return this;
+        if (typeof path[0] === "number")
+            return NeverType.create();
+        const newRequiredProperties = new Set(this.requiredProperties);
+        newRequiredProperties.add(path[0]);
+        return ObjectType.create(this.propertyTypes, this.restPropertyType, newRequiredProperties);
     }
 }
 
 export class ArrayType extends Type {
-    constructor(
-        readonly prefixElementTypes: Type[],
-        readonly restElementType: Type
+    private constructor(
+        readonly prefixElementTypes: readonly Type[],
+        readonly restElementType: Type,
+        readonly requiredElementCount: number
     ) {
         super();
     }
 
+    static create(prefixElementTypes: readonly Type[], restElementType: Type, requiredElementCount: number): ArrayType | NeverType {
+        const isSomeRequiredElementNever = prefixElementTypes.some((type, i) => type instanceof NeverType && i < requiredElementCount);
+        if (isSomeRequiredElementNever)
+            return NeverType.create();
+        return new ArrayType(prefixElementTypes, restElementType, requiredElementCount);
+    }
+
     getChildrenType(): Type {
-        return new UnionType([...this.prefixElementTypes, this.restElementType]).simplify();
+        return UnionType.create([...this.prefixElementTypes, this.restElementType]);
     }
 
-    getTypeAtProperty(propertyName: string): Type {
-        return NeverType.instance;
-    }
-
-    getTypeAtIndex(index: number): Type {
-        if (index < this.prefixElementTypes.length)
-            return this.prefixElementTypes[index];
+    getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
+        if (typeof segment === "string")
+            return usageContext === TypeUsageContext.query ? NeverType.create() : PrimitiveType.create(PrimitiveTypeType.nothing);
+        
+        let type;
+        if (segment < this.prefixElementTypes.length)
+            type = this.prefixElementTypes[segment];
         else
-            return this.restElementType;
-    }
-
-    simplify(): Type {
-        const simplifiedPrefixElementTypes = this.prefixElementTypes.map(type => type.simplify());
-        if (simplifiedPrefixElementTypes.some(spet => spet instanceof NeverType))
-            return NeverType.instance;
-        const simplifiedRestElementType = this.restElementType.simplify();
-        return new ArrayType(simplifiedPrefixElementTypes, simplifiedRestElementType);
+            type = this.restElementType;
+        if (segment >= this.requiredElementCount && usageContext === TypeUsageContext.expression)
+            type = UnionType.create([type, PrimitiveType.create(PrimitiveTypeType.nothing)]);
+        return type;
     }
 
     toString(): string {
         return `[${this.prefixElementTypes.join(", ")}, ...: ${this.restElementType}]`;
     }
 
-    setTypeAtPath(path: JSONPathNormalizedPath, type: Type): Type {
+    changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: Type) => Type): Type {
+        if (path.length === 0)
+            return operation(this);
         if (typeof path[0] === "string" || path[0] >= this.prefixElementTypes.length)
             return this;
 
         const newPrefixElementTypes = [...this.prefixElementTypes];
-        newPrefixElementTypes[path[0]] = newPrefixElementTypes[path[0]].setTypeAtPath(path.slice(1), type);
-        return new ArrayType(newPrefixElementTypes, this.restElementType).simplify();
+        newPrefixElementTypes[path[0]] = newPrefixElementTypes[path[0]].changeTypeAtPath(path.slice(1), operation);
+        return ArrayType.create(newPrefixElementTypes, this.restElementType, this.requiredElementCount);
+    }
+
+    setPathExistence(path: JSONPathNormalizedPath): Type {
+        if (path.length === 0)
+            return this;
+        if (typeof path[0] === "string")
+            return NeverType.create();
+        const newRequiredElementCount = Math.max(this.requiredElementCount, path[0] + 1);
+        return ArrayType.create(this.prefixElementTypes, this.restElementType, newRequiredElementCount);
     }
 }
 
 export class UnionType extends Type {
-    constructor(
-        readonly types: Type[]
+    private constructor(
+        readonly types: readonly Type[]
     ) {
         super();
     }
 
-    getChildrenType(): Type {
-        const childrenTypes = this.types.map(type => type.getChildrenType());
-        return new UnionType(childrenTypes).simplify();
-    }
-
-    getTypeAtProperty(propertyName: string): Type {
-        const propertyTypes = this.types.map(type => type.getTypeAtProperty(propertyName));
-        return new UnionType(propertyTypes).simplify();
-    }
-
-    getTypeAtIndex(index: number): Type {
-        const indexTypes = this.types.map(type => type.getTypeAtIndex(index));
-        return new UnionType(indexTypes).simplify();
-    }
-
-    simplify(): Type {
-        const simplifiedTypes = this.types.map(type => type.simplify());
-        const flattenedSimplifiedTypes = simplifiedTypes.flatMap(type => {
+    static create(types: readonly Type[]): Type {
+        const flattenedTypes = types.flatMap(type => {
             if (type instanceof UnionType)
                 return type.types;
             else
                 return [type];
         });
-        for (let i = 0; i < flattenedSimplifiedTypes.length; i++) {
-            for (let j = 0; j < flattenedSimplifiedTypes.length; j++) {
+        for (let i = 0; i < flattenedTypes.length; i++) {
+            for (let j = 0; j < flattenedTypes.length; j++) {
                 if (i == j) continue;
-                const typeA = flattenedSimplifiedTypes[i];
-                const typeB = flattenedSimplifiedTypes[j];
+                const typeA = flattenedTypes[i];
+                const typeB = flattenedTypes[j];
                 if (isSubtypeOf(typeA, typeB))
-                    flattenedSimplifiedTypes[i] = NeverType.instance;
+                    flattenedTypes[i] = NeverType.create();
             }
         }
-        const filteredFlattenedSimplifiedTypes = flattenedSimplifiedTypes.filter(type => !(type instanceof NeverType));
-        if (filteredFlattenedSimplifiedTypes.length === 0)
-            return NeverType.instance;
-        else if (filteredFlattenedSimplifiedTypes.length === 1)
-            return filteredFlattenedSimplifiedTypes[0];
+        const filteredFlattenedTypes = flattenedTypes.filter(type => !(type instanceof NeverType));
+        if (filteredFlattenedTypes.length === 0)
+            return NeverType.create();
+        else if (filteredFlattenedTypes.length === 1)
+            return filteredFlattenedTypes[0];
         else
-            return new UnionType(filteredFlattenedSimplifiedTypes);
+            return new UnionType(filteredFlattenedTypes);
+    }
+
+    getChildrenType(): Type {
+        const childrenTypes = this.types.map(type => type.getChildrenType());
+        return UnionType.create(childrenTypes);
+    }
+
+    getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
+        const types = this.types.map(type => type.getTypeAtPathSegment(segment, usageContext));
+        return UnionType.create(types);
     }
 
     toString(): string {
         return `(${this.types.join(" | ")})`;
     }
 
-    setTypeAtPath(path: JSONPathNormalizedPath, type: Type): Type {
-        const newTypes = this.types.map(t => t.setTypeAtPath(path, type));
-        return new UnionType(newTypes).simplify();
+    changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: Type) => Type): Type {
+        const newTypes = this.types.map(t => t.changeTypeAtPath(path, operation));
+        return UnionType.create(newTypes);
+    }
+
+    setPathExistence(path: JSONPathNormalizedPath): Type {
+        const newTypes = this.types.map(t => t.setPathExistence(path));
+        return UnionType.create(newTypes);
     }
 }
 
 export class NeverType extends Type {
+    private static readonly instance: NeverType = new NeverType();
+
     private constructor() {
         super();
     }
 
-    static readonly instance: NeverType = new NeverType();
+    static create(): NeverType {
+        return NeverType.instance;
+    }
 
     getChildrenType(): Type {
-        return NeverType.instance;
+        return NeverType.create();
     }
 
-    getTypeAtProperty(propertyName: string): Type {
-        return NeverType.instance;
-    }
-
-    getTypeAtIndex(index: number): Type {
-        return NeverType.instance;
-    }
-
-    simplify(): Type {
-        return this;
+    getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
+        return NeverType.create();
     }
 
     toString(): string {
         return "never";
     }
 
-    setTypeAtPath(path: JSONPathNormalizedPath, type: Type): Type {
-        if (path.length === 0)
-            return type;
-        else
-            return this;
+    changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: Type) => Type): Type {
+        return path.length === 0 ? operation(this) : this;
+    }
+
+    setPathExistence(path: JSONPathNormalizedPath): Type {
+        return this;
     }
 }
 
 export class AnyType extends Type {
+    private static readonly instance: AnyType = new AnyType();
+
     private constructor() {
         super();
     }
 
-    static readonly instance: AnyType = new AnyType();
+    static create(): AnyType {
+        return AnyType.instance;
+    }
 
     getChildrenType(): Type {
-        return AnyType.instance;
+        return AnyType.create();
     }
 
-    getTypeAtProperty(propertyName: string): Type {
-        return AnyType.instance;
-    }
-
-    getTypeAtIndex(index: number): Type {
-        return AnyType.instance;
-    }
-
-    simplify(): Type {
-        return this;
+    getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
+        return AnyType.create();
     }
 
     toString(): string {
         return "any";
     }
 
-    setTypeAtPath(path: JSONPathNormalizedPath, type: Type): Type {
-        if (path.length === 0)
-            return type;
-        else
-            return this;
+    changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: Type) => Type): Type {
+        return path.length === 0 ? operation(this) : this;
+    }
+
+    setPathExistence(path: JSONPathNormalizedPath): Type {
+        return this;
     }
 }
 
 export function intersectTypes(typeA: Type, typeB: Type): Type {
-    if (typeA instanceof UnionType) {
-        return new UnionType(typeA.types.map(type => intersectTypes(type, typeB))).simplify();
-    }
-    if (typeB instanceof UnionType) {
-        return new UnionType(typeB.types.map(type => intersectTypes(typeA, type))).simplify();
-    }
+    if (typeA instanceof UnionType)
+        return UnionType.create(typeA.types.map(type => intersectTypes(type, typeB)));
+    if (typeB instanceof UnionType)
+        return UnionType.create(typeB.types.map(type => intersectTypes(typeA, type)));
 
     if (isSubtypeOf(typeA, typeB))
         return typeA;
@@ -346,14 +367,14 @@ export function intersectTypes(typeA: Type, typeB: Type): Type {
         const propertyNames = new Set([...typeA.propertyTypes.keys(), ...typeB.propertyTypes.keys()]);
         const intersectedPropertyTypes = new Map<string, Type>();
         for (const propertyName of propertyNames) {
-            const propertyTypeA = typeA.getTypeAtProperty(propertyName);
-            const propertyTypeB = typeB.getTypeAtProperty(propertyName);
+            const propertyTypeA = typeA.getTypeAtPathSegment(propertyName, TypeUsageContext.query);
+            const propertyTypeB = typeB.getTypeAtPathSegment(propertyName, TypeUsageContext.query);
             const intersectedPropertyType = intersectTypes(propertyTypeA, propertyTypeB);
             intersectedPropertyTypes.set(propertyName, intersectedPropertyType);
         }
         const intersectedRestPropertyType = intersectTypes(typeA.restPropertyType, typeB.restPropertyType);
         const intersectedRequiredProperties = typeA.requiredProperties.union(typeB.requiredProperties)
-        return new ObjectType(intersectedPropertyTypes, intersectedRestPropertyType, intersectedRequiredProperties).simplify();
+        return ObjectType.create(intersectedPropertyTypes, intersectedRestPropertyType, intersectedRequiredProperties);
     }
     if (typeA instanceof ArrayType && typeB instanceof ArrayType) {
         const prefixElementTypes: Type[] = [];
@@ -362,22 +383,23 @@ export function intersectTypes(typeA: Type, typeB: Type): Type {
             prefixElementTypes.push(intersectedPrefixElementType);
         }
         const restElementType = intersectTypes(typeA.restElementType, typeB.restElementType);
-        return new ArrayType(prefixElementTypes, restElementType).simplify();
+        const intersectedRequiredElementCount = Math.max(typeA.requiredElementCount, typeB.requiredElementCount);
+        return ArrayType.create(prefixElementTypes, restElementType, intersectedRequiredElementCount);
     }
-    return NeverType.instance;
+    return NeverType.create();
 }
 
 export function subtractTypes(typeA: Type, typeB: Type): Type {
     if (typeA instanceof UnionType) {
         const newTypes = typeA.types.map(type => subtractTypes(type, typeB))
-        return new UnionType(newTypes).simplify();
+        return UnionType.create(newTypes);
     }
     if (typeB instanceof UnionType) {
         const newTypes = typeB.types.map(type => subtractTypes(typeA, type))
-        return new UnionType(newTypes).simplify();
+        return UnionType.create(newTypes);
     }
     if (isSubtypeOf(typeA, typeB))
-        return NeverType.instance;
+        return NeverType.create();
 
     return typeA;
 }
@@ -385,23 +407,22 @@ export function subtractTypes(typeA: Type, typeB: Type): Type {
 export function isSubtypeOf(typeA: Type, typeB: Type): boolean {
     if (typeB instanceof AnyType)
         return true;
-    if (typeB instanceof UnionType) {
+    if (typeB instanceof UnionType)
         return typeB.types.some(type => isSubtypeOf(typeA, type));
-    }
 
-    if (typeA instanceof LiteralType) {
+    if (typeA instanceof LiteralType)
         return typeB instanceof LiteralType && typeA.value === typeB.value || typeB instanceof PrimitiveType && typeA.type === typeB.type;
-    }
-    if (typeA instanceof PrimitiveType) {
+    if (typeA instanceof PrimitiveType)
         return typeB instanceof PrimitiveType && typeA.type === typeB.type;
-    }
     if (typeA instanceof ObjectType) {
         if (typeB instanceof ObjectType) {
             const propertyNames = new Set([...typeA.propertyTypes.keys(), ...typeB.propertyTypes.keys()]);
             for (const propertyName of propertyNames) {
-                if (!isSubtypeOf(typeA.getTypeAtProperty(propertyName), typeB.getTypeAtProperty(propertyName)))
+                if (!isSubtypeOf(typeA.getTypeAtPathSegment(propertyName, TypeUsageContext.query), typeB.getTypeAtPathSegment(propertyName, TypeUsageContext.query)))
                     return false;
             }
+            if (!isSubtypeOf(typeA.restPropertyType, typeB.restPropertyType))
+                return false;
             if (!typeA.requiredProperties.isSupersetOf(typeB.requiredProperties))
                 return false;
             return true;
@@ -411,23 +432,26 @@ export function isSubtypeOf(typeA: Type, typeB: Type): boolean {
     }
     if (typeA instanceof ArrayType) {
         if (typeB instanceof ArrayType) {
-            // TODO: repair
-            for (let i = 0; i < typeA.prefixElementTypes.length; i++) {
-                if (!isSubtypeOf(typeA.prefixElementTypes[i], typeB.getTypeAtIndex(i)))
+            for (let i = 0; i < Math.max(typeA.prefixElementTypes.length, typeB.prefixElementTypes.length); i++) {
+                if (!isSubtypeOf(typeA.getTypeAtPathSegment(i, TypeUsageContext.query), typeB.getTypeAtPathSegment(i, TypeUsageContext.query)))
                     return false;
             }
-            if (!isSubtypeOf(typeA.restElementType, typeB.getTypeAtIndex(typeA.prefixElementTypes.length)))
+            if (!isSubtypeOf(typeA.restElementType, typeB.restElementType))
+                return false;
+            if (!(typeA.requiredElementCount >= typeB.requiredElementCount))
                 return false;
             return true;
         }
     }
-    if (typeA instanceof NeverType) {
+    if (typeA instanceof NeverType)
         return true;
-    }
-    if (typeA instanceof UnionType) {
+    if (typeA instanceof UnionType)
         return typeA.types.every(type => isSubtypeOf(type, typeB));
-    }
     return false;
+}
+
+export function isEquvivalentTypeWith(typeA: Type, typeB: Type): boolean {
+    return isSubtypeOf(typeA, typeB) && isSubtypeOf(typeB, typeA);
 }
 
 /*function hasOverlap(typeA: Type, typeB: Type): boolean {
