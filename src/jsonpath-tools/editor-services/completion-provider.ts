@@ -9,6 +9,9 @@ import { DescriptionProvider } from "./description-provider";
 import { LocatedNode } from "../query/located-node";
 import { JsonSchema } from "./helpers/json-schema";
 import { logPerformance } from "../utils";
+import { TypeAnalyzer } from "./helpers/type-analyzer";
+import { JSONPathQuery } from "../query/query";
+import { TypeUsageContext } from "./helpers/types";
 
 export class CompletionProvider {
     private readonly descriptionProvider: DescriptionProvider;
@@ -19,7 +22,7 @@ export class CompletionProvider {
         this.descriptionProvider = new DescriptionProvider(options);
     }
 
-    provideCompletions(query: JSONPath, queryArgument: JSONPathJSONValue, queryArgumentSchema: JSONPathJSONValue | undefined, position: number): CompletionItem[] {
+    provideCompletions(query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentSchema: JsonSchema | undefined, position: number): CompletionItem[] {
         const completions: CompletionItem[] = [];
         const nodePaths = query.getTouchingAtPosition(position);
         for (const nodePath of nodePaths)
@@ -27,7 +30,7 @@ export class CompletionProvider {
         return completions;
     }
 
-    private provideCompletionsForNodePath(query: JSONPath, queryArgument: JSONPathJSONValue, queryArgumentSchema: JSONPathJSONValue | undefined, nodePath: JSONPathSyntaxTree[], completions: CompletionItem[]) {
+    private provideCompletionsForNodePath(query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentSchema: JsonSchema | undefined, nodePath: JSONPathSyntaxTree[], completions: CompletionItem[]) {
         const lastNode = nodePath[nodePath.length - 1];
         const lastButOneNode = nodePath[nodePath.length - 2];
 
@@ -61,7 +64,28 @@ export class CompletionProvider {
             this.completeFunctions(completions);
     }
 
-    private completeSegment(completions: CompletionItem[], segment: JSONPathSegment, query: JSONPath, queryArgument: JSONPathJSONValue, queryArgumentSchema: JSONPathJSONValue | undefined) {
+    private completeSegment(completions: CompletionItem[], segment: JSONPathSegment, query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentSchema: JsonSchema | undefined) {
+        if (queryArgument !== undefined)
+            this.completeSegmentData(completions, segment, query, queryArgument, queryArgumentSchema);
+        else if (queryArgumentSchema !== undefined)
+            this.completeSegmentSchema(completions, segment, queryArgumentSchema);
+    }
+
+    private completeSegmentSchema(completions: CompletionItem[], segment: JSONPathSegment, queryArgumentSchema: JsonSchema) {
+        const typeAnalyzer = new TypeAnalyzer(queryArgumentSchema.rootType);
+        const query = segment.parent as JSONPathQuery;
+        const segmentIndex = query.segments.indexOf(segment);
+        const previous = segmentIndex === 0 ? query.identifierToken : query.segments[segmentIndex - 1];
+        const previousType = typeAnalyzer.getType(previous);
+        const pathsSegments = new Set<string | number>();
+        previousType.collectKnownPathSegments(pathsSegments);
+        for (const pathSegment of pathsSegments) {
+            const pathSegmentType = previousType.getTypeAtPathSegment(pathSegment, TypeUsageContext.query);
+            completions.push(new CompletionItem(CompletionItemType.name, pathSegment.toString(), pathSegmentType.toString(), () => "TODO"));
+        }
+    }
+
+    private completeSegmentData(completions: CompletionItem[], segment: JSONPathSegment, query: JSONPath, queryArgument: JSONPathJSONValue, queryArgumentSchema: JsonSchema | undefined) {
         const schemaCache = new Map<LocatedNode, JsonSchema | null>();
         const nodes = this.getAllNodesAtSegment(queryArgument, query, segment);
         const keysAndTypes = this.getDistinctKeysAndTypes(nodes);
@@ -88,7 +112,7 @@ export class CompletionProvider {
         return undefined;
     }
 
-    private getSchemas(nodes: LocatedNode[], property: string, schemaCache: Map<LocatedNode, JsonSchema | null>, queryArgumentSchema: JSONPathJSONValue | undefined): JSONPathJSONValue[] {
+    private getSchemas(nodes: LocatedNode[], property: string, schemaCache: Map<LocatedNode, JsonSchema | null>, queryArgumentSchema: JsonSchema | undefined): JSONPathJSONValue[] {
         const schemas = new Set<JSONPathJSONValue>();
         for (const node of nodes) {
             const schema = this.getSchema(node, schemaCache, queryArgumentSchema);
@@ -101,14 +125,14 @@ export class CompletionProvider {
         return [...schemas];
     }
 
-    private getSchema(node: LocatedNode, schemaCache: Map<LocatedNode, JsonSchema | null>, queryArgumentSchema: JSONPathJSONValue | undefined): JsonSchema | null {
+    private getSchema(node: LocatedNode, schemaCache: Map<LocatedNode, JsonSchema | null>, queryArgumentSchema: JsonSchema | undefined): JsonSchema | null {
         const fromCache = schemaCache.get(node);
         if (fromCache !== undefined)
             return fromCache;
 
         let schema: JsonSchema | null;
         if (node.parent === null)
-            schema = queryArgumentSchema === undefined ? null : JsonSchema.create(queryArgumentSchema);
+            schema = queryArgumentSchema === undefined ? null : queryArgumentSchema;
         else {
             const parentSchema = this.getSchema(node.parent, schemaCache, queryArgumentSchema);
             schema = parentSchema === null ? null : parentSchema.step(node.pathSegment, node.parent.value);

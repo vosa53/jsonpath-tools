@@ -4,6 +4,7 @@ import { EditorState, Extension, Facet, StateEffect, StateField } from "@codemir
 import { EditorView, PluginValue, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { LanguageService } from "./worker/language-service";
 import { LanguageServiceSession } from "./worker/language-service-session";
+import { RawJSONSchema } from "@/jsonpath-tools/editor-services/helpers/raw-json-schema";
 
 export function jsonPathState(): Extension {
     return [
@@ -12,8 +13,8 @@ export function jsonPathState(): Extension {
 }
 
 export const updateOptionsEffect = StateEffect.define<JSONPathOptions>();
-export const updateQueryArgumentEffect = StateEffect.define<JSONPathJSONValue>();
-export const updateQueryArgumentSchemaEffect = StateEffect.define<JSONPathJSONValue | undefined>();
+export const updateQueryArgumentEffect = StateEffect.define<JSONPathJSONValue | undefined>();
+export const updateQueryArgumentSchemaEffect = StateEffect.define<RawJSONSchema | undefined>();
 export const jsonPathConfigFacet = Facet.define<{
     languageService: LanguageService
 }>();

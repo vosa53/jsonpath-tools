@@ -9,6 +9,7 @@ import { Signature } from "@/jsonpath-tools/editor-services/signature-provider";
 import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-provider";
 import { DocumentHighlight } from "@/jsonpath-tools/editor-services/document-highlights-provider";
 import { TextChange } from "@/jsonpath-tools/text-change";
+import { RawJSONSchema } from "@/jsonpath-tools/editor-services/helpers/raw-json-schema";
 
 
 export class LanguageServiceSession {
@@ -43,14 +44,14 @@ export class LanguageServiceSession {
         });
     }
 
-    updateQueryArgument(newQueryArgument: JSONPathJSONValue) {
+    updateQueryArgument(newQueryArgument: JSONPathJSONValue | undefined) {
         this.cancelQueue();
         this.rpcTopic.sendNotification<UpdateQueryArgumentLanguageServiceMessage>("updateQueryArgument", {
             newQueryArgument: newQueryArgument
         });
     }
 
-    updateQueryArgumentSchema(newQueryArgumentSchema: JSONPathJSONValue | undefined) {
+    updateQueryArgumentSchema(newQueryArgumentSchema: RawJSONSchema | undefined) {
         this.cancelQueue();
         this.rpcTopic.sendNotification<UpdateQueryArgumentSchemaLanguageServiceMessage>("updateQueryArgumentSchema", {
             newQueryArgumentSchema: newQueryArgumentSchema

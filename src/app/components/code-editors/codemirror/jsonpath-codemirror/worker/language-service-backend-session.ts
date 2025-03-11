@@ -4,7 +4,7 @@ import { defaultJSONPathOptions, JSONPathFunctionHandler, JSONPathOptions } from
 import { JSONPath } from "@/jsonpath-tools/query/json-path";
 import { TypeChecker } from "@/jsonpath-tools/semantic-analysis/type-checker";
 import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
-import { JSONPathJSONValue } from "@/jsonpath-tools/types";
+import { JSONPathJSONValue, JSONPathNodeList } from "@/jsonpath-tools/types";
 import { logPerformance } from "@/jsonpath-tools/utils";
 import { DisconnectLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentSchemaLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
 import { SimpleRPCTopic } from "./simple-rpc";
@@ -12,6 +12,7 @@ import { SignatureProvider } from "@/jsonpath-tools/editor-services/signature-pr
 import { TooltipProvider } from "@/jsonpath-tools/editor-services/tooltip-provider";
 import { DocumentHighlightsProvider } from "@/jsonpath-tools/editor-services/document-highlights-provider";
 import { Formatter } from "@/jsonpath-tools/editor-services/formatter";
+import { JsonSchema } from "@/jsonpath-tools/editor-services/helpers/json-schema";
 
 export class LanguageServiceBackendSession {
     private readonly parser: JSONPathParser;
@@ -24,8 +25,8 @@ export class LanguageServiceBackendSession {
     private dynamicAnalyzer: DynamicAnalyzer;
     private formatter: Formatter;
     private query: JSONPath;
-    private queryArgument: JSONPathJSONValue;
-    private queryArgumentSchema: JSONPathJSONValue | undefined;
+    private queryArgument: JSONPathJSONValue | undefined;
+    private queryArgumentSchema: JsonSchema | undefined;
     private dynamicAnalysisResult: DynamicAnalysisResult | null;
     private lastCompletions: readonly CompletionItem[];
 
@@ -40,7 +41,7 @@ export class LanguageServiceBackendSession {
         this.dynamicAnalyzer = new DynamicAnalyzer(this.options);
         this.formatter = new Formatter();
         this.query = this.parser.parse("");
-        this.queryArgument = {};
+        this.queryArgument = undefined;
         this.queryArgumentSchema = undefined;
         this.dynamicAnalysisResult = null;
         this.lastCompletions = [];
@@ -79,7 +80,9 @@ export class LanguageServiceBackendSession {
     }
 
     updateQueryArgumentSchema(message: UpdateQueryArgumentSchemaLanguageServiceMessage) {
-        this.queryArgumentSchema = message.newQueryArgumentSchema;
+        this.queryArgumentSchema = message.newQueryArgumentSchema !== undefined
+            ? JsonSchema.create(message.newQueryArgumentSchema)
+            : undefined;
     }
 
     getCompletions(message: GetCompletionsLanguageServiceMessage): GetCompletionsLanguageServiceMessageResponse {
@@ -158,8 +161,12 @@ export class LanguageServiceBackendSession {
     }
 
     private getDynamicAnalysisResult(): DynamicAnalysisResult {
-        if (this.dynamicAnalysisResult === null)
-            this.dynamicAnalysisResult = logPerformance("Execute query and anylyze (on worker)", () => this.dynamicAnalyzer.analyze(this.query, this.queryArgument));
+        if (this.dynamicAnalysisResult === null) {
+            if (this.queryArgument !== undefined)
+                this.dynamicAnalysisResult = logPerformance("Execute query and analyze (on worker)", () => this.dynamicAnalyzer.analyze(this.query, this.queryArgument!));
+            else
+                this.dynamicAnalysisResult = { diagnostics: [], queryResult: new JSONPathNodeList([]) };
+        }
         return this.dynamicAnalysisResult;
     }
 }

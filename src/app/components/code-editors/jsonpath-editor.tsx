@@ -12,11 +12,12 @@ import { getResult, updateOptionsEffect, updateQueryArgumentEffect, updateQueryA
 import { LanguageService } from "./codemirror/jsonpath-codemirror/worker/language-service";
 import { TextRange } from "@/jsonpath-tools/text-range";
 import { rangeHighlighter, setHighlightedRangeEffect } from "./codemirror/range-highlighter";
+import { RawJSONSchema } from "@/jsonpath-tools/editor-services/helpers/raw-json-schema";
 
 export default function JSONPathEditor({
     value,
     options = defaultJSONPathOptions,
-    queryArgument = {},
+    queryArgument = undefined,
     queryArgumentSchema = undefined,
     highlightedRange = null,
     languageService,
@@ -28,8 +29,8 @@ export default function JSONPathEditor({
 }: {
     value: string,
     options: JSONPathOptions,
-    queryArgument: JSONPathJSONValue,
-    queryArgumentSchema: JSONPathJSONValue | undefined,
+    queryArgument: JSONPathJSONValue | undefined,
+    queryArgumentSchema: RawJSONSchema | undefined,
     languageService: LanguageService,
     highlightedRange: TextRange | null,
     readonly?: boolean,

@@ -8,6 +8,7 @@ export enum TypeUsageContext {
 
 export abstract class Type {
     abstract getChildrenType(): Type;
+    abstract collectKnownPathSegments(pathSegments: Set<string | number>): void;
     abstract getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type;
 
     getTypeAtPath(path: JSONPathNormalizedPath, usageContext: TypeUsageContext): Type {
@@ -56,6 +57,10 @@ export class LiteralType extends Type {
         return NeverType.create();
     }
 
+    collectKnownPathSegments(pathSegments: Set<string | number>): void {
+        return;
+    }
+
     getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
         if (usageContext === TypeUsageContext.query)
             return NeverType.create();
@@ -89,6 +94,10 @@ export class PrimitiveType extends Type {
 
     getChildrenType(): Type {
         return NeverType.create();
+    }
+
+    collectKnownPathSegments(pathSegments: Set<string | number>): void {
+        return;
     }
 
     getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
@@ -130,6 +139,11 @@ export class ObjectType extends Type {
 
     getChildrenType(): Type {
         return UnionType.create([...this.propertyTypes.values(), this.restPropertyType]);
+    }
+
+    collectKnownPathSegments(pathSegments: Set<string | number>): void {
+        for (const propertyName of this.propertyTypes.keys())
+            pathSegments.add(propertyName);
     }
 
     getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
@@ -190,6 +204,11 @@ export class ArrayType extends Type {
 
     getChildrenType(): Type {
         return UnionType.create([...this.prefixElementTypes, this.restElementType]);
+    }
+
+    collectKnownPathSegments(pathSegments: Set<string | number>): void {
+        for (let i = 0; i < this.prefixElementTypes.length; i++)
+            pathSegments.add(i);
     }
 
     getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
@@ -268,6 +287,11 @@ export class UnionType extends Type {
         return UnionType.create(childrenTypes);
     }
 
+    collectKnownPathSegments(pathSegments: Set<string | number>): void {
+        for (const type of this.types)
+            type.collectKnownPathSegments(pathSegments);
+    }
+
     getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
         const types = this.types.map(type => type.getTypeAtPathSegment(segment, usageContext));
         return UnionType.create(types);
@@ -303,6 +327,10 @@ export class NeverType extends Type {
         return NeverType.create();
     }
 
+    collectKnownPathSegments(pathSegments: Set<string | number>): void {
+        return;
+    }
+
     getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
         return NeverType.create();
     }
@@ -333,6 +361,10 @@ export class AnyType extends Type {
 
     getChildrenType(): Type {
         return AnyType.create();
+    }
+
+    collectKnownPathSegments(pathSegments: Set<string | number>): void {
+        return;
     }
 
     getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {

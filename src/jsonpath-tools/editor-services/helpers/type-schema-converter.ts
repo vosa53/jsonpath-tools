@@ -1,5 +1,6 @@
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 import { AnyType, ArrayType, intersectTypes, LiteralType, NeverType, ObjectType, PrimitiveType, PrimitiveTypeType, subtractTypes, Type, UnionType } from "./types";
+import { RawJSONSchema } from "./raw-json-schema";
 
 type ObjectJsonSchema = {
     [key: string]: any

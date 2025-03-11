@@ -15,6 +15,7 @@ import { LanguageService } from "./components/code-editors/codemirror/jsonpath-c
 import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";
 import { TextRange } from "@/jsonpath-tools/text-range";
 import { JSONPathSyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
+import { RawJSONSchema } from "@/jsonpath-tools/editor-services/helpers/raw-json-schema";
 
 interface State {
     customFunctions: readonly CustomFunction[];
@@ -34,15 +35,15 @@ export function usePageViewModel() {
     const [operation, setOperation] = useState<Operation>(testOperation);
     const [pathType, setPathType] = useState<PathType>(PathType.normalizedPath);
     const [query, setQuery] = useState<JSONPath>(testQuery);
-    const queryArgument = useMemo<JSONPathJSONValue>(() => {
+    const queryArgument = useMemo<JSONPathJSONValue | undefined>(() => {
         try {
             return logPerformance("Parse query argument", () => JSON.parse(queryArgumentText));
         }
         catch {
-            return null;
+            return undefined;
         }
     }, [queryArgumentText]);
-    const queryArgumentSchema = useMemo<JSONPathJSONValue | undefined>(() => {
+    const queryArgumentSchema = useMemo<RawJSONSchema | undefined>(() => {
         try {
             return logPerformance("Parse query argument schema", () => JSON.parse(queryArgumentSchemaText));
         }
@@ -62,6 +63,7 @@ export function usePageViewModel() {
     const [result, setResult] = useState<readonly JSONPathJSONValue[]>([]);
     const [resultPaths, setResultPaths] = useState<readonly JSONPathNormalizedPath[]>([]);
     const resultText = useMemo(() => {
+        if (queryArgument === undefined) return "";
         const operationResult = logPerformance("Execute operation on result", () => {
             return executeOperation(operation, queryArgument, result as JSONPathJSONValue[], resultPaths);
         });

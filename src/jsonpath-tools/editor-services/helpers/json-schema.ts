@@ -1,16 +1,23 @@
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
-import { Draft, Draft2019, isJsonError, SchemaNode } from "json-schema-library";
+import { Draft2019, isJsonError, SchemaNode } from "json-schema-library";
+import { Type } from "./types";
+import { schemaToType } from "./type-schema-converter";
+import { RawJSONSchema } from "./raw-json-schema";
 
 export class JsonSchema {
-    static create(schema: JSONPathJSONValue) {
+    static create(schema: RawJSONSchema) {
         const draft = new Draft2019();
         // TODO
         // @ts-ignore
         const node = draft.createNode(schema);
-        return new JsonSchema(node);
+        const rootType = schemaToType(schema);
+        return new JsonSchema(node, rootType);
     }
 
-    private constructor(private readonly node: SchemaNode) {
+    private constructor(
+        private readonly node: SchemaNode,
+        readonly rootType: Type
+    ) {
 
     }
 
@@ -19,7 +26,7 @@ export class JsonSchema {
         if (isJsonError(childNode)) 
             return null;
         else 
-            return new JsonSchema(childNode);
+            return new JsonSchema(childNode, this.rootType);
     }
 
     get schema(): JSONPathJSONValue {
