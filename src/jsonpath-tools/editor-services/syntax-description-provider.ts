@@ -6,11 +6,9 @@ import { JSONPathNameSelector } from "../query/selectors/name-selector";
 import { JSONPathSliceSelector } from "../query/selectors/slice-selector";
 import { JSONPathSyntaxTree } from "../query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
-import { JSONPathJSONValue } from "../types";
-import { Type, TypeAnnotation } from "./helpers/types";
 
 export class SyntaxDescriptionProvider {
-    private readonly descriptionProviders = new Map<JSONPathSyntaxTreeType, (node: JSONPathSyntaxTree, queryArgument?: JSONPathJSONValue, queryArgumentType?: Type) => SyntaxDescription>([
+    private readonly descriptionProviders = new Map<JSONPathSyntaxTreeType, (node: JSONPathSyntaxTree) => SyntaxDescription>([
         [JSONPathSyntaxTreeType.query, n => new SyntaxDescription("Query", "Selects particular children using a logical expression. Current child is represented with @.")],
         [JSONPathSyntaxTreeType.segment, n => {
             const segment = n as JSONPathSegment;

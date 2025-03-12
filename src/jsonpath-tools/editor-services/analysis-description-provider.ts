@@ -1,4 +1,4 @@
-import { TypeAnnotation } from "./helpers/types";
+import { TypeAnnotation } from "../typing/types";
 
 export class AnalysisDescriptionProvider {
     provideDescription(type?: string, annotations?: TypeAnnotation[]): string {

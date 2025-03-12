@@ -1,5 +1,5 @@
 import { JSONPathJSONValue, JSONPathNothing } from "@/jsonpath-tools/types";
-import { JSONPathNormalizedPath } from "../../transformations";
+import { JSONPathNormalizedPath } from "../transformations";
 
 export enum TypeUsageContext {
     expression,

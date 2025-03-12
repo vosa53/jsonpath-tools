@@ -1,18 +1,17 @@
 import { JSONPathOptions } from "../options";
 import { JSONPathQueryContext } from "../query/evaluation";
 import { JSONPath } from "../query/json-path";
+import { LocatedNode } from "../query/located-node";
+import { JSONPathQuery } from "../query/query";
 import { JSONPathSegment } from "../query/segment";
 import { JSONPathSyntaxTree } from "../query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
 import { JSONPathJSONValue } from "../types";
-import { SyntaxDescriptionProvider } from "./syntax-description-provider";
-import { LocatedNode } from "../query/located-node";
-import { logPerformance } from "../utils";
-import { TypeAnalyzer } from "./helpers/type-analyzer";
-import { JSONPathQuery } from "../query/query";
-import { Type, TypeAnnotation, TypeUsageContext } from "./helpers/types";
+import { getJSONTypeName } from "../typing/json-types";
+import { TypeAnalyzer } from "../typing/type-analyzer";
+import { Type, TypeAnnotation, TypeUsageContext } from "../typing/types";
 import { AnalysisDescriptionProvider } from "./analysis-description-provider";
-import { getJSONTypeName } from "./helpers/json-types";
+import { SyntaxDescriptionProvider } from "./syntax-description-provider";
 
 export class CompletionProvider {
     private readonly syntaxDescriptionProvider: SyntaxDescriptionProvider;

@@ -1,8 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { AnyType, ArrayType, intersectTypes, LiteralType, NeverType, ObjectType, PrimitiveType, PrimitiveTypeType, UnionType } from "./types";
-import { JSONPathParser } from "../../syntax-analysis/parser";
-import { TypeAnalyzer } from "./type-analyzer";
-import { schemaToType } from "./type-schema-converter";
+import { describe, it } from "vitest";
+import { jsonSchemaToType } from "./json-schema-to-type";
 
 export const jsonSchemaForTest = `{
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -45,7 +42,7 @@ export const jsonSchemaForTest = `{
 
 describe("Type schema converter", () => {
     it("type schema converter test", () => {
-        const type = schemaToType(JSON.parse(jsonSchemaForTest));
+        const type = jsonSchemaToType(JSON.parse(jsonSchemaForTest));
         const typeText = type.toString();
         console.log(typeText);
     });

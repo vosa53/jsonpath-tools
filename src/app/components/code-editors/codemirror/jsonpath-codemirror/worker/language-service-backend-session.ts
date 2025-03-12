@@ -12,8 +12,8 @@ import { SignatureProvider } from "@/jsonpath-tools/editor-services/signature-pr
 import { TooltipProvider } from "@/jsonpath-tools/editor-services/tooltip-provider";
 import { DocumentHighlightsProvider } from "@/jsonpath-tools/editor-services/document-highlights-provider";
 import { Formatter } from "@/jsonpath-tools/editor-services/formatter";
-import { AnyType, Type } from "@/jsonpath-tools/editor-services/helpers/types";
-import { schemaToType } from "@/jsonpath-tools/editor-services/helpers/type-schema-converter";
+import { AnyType, Type } from "@/jsonpath-tools/typing/types";
+import { jsonSchemaToType } from "@/jsonpath-tools/typing/json-schema-to-type";
 
 export class LanguageServiceBackendSession {
     private readonly parser: JSONPathParser;
@@ -82,7 +82,7 @@ export class LanguageServiceBackendSession {
 
     updateQueryArgumentSchema(message: UpdateQueryArgumentSchemaLanguageServiceMessage) {
         this.queryArgumentType = message.newQueryArgumentSchema !== undefined
-            ? schemaToType(message.newQueryArgumentSchema)
+            ? jsonSchemaToType(message.newQueryArgumentSchema)
             : AnyType.create();
     }
 

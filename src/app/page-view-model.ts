@@ -15,7 +15,7 @@ import { LanguageService } from "./components/code-editors/codemirror/jsonpath-c
 import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";
 import { TextRange } from "@/jsonpath-tools/text-range";
 import { JSONPathSyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
-import { RawJSONSchema } from "@/jsonpath-tools/editor-services/helpers/raw-json-schema";
+import { RawJSONSchema } from "@/jsonpath-tools/typing/json-schema-to-type";
 
 interface State {
     customFunctions: readonly CustomFunction[];

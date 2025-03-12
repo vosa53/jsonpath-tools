@@ -1,16 +1,13 @@
 import { JSONPathOptions } from "../options";
-import { JSONPathQueryContext } from "../query/evaluation";
-import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
 import { JSONPath } from "../query/json-path";
-import { LocatedNode } from "../query/located-node";
 import { JSONPathSyntaxTree } from "../query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
 import { TextRange } from "../text-range";
-import { JSONPathJSONValue, JSONPathValueType } from "../types";
+import { JSONPathJSONValue } from "../types";
+import { getJSONTypeName } from "../typing/json-types";
+import { TypeAnalyzer } from "../typing/type-analyzer";
+import { Type, TypeAnnotation } from "../typing/types";
 import { AnalysisDescriptionProvider } from "./analysis-description-provider";
-import { getJSONTypeName } from "./helpers/json-types";
-import { TypeAnalyzer } from "./helpers/type-analyzer";
-import { Type, TypeAnnotation } from "./helpers/types";
 import { SyntaxDescriptionProvider } from "./syntax-description-provider";
 
 export class TooltipProvider {

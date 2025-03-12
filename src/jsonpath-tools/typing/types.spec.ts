@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { AnyType, ArrayType, intersectTypes, LiteralType, NeverType, ObjectType, PrimitiveType, PrimitiveTypeType, UnionType } from "./types";
-import { JSONPathParser } from "../../syntax-analysis/parser";
 import { TypeAnalyzer } from "./type-analyzer";
-import { schemaToType } from "./type-schema-converter";
-import { jsonSchemaForTest } from "./type-schema-converter.spec";
+import { jsonSchemaToType } from "./json-schema-to-type";
+import { jsonSchemaForTest } from "./json-schema-to-type.spec";
+import { JSONPathParser } from "../syntax-analysis/parser";
 
 describe("Types", () => {
     it("types test", () => {
-        const rootType = schemaToType(JSON.parse(jsonSchemaForTest));
+        const rootType = jsonSchemaToType(JSON.parse(jsonSchemaForTest));
         const typeAnalyzer = new TypeAnalyzer(rootType);
         const parser = new JSONPathParser();
         const path = parser.parse("$[?@.role=='admin']");

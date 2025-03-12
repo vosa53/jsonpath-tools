@@ -1,12 +1,7 @@
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 import { AnyType, ArrayType, intersectTypes, LiteralType, NeverType, ObjectType, PrimitiveType, PrimitiveTypeType, subtractTypes, Type, TypeAnnotation, UnionType } from "./types";
-import { RawJSONSchema } from "./raw-json-schema";
 
-type ObjectJsonSchema = {
-    [key: string]: any
-};
-
-export function schemaToType(jsonSchema: any): Type {
+export function jsonSchemaToType(jsonSchema: any): Type {
     if (jsonSchema === true)
         return AnyType.create();
     if (jsonSchema === false)
@@ -76,10 +71,10 @@ function createObjectType(jsonSchema: ObjectJsonSchema) {
     const properties = new Map<string, Type>();
     if (jsonSchema.properties !== undefined) {
         for (const [key, value] of Object.entries(jsonSchema.properties))
-            properties.set(key, schemaToType(value));
+            properties.set(key, jsonSchemaToType(value));
     }
 
-    const restProperties = jsonSchema.additionalProperties === undefined ? AnyType.create() : schemaToType(jsonSchema.additionalProperties);
+    const restProperties = jsonSchema.additionalProperties === undefined ? AnyType.create() : jsonSchemaToType(jsonSchema.additionalProperties);
     const requiredProperties = jsonSchema.required === undefined ? new Set<string>() : new Set<string>(jsonSchema.required);
     return ObjectType.create(properties, restProperties, requiredProperties);
 }
@@ -89,10 +84,10 @@ function createArrayType(jsonSchema: ObjectJsonSchema) {
         return NeverType.create();
 
     const prefixElementTypes: Type[] = jsonSchema.prefixItems !== undefined
-        ? jsonSchema.prefixItems.map((v: any) => schemaToType(v))
+        ? jsonSchema.prefixItems.map((v: any) => jsonSchemaToType(v))
         : [];
     const restElementType = jsonSchema.items !== undefined 
-        ? schemaToType(jsonSchema.items) 
+        ? jsonSchemaToType(jsonSchema.items) 
         : AnyType.create();
 
     const requiredElementsCount = jsonSchema.minItems === undefined ? 0 : jsonSchema.minItems as number;
@@ -115,14 +110,14 @@ function createConstType(jsonSchema: ObjectJsonSchema) {
 function createAllOfType(jsonSchema: ObjectJsonSchema) {
     if (jsonSchema.allOf === undefined)
         return AnyType.create();
-    const types = jsonSchema.allOf.map((v: any) => schemaToType(v));
+    const types = jsonSchema.allOf.map((v: any) => jsonSchemaToType(v));
     return types.reduce(intersectTypes, AnyType.create());
 }
 
 function createAnyOfType(jsonSchema: ObjectJsonSchema) {
     if (jsonSchema.anyOf === undefined)
         return AnyType.create();
-    const types = jsonSchema.anyOf.map((v: any) => schemaToType(v));
+    const types = jsonSchema.anyOf.map((v: any) => jsonSchemaToType(v));
     return UnionType.create(types);
 }
 
@@ -130,14 +125,14 @@ function createOneOfType(jsonSchema: ObjectJsonSchema) {
     // TODO: better
     if (jsonSchema.oneOf === undefined)
         return AnyType.create();
-    const types = jsonSchema.oneOf.map((v: any) => schemaToType(v));
+    const types = jsonSchema.oneOf.map((v: any) => jsonSchemaToType(v));
     return UnionType.create(types);
 }
 
 function createNotType(jsonSchema: ObjectJsonSchema) {
     if (jsonSchema.not === undefined)
         return NeverType.create();
-    return schemaToType(jsonSchema.not);
+    return jsonSchemaToType(jsonSchema.not);
 }
 
 function createConstantValueType(value: any): Type {
@@ -172,3 +167,9 @@ function isTypePermittedByTypeConstraint(type: string, jsonSchema: ObjectJsonSch
     const typeConstraint = jsonSchema.type;
     return typeConstraint === undefined || typeConstraint === type || Array.isArray(typeConstraint) && typeConstraint.includes(type);
 }
+
+type ObjectJsonSchema = {
+    [key: string]: any
+};
+
+export type RawJSONSchema = boolean | { [key: string]: JSONPathJSONValue };
