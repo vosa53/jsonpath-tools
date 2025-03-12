@@ -34,14 +34,26 @@ export abstract class Type {
         return this.withAnnotations(newAnnotations);
     }
 
-    collectAnnotations(annotations: Set<TypeAnnotation>) {
+    collectAnnotationsToSet(annotations: Set<TypeAnnotation>) {
         for (const annotation of this.annotations)
             annotations.add(annotation);
     }
 
+    collectAnnotations(): Set<TypeAnnotation> {
+        const annotations = new Set<TypeAnnotation>();
+        this.collectAnnotationsToSet(annotations);
+        return annotations;
+    }
+
     abstract getChildrenType(): Type;
-    abstract collectKnownPathSegments(pathSegments: Set<string | number>): void;
+    abstract collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void;
     abstract getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type;
+
+    collectKnownPathSegments(): Set<string | number> {
+        const knownPathSegments = new Set<string | number>();
+        this.collectKnownPathSegmentsToSet(knownPathSegments);
+        return knownPathSegments;
+    }
 
     getTypeAtPath(path: JSONPathNormalizedPath, usageContext: TypeUsageContext): Type {
         let current = this as Type;
@@ -94,7 +106,7 @@ export class LiteralType extends Type {
         return NeverType.create();
     }
 
-    collectKnownPathSegments(pathSegments: Set<string | number>): void {
+    collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
         return;
     }
 
@@ -138,7 +150,7 @@ export class PrimitiveType extends Type {
         return NeverType.create();
     }
 
-    collectKnownPathSegments(pathSegments: Set<string | number>): void {
+    collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
         return;
     }
 
@@ -188,7 +200,7 @@ export class ObjectType extends Type {
         return UnionType.create([...this.propertyTypes.values(), this.restPropertyType]);
     }
 
-    collectKnownPathSegments(pathSegments: Set<string | number>): void {
+    collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
         for (const propertyName of this.propertyTypes.keys())
             pathSegments.add(propertyName);
     }
@@ -258,7 +270,7 @@ export class ArrayType extends Type {
         return UnionType.create([...this.prefixElementTypes, this.restElementType]);
     }
 
-    collectKnownPathSegments(pathSegments: Set<string | number>): void {
+    collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
         for (let i = 0; i < this.prefixElementTypes.length; i++)
             pathSegments.add(i);
     }
@@ -347,10 +359,10 @@ export class UnionType extends Type {
         return new UnionType(this.types, annotations);
     }
 
-    collectAnnotations(annotations: Set<TypeAnnotation>) {
-        super.collectAnnotations(annotations);
+    collectAnnotationsToSet(annotations: Set<TypeAnnotation>) {
+        super.collectAnnotationsToSet(annotations);
         for (const type of this.types)
-            type.collectAnnotations(annotations);
+            type.collectAnnotationsToSet(annotations);
     }
 
     getChildrenType(): Type {
@@ -358,9 +370,9 @@ export class UnionType extends Type {
         return UnionType.create(childrenTypes);
     }
 
-    collectKnownPathSegments(pathSegments: Set<string | number>): void {
+    collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
         for (const type of this.types)
-            type.collectKnownPathSegments(pathSegments);
+            type.collectKnownPathSegmentsToSet(pathSegments);
     }
 
     getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
@@ -407,7 +419,7 @@ export class NeverType extends Type {
         return NeverType.create();
     }
 
-    collectKnownPathSegments(pathSegments: Set<string | number>): void {
+    collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
         return;
     }
 
@@ -452,7 +464,7 @@ export class AnyType extends Type {
         return AnyType.create();
     }
 
-    collectKnownPathSegments(pathSegments: Set<string | number>): void {
+    collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
         return;
     }
 

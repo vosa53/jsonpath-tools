@@ -38,7 +38,7 @@ export function schemaToType(jsonSchema: any): Type {
     const additionalConstraints = additionalConstraintTypes.reduce((a, b) => intersectTypes(a, b));
     let resultType = subtractTypes(additionalConstraints, notType);
 
-    const typeAnnotation = schemaToTypeAnnotation(jsonSchema);
+    const typeAnnotation = createTypeAnnotation(jsonSchema);
     if (typeAnnotation !== null)
         resultType = resultType.addAnnotations(new Set([typeAnnotation]));
 
@@ -147,7 +147,7 @@ function createConstantValueType(value: any): Type {
         throw new Error("Not supported."); // TODO
 }
 
-export function schemaToTypeAnnotation(jsonSchema: any): TypeAnnotation | null {
+function createTypeAnnotation(jsonSchema: ObjectJsonSchema): TypeAnnotation | null {
     const title = jsonSchema.title;
     const description = jsonSchema.description;
     const readOnly = jsonSchema.readOnly;

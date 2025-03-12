@@ -21,12 +21,12 @@ export class JSONPathSegment extends JSONPathNode {
     get type() { return JSONPathSyntaxTreeType.segment; }
 
     select(input: LocatedNode, output: PushOnlyArray<LocatedNode>, queryContext: JSONPathQueryContext) {
-        queryContext.segmentInstrumentationCallback?.(this, input);
+        const outputStartIndex = output.length;
 
         for (const selector of this.selectors) {
-            const outputStartIndex = output.length;
+            const selectorOutputStartIndex = output.length;
             selector.selector.select(input, output, queryContext);
-            queryContext.selectorInstrumentationCallback?.(selector.selector, input, output, outputStartIndex, output.length - outputStartIndex);
+            queryContext.selectorInstrumentationCallback?.(selector.selector, input, output, selectorOutputStartIndex, output.length - selectorOutputStartIndex);
         }
 
         if (this.isRecursive) {
@@ -39,5 +39,7 @@ export class JSONPathSegment extends JSONPathNode {
                     this.select(new LocatedNode(entry[1], entry[0], input), output, queryContext);
             }
         }
+
+        queryContext.segmentInstrumentationCallback?.(this, input, output, outputStartIndex, output.length - outputStartIndex);
     }
 }

@@ -27,15 +27,18 @@ export class JSONPathQuery extends JSONPathNode {
     }
 
     select(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext | null): JSONPathNodeList {
-        const inputNode = this.isRelative && filterExpressionContext !== null ? filterExpressionContext.currentNode : queryContext.rootNode;
-        let inputNodes = [new LocatedNode(inputNode, "", null)];
-        let outputNodes: LocatedNode[] = [];
+        const inputValue = this.isRelative && filterExpressionContext !== null ? filterExpressionContext.currentNode : queryContext.rootNode;
+        const input = new LocatedNode(inputValue, "", null);
+        let inputs = [input];
+        let outputs: LocatedNode[] = [];
         for (const segment of this.segments) {
-            for (const inputNode of inputNodes)
-                segment.select(inputNode, outputNodes, queryContext);
-            [inputNodes, outputNodes] = [outputNodes, inputNodes];
-            outputNodes.length = 0;
+            for (const input of inputs)
+                segment.select(input, outputs, queryContext);
+            [inputs, outputs] = [outputs, inputs];
+            outputs.length = 0;
         }
-        return new JSONPathNodeList(inputNodes);
+
+        queryContext.queryInstrumentationCallback?.(this, input, inputs, 0, inputs.length);
+        return new JSONPathNodeList(inputs);
     }
 }

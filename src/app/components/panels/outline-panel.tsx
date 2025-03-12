@@ -17,7 +17,7 @@ import { JSONPathOrExpression } from "@/jsonpath-tools/query/filter-expression/o
 import { JSONPathComparisonExpression } from "@/jsonpath-tools/query/filter-expression/comparison-expression";
 import { JSONPathFunctionExpression } from "@/jsonpath-tools/query/filter-expression/function-expression";
 import { JSONPathFilterQueryExpression } from "@/jsonpath-tools/query/filter-expression/filter-query-expression";
-import { DescriptionProvider } from "@/jsonpath-tools/editor-services/description-provider";
+import { SyntaxDescriptionProvider } from "@/jsonpath-tools/editor-services/syntax-description-provider";
 import { defaultJSONPathOptions } from "@/jsonpath-tools/options";
 
 const OutlinePanel = memo(({
@@ -107,7 +107,7 @@ const classNameMap = new Map<JSONPathSyntaxTreeType, string>([
 ]);
 
 function getLabel(tree: JSONPathSyntaxTree): string {
-    return new DescriptionProvider(defaultJSONPathOptions).provideDescription(tree)?.title ?? tree.type;
+    return new SyntaxDescriptionProvider(defaultJSONPathOptions).provideDescription(tree)?.title ?? tree.type;
     if (tree instanceof JSONPathQuery) return "$ Query";
     if (tree instanceof JSONPathSegment) return "[] Segment";
     if (tree instanceof JSONPathFilterSelector) return "? Filter Selector";

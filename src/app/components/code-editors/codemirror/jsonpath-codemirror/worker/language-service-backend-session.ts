@@ -12,7 +12,8 @@ import { SignatureProvider } from "@/jsonpath-tools/editor-services/signature-pr
 import { TooltipProvider } from "@/jsonpath-tools/editor-services/tooltip-provider";
 import { DocumentHighlightsProvider } from "@/jsonpath-tools/editor-services/document-highlights-provider";
 import { Formatter } from "@/jsonpath-tools/editor-services/formatter";
-import { JsonSchema } from "@/jsonpath-tools/editor-services/helpers/json-schema";
+import { AnyType, Type } from "@/jsonpath-tools/editor-services/helpers/types";
+import { schemaToType } from "@/jsonpath-tools/editor-services/helpers/type-schema-converter";
 
 export class LanguageServiceBackendSession {
     private readonly parser: JSONPathParser;
@@ -26,7 +27,7 @@ export class LanguageServiceBackendSession {
     private formatter: Formatter;
     private query: JSONPath;
     private queryArgument: JSONPathJSONValue | undefined;
-    private queryArgumentSchema: JsonSchema | undefined;
+    private queryArgumentType: Type;
     private dynamicAnalysisResult: DynamicAnalysisResult | null;
     private lastCompletions: readonly CompletionItem[];
 
@@ -42,7 +43,7 @@ export class LanguageServiceBackendSession {
         this.formatter = new Formatter();
         this.query = this.parser.parse("");
         this.queryArgument = undefined;
-        this.queryArgumentSchema = undefined;
+        this.queryArgumentType = AnyType.create();
         this.dynamicAnalysisResult = null;
         this.lastCompletions = [];
     }
@@ -80,13 +81,13 @@ export class LanguageServiceBackendSession {
     }
 
     updateQueryArgumentSchema(message: UpdateQueryArgumentSchemaLanguageServiceMessage) {
-        this.queryArgumentSchema = message.newQueryArgumentSchema !== undefined
-            ? JsonSchema.create(message.newQueryArgumentSchema)
-            : undefined;
+        this.queryArgumentType = message.newQueryArgumentSchema !== undefined
+            ? schemaToType(message.newQueryArgumentSchema)
+            : AnyType.create();
     }
 
     getCompletions(message: GetCompletionsLanguageServiceMessage): GetCompletionsLanguageServiceMessageResponse {
-        const completions = logPerformance("Get completions", () => this.completionProvider.provideCompletions(this.query, this.queryArgument, this.queryArgumentSchema, message.position));
+        const completions = logPerformance("Get completions", () => this.completionProvider.provideCompletions(this.query, this.queryArgument, this.queryArgumentType, message.position));
         this.lastCompletions = completions;
 
         return {
@@ -120,7 +121,7 @@ export class LanguageServiceBackendSession {
     }
 
     getTooltip(message: GetTooltipLanguageServiceMessage): GetTooltipLanguageServiceMessageResponse {
-        const tooltip = this.tooltipProvider.provideTooltip(this.query, message.position);
+        const tooltip = this.tooltipProvider.provideTooltip(this.query, this.queryArgument, this.queryArgumentType, message.position);
 
         return {
             tooltip: tooltip
