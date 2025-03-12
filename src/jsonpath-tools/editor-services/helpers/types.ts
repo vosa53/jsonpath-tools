@@ -1,4 +1,4 @@
-import { JSONPathNothing } from "@/jsonpath-tools/types";
+import { JSONPathJSONValue, JSONPathNothing } from "@/jsonpath-tools/types";
 import { JSONPathNormalizedPath } from "../../transformations";
 
 export enum TypeUsageContext {
@@ -6,7 +6,39 @@ export enum TypeUsageContext {
     query
 }
 
+export class TypeAnnotation {
+    constructor(
+        readonly title: string,
+        readonly description: string,
+        readonly deprecated: boolean,
+        readonly readOnly: boolean,
+        readonly writeOnly: boolean,
+        readonly defaultValue: JSONPathJSONValue | undefined,
+        readonly exampleValues: readonly JSONPathJSONValue[]
+    ) { }
+
+    static readonly EMPTY_SET: ReadonlySet<TypeAnnotation> = new Set<TypeAnnotation>();
+}
+
 export abstract class Type {
+    constructor(
+        readonly annotations: ReadonlySet<TypeAnnotation>
+    ) { }
+
+    abstract withAnnotations(annotations: ReadonlySet<TypeAnnotation>): Type;
+
+    addAnnotations(annotations: ReadonlySet<TypeAnnotation>): Type {
+        if (annotations.size === 0) 
+            return this;
+        const newAnnotations = this.annotations.union(annotations);
+        return this.withAnnotations(newAnnotations);
+    }
+
+    collectAnnotations(annotations: Set<TypeAnnotation>) {
+        for (const annotation of this.annotations)
+            annotations.add(annotation);
+    }
+
     abstract getChildrenType(): Type;
     abstract collectKnownPathSegments(pathSegments: Set<string | number>): void;
     abstract getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type;
@@ -33,13 +65,14 @@ export enum PrimitiveTypeType {
 
 export class LiteralType extends Type {
     private constructor(
-        readonly value: string | number | boolean
+        readonly value: string | number | boolean,
+        annotations: ReadonlySet<TypeAnnotation>
     ) {
-        super();
+        super(annotations);
     }
 
-    static create(value: string | number | boolean): LiteralType {
-        return new LiteralType(value);
+    static create(value: string | number | boolean, annotations = TypeAnnotation.EMPTY_SET): LiteralType {
+        return new LiteralType(value, annotations);
     }
 
     get type(): PrimitiveTypeType {
@@ -51,6 +84,10 @@ export class LiteralType extends Type {
             return PrimitiveTypeType.boolean;
         else
             throw new Error("Unknown literal type.");
+    }
+
+    withAnnotations(annotations: ReadonlySet<TypeAnnotation>): Type {
+        return new LiteralType(this.value, annotations);
     }
 
     getChildrenType(): Type {
@@ -83,13 +120,18 @@ export class LiteralType extends Type {
 
 export class PrimitiveType extends Type {
     private constructor(
-        readonly type: PrimitiveTypeType
+        readonly type: PrimitiveTypeType,
+        annotations: ReadonlySet<TypeAnnotation>
     ) {
-        super();
+        super(annotations);
     }
 
-    static create(type: PrimitiveTypeType): PrimitiveType {
-        return new PrimitiveType(type);
+    static create(type: PrimitiveTypeType, annotations = TypeAnnotation.EMPTY_SET): PrimitiveType {
+        return new PrimitiveType(type, annotations);
+    }
+
+    withAnnotations(annotations: ReadonlySet<TypeAnnotation>): Type {
+        return new PrimitiveType(this.type, annotations);
     }
 
     getChildrenType(): Type {
@@ -124,17 +166,22 @@ export class ObjectType extends Type {
     private constructor(
         readonly propertyTypes: ReadonlyMap<string, Type>,
         readonly restPropertyType: Type,
-        readonly requiredProperties: ReadonlySet<string>
+        readonly requiredProperties: ReadonlySet<string>,
+        annotations: ReadonlySet<TypeAnnotation>
     ) {
-        super();
+        super(annotations);
     }
 
-    static create(propertyTypes: ReadonlyMap<string, Type>, restPropertyType: Type, requiredProperties: ReadonlySet<string>): ObjectType | NeverType {
+    static create(propertyTypes: ReadonlyMap<string, Type>, restPropertyType: Type, requiredProperties: ReadonlySet<string>, annotations = TypeAnnotation.EMPTY_SET): ObjectType | NeverType {
         const isSomeRequiredPropertyNever = propertyTypes.entries().some(([name, type]) => type instanceof NeverType && requiredProperties.has(name));
         if (isSomeRequiredPropertyNever)
             return NeverType.create();
 
-        return new ObjectType(propertyTypes, restPropertyType, requiredProperties);
+        return new ObjectType(propertyTypes, restPropertyType, requiredProperties, annotations);
+    }
+
+    withAnnotations(annotations: ReadonlySet<TypeAnnotation>): Type {
+        return new ObjectType(this.propertyTypes, this.restPropertyType, this.requiredProperties, annotations);
     }
 
     getChildrenType(): Type {
@@ -149,7 +196,7 @@ export class ObjectType extends Type {
     getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
         if (typeof segment === "number")
             return usageContext === TypeUsageContext.query ? NeverType.create() : PrimitiveType.create(PrimitiveTypeType.nothing);
-        
+
         let type = this.propertyTypes.get(segment);
         if (type === undefined)
             type = this.restPropertyType;
@@ -169,7 +216,7 @@ export class ObjectType extends Type {
             return operation(this)
         if (typeof path[0] === "number" || !this.propertyTypes.has(path[0]))
             return this;
-        
+
         const newPropertyTypes = new Map(this.propertyTypes);
         newPropertyTypes.set(path[0], newPropertyTypes.get(path[0])!.changeTypeAtPath(path.slice(1), operation));
         return ObjectType.create(newPropertyTypes, this.restPropertyType, this.requiredProperties);
@@ -190,16 +237,21 @@ export class ArrayType extends Type {
     private constructor(
         readonly prefixElementTypes: readonly Type[],
         readonly restElementType: Type,
-        readonly requiredElementCount: number
+        readonly requiredElementCount: number,
+        annotations: ReadonlySet<TypeAnnotation>
     ) {
-        super();
+        super(annotations);
     }
 
-    static create(prefixElementTypes: readonly Type[], restElementType: Type, requiredElementCount: number): ArrayType | NeverType {
+    static create(prefixElementTypes: readonly Type[], restElementType: Type, requiredElementCount: number, annotations = TypeAnnotation.EMPTY_SET): ArrayType | NeverType {
         const isSomeRequiredElementNever = prefixElementTypes.some((type, i) => type instanceof NeverType && i < requiredElementCount);
         if (isSomeRequiredElementNever)
             return NeverType.create();
-        return new ArrayType(prefixElementTypes, restElementType, requiredElementCount);
+        return new ArrayType(prefixElementTypes, restElementType, requiredElementCount, annotations);
+    }
+
+    withAnnotations(annotations: ReadonlySet<TypeAnnotation>): Type {
+        return new ArrayType(this.prefixElementTypes, this.restElementType, this.requiredElementCount, annotations);
     }
 
     getChildrenType(): Type {
@@ -214,7 +266,7 @@ export class ArrayType extends Type {
     getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
         if (typeof segment === "string")
             return usageContext === TypeUsageContext.query ? NeverType.create() : PrimitiveType.create(PrimitiveTypeType.nothing);
-        
+
         let type;
         if (segment < this.prefixElementTypes.length)
             type = this.prefixElementTypes[segment];
@@ -252,34 +304,53 @@ export class ArrayType extends Type {
 
 export class UnionType extends Type {
     private constructor(
-        readonly types: readonly Type[]
+        readonly types: readonly Type[],
+        annotations: ReadonlySet<TypeAnnotation>
     ) {
-        super();
+        super(annotations);
     }
 
-    static create(types: readonly Type[]): Type {
+    static create(types: readonly Type[], annotations = TypeAnnotation.EMPTY_SET): Type {
         const flattenedTypes = types.flatMap(type => {
             if (type instanceof UnionType)
-                return type.types;
+                return type.types.map(t => t.addAnnotations(type.annotations));
             else
                 return [type];
         });
         for (let i = 0; i < flattenedTypes.length; i++) {
-            for (let j = 0; j < flattenedTypes.length; j++) {
-                if (i == j) continue;
-                const typeA = flattenedTypes[i];
-                const typeB = flattenedTypes[j];
-                if (isSubtypeOf(typeA, typeB))
+            for (let j = i + 1; j < flattenedTypes.length; j++) {
+                const typeI = flattenedTypes[i];
+                const typeJ = flattenedTypes[j];
+                const isISubtypeOfJ = isSubtypeOf(typeI, typeJ);
+                const isJSubtypeOfI = isSubtypeOf(typeJ, typeI);
+                const areEquivalent = isISubtypeOfJ && isJSubtypeOfI;
+                if (areEquivalent) {
                     flattenedTypes[i] = NeverType.create();
+                    flattenedTypes[j] = typeJ.addAnnotations(typeI.annotations);
+                }
+                else if (isISubtypeOfJ)
+                    flattenedTypes[i] = NeverType.create();
+                else if (isJSubtypeOfI)
+                    flattenedTypes[j] = NeverType.create();
             }
         }
         const filteredFlattenedTypes = flattenedTypes.filter(type => !(type instanceof NeverType));
         if (filteredFlattenedTypes.length === 0)
             return NeverType.create();
         else if (filteredFlattenedTypes.length === 1)
-            return filteredFlattenedTypes[0];
+            return filteredFlattenedTypes[0].addAnnotations(annotations);
         else
-            return new UnionType(filteredFlattenedTypes);
+            return new UnionType(filteredFlattenedTypes, annotations);
+    }
+
+    withAnnotations(annotations: ReadonlySet<TypeAnnotation>): Type {
+        return new UnionType(this.types, annotations);
+    }
+
+    collectAnnotations(annotations: Set<TypeAnnotation>) {
+        super.collectAnnotations(annotations);
+        for (const type of this.types)
+            type.collectAnnotations(annotations);
     }
 
     getChildrenType(): Type {
@@ -313,14 +384,23 @@ export class UnionType extends Type {
 }
 
 export class NeverType extends Type {
-    private static readonly instance: NeverType = new NeverType();
+    private static readonly instance: NeverType = new NeverType(TypeAnnotation.EMPTY_SET);
 
-    private constructor() {
-        super();
+    private constructor(
+        annotations: ReadonlySet<TypeAnnotation>
+    ) {
+        super(annotations);
     }
 
-    static create(): NeverType {
-        return NeverType.instance;
+    static create(annotations = TypeAnnotation.EMPTY_SET): NeverType {
+        if (annotations.size === 0)
+            return NeverType.instance;
+        else
+            return new NeverType(annotations);
+    }
+
+    withAnnotations(annotations: ReadonlySet<TypeAnnotation>): Type {
+        return new NeverType(annotations);
     }
 
     getChildrenType(): Type {
@@ -351,12 +431,21 @@ export class NeverType extends Type {
 export class AnyType extends Type {
     private static readonly instance: AnyType = new AnyType();
 
-    private constructor() {
-        super();
+    private constructor(
+        annotations: ReadonlySet<TypeAnnotation> = TypeAnnotation.EMPTY_SET
+    ) {
+        super(annotations);
     }
 
-    static create(): AnyType {
-        return AnyType.instance;
+    static create(annotations = TypeAnnotation.EMPTY_SET): AnyType {
+        if (annotations.size === 0)
+            return AnyType.instance;
+        else
+            return new AnyType(annotations);
+    }
+
+    withAnnotations(annotations: ReadonlySet<TypeAnnotation>): Type {
+        return new AnyType(annotations);
     }
 
     getChildrenType(): Type {
@@ -386,14 +475,14 @@ export class AnyType extends Type {
 
 export function intersectTypes(typeA: Type, typeB: Type): Type {
     if (typeA instanceof UnionType)
-        return UnionType.create(typeA.types.map(type => intersectTypes(type, typeB)));
+        return UnionType.create(typeA.types.map(type => intersectTypes(type, typeB)), typeA.annotations);
     if (typeB instanceof UnionType)
-        return UnionType.create(typeB.types.map(type => intersectTypes(typeA, type)));
+        return UnionType.create(typeB.types.map(type => intersectTypes(typeA, type)), typeB.annotations);
 
     if (isSubtypeOf(typeA, typeB))
-        return typeA;
+        return typeA.addAnnotations(typeB.annotations);
     if (isSubtypeOf(typeB, typeA))
-        return typeB;
+        return typeB.addAnnotations(typeA.annotations);
 
     if (typeA instanceof ObjectType && typeB instanceof ObjectType) {
         const propertyNames = new Set([...typeA.propertyTypes.keys(), ...typeB.propertyTypes.keys()]);
@@ -405,8 +494,9 @@ export function intersectTypes(typeA: Type, typeB: Type): Type {
             intersectedPropertyTypes.set(propertyName, intersectedPropertyType);
         }
         const intersectedRestPropertyType = intersectTypes(typeA.restPropertyType, typeB.restPropertyType);
-        const intersectedRequiredProperties = typeA.requiredProperties.union(typeB.requiredProperties)
-        return ObjectType.create(intersectedPropertyTypes, intersectedRestPropertyType, intersectedRequiredProperties);
+        const intersectedRequiredProperties = typeA.requiredProperties.union(typeB.requiredProperties);
+        const intersectedAnnotations = typeA.annotations.union(typeB.annotations);
+        return ObjectType.create(intersectedPropertyTypes, intersectedRestPropertyType, intersectedRequiredProperties, intersectedAnnotations);
     }
     if (typeA instanceof ArrayType && typeB instanceof ArrayType) {
         const prefixElementTypes: Type[] = [];
@@ -416,7 +506,8 @@ export function intersectTypes(typeA: Type, typeB: Type): Type {
         }
         const restElementType = intersectTypes(typeA.restElementType, typeB.restElementType);
         const intersectedRequiredElementCount = Math.max(typeA.requiredElementCount, typeB.requiredElementCount);
-        return ArrayType.create(prefixElementTypes, restElementType, intersectedRequiredElementCount);
+        const intersectedAnnotations = typeA.annotations.union(typeB.annotations);
+        return ArrayType.create(prefixElementTypes, restElementType, intersectedRequiredElementCount, intersectedAnnotations);
     }
     return NeverType.create();
 }
@@ -424,11 +515,11 @@ export function intersectTypes(typeA: Type, typeB: Type): Type {
 export function subtractTypes(typeA: Type, typeB: Type): Type {
     if (typeA instanceof UnionType) {
         const newTypes = typeA.types.map(type => subtractTypes(type, typeB))
-        return UnionType.create(newTypes);
+        return UnionType.create(newTypes, typeA.annotations);
     }
     if (typeB instanceof UnionType) {
         const newTypes = typeB.types.map(type => subtractTypes(typeA, type))
-        return UnionType.create(newTypes);
+        return UnionType.create(newTypes, typeB.annotations);
     }
     if (isSubtypeOf(typeA, typeB))
         return NeverType.create();
@@ -437,6 +528,8 @@ export function subtractTypes(typeA: Type, typeB: Type): Type {
 }
 
 export function isSubtypeOf(typeA: Type, typeB: Type): boolean {
+    if (typeA === typeB)
+        return true;
     if (typeB instanceof AnyType)
         return true;
     if (typeB instanceof UnionType)

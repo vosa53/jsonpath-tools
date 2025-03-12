@@ -1,5 +1,5 @@
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
-import { AnyType, ArrayType, intersectTypes, LiteralType, NeverType, ObjectType, PrimitiveType, PrimitiveTypeType, subtractTypes, Type, UnionType } from "./types";
+import { AnyType, ArrayType, intersectTypes, LiteralType, NeverType, ObjectType, PrimitiveType, PrimitiveTypeType, subtractTypes, Type, TypeAnnotation, UnionType } from "./types";
 import { RawJSONSchema } from "./raw-json-schema";
 
 type ObjectJsonSchema = {
@@ -15,6 +15,8 @@ export function schemaToType(jsonSchema: any): Type {
         return NeverType.create();
     
     const types = [
+        createNullType(jsonSchema),
+        createBooleanType(jsonSchema),
         createStringType(jsonSchema),
         createNumberType(jsonSchema),
         createObjectType(jsonSchema),
@@ -31,11 +33,28 @@ export function schemaToType(jsonSchema: any): Type {
         createAnyOfType(jsonSchema),
         createOneOfType(jsonSchema),
     ];
-
     const notType = createNotType(jsonSchema);
 
     const additionalConstraints = additionalConstraintTypes.reduce((a, b) => intersectTypes(a, b));
-    return subtractTypes(additionalConstraints, notType);
+    let resultType = subtractTypes(additionalConstraints, notType);
+
+    const typeAnnotation = schemaToTypeAnnotation(jsonSchema);
+    if (typeAnnotation !== null)
+        resultType = resultType.addAnnotations(new Set([typeAnnotation]));
+
+    return resultType;
+}
+
+function createNullType(jsonSchema: ObjectJsonSchema) {
+    if (!isTypePermittedByTypeConstraint("null", jsonSchema))
+        return NeverType.create();
+    return PrimitiveType.create(PrimitiveTypeType.null);
+}
+
+function createBooleanType(jsonSchema: ObjectJsonSchema) {
+    if (!isTypePermittedByTypeConstraint("boolean", jsonSchema))
+        return NeverType.create();
+    return PrimitiveType.create(PrimitiveTypeType.boolean);
 }
 
 function createStringType(jsonSchema: ObjectJsonSchema) {
@@ -126,6 +145,27 @@ function createConstantValueType(value: any): Type {
         return LiteralType.create(value);
     else
         throw new Error("Not supported."); // TODO
+}
+
+export function schemaToTypeAnnotation(jsonSchema: any): TypeAnnotation | null {
+    const title = jsonSchema.title;
+    const description = jsonSchema.description;
+    const readOnly = jsonSchema.readOnly;
+    const writeOnly = jsonSchema.writeOnly;
+    const deprecated = jsonSchema.deprecated;
+    const defaultValue = jsonSchema.default;
+    const exampleValues = jsonSchema.examples;
+    if (title === undefined && description === undefined && readOnly === undefined && writeOnly === undefined && deprecated === undefined && defaultValue === undefined && exampleValues === undefined)
+        return null;
+    return new TypeAnnotation(
+        title ?? "",
+        description ?? "",
+        deprecated ?? false,
+        readOnly ?? false,
+        writeOnly ?? false,
+        defaultValue ?? undefined,
+        exampleValues ?? []
+    );
 }
 
 function isTypePermittedByTypeConstraint(type: string, jsonSchema: ObjectJsonSchema): boolean {

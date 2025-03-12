@@ -11,7 +11,8 @@ import { JsonSchema } from "./helpers/json-schema";
 import { logPerformance } from "../utils";
 import { TypeAnalyzer } from "./helpers/type-analyzer";
 import { JSONPathQuery } from "../query/query";
-import { TypeUsageContext } from "./helpers/types";
+import { TypeAnnotation, TypeUsageContext } from "./helpers/types";
+import { schemaToTypeAnnotation } from "./helpers/type-schema-converter";
 
 export class CompletionProvider {
     private readonly descriptionProvider: DescriptionProvider;
@@ -80,8 +81,15 @@ export class CompletionProvider {
         const pathsSegments = new Set<string | number>();
         previousType.collectKnownPathSegments(pathsSegments);
         for (const pathSegment of pathsSegments) {
+            const pahtSegmentString = pathSegment.toString();
             const pathSegmentType = previousType.getTypeAtPathSegment(pathSegment, TypeUsageContext.query);
-            completions.push(new CompletionItem(CompletionItemType.name, pathSegment.toString(), pathSegmentType.toString(), () => "TODO"));
+            const pathSegmentTypeString = pathSegmentType.toString();
+            completions.push(new CompletionItem(CompletionItemType.name, pahtSegmentString, pathSegmentTypeString, () => {
+                const annotations = new Set<TypeAnnotation>();
+                pathSegmentType.collectAnnotations(annotations);
+                return this.descriptionProvider.provideDescriptionForNameSelector(pahtSegmentString, pathSegmentTypeString, Array.from(annotations))
+                    .toMarkdown();
+            }));
         }
     }
 
@@ -90,11 +98,25 @@ export class CompletionProvider {
         const nodes = this.getAllNodesAtSegment(queryArgument, query, segment);
         const keysAndTypes = this.getDistinctKeysAndTypes(nodes);
         for (const [key, types] of keysAndTypes) {
-            const typesText = Array.from(types).join(" | ");
-            completions.push(new CompletionItem(CompletionItemType.name, key, typesText, () => {
+            const typeText = Array.from(types).join(" | ");
+            completions.push(new CompletionItem(CompletionItemType.name, key, typeText, () => {
                 const schemas = logPerformance("Calculate schemas", () => this.getSchemas(nodes, key, schemaCache, queryArgumentSchema));
-                const example = types.has("string") || types.has("number") ? this.getExample(nodes, key) : undefined;
-                return this.descriptionProvider.provideDescriptionForNameSelector(key, schemas, [...types], example).toMarkdown();
+                
+                const annotations: TypeAnnotation[] = [];
+                for (const schema of schemas) {
+                    const annotation = schemaToTypeAnnotation(schema);
+                    if (annotation !== null)
+                        annotations.push(annotation);
+                }
+                if (types.has("string") || types.has("number")) {
+                    const example = this.getExample(nodes, key);
+                    if (example !== undefined) {
+                        const exampleAnnotation = new TypeAnnotation("", "", false, false, false, undefined, [example]);
+                        annotations.push(exampleAnnotation);
+                    }
+                }
+
+                return this.descriptionProvider.provideDescriptionForNameSelector(key, typeText, annotations).toMarkdown();
             }));
         }
     }

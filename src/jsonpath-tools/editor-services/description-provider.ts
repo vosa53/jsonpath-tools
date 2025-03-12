@@ -5,6 +5,7 @@ import { JSONPathNameSelector } from "../query/selectors/name-selector";
 import { JSONPathSyntaxTree } from "../query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
 import { JSONPathJSONValue } from "../types";
+import { TypeAnnotation } from "./helpers/types";
 
 export class DescriptionProvider {
     private readonly descriptionProviders = new Map<JSONPathSyntaxTreeType, (node: JSONPathSyntaxTree) => Description>([
@@ -77,28 +78,27 @@ export class DescriptionProvider {
         return new Description("Index Selector", "Selects an object at the given index from an array.");
     }
 
-    provideDescriptionForNameSelector(name: string, schemas?: JSONPathJSONValue[], types?: string[], example?: JSONPathJSONValue): Description {
+    provideDescriptionForNameSelector(name: string, type?: string, annotations?: TypeAnnotation[]): Description {
         let text = `Selects a property \`${name}\` from the object.`;
-        if (schemas !== undefined && schemas.length > 0) {
-            text += "\n\n---\n";
-            for (const schema of schemas) {
-                if (typeof schema !== "object" || Array.isArray(schema) || schema === null) 
-                    continue;
-                if (Object.hasOwn(schema, "title"))
-                    text += `\n##### ${schema.title}`;
-                if (Object.hasOwn(schema, "description"))
-                    text += `\n${schema.description}`;
-            }
-        }
-        if (types !== undefined || example !== undefined) {
-            text += "\n\n---\n";
-            if (types !== undefined)
-                text += `\n##### Type: \`${types.join(" | ")}\``;
-            if (example !== undefined) {
-                text += "\n##### Example\n";
-                text += "```json\n";
-                text += JSON.stringify(example, null, 4);
-                text += "\n```";
+
+        if (type !== undefined)
+            text += `\n\n---\n\n##### Type: \`${type}\``;
+
+        if (annotations !== undefined) {
+            for (const annotation of annotations) {
+                text += "\n\n---\n";
+                if (annotation.title !== "")
+                    text += `\n##### ${annotation.title}`;
+                if (annotation.description !== "")
+                    text += `\n${annotation.description}`;
+                if (annotation.exampleValues.length > 0) {
+                    text += "\n###### Examples";
+                    for (const example of annotation.exampleValues) {
+                        text += "\n```json\n";
+                        text += JSON.stringify(example, null, 4);
+                        text += "\n```";
+                    }
+                }
             }
         }
 
