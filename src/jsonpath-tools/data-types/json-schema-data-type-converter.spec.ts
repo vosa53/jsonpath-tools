@@ -1,5 +1,5 @@
 import { describe, it } from "vitest";
-import { jsonSchemaToType } from "./json-schema-to-type";
+import { jsonSchemaToType } from "./json-schema-data-type-converter";
 
 export const jsonSchemaForTest = `{
   "$schema": "http://json-schema.org/draft-07/schema#",

@@ -1,3 +1,6 @@
+import { getJSONTypeName } from "../data-types/json-types";
+import { DataTypeAnalyzer } from "../data-types/data-type-analyzer";
+import { DataType, DataTypeAnnotation } from "../data-types/data-types";
 import { JSONPathOptions } from "../options";
 import { JSONPathQueryContext } from "../query/evaluation";
 import { JSONPath } from "../query/json-path";
@@ -6,9 +9,6 @@ import { JSONPathSegment } from "../query/segment";
 import { JSONPathSyntaxTree } from "../query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
 import { JSONPathJSONValue } from "../types";
-import { getJSONTypeName } from "../typing/json-types";
-import { TypeAnalyzer } from "../typing/type-analyzer";
-import { Type, TypeAnnotation } from "../typing/types";
 import { AnalysisDescriptionProvider } from "./analysis-description-provider";
 import { SyntaxDescriptionProvider } from "./syntax-description-provider";
 
@@ -23,7 +23,7 @@ export class CompletionProvider {
         this.analysisDescriptionProvider = new AnalysisDescriptionProvider();
     }
 
-    provideCompletions(query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: Type, position: number): CompletionItem[] {
+    provideCompletions(query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType, position: number): CompletionItem[] {
         const completions: CompletionItem[] = [];
         const nodePaths = query.getTouchingAtPosition(position);
         for (const nodePath of nodePaths)
@@ -31,7 +31,7 @@ export class CompletionProvider {
         return completions;
     }
 
-    private provideCompletionsForNodePath(query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: Type, nodePath: JSONPathSyntaxTree[], completions: CompletionItem[]) {
+    private provideCompletionsForNodePath(query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType, nodePath: JSONPathSyntaxTree[], completions: CompletionItem[]) {
         const lastNode = nodePath[nodePath.length - 1];
         const lastButOneNode = nodePath[nodePath.length - 2];
 
@@ -65,14 +65,14 @@ export class CompletionProvider {
             this.completeFunctions(completions);
     }
 
-    private completeSegment(completions: CompletionItem[], segment: JSONPathSegment, query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: Type) {
+    private completeSegment(completions: CompletionItem[], segment: JSONPathSegment, query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType) {
         if (queryArgument !== undefined)
             this.completeSegmentData(completions, segment, query, queryArgument, queryArgumentType);
         else
             this.completeSegmentType(completions, segment, queryArgumentType);
     }
 
-    private completeSegmentType(completions: CompletionItem[], segment: JSONPathSegment, queryArgumentType: Type) {
+    private completeSegmentType(completions: CompletionItem[], segment: JSONPathSegment, queryArgumentType: DataType) {
         const previousType = this.getIncomingType(segment, queryArgumentType);
         const pathsSegments = previousType.collectKnownPathSegments();
         for (const pathSegment of pathsSegments) {
@@ -87,8 +87,8 @@ export class CompletionProvider {
         }
     }
 
-    private completeSegmentData(completions: CompletionItem[], segment: JSONPathSegment, query: JSONPath, queryArgument: JSONPathJSONValue, queryArgumentType: Type) {
-        let previousType: Type;
+    private completeSegmentData(completions: CompletionItem[], segment: JSONPathSegment, query: JSONPath, queryArgument: JSONPathJSONValue, queryArgumentType: DataType) {
+        let previousType: DataType;
         const nodes = this.getAllNodesAtSegment(queryArgument, query, segment);
         const keysAndTypes = this.getDistinctKeysAndTypes(nodes);
         for (const [key, types] of keysAndTypes) {
@@ -99,7 +99,7 @@ export class CompletionProvider {
                 if (types.has("string") || types.has("number")) {
                     const example = this.getStringOrNumberExample(nodes, key);
                     if (example !== undefined) {
-                        const exampleAnnotation = new TypeAnnotation("", "", false, false, false, undefined, [example]);
+                        const exampleAnnotation = new DataTypeAnnotation("", "", false, false, false, undefined, [example]);
                         annotations.add(exampleAnnotation);
                     }
                 }
@@ -110,8 +110,8 @@ export class CompletionProvider {
         }
     }
 
-    private getIncomingType(segment: JSONPathSegment, queryArgumentType: Type): Type {
-        const typeAnalyzer = new TypeAnalyzer(queryArgumentType);
+    private getIncomingType(segment: JSONPathSegment, queryArgumentType: DataType): DataType {
+        const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType);
         return typeAnalyzer.getIncomingTypeToSegment(segment);
     }
 

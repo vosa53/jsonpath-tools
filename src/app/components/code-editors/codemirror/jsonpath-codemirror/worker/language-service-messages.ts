@@ -1,7 +1,7 @@
+import { RawJSONSchema } from "@/jsonpath-tools/data-types/json-schema-data-type-converter";
 import { JSONPathDiagnostics } from "@/jsonpath-tools/diagnostics";
 import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-provider";
 import { DocumentHighlight } from "@/jsonpath-tools/editor-services/document-highlights-provider";
-import { RawJSONSchema } from "@/jsonpath-tools/editor-services/helpers/raw-json-schema";
 import { Signature } from "@/jsonpath-tools/editor-services/signature-provider";
 import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-provider";
 import { JSONPathFunction, JSONPathType } from "@/jsonpath-tools/options";

@@ -1,12 +1,12 @@
+import { getJSONTypeName } from "../data-types/json-types";
+import { DataTypeAnalyzer } from "../data-types/data-type-analyzer";
+import { DataType, DataTypeAnnotation } from "../data-types/data-types";
 import { JSONPathOptions } from "../options";
 import { JSONPath } from "../query/json-path";
 import { JSONPathSyntaxTree } from "../query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
 import { TextRange } from "../text-range";
 import { JSONPathJSONValue } from "../types";
-import { getJSONTypeName } from "../typing/json-types";
-import { TypeAnalyzer } from "../typing/type-analyzer";
-import { Type, TypeAnnotation } from "../typing/types";
 import { AnalysisDescriptionProvider } from "./analysis-description-provider";
 import { SyntaxDescriptionProvider } from "./syntax-description-provider";
 
@@ -21,7 +21,7 @@ export class TooltipProvider {
         this.analysisDescriptionProvider = new AnalysisDescriptionProvider();
     }
 
-    provideTooltip(query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: Type, position: number): Tooltip | null {
+    provideTooltip(query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType, position: number): Tooltip | null {
         const nodePath = query.getAtPosition(position);
         if (nodePath.length === 0)
             return null;
@@ -77,13 +77,13 @@ export class TooltipProvider {
             return null;
     }
 
-    private createTooltip(node: JSONPathSyntaxTree, query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: Type): Tooltip | null {
+    private createTooltip(node: JSONPathSyntaxTree, query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType): Tooltip | null {
         const description = this.syntaxDescriptionProvider.provideDescription(node);
         if (description === null)
             return null;
 
         let text = description.toMarkdown();
-        const typeAnalyzer = new TypeAnalyzer(queryArgumentType);
+        const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType);
         const type = typeAnalyzer.getType(node);
 
         const typeAnnotations = type.collectAnnotations();
@@ -92,7 +92,7 @@ export class TooltipProvider {
             const { typeNames, example } = this.findTypeNamesAndExample(node, query, queryArgument);
             typeName = Array.from(typeNames).join(" | ");
             if (example !== undefined)
-                typeAnnotations.add(new TypeAnnotation("", "", false, false, false, undefined, [example]));
+                typeAnnotations.add(new DataTypeAnnotation("", "", false, false, false, undefined, [example]));
         }
         else {
             typeName = type.toString();

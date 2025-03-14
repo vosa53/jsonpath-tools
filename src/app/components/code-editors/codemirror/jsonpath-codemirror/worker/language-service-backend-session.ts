@@ -12,8 +12,8 @@ import { SignatureProvider } from "@/jsonpath-tools/editor-services/signature-pr
 import { TooltipProvider } from "@/jsonpath-tools/editor-services/tooltip-provider";
 import { DocumentHighlightsProvider } from "@/jsonpath-tools/editor-services/document-highlights-provider";
 import { Formatter } from "@/jsonpath-tools/editor-services/formatter";
-import { AnyType, Type } from "@/jsonpath-tools/typing/types";
-import { jsonSchemaToType } from "@/jsonpath-tools/typing/json-schema-to-type";
+import { jsonSchemaToType } from "@/jsonpath-tools/data-types/json-schema-data-type-converter";
+import { DataType, AnyDataType } from "@/jsonpath-tools/data-types/data-types";
 
 export class LanguageServiceBackendSession {
     private readonly parser: JSONPathParser;
@@ -27,7 +27,7 @@ export class LanguageServiceBackendSession {
     private formatter: Formatter;
     private query: JSONPath;
     private queryArgument: JSONPathJSONValue | undefined;
-    private queryArgumentType: Type;
+    private queryArgumentType: DataType;
     private dynamicAnalysisResult: DynamicAnalysisResult | null;
     private lastCompletions: readonly CompletionItem[];
 
@@ -43,7 +43,7 @@ export class LanguageServiceBackendSession {
         this.formatter = new Formatter();
         this.query = this.parser.parse("");
         this.queryArgument = undefined;
-        this.queryArgumentType = AnyType.create();
+        this.queryArgumentType = AnyDataType.create();
         this.dynamicAnalysisResult = null;
         this.lastCompletions = [];
     }
@@ -83,7 +83,7 @@ export class LanguageServiceBackendSession {
     updateQueryArgumentSchema(message: UpdateQueryArgumentSchemaLanguageServiceMessage) {
         this.queryArgumentType = message.newQueryArgumentSchema !== undefined
             ? jsonSchemaToType(message.newQueryArgumentSchema)
-            : AnyType.create();
+            : AnyDataType.create();
     }
 
     getCompletions(message: GetCompletionsLanguageServiceMessage): GetCompletionsLanguageServiceMessageResponse {

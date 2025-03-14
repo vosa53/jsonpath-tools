@@ -1,7 +1,7 @@
-import { TypeAnnotation } from "../typing/types";
+import { DataTypeAnnotation } from "../data-types/data-types";
 
 export class AnalysisDescriptionProvider {
-    provideDescription(type?: string, annotations?: TypeAnnotation[]): string {
+    provideDescription(type?: string, annotations?: DataTypeAnnotation[]): string {
         let text = "";
         if (type !== undefined)
             text += `\n\n---\n\n##### Type: \`${type}\``;

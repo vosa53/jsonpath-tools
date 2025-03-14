@@ -1,10 +1,10 @@
-import { AnyType, LiteralType, NeverType, ObjectType, PrimitiveType, PrimitiveTypeType, Type, TypeAnnotation, UnionType } from "./types";
+import { AnyDataType, LiteralDataType, NeverDataType, ObjectDataType, PrimitiveDataType, PrimitiveDataTypeType, DataType, DataTypeAnnotation, UnionDataType } from "./data-types";
 
-export function jsonTypeDefinitionToType(jsonTypeDefinition: any): Type {
+export function jsonTypeDefinitionToType(jsonTypeDefinition: any): DataType {
     let type = createTypeBasedOnShape(jsonTypeDefinition);
 
     if (jsonTypeDefinition.nullable === true)
-        type = UnionType.create([type, PrimitiveType.create(PrimitiveTypeType.null)]);
+        type = UnionDataType.create([type, PrimitiveDataType.create(PrimitiveDataTypeType.null)]);
 
     const typeAnnotation = createTypeAnnotation(jsonTypeDefinition);
     if (typeAnnotation !== null)
@@ -13,7 +13,7 @@ export function jsonTypeDefinitionToType(jsonTypeDefinition: any): Type {
     return type;
 }
 
-function createTypeBasedOnShape(jsonTypeDefinition: any): Type {
+function createTypeBasedOnShape(jsonTypeDefinition: any): DataType {
     const typeType = createTypeType(jsonTypeDefinition);
     if (typeType !== null) return typeType;
 
@@ -33,18 +33,18 @@ function createTypeBasedOnShape(jsonTypeDefinition: any): Type {
     if (discriminatorType !== null) return discriminatorType;
 
     // TODO: Is this correct? Should not we exclude null (based on "nullable" property value)?
-    return AnyType.create();
+    return AnyDataType.create();
 }
 
-function createTypeType(jsonTypeDefinition: any): Type | null {
+function createTypeType(jsonTypeDefinition: any): DataType | null {
     if (jsonTypeDefinition.type === undefined)
         return null;
     switch (jsonTypeDefinition.type) {
         case "boolean":
-            return PrimitiveType.create(PrimitiveTypeType.boolean);
+            return PrimitiveDataType.create(PrimitiveDataTypeType.boolean);
         case "string":
         case "timestamp":
-            return PrimitiveType.create(PrimitiveTypeType.string);
+            return PrimitiveDataType.create(PrimitiveDataTypeType.string);
         case "float32":
         case "float64":
         case "int8":
@@ -53,35 +53,35 @@ function createTypeType(jsonTypeDefinition: any): Type | null {
         case "uint16":
         case "int32":
         case "uint32":
-            return PrimitiveType.create(PrimitiveTypeType.number);
+            return PrimitiveDataType.create(PrimitiveDataTypeType.number);
         default:
             return null;
     }
 }
 
-function createEnumType(jsonTypeDefinition: any): Type | null {
+function createEnumType(jsonTypeDefinition: any): DataType | null {
     if (jsonTypeDefinition.enum === undefined || !Array.isArray(jsonTypeDefinition.enum))
         return null;
-    const memberLiterals: LiteralType[] = [];
+    const memberLiterals: LiteralDataType[] = [];
     for (const enumMember of jsonTypeDefinition.enum) {
         if (typeof enumMember === "string")
-            memberLiterals.push(LiteralType.create(enumMember));
+            memberLiterals.push(LiteralDataType.create(enumMember));
     }
-    return UnionType.create(memberLiterals);
+    return UnionDataType.create(memberLiterals);
 }
 
-function createElementsType(jsonTypeDefinition: any): Type | null {
+function createElementsType(jsonTypeDefinition: any): DataType | null {
     if (jsonTypeDefinition.elements === undefined)
         return null;
     return jsonTypeDefinitionToType(jsonTypeDefinition.elements);
 }
 
-function createPropertiesType(jsonTypeDefinition: any): Type | null {
+function createPropertiesType(jsonTypeDefinition: any): DataType | null {
     if (jsonTypeDefinition.properties === undefined && jsonTypeDefinition.optionalProperties === undefined && jsonTypeDefinition.additionalProperties === undefined)
         return null;
 
-    const propertyTypes = new Map<string, Type>();
-    let restPropertyType = NeverType.create();
+    const propertyTypes = new Map<string, DataType>();
+    let restPropertyType = NeverDataType.create();
     const requiredProperties = new Set<string>();
     if (jsonTypeDefinition.properties !== undefined) {
         for (const [propertyName, propertyJSONTypeDefinition] of Object.entries(jsonTypeDefinition.properties)) {
@@ -97,38 +97,38 @@ function createPropertiesType(jsonTypeDefinition: any): Type | null {
         }
     }
     if (jsonTypeDefinition.additionalProperties === true)
-        restPropertyType = AnyType.create();
+        restPropertyType = AnyDataType.create();
     
-    return ObjectType.create(propertyTypes, restPropertyType, requiredProperties);
+    return ObjectDataType.create(propertyTypes, restPropertyType, requiredProperties);
 }
 
-function createValuesType(jsonTypeDefinition: any): Type | null {
+function createValuesType(jsonTypeDefinition: any): DataType | null {
     if (jsonTypeDefinition.values === undefined)
         return null;
     const valueType = jsonTypeDefinitionToType(jsonTypeDefinition.values);
-    return ObjectType.create(new Map<string, Type>(), valueType, new Set<string>());
+    return ObjectDataType.create(new Map<string, DataType>(), valueType, new Set<string>());
 }
 
-function createDiscriminatorType(jsonTypeDefinition: any): Type | null {
+function createDiscriminatorType(jsonTypeDefinition: any): DataType | null {
     if (jsonTypeDefinition.mapping === undefined || jsonTypeDefinition.discriminator === undefined)
         return null;
-    const types: Type[] = [];
+    const types: DataType[] = [];
     for (const mappingEntry of Object.entries(jsonTypeDefinition.mapping)) {
         const discriminatorValue = mappingEntry[0];
         // TODO: Add metadata.
         const type = createPropertiesType(mappingEntry[1]);
-        if (!(type instanceof ObjectType)) continue;
-        const propertyTypesWithDiscriminator = new Map<string, Type>(type.propertyTypes);
-        propertyTypesWithDiscriminator.set(jsonTypeDefinition.discriminator, LiteralType.create(discriminatorValue));
+        if (!(type instanceof ObjectDataType)) continue;
+        const propertyTypesWithDiscriminator = new Map<string, DataType>(type.propertyTypes);
+        propertyTypesWithDiscriminator.set(jsonTypeDefinition.discriminator, LiteralDataType.create(discriminatorValue));
         const requiredPropertiesWithDiscriminator = new Set<string>(type.requiredProperties);
         requiredPropertiesWithDiscriminator.add(jsonTypeDefinition.discriminator);
-        const resultType = ObjectType.create(propertyTypesWithDiscriminator, type.restPropertyType, requiredPropertiesWithDiscriminator);
+        const resultType = ObjectDataType.create(propertyTypesWithDiscriminator, type.restPropertyType, requiredPropertiesWithDiscriminator);
         types.push(resultType);
     }
-    return UnionType.create(types);
+    return UnionDataType.create(types);
 }
 
-function createTypeAnnotation(jsonTypeDefinition: any): TypeAnnotation | null {
+function createTypeAnnotation(jsonTypeDefinition: any): DataTypeAnnotation | null {
     if (jsonTypeDefinition.metadata === undefined)
         return null;
 
@@ -139,5 +139,5 @@ function createTypeAnnotation(jsonTypeDefinition: any): TypeAnnotation | null {
         const metadataJSONText = JSON.stringify(jsonTypeDefinition.metadata, null, 4);
         description = `Metadata:\n\`\`\`json\n${metadataJSONText}\n\`\`\``;
     }
-    return new TypeAnnotation("", description, false, false, false, undefined, []);
+    return new DataTypeAnnotation("", description, false, false, false, undefined, []);
 }

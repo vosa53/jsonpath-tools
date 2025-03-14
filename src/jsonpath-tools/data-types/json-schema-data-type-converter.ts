@@ -1,13 +1,13 @@
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
-import { AnyType, ArrayType, intersectTypes, LiteralType, NeverType, ObjectType, PrimitiveType, PrimitiveTypeType, subtractTypes, Type, TypeAnnotation, UnionType } from "./types";
+import { AnyDataType, ArrayDataType, intersectTypes, LiteralDataType, NeverDataType, ObjectDataType, PrimitiveDataType, PrimitiveDataTypeType, subtractTypes, DataType, DataTypeAnnotation, UnionDataType } from "./data-types";
 
-export function jsonSchemaToType(jsonSchema: any): Type {
+export function jsonSchemaToType(jsonSchema: any): DataType {
     if (jsonSchema === true)
-        return AnyType.create();
+        return AnyDataType.create();
     if (jsonSchema === false)
-        return NeverType.create();
+        return NeverDataType.create();
     if (typeof jsonSchema !== "object")
-        return NeverType.create();
+        return NeverDataType.create();
     
     const types = [
         createNullType(jsonSchema),
@@ -18,7 +18,7 @@ export function jsonSchemaToType(jsonSchema: any): Type {
         createArrayType(jsonSchema)
     ];
 
-    const basicTypes = UnionType.create(types);
+    const basicTypes = UnionDataType.create(types);
     
     const additionalConstraintTypes = [
         basicTypes,
@@ -42,107 +42,107 @@ export function jsonSchemaToType(jsonSchema: any): Type {
 
 function createNullType(jsonSchema: ObjectJsonSchema) {
     if (!isTypePermittedByTypeConstraint("null", jsonSchema))
-        return NeverType.create();
-    return PrimitiveType.create(PrimitiveTypeType.null);
+        return NeverDataType.create();
+    return PrimitiveDataType.create(PrimitiveDataTypeType.null);
 }
 
 function createBooleanType(jsonSchema: ObjectJsonSchema) {
     if (!isTypePermittedByTypeConstraint("boolean", jsonSchema))
-        return NeverType.create();
-    return PrimitiveType.create(PrimitiveTypeType.boolean);
+        return NeverDataType.create();
+    return PrimitiveDataType.create(PrimitiveDataTypeType.boolean);
 }
 
 function createStringType(jsonSchema: ObjectJsonSchema) {
     if (!isTypePermittedByTypeConstraint("string", jsonSchema))
-        return NeverType.create();
-    return PrimitiveType.create(PrimitiveTypeType.string);
+        return NeverDataType.create();
+    return PrimitiveDataType.create(PrimitiveDataTypeType.string);
 }
 
 function createNumberType(jsonSchema: ObjectJsonSchema) {
     if (!isTypePermittedByTypeConstraint("number", jsonSchema) && !isTypePermittedByTypeConstraint("integer", jsonSchema))
-        return NeverType.create();
-    return PrimitiveType.create(PrimitiveTypeType.number);
+        return NeverDataType.create();
+    return PrimitiveDataType.create(PrimitiveDataTypeType.number);
 }
 
 function createObjectType(jsonSchema: ObjectJsonSchema) {
     if (!isTypePermittedByTypeConstraint("object", jsonSchema))
-        return NeverType.create();
+        return NeverDataType.create();
 
-    const properties = new Map<string, Type>();
+    const properties = new Map<string, DataType>();
     if (jsonSchema.properties !== undefined) {
         for (const [key, value] of Object.entries(jsonSchema.properties))
             properties.set(key, jsonSchemaToType(value));
     }
 
-    const restProperties = jsonSchema.additionalProperties === undefined ? AnyType.create() : jsonSchemaToType(jsonSchema.additionalProperties);
+    const restProperties = jsonSchema.additionalProperties === undefined ? AnyDataType.create() : jsonSchemaToType(jsonSchema.additionalProperties);
     const requiredProperties = jsonSchema.required === undefined ? new Set<string>() : new Set<string>(jsonSchema.required);
-    return ObjectType.create(properties, restProperties, requiredProperties);
+    return ObjectDataType.create(properties, restProperties, requiredProperties);
 }
 
 function createArrayType(jsonSchema: ObjectJsonSchema) {
     if (!isTypePermittedByTypeConstraint("array", jsonSchema))
-        return NeverType.create();
+        return NeverDataType.create();
 
-    const prefixElementTypes: Type[] = jsonSchema.prefixItems !== undefined
+    const prefixElementTypes: DataType[] = jsonSchema.prefixItems !== undefined
         ? jsonSchema.prefixItems.map((v: any) => jsonSchemaToType(v))
         : [];
     const restElementType = jsonSchema.items !== undefined 
         ? jsonSchemaToType(jsonSchema.items) 
-        : AnyType.create();
+        : AnyDataType.create();
 
     const requiredElementsCount = jsonSchema.minItems === undefined ? 0 : jsonSchema.minItems as number;
-    return ArrayType.create(prefixElementTypes, restElementType, requiredElementsCount);
+    return ArrayDataType.create(prefixElementTypes, restElementType, requiredElementsCount);
 }
 
 function createEnumType(jsonSchema: ObjectJsonSchema) {
     if (jsonSchema.enum === undefined)
-        return AnyType.create();
+        return AnyDataType.create();
     const types = jsonSchema.enum.map((v: any) => createConstantValueType(v));
-    return UnionType.create(types);
+    return UnionDataType.create(types);
 }
 
 function createConstType(jsonSchema: ObjectJsonSchema) {
     if (jsonSchema.const === undefined)
-        return AnyType.create();
+        return AnyDataType.create();
     return createConstantValueType(jsonSchema.const);
 }
 
 function createAllOfType(jsonSchema: ObjectJsonSchema) {
     if (jsonSchema.allOf === undefined)
-        return AnyType.create();
+        return AnyDataType.create();
     const types = jsonSchema.allOf.map((v: any) => jsonSchemaToType(v));
-    return types.reduce(intersectTypes, AnyType.create());
+    return types.reduce(intersectTypes, AnyDataType.create());
 }
 
 function createAnyOfType(jsonSchema: ObjectJsonSchema) {
     if (jsonSchema.anyOf === undefined)
-        return AnyType.create();
+        return AnyDataType.create();
     const types = jsonSchema.anyOf.map((v: any) => jsonSchemaToType(v));
-    return UnionType.create(types);
+    return UnionDataType.create(types);
 }
 
 function createOneOfType(jsonSchema: ObjectJsonSchema) {
     // TODO: better
     if (jsonSchema.oneOf === undefined)
-        return AnyType.create();
+        return AnyDataType.create();
     const types = jsonSchema.oneOf.map((v: any) => jsonSchemaToType(v));
-    return UnionType.create(types);
+    return UnionDataType.create(types);
 }
 
 function createNotType(jsonSchema: ObjectJsonSchema) {
     if (jsonSchema.not === undefined)
-        return NeverType.create();
+        return NeverDataType.create();
     return jsonSchemaToType(jsonSchema.not);
 }
 
-function createConstantValueType(value: any): Type {
+function createConstantValueType(value: any): DataType {
     if (typeof value === "string" || typeof value === "number" || typeof value === "boolean")
-        return LiteralType.create(value);
+        return LiteralDataType.create(value);
     else
         throw new Error("Not supported."); // TODO
 }
 
-function createTypeAnnotation(jsonSchema: ObjectJsonSchema): TypeAnnotation | null {
+function createTypeAnnotation(jsonSchema: ObjectJsonSchema): DataTypeAnnotation | null {
     const title = jsonSchema.title;
     const description = jsonSchema.description;
     const readOnly = jsonSchema.readOnly;
@@ -152,7 +152,7 @@ function createTypeAnnotation(jsonSchema: ObjectJsonSchema): TypeAnnotation | nu
     const exampleValues = jsonSchema.examples;
     if (title === undefined && description === undefined && readOnly === undefined && writeOnly === undefined && deprecated === undefined && defaultValue === undefined && exampleValues === undefined)
         return null;
-    return new TypeAnnotation(
+    return new DataTypeAnnotation(
         title ?? "",
         description ?? "",
         deprecated ?? false,

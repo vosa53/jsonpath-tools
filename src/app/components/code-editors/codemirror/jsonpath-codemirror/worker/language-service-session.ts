@@ -9,7 +9,7 @@ import { Signature } from "@/jsonpath-tools/editor-services/signature-provider";
 import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-provider";
 import { DocumentHighlight } from "@/jsonpath-tools/editor-services/document-highlights-provider";
 import { TextChange } from "@/jsonpath-tools/text-change";
-import { RawJSONSchema } from "@/jsonpath-tools/editor-services/helpers/raw-json-schema";
+import { RawJSONSchema } from "@/jsonpath-tools/data-types/json-schema-data-type-converter";
 
 
 export class LanguageServiceSession {

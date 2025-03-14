@@ -1,5 +1,5 @@
 import { describe, it } from "vitest";
-import { jsonTypeDefinitionToType } from "./json-type-definition-to-type";
+import { jsonTypeDefinitionToType } from "./json-type-definition-data-type-converter";
 
 export const jsonTypeDefinitionForTest = `{
   "properties": {
