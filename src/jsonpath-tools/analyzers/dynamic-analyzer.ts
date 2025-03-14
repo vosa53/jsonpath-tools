@@ -1,4 +1,3 @@
-import { Diagnostics } from "next/dist/build/swc/types";
 import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "../diagnostics";
 import { JSONPathOptions } from "../options";
 import { JSONPathQueryContext } from "../query/evaluation";

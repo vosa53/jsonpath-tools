@@ -1,4 +1,3 @@
-import { DynamicAnalysisResult, DynamicAnalyzer } from "@/jsonpath-tools/dynamic-analysis/dynamic-analyzer";
 import { CompletionItem, CompletionProvider } from "@/jsonpath-tools/editor-services/completion-provider";
 import { defaultJSONPathOptions, JSONPathFunctionHandler, JSONPathOptions } from "@/jsonpath-tools/options";
 import { JSONPath } from "@/jsonpath-tools/query/json-path";
@@ -14,6 +13,7 @@ import { DocumentHighlightsProvider } from "@/jsonpath-tools/editor-services/doc
 import { Formatter } from "@/jsonpath-tools/editor-services/formatter";
 import { jsonSchemaToType } from "@/jsonpath-tools/data-types/json-schema-data-type-converter";
 import { DataType, AnyDataType } from "@/jsonpath-tools/data-types/data-types";
+import { DynamicAnalyzer, DynamicAnalysisResult } from "@/jsonpath-tools/analyzers/dynamic-analyzer";
 
 export class LanguageServiceBackendSession {
     private readonly parser: JSONPathParser;
