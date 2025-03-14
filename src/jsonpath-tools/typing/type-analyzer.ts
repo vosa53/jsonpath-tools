@@ -17,13 +17,13 @@ import { JSONPathWildcardSelector } from "@/jsonpath-tools/query/selectors/wildc
 import { JSONPathSyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "@/jsonpath-tools/query/syntax-tree-type";
 import { JSONPathToken } from "@/jsonpath-tools/query/token";
-import { JSONPathNormalizedPath } from "@/jsonpath-tools/transformations";
-import { Type, LiteralType, PrimitiveType, PrimitiveTypeType, AnyType, UnionType, intersectTypes, subtractTypes, NeverType, TypeUsageContext, isSubtypeOf, isEquvivalentTypeWith } from "./types";
+import { Type, LiteralType, PrimitiveType, PrimitiveTypeType, AnyType, UnionType, intersectTypes, subtractTypes, NeverType, isSubtypeOf, isEquvivalentTypeWith } from "./types";
+import { JSONPathSliceSelector } from "../query/selectors/slice-selector";
 
 export class TypeAnalyzer {
     private readonly typeCache = new Map<JSONPathSyntaxTree, Type>();
 
-    constructor(readonly rootType: Type) {
+    constructor(private readonly rootType: Type) {
 
     }
 
@@ -54,6 +54,8 @@ export class TypeAnalyzer {
             type = this.getNameSelectorType(expression);
         else if (expression instanceof JSONPathIndexSelector)
             type = this.getIndexSelectorType(expression);
+        else if (expression instanceof JSONPathSliceSelector)
+            type = this.getSliceSelectorType(expression);
         else if (expression instanceof JSONPathSegment)
             type = this.getSegmentType(expression);
         else if (expression instanceof JSONPathQuery)
@@ -66,36 +68,41 @@ export class TypeAnalyzer {
         this.typeCache.set(expression, type);
         return type;
     }
-
+    
+    private getSegmentType(segment: JSONPathSegment): Type {
+        const selectorTypes = segment.selectors.map(selector => this.getType(selector.selector));
+        return UnionType.create(selectorTypes);
+    }
+    
     private getFilterSelectorType(filterSelector: JSONPathFilterSelector): Type {
-        const previousSegmentType = this.getPreviousSegmentType(filterSelector);
+        const previousSegmentType = this.getIncomingTypeToSegment(filterSelector);
         const childrenType = previousSegmentType.getChildrenType();
         const narrowedType = this.narrowTypeByExpression(childrenType, filterSelector.expression, true);
         return narrowedType;
     }
 
-    private getSegmentType(segment: JSONPathSegment): Type {
-        const selectorTypes = segment.selectors.map(selector => this.getType(selector.selector));
-        return UnionType.create(selectorTypes);
-    }
-
     private getWildcardSelectorType(wildcardSelector: JSONPathWildcardSelector): Type {
-        const previousSegmentType = this.getPreviousSegmentType(wildcardSelector);
+        const previousSegmentType = this.getIncomingTypeToSegment(wildcardSelector);
         return previousSegmentType.getChildrenType();
     }
 
     private getNameSelectorType(nameSelector: JSONPathNameSelector): Type {
-        const previousSegmentType = this.getPreviousSegmentType(nameSelector);
-        return previousSegmentType.getTypeAtPathSegment(nameSelector.name, TypeUsageContext.query);
+        const previousSegmentType = this.getIncomingTypeToSegment(nameSelector);
+        return previousSegmentType.getTypeAtPathSegment(nameSelector.name);
     }
 
     private getIndexSelectorType(indexSelector: JSONPathIndexSelector): Type {
-        const previousSegmentType = this.getPreviousSegmentType(indexSelector);
-        return previousSegmentType.getTypeAtPathSegment(indexSelector.index, TypeUsageContext.query);
+        const previousSegmentType = this.getIncomingTypeToSegment(indexSelector);
+        return previousSegmentType.getTypeAtPathSegment(indexSelector.index);
+    }
+
+    private getSliceSelectorType(indexSelector: JSONPathSliceSelector): Type {
+        const previousSegmentType = this.getIncomingTypeToSegment(indexSelector);
+        return previousSegmentType.getChildrenType(); // It's not worth dealing with special cases for now, just consider wider type (corresponds to ::).
     }
 
     private getCurrentIdentifierType(currentIdentifier: JSONPathToken): Type {
-        const previousSegmentType = this.getPreviousSegmentType(currentIdentifier);
+        const previousSegmentType = this.getIncomingTypeToSegment(currentIdentifier);
         return previousSegmentType.getChildrenType();
     }
 
@@ -113,13 +120,17 @@ export class TypeAnalyzer {
         return this.getQueryType(filterQuery.query);
     }
 
-    private getPreviousSegmentType(tree: JSONPathSyntaxTree): Type {
+    getIncomingTypeToSegment(tree: JSONPathSyntaxTree): Type {
         let segment: JSONPathSyntaxTree = tree;
         while (!(segment instanceof JSONPathSegment)) segment = segment.parent;
         const query = segment.parent as JSONPathQuery;
         const segmentIndex = query.segments.indexOf(segment);
         const previousSegment = segmentIndex === 0 ? query.identifierToken : query.segments[segmentIndex - 1];
-        return this.getType(previousSegment);
+        const previousSegmentType = this.getType(previousSegment);
+        if (segment.isRecursive)
+            return UnionType.create([previousSegmentType, previousSegmentType.getDescendantType()]);
+        else
+            return previousSegmentType;
     }
 
     private narrowTypeByExpression(type: Type, expression: JSONPathFilterExpression, isTrue: boolean): Type {
@@ -151,9 +162,11 @@ export class TypeAnalyzer {
     }
 
     private narrowTypeByEquals(type: Type, sideToNarrow: JSONPathFilterExpression, otherSide: JSONPathFilterExpression, isTrue: boolean): Type {
-        if (!(sideToNarrow instanceof JSONPathFilterQueryExpression) || !sideToNarrow.query.isRelative || !sideToNarrow.query.isSingular)
+        if (!(sideToNarrow instanceof JSONPathFilterQueryExpression) || !sideToNarrow.query.isRelative)
             return type;
-        const path = queryToPath(sideToNarrow.query);
+        const path = sideToNarrow.query.toNormalizedPath();
+        if (path === null)
+            return type;
         const otherType = this.getType(otherSide);
         let narrowedType = type.changeTypeAtPath(path, t => isTrue ? intersectTypes(t, otherType) : subtractTypes(t, otherType));
         const pathSurelyExists = isTrue && !isSubtypeOf(PrimitiveType.create(PrimitiveTypeType.nothing), otherType) ||
@@ -164,10 +177,11 @@ export class TypeAnalyzer {
     }
 
     private narrowTypeByFilterQuery(type: Type, filterQueryExpression: JSONPathFilterQueryExpression, isTrue: boolean): Type {
-        if (!filterQueryExpression.query.isRelative || !filterQueryExpression.query.isSingular)
+        if (!filterQueryExpression.query.isRelative)
             return type;
-
-        const path = queryToPath(filterQueryExpression.query);
+        const path = filterQueryExpression.query.toNormalizedPath();
+        if (path === null)
+            return type;
         if (isTrue)
             return type.setPathExistence(path);
         else
@@ -207,18 +221,4 @@ export class TypeAnalyzer {
     private narrowTypeByNot(type: Type, expression: JSONPathNotExpression, isTrue: boolean): Type {
         return this.narrowTypeByExpression(type, expression.expression, !isTrue);
     }
-}
-
-function queryToPath(query: JSONPathQuery): JSONPathNormalizedPath {
-    return query.segments.map(segment => {
-        if (segment.selectors.length !== 1)
-            throw new Error("Invalid segment.");
-        const selector = segment.selectors[0].selector;
-        if (selector instanceof JSONPathNameSelector)
-            return selector.name;
-        else if (selector instanceof JSONPathIndexSelector)
-            return selector.index;
-        else
-            throw new Error("Invalid selector.");
-    });
 }

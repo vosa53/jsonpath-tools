@@ -256,7 +256,8 @@ export const testJsonSchema = `{
                             "isbn": { "title": "ISBN", "description": "The ISBN identifier of the book.", "type": "string" },
                             "price": { "title": "Price", "description": "The price of the book.", "type": "number" }
                         },
-                        "required": ["category", "author", "title", "price"]
+                        "required": ["category", "author", "title", "price"],
+                        "additionalProperties": false
                     }
                 },
                 "bicycle": {
@@ -267,13 +268,16 @@ export const testJsonSchema = `{
                         "color": { "title": "Color", "description": "The color of the bicycle.", "type": "string" },
                         "price": { "title": "Price", "description": "The price of the bicycle.", "type": "number" }
                     },
-                    "required": ["color", "price"]
+                    "required": ["color", "price"],
+                    "additionalProperties": false
                 }
             },
-            "required": ["books", "bicycle"]
+            "required": ["books", "bicycle"],
+            "additionalProperties": false
         }
     },
-    "required": ["store"]
+    "required": ["store"],
+    "additionalProperties": false
 }`;
 
 const testSettings: Settings = {

@@ -1,11 +1,6 @@
 import { JSONPathJSONValue, JSONPathNothing } from "@/jsonpath-tools/types";
 import { JSONPathNormalizedPath } from "../transformations";
 
-export enum TypeUsageContext {
-    expression,
-    query
-}
-
 export class TypeAnnotation {
     constructor(
         readonly title: string,
@@ -44,10 +39,11 @@ export abstract class Type {
         this.collectAnnotationsToSet(annotations);
         return annotations;
     }
-
+    
     abstract getChildrenType(): Type;
+    abstract getDescendantType(): Type;
+    abstract getTypeAtPathSegment(segment: string | number): Type;
     abstract collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void;
-    abstract getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type;
 
     collectKnownPathSegments(): Set<string | number> {
         const knownPathSegments = new Set<string | number>();
@@ -55,10 +51,10 @@ export abstract class Type {
         return knownPathSegments;
     }
 
-    getTypeAtPath(path: JSONPathNormalizedPath, usageContext: TypeUsageContext): Type {
+    getTypeAtPath(path: JSONPathNormalizedPath): Type {
         let current = this as Type;
         for (const pathSegment of path) {
-            current = current.getTypeAtPathSegment(pathSegment, usageContext);
+            current = current.getTypeAtPathSegment(pathSegment);
         }
         return current;
     }
@@ -106,15 +102,16 @@ export class LiteralType extends Type {
         return NeverType.create();
     }
 
+    getDescendantType(): Type {
+        return NeverType.create();
+    }
+
     collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
         return;
     }
 
-    getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
-        if (usageContext === TypeUsageContext.query)
-            return NeverType.create();
-        else
-            return PrimitiveType.create(PrimitiveTypeType.nothing);
+    getTypeAtPathSegment(segment: string | number): Type {
+        return NeverType.create();
     }
 
     toString(): string {
@@ -150,15 +147,16 @@ export class PrimitiveType extends Type {
         return NeverType.create();
     }
 
+    getDescendantType(): Type {
+        return NeverType.create();
+    }
+
     collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
         return;
     }
 
-    getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
-        if (usageContext === TypeUsageContext.query)
-            return NeverType.create();
-        else
-            return PrimitiveType.create(PrimitiveTypeType.nothing);
+    getTypeAtPathSegment(segment: string | number): Type {
+        return NeverType.create();
     }
 
     toString(): string {
@@ -200,21 +198,23 @@ export class ObjectType extends Type {
         return UnionType.create([...this.propertyTypes.values(), this.restPropertyType]);
     }
 
+    getDescendantType(): Type {
+        const childrenType = this.getChildrenType();
+        return UnionType.create([childrenType, childrenType.getDescendantType()]);
+    }
+
     collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
         for (const propertyName of this.propertyTypes.keys())
             pathSegments.add(propertyName);
     }
 
-    getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
+    getTypeAtPathSegment(segment: string | number): Type {
         if (typeof segment === "number")
-            return usageContext === TypeUsageContext.query ? NeverType.create() : PrimitiveType.create(PrimitiveTypeType.nothing);
+            return NeverType.create();
 
         let type = this.propertyTypes.get(segment);
         if (type === undefined)
             type = this.restPropertyType;
-
-        if (!this.requiredProperties.has(segment) && usageContext === TypeUsageContext.expression)
-            type = UnionType.create([type, PrimitiveType.create(PrimitiveTypeType.nothing)]);
         return type;
     }
 
@@ -270,23 +270,46 @@ export class ArrayType extends Type {
         return UnionType.create([...this.prefixElementTypes, this.restElementType]);
     }
 
+    getDescendantType(): Type {
+        const childrenType = this.getChildrenType();
+        return UnionType.create([childrenType, childrenType.getDescendantType()]);
+    }
+
     collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
         for (let i = 0; i < this.prefixElementTypes.length; i++)
             pathSegments.add(i);
     }
 
-    getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
+    getTypeAtPathSegment(segment: string | number): Type {
         if (typeof segment === "string")
-            return usageContext === TypeUsageContext.query ? NeverType.create() : PrimitiveType.create(PrimitiveTypeType.nothing);
+            return NeverType.create();
+
+        if (segment < 0) {
+            const possibleTypes: Type[] = [];
+            for (const normalizedIndex of this.getAllPossibleNormalizedIndices(segment))
+                possibleTypes.push(this.getTypeAtPathSegment(normalizedIndex));
+            return UnionType.create(possibleTypes);
+        }
 
         let type;
         if (segment < this.prefixElementTypes.length)
             type = this.prefixElementTypes[segment];
         else
             type = this.restElementType;
-        if (segment >= this.requiredElementCount && usageContext === TypeUsageContext.expression)
-            type = UnionType.create([type, PrimitiveType.create(PrimitiveTypeType.nothing)]);
         return type;
+    }
+
+    private *getAllPossibleNormalizedIndices(segment: number) {
+        // Loop through all possible positions of the last element.
+        for (let normalizedIndex = this.restElementType instanceof NeverType ? this.prefixElementTypes.length + segment : this.prefixElementTypes.length; normalizedIndex >= 0; normalizedIndex--) {
+            const impliedArrayLength = normalizedIndex - segment;
+            if (impliedArrayLength < this.requiredElementCount) 
+                return;
+            if (this.getTypeAtPathSegment(impliedArrayLength - 1) instanceof NeverType)
+                continue;
+            else
+                yield normalizedIndex;
+        }
     }
 
     toString(): string {
@@ -370,13 +393,18 @@ export class UnionType extends Type {
         return UnionType.create(childrenTypes);
     }
 
+    getDescendantType(): Type {
+        const descendantTypes = this.types.map(type => type.getDescendantType());
+        return UnionType.create(descendantTypes);
+    }
+
     collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
         for (const type of this.types)
             type.collectKnownPathSegmentsToSet(pathSegments);
     }
 
-    getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
-        const types = this.types.map(type => type.getTypeAtPathSegment(segment, usageContext));
+    getTypeAtPathSegment(segment: string | number): Type {
+        const types = this.types.map(type => type.getTypeAtPathSegment(segment));
         return UnionType.create(types);
     }
 
@@ -419,11 +447,15 @@ export class NeverType extends Type {
         return NeverType.create();
     }
 
+    getDescendantType(): Type {
+        return NeverType.create();
+    }
+
     collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
         return;
     }
 
-    getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
+    getTypeAtPathSegment(segment: string | number): Type {
         return NeverType.create();
     }
 
@@ -464,11 +496,15 @@ export class AnyType extends Type {
         return AnyType.create();
     }
 
+    getDescendantType(): Type {
+        return AnyType.create();
+    }
+
     collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
         return;
     }
 
-    getTypeAtPathSegment(segment: string | number, usageContext: TypeUsageContext): Type {
+    getTypeAtPathSegment(segment: string | number): Type {
         return AnyType.create();
     }
 
@@ -500,8 +536,8 @@ export function intersectTypes(typeA: Type, typeB: Type): Type {
         const propertyNames = new Set([...typeA.propertyTypes.keys(), ...typeB.propertyTypes.keys()]);
         const intersectedPropertyTypes = new Map<string, Type>();
         for (const propertyName of propertyNames) {
-            const propertyTypeA = typeA.getTypeAtPathSegment(propertyName, TypeUsageContext.query);
-            const propertyTypeB = typeB.getTypeAtPathSegment(propertyName, TypeUsageContext.query);
+            const propertyTypeA = typeA.getTypeAtPathSegment(propertyName);
+            const propertyTypeB = typeB.getTypeAtPathSegment(propertyName);
             const intersectedPropertyType = intersectTypes(propertyTypeA, propertyTypeB);
             intersectedPropertyTypes.set(propertyName, intersectedPropertyType);
         }
@@ -555,7 +591,7 @@ export function isSubtypeOf(typeA: Type, typeB: Type): boolean {
         if (typeB instanceof ObjectType) {
             const propertyNames = new Set([...typeA.propertyTypes.keys(), ...typeB.propertyTypes.keys()]);
             for (const propertyName of propertyNames) {
-                if (!isSubtypeOf(typeA.getTypeAtPathSegment(propertyName, TypeUsageContext.query), typeB.getTypeAtPathSegment(propertyName, TypeUsageContext.query)))
+                if (!isSubtypeOf(typeA.getTypeAtPathSegment(propertyName), typeB.getTypeAtPathSegment(propertyName)))
                     return false;
             }
             if (!isSubtypeOf(typeA.restPropertyType, typeB.restPropertyType))
@@ -570,7 +606,7 @@ export function isSubtypeOf(typeA: Type, typeB: Type): boolean {
     if (typeA instanceof ArrayType) {
         if (typeB instanceof ArrayType) {
             for (let i = 0; i < Math.max(typeA.prefixElementTypes.length, typeB.prefixElementTypes.length); i++) {
-                if (!isSubtypeOf(typeA.getTypeAtPathSegment(i, TypeUsageContext.query), typeB.getTypeAtPathSegment(i, TypeUsageContext.query)))
+                if (!isSubtypeOf(typeA.getTypeAtPathSegment(i), typeB.getTypeAtPathSegment(i)))
                     return false;
             }
             if (!isSubtypeOf(typeA.restElementType, typeB.restElementType))

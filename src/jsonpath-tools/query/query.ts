@@ -1,3 +1,4 @@
+import { JSONPathNormalizedPath } from "../transformations";
 import { JSONPathNodeList } from "../types";
 import { JSONPathFilterExpressionContext, JSONPathQueryContext } from "./evaluation";
 import { LocatedNode } from "./located-node";
@@ -40,5 +41,24 @@ export class JSONPathQuery extends JSONPathNode {
 
         queryContext.queryInstrumentationCallback?.(this, input, inputs, 0, inputs.length);
         return new JSONPathNodeList(inputs);
+    }
+
+    toNormalizedPath(): JSONPathNormalizedPath | null {
+        const segments: (string | number)[] = [];
+        for (const segment of this.segments) {
+            if (segment.selectors.length !== 1)
+                return null;
+            const selector = segment.selectors[0].selector;
+            if (selector instanceof JSONPathNameSelector)
+                segments.push(selector.name);
+            else if (selector instanceof JSONPathIndexSelector) {
+                if (selector.index < 0)
+                    return null;
+                segments.push(selector.index);
+            }
+            else
+                return null;
+        }
+        return segments;
     }
 }

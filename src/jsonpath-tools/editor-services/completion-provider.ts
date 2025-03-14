@@ -2,14 +2,13 @@ import { JSONPathOptions } from "../options";
 import { JSONPathQueryContext } from "../query/evaluation";
 import { JSONPath } from "../query/json-path";
 import { LocatedNode } from "../query/located-node";
-import { JSONPathQuery } from "../query/query";
 import { JSONPathSegment } from "../query/segment";
 import { JSONPathSyntaxTree } from "../query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
 import { JSONPathJSONValue } from "../types";
 import { getJSONTypeName } from "../typing/json-types";
 import { TypeAnalyzer } from "../typing/type-analyzer";
-import { Type, TypeAnnotation, TypeUsageContext } from "../typing/types";
+import { Type, TypeAnnotation } from "../typing/types";
 import { AnalysisDescriptionProvider } from "./analysis-description-provider";
 import { SyntaxDescriptionProvider } from "./syntax-description-provider";
 
@@ -70,15 +69,15 @@ export class CompletionProvider {
         if (queryArgument !== undefined)
             this.completeSegmentData(completions, segment, query, queryArgument, queryArgumentType);
         else
-            this.completeSegmentSchema(completions, segment, queryArgumentType);
+            this.completeSegmentType(completions, segment, queryArgumentType);
     }
 
-    private completeSegmentSchema(completions: CompletionItem[], segment: JSONPathSegment, queryArgumentType: Type) {
+    private completeSegmentType(completions: CompletionItem[], segment: JSONPathSegment, queryArgumentType: Type) {
         const previousType = this.getIncomingType(segment, queryArgumentType);
         const pathsSegments = previousType.collectKnownPathSegments();
         for (const pathSegment of pathsSegments) {
             const pahtSegmentString = pathSegment.toString();
-            const pathSegmentType = previousType.getTypeAtPathSegment(pathSegment, TypeUsageContext.query);
+            const pathSegmentType = previousType.getTypeAtPathSegment(pathSegment);
             const pathSegmentTypeString = pathSegmentType.toString();
             completions.push(new CompletionItem(CompletionItemType.name, pahtSegmentString, pathSegmentTypeString, () => {
                 const annotations = pathSegmentType.collectAnnotations();
@@ -96,7 +95,7 @@ export class CompletionProvider {
             const typeText = Array.from(types).join(" | ");
             completions.push(new CompletionItem(CompletionItemType.name, key, typeText, () => {
                 previousType ??= this.getIncomingType(segment, queryArgumentType);
-                const annotations = previousType.getTypeAtPathSegment(key, TypeUsageContext.query).collectAnnotations();
+                const annotations = previousType.getTypeAtPathSegment(key).collectAnnotations();
                 if (types.has("string") || types.has("number")) {
                     const example = this.getStringOrNumberExample(nodes, key);
                     if (example !== undefined) {
@@ -113,10 +112,7 @@ export class CompletionProvider {
 
     private getIncomingType(segment: JSONPathSegment, queryArgumentType: Type): Type {
         const typeAnalyzer = new TypeAnalyzer(queryArgumentType);
-        const query = segment.parent as JSONPathQuery;
-        const segmentIndex = query.segments.indexOf(segment);
-        const previous = segmentIndex === 0 ? query.identifierToken : query.segments[segmentIndex - 1];
-        return typeAnalyzer.getType(previous);
+        return typeAnalyzer.getIncomingTypeToSegment(segment);
     }
 
     private getStringOrNumberExample(nodes: LocatedNode[], property: string): JSONPathJSONValue | undefined {
