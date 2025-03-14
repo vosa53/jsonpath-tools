@@ -8,17 +8,17 @@ import { JSONPathDiagnostics } from "../../../jsonpath-tools/diagnostics";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
 import { jsonPath } from "./codemirror/jsonpath-codemirror/jsonpath-language";
 import { getJSONPath } from "./codemirror/jsonpath-codemirror/jsonpath-parser";
-import { getResult, updateOptionsEffect, updateQueryArgumentEffect, updateQueryArgumentSchemaEffect } from "./codemirror/jsonpath-codemirror/jsonpath-state";
+import { getResult, updateOptionsEffect, updateQueryArgumentEffect, updateQueryArgumentTypeEffect } from "./codemirror/jsonpath-codemirror/jsonpath-state";
 import { LanguageService } from "./codemirror/jsonpath-codemirror/worker/language-service";
 import { TextRange } from "@/jsonpath-tools/text-range";
 import { rangeHighlighter, setHighlightedRangeEffect } from "./codemirror/range-highlighter";
-import { RawJSONSchema } from "@/jsonpath-tools/editor-services/helpers/raw-json-schema";
+import { AnyDataType, DataType } from "@/jsonpath-tools/data-types/data-types";
 
 export default function JSONPathEditor({
     value,
     options = defaultJSONPathOptions,
     queryArgument = undefined,
-    queryArgumentSchema = undefined,
+    queryArgumentType = AnyDataType.create(),
     highlightedRange = null,
     languageService,
     readonly = false,
@@ -30,7 +30,7 @@ export default function JSONPathEditor({
     value: string,
     options: JSONPathOptions,
     queryArgument: JSONPathJSONValue | undefined,
-    queryArgumentSchema: RawJSONSchema | undefined,
+    queryArgumentType: DataType,
     languageService: LanguageService,
     highlightedRange: TextRange | null,
     readonly?: boolean,
@@ -53,8 +53,8 @@ export default function JSONPathEditor({
 
     useEffect(() => {
         if (editorViewRef.current !== null)
-            editorViewRef.current.dispatch({ effects: updateQueryArgumentSchemaEffect.of(queryArgumentSchema) });
-    }, [queryArgumentSchema]);
+            editorViewRef.current.dispatch({ effects: updateQueryArgumentTypeEffect.of(queryArgumentType) });
+    }, [queryArgumentType]);
 
     useEffect(() => {
         if (editorViewRef.current !== null)
@@ -85,7 +85,7 @@ export default function JSONPathEditor({
         view.dispatch({ effects: [
             updateOptionsEffect.of(options), 
             updateQueryArgumentEffect.of(queryArgument), 
-            updateQueryArgumentSchemaEffect.of(queryArgumentSchema), 
+            updateQueryArgumentTypeEffect.of(queryArgumentType), 
             setHighlightedRangeEffect.of(highlightedRange)
         ] });
         editorViewRef.current = view;

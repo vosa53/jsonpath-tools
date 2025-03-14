@@ -4,7 +4,7 @@ import { EditorState, Extension, Facet, StateEffect, StateField } from "@codemir
 import { EditorView, PluginValue, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { LanguageService } from "./worker/language-service";
 import { LanguageServiceSession } from "./worker/language-service-session";
-import { RawJSONSchema } from "@/jsonpath-tools/editor-services/helpers/raw-json-schema";
+import { DataType } from "@/jsonpath-tools/data-types/data-types";
 
 export function jsonPathState(): Extension {
     return [
@@ -14,7 +14,7 @@ export function jsonPathState(): Extension {
 
 export const updateOptionsEffect = StateEffect.define<JSONPathOptions>();
 export const updateQueryArgumentEffect = StateEffect.define<JSONPathJSONValue | undefined>();
-export const updateQueryArgumentSchemaEffect = StateEffect.define<RawJSONSchema | undefined>();
+export const updateQueryArgumentTypeEffect = StateEffect.define<DataType>();
 export const jsonPathConfigFacet = Facet.define<{
     languageService: LanguageService
 }>();
@@ -36,8 +36,8 @@ export const languageServiceSessionStateField = StateField.define<LanguageServic
                 languageServiceSession.updateOptions(effect.value);
             else if (effect.is(updateQueryArgumentEffect))
                 languageServiceSession.updateQueryArgument(effect.value);
-            else if (effect.is(updateQueryArgumentSchemaEffect))
-                languageServiceSession.updateQueryArgumentSchema(effect.value);
+            else if (effect.is(updateQueryArgumentTypeEffect))
+                languageServiceSession.updateQueryArgumentType(effect.value);
         }
         return languageServiceSession;
     }

@@ -15,7 +15,10 @@ import { LanguageService } from "./components/code-editors/codemirror/jsonpath-c
 import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";
 import { TextRange } from "@/jsonpath-tools/text-range";
 import { JSONPathSyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
-import { RawJSONSchema } from "@/jsonpath-tools/data-types/json-schema-data-type-converter";
+import { jsonSchemaToType, RawJSONSchema } from "@/jsonpath-tools/data-types/json-schema-data-type-converter";
+import { AnyDataType, DataType } from "@/jsonpath-tools/data-types/data-types";
+import { DataTypeRaw, DataTypeRawFormat } from "./models/data-type-raw";
+import { jsonTypeDefinitionToType } from "@/jsonpath-tools/data-types/json-type-definition-data-type-converter";
 
 interface State {
     customFunctions: readonly CustomFunction[];
@@ -31,7 +34,7 @@ export function usePageViewModel() {
     const [settings, setSettings] = useState<Settings>(testSettings);
     const [queryText, setQueryText] = useState<string>(testQueryText);
     const [queryArgumentText, setQueryArgumentText] = useState<string>(testJson);
-    const [queryArgumentSchemaText, setQueryArgumentSchemaText] = useState<string>(testJsonSchema);
+    const [queryArgumentTypeRaw, setQueryArgumentTypeRaw] = useState<DataTypeRaw>(testQueryArgumentTypeRaw);
     const [operation, setOperation] = useState<Operation>(testOperation);
     const [pathType, setPathType] = useState<PathType>(PathType.normalizedPath);
     const [query, setQuery] = useState<JSONPath>(testQuery);
@@ -43,14 +46,20 @@ export function usePageViewModel() {
             return undefined;
         }
     }, [queryArgumentText]);
-    const queryArgumentSchema = useMemo<RawJSONSchema | undefined>(() => {
+    const queryArgumentType = useMemo<DataType>(() => {
         try {
-            return logPerformance("Parse query argument schema", () => JSON.parse(queryArgumentSchemaText));
+            const jsonText = queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema
+                ? queryArgumentTypeRaw.jsonSchemaText
+                : queryArgumentTypeRaw.jsonTypeDefinitionText;
+            const json = logPerformance("Parse query argument type raw", () => JSON.parse(jsonText));
+            return queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema
+                ? jsonSchemaToType(json)
+                : jsonTypeDefinitionToType(json);
         }
         catch {
-            return undefined;
+            return AnyDataType.create();
         }
-    }, [queryArgumentSchemaText]);
+    }, [queryArgumentTypeRaw]);
     const options = useMemo<JSONPathOptions>(() => {
         return {
             ...defaultJSONPathOptions,
@@ -106,8 +115,8 @@ export function usePageViewModel() {
         setQueryArgumentText(queryArgumentText);
     }, []);
 
-    const onQueryArgumentSchemaTextChanged = useCallback((queryArgumentSchemaText: string) => {
-        setQueryArgumentSchemaText(queryArgumentSchemaText);
+    const onQueryArgumentTypeRawChanged = useCallback((queryArgumentTypeRaw: DataTypeRaw) => {
+        setQueryArgumentTypeRaw(queryArgumentTypeRaw);
     }, []);
 
     const onOperationChanged = useCallback((operation: Operation) => {
@@ -163,7 +172,7 @@ export function usePageViewModel() {
         onSettingsChanged,
         onQueryTextChanged,
         onQueryArgumentTextChanged,
-        onQueryArgumentSchemaTextChanged,
+        onQueryArgumentTypeRawChanged,
         onOperationChanged,
         onPathTypeChanged,
         onQueryParsed,
@@ -176,12 +185,12 @@ export function usePageViewModel() {
         settings,
         queryText,
         queryArgumentText,
-        queryArgumentSchemaText,
+        queryArgumentTypeRaw,
         operation,
         pathType,
         query,
         queryArgument,
-        queryArgumentSchema,
+        queryArgumentType,
         options,
         resultPaths,
         resultText,
@@ -279,6 +288,21 @@ export const testJsonSchema = `{
     "required": ["store"],
     "additionalProperties": false
 }`;
+
+export const testJsonTypeDefinition = `{
+  "properties": {
+    "id": { "type": "string" },
+    "createdAt": { "type": "timestamp" },
+    "karma": { "type": "int32" },
+    "isAdmin": { "type": "boolean" }
+  }
+}`;
+
+const testQueryArgumentTypeRaw: DataTypeRaw = {
+    format: DataTypeRawFormat.jsonSchema,
+    jsonSchemaText: testJsonSchema,
+    jsonTypeDefinitionText: testJsonTypeDefinition
+};
 
 const testSettings: Settings = {
     autoRun: true,

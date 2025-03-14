@@ -3,13 +3,15 @@ import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-prov
 import { JSONPathOptions } from "@/jsonpath-tools/options";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 import { CancellationToken } from "../cancellation-token";
-import { GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, SerializableCompletionItem, SerializableJSONPathOptions, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentSchemaLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
+import { GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, SerializableCompletionItem, SerializableJSONPathOptions, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage as UpdateQueryArgumentTypeLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
 import { SimpleRPCTopic } from "./simple-rpc";
 import { Signature } from "@/jsonpath-tools/editor-services/signature-provider";
 import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-provider";
 import { DocumentHighlight } from "@/jsonpath-tools/editor-services/document-highlights-provider";
 import { TextChange } from "@/jsonpath-tools/text-change";
 import { RawJSONSchema } from "@/jsonpath-tools/data-types/json-schema-data-type-converter";
+import { DataType } from "@/jsonpath-tools/data-types/data-types";
+import { serializeDataType } from "./data-type-serializer";
 
 
 export class LanguageServiceSession {
@@ -51,10 +53,10 @@ export class LanguageServiceSession {
         });
     }
 
-    updateQueryArgumentSchema(newQueryArgumentSchema: RawJSONSchema | undefined) {
+    updateQueryArgumentType(newQueryArgumentType: DataType) {
         this.cancelQueue();
-        this.rpcTopic.sendNotification<UpdateQueryArgumentSchemaLanguageServiceMessage>("updateQueryArgumentSchema", {
-            newQueryArgumentSchema: newQueryArgumentSchema
+        this.rpcTopic.sendNotification<UpdateQueryArgumentTypeLanguageServiceMessage>("updateQueryArgumentType", {
+            newQueryArgumentTypeSerialized: serializeDataType(newQueryArgumentType)
         });
     }
 

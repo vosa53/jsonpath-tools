@@ -1,14 +1,14 @@
 "use client"
 
 import { AppShell, Divider, Flex, Indicator, Stack, Tabs } from '@mantine/core';
-import { IconBraces, IconEqual, IconExclamationCircle, IconListTree, IconRouteSquare } from '@tabler/icons-react';
+import { IconBraces, IconEqual, IconExclamationCircle, IconListTree, IconRouteSquare, IconSitemap, IconTriangleSquareCircle } from '@tabler/icons-react';
 import { useMemo, useState } from "react";
 import JSONPathEditor from "./components/code-editors/jsonpath-editor";
 import Header from "./components/header";
 import Navbar from "./components/navbar";
 import DiagnosticsPanel from "./components/panels/diagnostics-panel";
 import JSONPanel from "./components/panels/json-panel";
-import JSONSchemaPanel from "./components/panels/json-schema-panel";
+import TypePanel from "./components/panels/type-panel";
 import OutlinePanel from "./components/panels/outline-panel";
 import PathsPanel from "./components/panels/paths-panel";
 import ResultPanel from "./components/panels/result-panel";
@@ -50,7 +50,7 @@ export default function Home() {
                         value={viewModel.queryText}
                         options={viewModel.options}
                         queryArgument={viewModel.queryArgument}
-                        queryArgumentSchema={viewModel.queryArgumentSchema}
+                        queryArgumentType={viewModel.queryArgumentType}
                         highlightedRange={viewModel.highlightedRange}
                         languageService={viewModel.languageService}
                         onValueChanged={viewModel.onQueryTextChanged}
@@ -59,16 +59,16 @@ export default function Home() {
                         onGetResultAvailable={viewModel.onGetResultAvailable} />
                     <Divider size="xs" />
                     <Flex flex="1 1 0" direction={{ sm: "row", base: "column" }}>
-                        <Tabs defaultValue="json" flex="1" miw={0} display="flex" style={{ flexDirection: "column" }}>
+                        <Tabs defaultValue="data" flex="1" miw={0} display="flex" style={{ flexDirection: "column" }}>
                             <Tabs.List>
-                                <Tabs.Tab value="json" leftSection={<IconBraces size={20} />}>
-                                    JSON
+                                <Tabs.Tab value="data" leftSection={<IconBraces size={20} />}>
+                                    Data
                                 </Tabs.Tab>
-                                <Tabs.Tab value="jsonSchema" leftSection={<IconBraces size={20} />}>
-                                    JSON Schema
+                                <Tabs.Tab value="type" leftSection={<IconSitemap size={20} />}>
+                                    Schema
                                 </Tabs.Tab>
                             </Tabs.List>
-                            <Tabs.Panel value="json" flex="1 1 0" mih={0}>
+                            <Tabs.Panel value="data" flex="1 1 0" mih={0}>
                                 <JSONPanel
                                     queryArgumentText={viewModel.queryArgumentText}
                                     paths={viewModel.resultPaths}
@@ -77,10 +77,10 @@ export default function Home() {
                                     onCurrentPathIndexChanged={viewModel.onCurrentResultPathIndexChanged}
                                 />
                             </Tabs.Panel>
-                            <Tabs.Panel value="jsonSchema" flex="1 1 0" mih={0}>
-                                <JSONSchemaPanel 
-                                    queryArgumentSchemaText={viewModel.queryArgumentSchemaText}
-                                    onQueryArgumentSchemaTextChanged={viewModel.onQueryArgumentSchemaTextChanged} />
+                            <Tabs.Panel value="type" flex="1 1 0" mih={0}>
+                                <TypePanel 
+                                    queryArgumentTypeRaw={viewModel.queryArgumentTypeRaw}
+                                    onQueryArgumentTypeRawChanged={viewModel.onQueryArgumentTypeRawChanged} />
                             </Tabs.Panel>
                         </Tabs>
                         <Divider size="xs" orientation="vertical" />

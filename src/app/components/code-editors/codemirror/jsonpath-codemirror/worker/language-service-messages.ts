@@ -30,8 +30,8 @@ export interface UpdateQueryArgumentLanguageServiceMessage {
     readonly newQueryArgument: JSONPathJSONValue | undefined;
 }
 
-export interface UpdateQueryArgumentSchemaLanguageServiceMessage {
-    readonly newQueryArgumentSchema: RawJSONSchema | undefined;
+export interface UpdateQueryArgumentTypeLanguageServiceMessage {
+    readonly newQueryArgumentTypeSerialized: any;
 }
 
 export interface GetCompletionsLanguageServiceMessage {

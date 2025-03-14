@@ -1,7 +1,7 @@
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 import { SimpleRPC } from "./simple-rpc";
 import { LanguageServiceBackendSession } from "./language-service-backend-session";
-import { UpdateOptionsLanguageServiceMessage, UpdateQueryLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessage, GetResultLanguageServiceMessage, DisconnectLanguageServiceMessage, GetSignatureLanguageServiceMessage, GetTooltipLanguageServiceMessage, ResolveCompletionLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessage, UpdateQueryArgumentSchemaLanguageServiceMessage } from "./language-service-messages";
+import { UpdateOptionsLanguageServiceMessage, UpdateQueryLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessage, GetResultLanguageServiceMessage, DisconnectLanguageServiceMessage, GetSignatureLanguageServiceMessage, GetTooltipLanguageServiceMessage, ResolveCompletionLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage as UpdateQueryArgumentTypeLanguageServiceMessage } from "./language-service-messages";
 import { defaultJSONPathOptions, JSONPathFunctionHandler } from "@/jsonpath-tools/options";
 
 export class LanguageServiceBackend {
@@ -21,7 +21,7 @@ export class LanguageServiceBackend {
         this.rpc.addHandlerAction("updateOptions", (h, message: UpdateOptionsLanguageServiceMessage) => h.updateOptions(message));
         this.rpc.addHandlerAction("updateQuery", (h, message: UpdateQueryLanguageServiceMessage) => h.updateQuery(message));
         this.rpc.addHandlerAction("updateQueryArgument", (h, message: UpdateQueryArgumentLanguageServiceMessage) => h.updateQueryArgument(message));
-        this.rpc.addHandlerAction("updateQueryArgumentSchema", (h, message: UpdateQueryArgumentSchemaLanguageServiceMessage) => h.updateQueryArgumentSchema(message));
+        this.rpc.addHandlerAction("updateQueryArgumentType", (h, message: UpdateQueryArgumentTypeLanguageServiceMessage) => h.updateQueryArgumentType(message));
         this.rpc.addHandlerAction("getCompletions", (h, message: GetCompletionsLanguageServiceMessage) => h.getCompletions(message));
         this.rpc.addHandlerAction("resolveCompletion", (h, message: ResolveCompletionLanguageServiceMessage) => h.resolveCompletion(message));
         this.rpc.addHandlerAction("getSignature", (h, message: GetSignatureLanguageServiceMessage) => h.getSignature(message));

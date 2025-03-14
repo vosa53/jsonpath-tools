@@ -5,7 +5,7 @@ import { TypeChecker } from "@/jsonpath-tools/semantic-analysis/type-checker";
 import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
 import { JSONPathJSONValue, JSONPathNodeList } from "@/jsonpath-tools/types";
 import { logPerformance } from "@/jsonpath-tools/utils";
-import { DisconnectLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentSchemaLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
+import { DisconnectLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
 import { SimpleRPCTopic } from "./simple-rpc";
 import { SignatureProvider } from "@/jsonpath-tools/editor-services/signature-provider";
 import { TooltipProvider } from "@/jsonpath-tools/editor-services/tooltip-provider";
@@ -14,6 +14,7 @@ import { Formatter } from "@/jsonpath-tools/editor-services/formatter";
 import { jsonSchemaToType } from "@/jsonpath-tools/data-types/json-schema-data-type-converter";
 import { DataType, AnyDataType } from "@/jsonpath-tools/data-types/data-types";
 import { DynamicAnalyzer, DynamicAnalysisResult } from "@/jsonpath-tools/analyzers/dynamic-analyzer";
+import { deserializeDataType } from "./data-type-serializer";
 
 export class LanguageServiceBackendSession {
     private readonly parser: JSONPathParser;
@@ -80,10 +81,9 @@ export class LanguageServiceBackendSession {
         this.dynamicAnalysisResult = null;
     }
 
-    updateQueryArgumentSchema(message: UpdateQueryArgumentSchemaLanguageServiceMessage) {
-        this.queryArgumentType = message.newQueryArgumentSchema !== undefined
-            ? jsonSchemaToType(message.newQueryArgumentSchema)
-            : AnyDataType.create();
+    updateQueryArgumentType(message: UpdateQueryArgumentTypeLanguageServiceMessage) {
+        this.queryArgumentType = deserializeDataType(message.newQueryArgumentTypeSerialized);
+        debugger;
     }
 
     getCompletions(message: GetCompletionsLanguageServiceMessage): GetCompletionsLanguageServiceMessageResponse {
