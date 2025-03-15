@@ -1,3 +1,4 @@
+import { AnyDataType, ArrayDataType, DataType, ObjectDataType, PrimitiveDataType, PrimitiveDataTypeType, UnionDataType } from "./data-types/data-types";
 import { IRegexp } from "./syntax-analysis/iregexp";
 import { isNodesType, isValueType, JSONPathFilterValue, JSONPathLogicalFalse, JSONPathLogicalTrue, JSONPathNothing } from "./types";
 
@@ -9,6 +10,7 @@ export interface JSONPathFunction {
     readonly description: string;
     readonly parameters: readonly JSONPathFunctionParameter[];
     readonly returnType: JSONPathType;
+    readonly returnDataType: DataType;
     readonly handler: JSONPathFunctionHandler;
 }
 
@@ -16,6 +18,7 @@ export interface JSONPathFunctionParameter {
     readonly name: string;
     readonly description: string;
     readonly type: JSONPathType;
+    readonly dataType: DataType;
 }
 
 export type JSONPathFunctionHandler = (context: JSONPathFunctionContext, ...args: JSONPathFilterValue[]) => JSONPathFilterValue;
@@ -36,9 +39,10 @@ export const defaultJSONPathOptions: JSONPathOptions = {
         "length": {
             description: "Gets the length of a value.",
             parameters: [
-                { name: "value", description: "The value to get the length of.", type: JSONPathType.valueType }
+                { name: "value", description: "The value to get the length of.", type: JSONPathType.valueType, dataType: UnionDataType.create([PrimitiveDataType.create(PrimitiveDataTypeType.string), ObjectDataType.create(new Map(), AnyDataType.create(), new Set()), ArrayDataType.create([], AnyDataType.create(), 0)]) }
             ],
             returnType: JSONPathType.valueType,
+            returnDataType: UnionDataType.create([PrimitiveDataType.create(PrimitiveDataTypeType.number), PrimitiveDataType.create(PrimitiveDataTypeType.nothing)]),
             handler: (context: JSONPathFunctionContext, value: JSONPathFilterValue) => {
                 if (!isValueType(value)) throw new Error();
 
@@ -51,9 +55,10 @@ export const defaultJSONPathOptions: JSONPathOptions = {
         "count": {
             description: "Counts the number of nodes.",
             parameters: [
-                { name: "nodes", description: "The nodes to count.", type: JSONPathType.nodesType }
+                { name: "nodes", description: "The nodes to count.", type: JSONPathType.nodesType, dataType: AnyDataType.create() }
             ],
             returnType: JSONPathType.valueType,
+            returnDataType: PrimitiveDataType.create(PrimitiveDataTypeType.number),
             handler: (context: JSONPathFunctionContext, nodes: JSONPathFilterValue) => {
                 if (!isNodesType(nodes)) throw new Error();
 
@@ -63,10 +68,11 @@ export const defaultJSONPathOptions: JSONPathOptions = {
         "match": {
             description: "Matches a text against a pattern.",
             parameters: [
-                { name: "text", description: "The text to search.", type: JSONPathType.valueType },
-                { name: "pattern", description: "The pattern to match.", type: JSONPathType.valueType }
+                { name: "text", description: "The text to search.", type: JSONPathType.valueType, dataType: PrimitiveDataType.create(PrimitiveDataTypeType.string) },
+                { name: "pattern", description: "The pattern to match.", type: JSONPathType.valueType, dataType: PrimitiveDataType.create(PrimitiveDataTypeType.string) }
             ],
             returnType: JSONPathType.logicalType,
+            returnDataType: AnyDataType.create(),
             handler: (context: JSONPathFunctionContext, text: JSONPathFilterValue, pattern: JSONPathFilterValue) => {
                 if (!isValueType(text)) throw new Error();
                 if (!isValueType(pattern)) throw new Error();
@@ -85,10 +91,11 @@ export const defaultJSONPathOptions: JSONPathOptions = {
         "search": {
             description: "Searches a text for a pattern.",
             parameters: [
-                { name: "text", description: "The text to search.", type: JSONPathType.valueType },
-                { name: "pattern", description: "The pattern to search.", type: JSONPathType.valueType }
+                { name: "text", description: "The text to search.", type: JSONPathType.valueType, dataType: PrimitiveDataType.create(PrimitiveDataTypeType.string) },
+                { name: "pattern", description: "The pattern to search.", type: JSONPathType.valueType, dataType: PrimitiveDataType.create(PrimitiveDataTypeType.string) }
             ],
             returnType: JSONPathType.logicalType,
+            returnDataType: AnyDataType.create(),
             handler: (context: JSONPathFunctionContext, text: JSONPathFilterValue, pattern: JSONPathFilterValue) => {
                 if (!isValueType(text)) throw new Error();
                 if (!isValueType(pattern)) throw new Error();
@@ -107,9 +114,10 @@ export const defaultJSONPathOptions: JSONPathOptions = {
         "value": {
             description: "Gets the value of a node.",
             parameters: [
-                { name: "nodes", description: "The nodes to get the value of.", type: JSONPathType.nodesType }
+                { name: "nodes", description: "The nodes to get the value of.", type: JSONPathType.nodesType, dataType: AnyDataType.create() }
             ],
             returnType: JSONPathType.valueType,
+            returnDataType: AnyDataType.create(),
             handler: (context: JSONPathFunctionContext, nodes: JSONPathFilterValue) => {
                 if (!isNodesType(nodes)) throw new Error();
 

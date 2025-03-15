@@ -4,11 +4,12 @@ import { DataTypeAnalyzer } from "./data-type-analyzer";
 import { jsonSchemaToType } from "./json-schema-data-type-converter";
 import { jsonSchemaForTest } from "./json-schema-data-type-converter.spec";
 import { JSONPathParser } from "../syntax-analysis/parser";
+import { defaultJSONPathOptions } from "../options";
 
 describe("Types", () => {
     it("types test", () => {
         const rootType = jsonSchemaToType(JSON.parse(jsonSchemaForTest));
-        const typeAnalyzer = new DataTypeAnalyzer(rootType);
+        const typeAnalyzer = new DataTypeAnalyzer(rootType, defaultJSONPathOptions);
         const parser = new JSONPathParser();
         const path = parser.parse("$[?@.role=='admin']");
 

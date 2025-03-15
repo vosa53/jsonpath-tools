@@ -111,7 +111,7 @@ export class CompletionProvider {
     }
 
     private getIncomingType(segment: JSONPathSegment, queryArgumentType: DataType): DataType {
-        const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType);
+        const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType, this.options);
         return typeAnalyzer.getIncomingTypeToSegment(segment);
     }
 

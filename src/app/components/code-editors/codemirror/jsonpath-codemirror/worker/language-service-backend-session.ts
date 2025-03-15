@@ -1,5 +1,5 @@
 import { CompletionItem, CompletionProvider } from "@/jsonpath-tools/editor-services/completion-provider";
-import { defaultJSONPathOptions, JSONPathFunctionHandler, JSONPathOptions } from "@/jsonpath-tools/options";
+import { defaultJSONPathOptions, JSONPathFunction, JSONPathFunctionHandler, JSONPathOptions } from "@/jsonpath-tools/options";
 import { JSONPath } from "@/jsonpath-tools/query/json-path";
 import { TypeChecker } from "@/jsonpath-tools/semantic-analysis/type-checker";
 import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
@@ -50,12 +50,18 @@ export class LanguageServiceBackendSession {
     }
 
     updateOptions(message: UpdateOptionsLanguageServiceMessage) {
-        const functions = Object.entries(message.newOptions.functions).map(([name, f]) => [
+        const functions: [string, JSONPathFunction][] = Object.entries(message.newOptions.functions).map(([name, f]) => [
             name,
             {
                 description: f.description,
-                parameters: f.parameters,
+                parameters: f.parameters.map(p => ({
+                    name: p.name,
+                    description: p.description,
+                    type: p.type,
+                    dataType: deserializeDataType(p.dataType)
+                })),
                 returnType: f.returnType,
+                returnDataType: deserializeDataType(f.returnDataType),
                 handler: this.resolveFunctionHandler(name)
             }
         ]);

@@ -3,7 +3,7 @@ import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-prov
 import { JSONPathOptions } from "@/jsonpath-tools/options";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 import { CancellationToken } from "../cancellation-token";
-import { GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, SerializableCompletionItem, SerializableJSONPathOptions, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage as UpdateQueryArgumentTypeLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
+import { GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, SerializableCompletionItem, SerializableJSONPathFunction, SerializableJSONPathOptions, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage as UpdateQueryArgumentTypeLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
 import { SimpleRPCTopic } from "./simple-rpc";
 import { Signature } from "@/jsonpath-tools/editor-services/signature-provider";
 import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-provider";
@@ -21,12 +21,18 @@ export class LanguageServiceSession {
     constructor(readonly rpcTopic: SimpleRPCTopic) { }
 
     updateOptions(newOptions: JSONPathOptions) {
-        const serializableFunctions = Object.entries(newOptions.functions).map(([name, f]) => [
+        const serializableFunctions: [string, SerializableJSONPathFunction][] = Object.entries(newOptions.functions).map(([name, f]) => [
             name,
             {
                 description: f.description,
-                parameters: f.parameters,
-                returnType: f.returnType
+                parameters: f.parameters.map(p => ({
+                    name: p.name,
+                    description: p.description,
+                    type: p.type,
+                    dataType: serializeDataType(p.dataType)
+                })),
+                returnType: f.returnType,
+                returnDataType: serializeDataType(f.returnDataType)
             }
         ]);
         const serializableNewOptions: SerializableJSONPathOptions = {

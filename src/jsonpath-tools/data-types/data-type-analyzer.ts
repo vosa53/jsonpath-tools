@@ -19,11 +19,13 @@ import { JSONPathSyntaxTreeType } from "@/jsonpath-tools/query/syntax-tree-type"
 import { JSONPathToken } from "@/jsonpath-tools/query/token";
 import { DataType, LiteralDataType, PrimitiveDataType, PrimitiveDataTypeType, AnyDataType, UnionDataType, intersectTypes, subtractTypes, NeverDataType, isSubtypeOf, isEquvivalentTypeWith } from "./data-types";
 import { JSONPathSliceSelector } from "../query/selectors/slice-selector";
+import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
+import { JSONPathOptions } from "../options";
 
 export class DataTypeAnalyzer {
     private readonly typeCache = new Map<JSONPathSyntaxTree, DataType>();
 
-    constructor(private readonly rootType: DataType) {
+    constructor(private readonly rootType: DataType, private readonly options: JSONPathOptions) {
 
     }
 
@@ -62,6 +64,8 @@ export class DataTypeAnalyzer {
             type = this.getQueryType(expression);
         else if (expression instanceof JSONPathFilterQueryExpression)
             type = this.getFilterQueryType(expression);
+        else if (expression instanceof JSONPathFunctionExpression)
+            type = this.getFunctionType(expression);
         else
             type = AnyDataType.create();
 
@@ -118,6 +122,13 @@ export class DataTypeAnalyzer {
 
     private getFilterQueryType(filterQuery: JSONPathFilterQueryExpression): DataType {
         return this.getQueryType(filterQuery.query);
+    }
+
+    private getFunctionType(functionExpression: JSONPathFunctionExpression): DataType {
+        const functionDefinition = this.options.functions[functionExpression.name];
+        if (functionDefinition === undefined)
+            return AnyDataType.create();
+        return functionDefinition.returnDataType;
     }
 
     getIncomingTypeToSegment(tree: JSONPathSyntaxTree): DataType {

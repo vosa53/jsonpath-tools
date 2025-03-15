@@ -65,7 +65,7 @@ export function usePageViewModel() {
             ...defaultJSONPathOptions,
             functions: {
                 ...defaultJSONPathOptions.functions,
-                ...Object.fromEntries(customFunctions.map(f => [f.name, { description: f.description, parameters: f.parameters.map(p => ({ name: p.name, description: p.description, type: p.type })), returnType: f.returnType, handler: () => JSONPathNothing }]))
+                ...Object.fromEntries(customFunctions.map(f => [f.name, { description: f.description, parameters: f.parameters.map(p => ({ name: p.name, description: p.description, type: p.type, dataType: AnyDataType.create() })), returnType: f.returnType, returnDataType: AnyDataType.create(), handler: () => JSONPathNothing }]))
             }
         };
     }, [customFunctions]);

@@ -4,7 +4,7 @@ import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-prov
 import { DocumentHighlight } from "@/jsonpath-tools/editor-services/document-highlights-provider";
 import { Signature } from "@/jsonpath-tools/editor-services/signature-provider";
 import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-provider";
-import { JSONPathFunction, JSONPathType } from "@/jsonpath-tools/options";
+import { JSONPathFunction, JSONPathFunctionParameter, JSONPathOptions, JSONPathType } from "@/jsonpath-tools/options";
 import { TextChange } from "@/jsonpath-tools/text-change";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 
@@ -105,8 +105,15 @@ export interface DisconnectLanguageServiceMessage {
 
 export type SerializableCompletionItem = Omit<CompletionItem, "resolveDescription">;
 
-export interface SerializableJSONPathOptions {
+export type SerializableJSONPathOptions = Omit<JSONPathOptions, "functions"> & {
     readonly functions: { [name: string]: SerializableJSONPathFunction };
 }
 
-export type SerializableJSONPathFunction = Omit<JSONPathFunction, "handler">;
+export type SerializableJSONPathFunction = Omit<JSONPathFunction, "parameters" | "returnDataType" | "handler"> & {
+    readonly parameters: readonly SerializableJSONPathFunctionParameter[];
+    readonly returnDataType: any;
+}
+
+export type SerializableJSONPathFunctionParameter = Omit<JSONPathFunctionParameter, "dataType"> & {
+    readonly dataType: any;
+}

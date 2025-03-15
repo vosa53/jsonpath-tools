@@ -83,7 +83,7 @@ export class TooltipProvider {
             return null;
 
         let text = description.toMarkdown();
-        const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType);
+        const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType, this.options);
         const type = typeAnalyzer.getType(node);
 
         const typeAnnotations = type.collectAnnotations();
