@@ -1,20 +1,20 @@
+import { DynamicAnalysisResult, DynamicAnalyzer } from "@/jsonpath-tools/analyzers/dynamic-analyzer";
+import { AnyDataType, DataType } from "@/jsonpath-tools/data-types/data-types";
 import { CompletionItem, CompletionProvider } from "@/jsonpath-tools/editor-services/completion-provider";
+import { DocumentHighlightsProvider } from "@/jsonpath-tools/editor-services/document-highlights-provider";
+import { Formatter } from "@/jsonpath-tools/editor-services/formatter";
+import { SignatureProvider } from "@/jsonpath-tools/editor-services/signature-provider";
+import { TooltipProvider } from "@/jsonpath-tools/editor-services/tooltip-provider";
 import { defaultJSONPathOptions, JSONPathFunction, JSONPathFunctionHandler, JSONPathOptions } from "@/jsonpath-tools/options";
 import { JSONPath } from "@/jsonpath-tools/query/json-path";
 import { TypeChecker } from "@/jsonpath-tools/semantic-analysis/type-checker";
 import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
 import { JSONPathJSONValue, JSONPathNodeList } from "@/jsonpath-tools/types";
 import { logPerformance } from "@/jsonpath-tools/utils";
+import { deserializeDataType } from "./data-type-serializer";
 import { DisconnectLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
 import { SimpleRPCTopic } from "./simple-rpc";
-import { SignatureProvider } from "@/jsonpath-tools/editor-services/signature-provider";
-import { TooltipProvider } from "@/jsonpath-tools/editor-services/tooltip-provider";
-import { DocumentHighlightsProvider } from "@/jsonpath-tools/editor-services/document-highlights-provider";
-import { Formatter } from "@/jsonpath-tools/editor-services/formatter";
-import { jsonSchemaToType } from "@/jsonpath-tools/data-types/json-schema-data-type-converter";
-import { DataType, AnyDataType } from "@/jsonpath-tools/data-types/data-types";
-import { DynamicAnalyzer, DynamicAnalysisResult } from "@/jsonpath-tools/analyzers/dynamic-analyzer";
-import { deserializeDataType } from "./data-type-serializer";
+import { StaticAnalyzer } from "@/jsonpath-tools/analyzers/static-analyzer";
 
 export class LanguageServiceBackendSession {
     private readonly parser: JSONPathParser;
@@ -24,6 +24,7 @@ export class LanguageServiceBackendSession {
     private signatureProvider: SignatureProvider;
     private documentHighlightsProvider: DocumentHighlightsProvider;
     private tooltipProvider: TooltipProvider;
+    private staticAnalyzer: StaticAnalyzer;
     private dynamicAnalyzer: DynamicAnalyzer;
     private formatter: Formatter;
     private query: JSONPath;
@@ -40,6 +41,7 @@ export class LanguageServiceBackendSession {
         this.signatureProvider = new SignatureProvider(this.options);
         this.documentHighlightsProvider = new DocumentHighlightsProvider(this.options);
         this.tooltipProvider = new TooltipProvider(this.options);
+        this.staticAnalyzer = new StaticAnalyzer(this.options);
         this.dynamicAnalyzer = new DynamicAnalyzer(this.options);
         this.formatter = new Formatter();
         this.query = this.parser.parse("");
@@ -73,6 +75,7 @@ export class LanguageServiceBackendSession {
         this.signatureProvider = new SignatureProvider(this.options);
         this.documentHighlightsProvider = new DocumentHighlightsProvider(this.options);
         this.tooltipProvider = new TooltipProvider(this.options);
+        this.staticAnalyzer = new StaticAnalyzer(this.options);
         this.dynamicAnalyzer = new DynamicAnalyzer(this.options);
         this.dynamicAnalysisResult = null;
     }
@@ -137,8 +140,10 @@ export class LanguageServiceBackendSession {
     getDiagnostics(message: GetDiagnosticsLanguageServiceMessage): GetDiagnosticsLanguageServiceMessageResponse {
         const syntaxDiagnostics = this.query.syntaxDiagnostics;
         const typeCheckerDiagnostics = this.typeChecker.check(this.query);
-        const dynamicAnalysisDiagnostics = this.getDynamicAnalysisResult().diagnostics;
-        const diagnostics = [...syntaxDiagnostics, ...typeCheckerDiagnostics, ...dynamicAnalysisDiagnostics];
+        const analysisDiagnostics = this.queryArgument === undefined 
+            ? this.staticAnalyzer.analyze(this.query, this.queryArgumentType)
+            : this.getDynamicAnalysisResult().diagnostics;
+        const diagnostics = [...syntaxDiagnostics, ...typeCheckerDiagnostics, ...analysisDiagnostics];
         diagnostics.sort((a, b) => a.textRange.position - b.textRange.position);
 
         return {
