@@ -5,6 +5,7 @@ import { memo, useState } from "react";
 import JSONEditor from "../code-editors/json-editor";
 import PanelShell from "../panel-shell";
 import { examples } from "@/app/models/examples";
+import { openTextFile } from "@/app/services/files";
 
 const JSONPanel = memo(({
     queryArgumentText,
@@ -47,7 +48,10 @@ const JSONPanel = memo(({
                         <IconRouteSquare style={{ width: '70%', height: '70%' }} stroke={1.5} />
                     </ActionIcon>
                     <Divider orientation="vertical" />
-                    <ActionIcon variant="default" aria-label="Settings">
+                    <ActionIcon variant="default" aria-label="Settings" onClick={async () => {
+                        const content = await openTextFile(".json");
+                        if (content !== null) onQueryArgumentTextChanged(content);
+                    }}>
                         <IconFileUpload style={{ width: '70%', height: '70%' }} stroke={1.5} />
                     </ActionIcon>
                     <Menu shadow="md" width={200}>

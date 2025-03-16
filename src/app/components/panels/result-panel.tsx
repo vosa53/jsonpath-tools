@@ -7,6 +7,7 @@ import { memo } from "react";
 import JSONEditor from "../code-editors/json-editor";
 import { EditorFormAdapter } from "../editor-form-adapter";
 import PanelShell from "../panel-shell";
+import { saveTextFile } from "@/app/services/files";
 
 const ResultPanel = memo(({
     resultText,
@@ -49,7 +50,7 @@ const ResultPanel = memo(({
                         <Button
                             variant="subtle" size="compact-sm" onClick={() => open()}>Edit Replacement</Button>
                     }
-                    <ActionIcon variant="default" aria-label="Settings" ml="auto">
+                    <ActionIcon variant="default" aria-label="Settings" ml="auto" onClick={async () => await saveTextFile("result.json", "application/json", ".json", resultText)}>
                         <IconFileDownload style={{ width: '70%', height: '70%' }} stroke={1.5} />
                     </ActionIcon>
                 </Group>

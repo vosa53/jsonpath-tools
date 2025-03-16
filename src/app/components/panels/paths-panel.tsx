@@ -4,6 +4,7 @@ import { memo } from "react";
 import JSONEditor from "../code-editors/json-editor";
 import PanelShell from "../panel-shell";
 import { IconFileDownload } from "@tabler/icons-react";
+import { saveTextFile } from "@/app/services/files";
 
 const PathsPanel = memo(({
     pathsText,
@@ -28,7 +29,7 @@ const PathsPanel = memo(({
                         value={pathType}
                         onChange={value => onPathTypeChanged(value as PathType)}
                     />
-                    <ActionIcon variant="default" aria-label="Settings" ml="auto">
+                    <ActionIcon variant="default" aria-label="Settings" ml="auto" onClick={async () => await saveTextFile("paths.json", "application/json", ".json", pathsText)}>
                         <IconFileDownload style={{ width: '70%', height: '70%' }} stroke={1.5} />
                     </ActionIcon>
                 </Group>

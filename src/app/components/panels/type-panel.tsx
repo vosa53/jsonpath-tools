@@ -5,6 +5,7 @@ import JSONEditor from "../code-editors/json-editor";
 import PanelShell from "../panel-shell";
 import { DataTypeRaw, DataTypeRawFormat } from "@/app/models/data-type-raw";
 import { examples } from "@/app/models/examples";
+import { openTextFile } from "@/app/services/files";
 
 const TypePanel = memo(({
     queryArgumentTypeRaw,
@@ -27,7 +28,14 @@ const TypePanel = memo(({
                         value={queryArgumentTypeRaw.format}
                         onChange={value => onQueryArgumentTypeRawChanged({ ...queryArgumentTypeRaw, format: value as DataTypeRawFormat })}
                     />
-                    <ActionIcon variant="default" aria-label="Settings" ml="auto">
+                    <ActionIcon variant="default" aria-label="Settings" ml="auto" onClick={async () => {
+                        const content = await openTextFile(".json");
+                        if (content === null) return;
+                        if (queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema)
+                            onQueryArgumentTypeRawChanged({ ...queryArgumentTypeRaw, jsonSchemaText: content });
+                        else
+                            onQueryArgumentTypeRawChanged({ ...queryArgumentTypeRaw, jsonTypeDefinitionText: content });
+                    }}>
                         <IconFileUpload style={{ width: '70%', height: '70%' }} stroke={1.5} />
                     </ActionIcon>
                     <Menu shadow="md" width={200}>
