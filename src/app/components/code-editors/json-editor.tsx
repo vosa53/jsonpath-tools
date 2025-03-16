@@ -1,11 +1,12 @@
 import { JSONPathNormalizedPath } from "@/jsonpath-tools/transformations";
 import { json, jsonParseLinter } from "@codemirror/lang-json";
+import { syntaxTree } from "@codemirror/language";
 import { linter } from "@codemirror/lint";
 import { StateEffect } from "@codemirror/state";
 import { EditorView } from "codemirror";
 import { useEffect, useRef } from "react";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
-import { getNodeAtPath, pathsHighlighter, setCurrentHighlightedPathEffect, setHighlightedPathsEffect } from "./codemirror/paths-highlighter";
+import { getNodeAtPath, getPathAtTreeCursor, pathsHighlighter, setCurrentHighlightedPathEffect, setHighlightedPathsEffect } from "./codemirror/paths-highlighter";
 import { EMPTY_ARRAY, logPerformance } from "@/jsonpath-tools/utils";
 import { ensureParsed } from "./codemirror/ensure-parsed";
 
@@ -15,6 +16,7 @@ export default function JSONEditor({
     paths = EMPTY_ARRAY,
     currentPath = EMPTY_ARRAY,
     onValueChanged,
+    onCurrentPathChanged,
     onParsingProgressChanged
 }: {
     value: string,
@@ -22,6 +24,7 @@ export default function JSONEditor({
     paths?: readonly JSONPathNormalizedPath[],
     currentPath?: JSONPathNormalizedPath,
     onValueChanged: (value: string) => void,
+    onCurrentPathChanged?: (currentPathGetter: () => JSONPathNormalizedPath) => void,
     onParsingProgressChanged?: (inProgress: boolean) => void
 }) {
     const editorViewRef = useRef<EditorView>(null);
@@ -47,7 +50,16 @@ export default function JSONEditor({
             json(),
             linter(jsonParseLinter()), // TODO: Disable in readonly editor.
             pathsHighlighter(),
-            ensureParsed({ onParsingProgressChanged: (inProgress: boolean) => onParsingProgressChanged?.(inProgress) })
+            ensureParsed({ onParsingProgressChanged: (inProgress: boolean) => onParsingProgressChanged?.(inProgress) }),
+            EditorView.updateListener.of(u => {
+                if (onCurrentPathChanged !== undefined && u.selectionSet) {
+                    onCurrentPathChanged(() => {
+                        const tree = syntaxTree(u.state);
+                        const cursor = tree.cursorAt(u.state.selection.main.head);
+                        return getPathAtTreeCursor(cursor, u.state);
+                    });
+                }
+            })
         ];
     };
 
