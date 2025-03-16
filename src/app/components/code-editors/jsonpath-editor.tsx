@@ -2,7 +2,8 @@ import { defaultJSONPathOptions, JSONPathOptions } from "@/jsonpath-tools/option
 import { JSONPath } from "@/jsonpath-tools/query/json-path";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 import { syntaxTree } from "@codemirror/language";
-import { EditorView } from "codemirror";
+import { EditorView, keymap } from "@codemirror/view";
+import { Prec } from "@codemirror/state";
 import { useEffect, useRef } from "react";
 import { JSONPathDiagnostics } from "../../../jsonpath-tools/diagnostics";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
@@ -25,7 +26,8 @@ export default function JSONPathEditor({
     onValueChanged,
     onParsed,
     onDiagnosticsCreated,
-    onGetResultAvailable
+    onGetResultAvailable,
+    onRun
 }: {
     value: string,
     options: JSONPathOptions,
@@ -37,7 +39,8 @@ export default function JSONPathEditor({
     onValueChanged: (value: string) => void,
     onParsed?: (jsonPath: JSONPath) => void,
     onDiagnosticsCreated?: (diagnostics: readonly JSONPathDiagnostics[]) => void,
-    onGetResultAvailable?: (getResult: () => Promise<{ nodes: readonly JSONPathJSONValue[], paths: readonly (string | number)[][] }>) => void
+    onGetResultAvailable?: (getResult: () => Promise<{ nodes: readonly JSONPathJSONValue[], paths: readonly (string | number)[][] }>) => void,
+    onRun?: () => void
 }) {
     const editorViewRef = useRef<EditorView>(null);
 
@@ -65,7 +68,7 @@ export default function JSONPathEditor({
         return [
             jsonPath({
                 languageService,
-                onDiagnosticsCreated 
+                onDiagnosticsCreated
             }),
             rangeHighlighter(),
             EditorView.theme({
@@ -78,18 +81,33 @@ export default function JSONPathEditor({
                     onParsed?.(jsonPath);
                 }
             }),
+            Prec.highest(keymap.of([
+                {
+                    key: "Ctrl-Enter",
+                    run: () => true
+                }
+            ]))
         ];
     };
 
     const onEditorViewCreated = (view: EditorView) => {
-        view.dispatch({ effects: [
-            updateOptionsEffect.of(options), 
-            updateQueryArgumentEffect.of(queryArgument), 
-            updateQueryArgumentTypeEffect.of(queryArgumentType), 
-            setHighlightedRangeEffect.of(highlightedRange)
-        ] });
+        view.dispatch({
+            effects: [
+                updateOptionsEffect.of(options),
+                updateQueryArgumentEffect.of(queryArgument),
+                updateQueryArgumentTypeEffect.of(queryArgumentType),
+                setHighlightedRangeEffect.of(highlightedRange)
+            ]
+        });
         editorViewRef.current = view;
         onGetResultAvailable?.(() => getResult(view.state));
+    };
+
+    const onKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+        if (event.ctrlKey && event.key === "Enter") {
+            event.preventDefault();
+            onRun?.();
+        }
     };
 
     return (
@@ -99,6 +117,7 @@ export default function JSONPathEditor({
             onValueChanged={onValueChanged}
             onExtensionsRequested={onEditorExtensionsRequested}
             onEditorViewCreated={onEditorViewCreated}
-            style={{ maxHeight: "150px" }} />
+            onKeyDown={onKeyDown}
+            style={{ maxHeight: "150px", flex: "1 1 0" }} />
     );
 }

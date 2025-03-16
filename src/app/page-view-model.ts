@@ -151,21 +151,30 @@ export function usePageViewModel() {
         setHighlightedRange(tree === null ? null : tree.textRangeWithoutSkipped);
     }, []);
 
+    const onRun = useCallback(() => {
+        if (!settings.autoRun)
+            run();
+    }, [settings]);
+
     useEffect(() => {
-        if (getResultRef.current === null) return;
+        if (getResultRef.current === null || !settings.autoRun) return;
         if (resultTimeoutRef.current !== null) window.clearTimeout(resultTimeoutRef.current);
         resultTimeoutRef.current = window.setTimeout(async () => {
-            try {
-                const result = await getResultRef.current!();
-                setResultPaths(result.paths);
-                setResult(result.nodes);
-                setCurrentResultPathIndex(0);
-            }
-            catch (error) {
-                if (!(error instanceof OperationCancelledError)) throw error;
-            }
+            await run();
         }, 500);
     }, [queryText, queryArgument, getResultRef.current]);
+
+    async function run() {
+        try {
+            const result = await getResultRef.current!();
+            setResultPaths(result.paths);
+            setResult(result.nodes);
+            setCurrentResultPathIndex(0);
+        }
+        catch (error) {
+            if (!(error instanceof OperationCancelledError)) throw error;
+        }
+    }
 
     return {
         onCustomFunctionsChanged,
@@ -181,6 +190,7 @@ export function usePageViewModel() {
         onGetResultAvailable,
         onSelectedDiagnosticsChanged,
         onSelectedNodeChanged,
+        onRun,
         customFunctions,
         settings,
         queryText,

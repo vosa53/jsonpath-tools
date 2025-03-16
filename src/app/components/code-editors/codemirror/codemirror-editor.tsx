@@ -7,7 +7,7 @@ import { Compartment, EditorState, Extension } from "@codemirror/state";
 import { crosshairCursor, drawSelection, dropCursor, highlightActiveLine, highlightActiveLineGutter, highlightSpecialChars, keymap, lineNumbers, rectangularSelection } from "@codemirror/view";
 import { MantineColorScheme, useMantineColorScheme } from "@mantine/core";
 import { EditorView } from "codemirror";
-import { CSSProperties, useEffect, useRef } from "react";
+import { CSSProperties, KeyboardEventHandler, useEffect, useRef } from "react";
 import { highlightStyle } from "./highlight-style";
 import { tabKeymap } from "./tab-keymap";
 import { theme } from "./theme";
@@ -18,14 +18,16 @@ export default function CodeMirrorEditor({
     style,
     onValueChanged: onValueChanged,
     onExtensionsRequested,
-    onEditorViewCreated
+    onEditorViewCreated,
+    onKeyDown
 }: {
     value: string,
     readonly: boolean,
     style?: CSSProperties,
     onValueChanged: (value: string) => void,
     onExtensionsRequested: () => Extension[],
-    onEditorViewCreated?: (view: EditorView) => void
+    onEditorViewCreated?: (view: EditorView) => void,
+    onKeyDown?: KeyboardEventHandler<HTMLElement>
 }) {
     const containerElementRef = useRef<HTMLDivElement>(null);
     const valueInEditorRef = useRef("");
@@ -121,7 +123,7 @@ export default function CodeMirrorEditor({
     //}, [value]);
 
     return (
-        <div ref={containerElementRef} style={style}></div>
+        <div onKeyDown={onKeyDown} ref={containerElementRef} style={style}></div>
     );
 }
 

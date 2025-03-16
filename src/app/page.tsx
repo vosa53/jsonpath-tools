@@ -1,20 +1,20 @@
 "use client"
 
-import { AppShell, Divider, Flex, Indicator, Stack, Tabs } from '@mantine/core';
-import { IconBraces, IconEqual, IconExclamationCircle, IconListTree, IconRouteSquare, IconSitemap, IconTriangleSquareCircle } from '@tabler/icons-react';
+import { JSONPathDiagnosticsType } from '@/jsonpath-tools/diagnostics';
+import { ActionIcon, AppShell, Divider, Flex, Indicator, Stack, Tabs } from '@mantine/core';
+import { IconBraces, IconEqual, IconExclamationCircle, IconListTree, IconPlayerPlay, IconRouteSquare, IconSitemap } from '@tabler/icons-react';
 import { useMemo, useState } from "react";
 import JSONPathEditor from "./components/code-editors/jsonpath-editor";
 import Header from "./components/header";
 import Navbar from "./components/navbar";
 import DiagnosticsPanel from "./components/panels/diagnostics-panel";
 import JSONPanel from "./components/panels/json-panel";
-import TypePanel from "./components/panels/type-panel";
 import OutlinePanel from "./components/panels/outline-panel";
 import PathsPanel from "./components/panels/paths-panel";
 import ResultPanel from "./components/panels/result-panel";
+import TypePanel from "./components/panels/type-panel";
 import { usePageViewModel } from "./page-view-model";
 import classes from "./styles/page.module.css";
-import { JSONPathDiagnosticsType } from '@/jsonpath-tools/diagnostics';
 
 export default function Home() {
     const [navbarOpened, setNavbarOpened] = useState(false);
@@ -22,7 +22,7 @@ export default function Home() {
     const errorCount = useMemo(() => {
         return viewModel.diagnostics.filter(d => d.type === JSONPathDiagnosticsType.error).length;
     }, [viewModel.diagnostics]);
-    
+
     return (
         <AppShell
             header={{ height: 55 }}
@@ -46,17 +46,25 @@ export default function Home() {
 
             <AppShell.Main className={classes.navbar} h="100vh">
                 <Stack gap={0} h="100%">
-                    <JSONPathEditor
-                        value={viewModel.queryText}
-                        options={viewModel.options}
-                        queryArgument={viewModel.queryArgument}
-                        queryArgumentType={viewModel.queryArgumentType}
-                        highlightedRange={viewModel.highlightedRange}
-                        languageService={viewModel.languageService}
-                        onValueChanged={viewModel.onQueryTextChanged}
-                        onParsed={viewModel.onQueryParsed}
-                        onDiagnosticsCreated={viewModel.onDiagnosticsPublished}
-                        onGetResultAvailable={viewModel.onGetResultAvailable} />
+                    <Flex w="100%" style={{ background: "var(--mantine-color-body)" }}>
+                        <JSONPathEditor
+                            value={viewModel.queryText}
+                            options={viewModel.options}
+                            queryArgument={viewModel.queryArgument}
+                            queryArgumentType={viewModel.queryArgumentType}
+                            highlightedRange={viewModel.highlightedRange}
+                            languageService={viewModel.languageService}
+                            onValueChanged={viewModel.onQueryTextChanged}
+                            onParsed={viewModel.onQueryParsed}
+                            onDiagnosticsCreated={viewModel.onDiagnosticsPublished}
+                            onGetResultAvailable={viewModel.onGetResultAvailable}
+                            onRun={viewModel.onRun} />
+                        {!viewModel.settings.autoRun &&
+                            <ActionIcon variant="filled" aria-label="Settings" size="lg" style={{ alignSelf: "end" }} m={5.2} onClick={viewModel.onRun}>
+                                <IconPlayerPlay style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                            </ActionIcon>
+                        }
+                    </Flex>
                     <Divider size="xs" />
                     <Flex flex="1 1 0" direction={{ sm: "row", base: "column" }}>
                         <Tabs defaultValue="data" flex="1" miw={0} display="flex" style={{ flexDirection: "column" }}>
@@ -78,7 +86,7 @@ export default function Home() {
                                 />
                             </Tabs.Panel>
                             <Tabs.Panel value="type" flex="1 1 0" mih={0}>
-                                <TypePanel 
+                                <TypePanel
                                     queryArgumentTypeRaw={viewModel.queryArgumentTypeRaw}
                                     onQueryArgumentTypeRawChanged={viewModel.onQueryArgumentTypeRawChanged} />
                             </Tabs.Panel>
@@ -102,24 +110,24 @@ export default function Home() {
                                 </Tabs.Tab>
                             </Tabs.List>
                             <Tabs.Panel value="result" flex="1 1 0" mih={0}>
-                                <ResultPanel 
-                                    resultText={viewModel.resultText} 
-                                    operation={viewModel.operation} 
+                                <ResultPanel
+                                    resultText={viewModel.resultText}
+                                    operation={viewModel.operation}
                                     onOperationChanged={viewModel.onOperationChanged} />
                             </Tabs.Panel>
                             <Tabs.Panel value="paths" flex="1 1 0" mih={0}>
-                                <PathsPanel 
-                                    pathsText={viewModel.resultPathsText} 
-                                    pathType={viewModel.pathType} 
+                                <PathsPanel
+                                    pathsText={viewModel.resultPathsText}
+                                    pathType={viewModel.pathType}
                                     onPathTypeChanged={viewModel.onPathTypeChanged} />
                             </Tabs.Panel>
                             <Tabs.Panel value="errors" flex="1 1 0" mih={0}>
-                                <DiagnosticsPanel 
+                                <DiagnosticsPanel
                                     diagnostics={viewModel.diagnostics}
                                     onSelectedDiagnosticsChanged={viewModel.onSelectedDiagnosticsChanged} />
                             </Tabs.Panel>
                             <Tabs.Panel value="outline" flex="1 1 0" mih={0}>
-                                <OutlinePanel 
+                                <OutlinePanel
                                     query={viewModel.query}
                                     onSelectedNodeChanged={viewModel.onSelectedNodeChanged} />
                             </Tabs.Panel>
