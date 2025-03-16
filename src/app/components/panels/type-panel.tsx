@@ -4,6 +4,7 @@ import { memo } from "react";
 import JSONEditor from "../code-editors/json-editor";
 import PanelShell from "../panel-shell";
 import { DataTypeRaw, DataTypeRawFormat } from "@/app/models/data-type-raw";
+import { examples } from "@/app/models/examples";
 
 const TypePanel = memo(({
     queryArgumentTypeRaw,
@@ -34,9 +35,14 @@ const TypePanel = memo(({
                             <Button variant="default" size="xs" rightSection={<IconChevronDown size={14} />}>Example Schema</Button>
                         </Menu.Target>
                         <Menu.Dropdown>
-                            <Menu.Item>Example 1</Menu.Item>
-                            <Menu.Item>Example 2</Menu.Item>
-                            <Menu.Item>Example 3</Menu.Item>
+                            {examples.map((e, i) => (
+                                <Menu.Item key={i} onClick={() => {
+                                    if (queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema)
+                                        onQueryArgumentTypeRawChanged({ ...queryArgumentTypeRaw, jsonSchemaText: e.jsonSchemaText });
+                                    else
+                                        onQueryArgumentTypeRawChanged({ ...queryArgumentTypeRaw, jsonTypeDefinitionText: e.jsonTypeDefinitionText });
+                                }}>{e.name}</Menu.Item>
+                            ))}
                         </Menu.Dropdown>
                     </Menu>
                 </Group>

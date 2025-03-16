@@ -4,6 +4,7 @@ import { IconArrowDown, IconArrowUp, IconChevronDown, IconFileUpload, IconRouteS
 import { memo, useState } from "react";
 import JSONEditor from "../code-editors/json-editor";
 import PanelShell from "../panel-shell";
+import { examples } from "@/app/models/examples";
 
 const JSONPanel = memo(({
     queryArgumentText,
@@ -54,9 +55,9 @@ const JSONPanel = memo(({
                             <Button variant="default" size="xs" rightSection={<IconChevronDown size={14} />}>Example Data</Button>
                         </Menu.Target>
                         <Menu.Dropdown>
-                            <Menu.Item>Example 1</Menu.Item>
-                            <Menu.Item>Example 2</Menu.Item>
-                            <Menu.Item>Example 3</Menu.Item>
+                            {examples.map((e, i) => (
+                                <Menu.Item key={i} onClick={() => onQueryArgumentTextChanged(e.jsonText)}>{e.name}</Menu.Item>
+                            ))}
                         </Menu.Dropdown>
                     </Menu>
                 </Group>
