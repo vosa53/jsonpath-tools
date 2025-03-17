@@ -118,6 +118,6 @@ export default function JSONPathEditor({
             onExtensionsRequested={onEditorExtensionsRequested}
             onEditorViewCreated={onEditorViewCreated}
             onKeyDown={onKeyDown}
-            style={{ maxHeight: "150px", flex: "1 1 0" }} />
+            style={{ maxHeight: "150px", flex: "1 1 0", overflow: "hidden" }} />
     );
 }
