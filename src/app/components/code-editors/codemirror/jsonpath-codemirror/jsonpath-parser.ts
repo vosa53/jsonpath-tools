@@ -189,10 +189,13 @@ class CodeMirrorJSONPathParser extends Parser {
 }
 
 class CodeMirrorJSONPathPartialParse implements PartialParse {
-    readonly parsedPos = this.tree.length;
-    readonly stoppedAt = this.tree.length;
+    readonly parsedPos: number;
+    readonly stoppedAt: number;
 
-    constructor(private readonly tree: Tree) { }
+    constructor(private readonly tree: Tree) { 
+        this.parsedPos = this.tree.length;
+        this.stoppedAt = this.tree.length;
+    }
 
     advance(): Tree | null {
         return this.tree;

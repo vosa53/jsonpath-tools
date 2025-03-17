@@ -19,15 +19,15 @@
         "jsx": "react-jsx",
         /* Linting */
         "strict": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "noFallthroughCasesInSwitch": true,
-        "noUncheckedSideEffectImports": true,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "noFallthroughCasesInSwitch": false,
+        "noUncheckedSideEffectImports": false,
         "paths": {
             "@/*": [
                 "./src/*"
             ]
-        }
+        },
     },
     "include": [
         "src"

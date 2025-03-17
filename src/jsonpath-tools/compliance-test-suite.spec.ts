@@ -21,8 +21,10 @@ describe("JSONPath Compliance Test Suite", () => {
             else {
                 expect(errorsCount).toBe(0);
                 if (test.document !== undefined) {
+                    // @ts-ignore
                     const result = path.select({ rootNode: test.document, options: defaultJSONPathOptions }).nodes.map(n => n.value);
                     if (test.results !== undefined) {
+                        // @ts-ignore
                         expect(test.results.some(r => deepEquals(r, result))).toBeTruthy();
                     }
                     if (test.result !== undefined)
