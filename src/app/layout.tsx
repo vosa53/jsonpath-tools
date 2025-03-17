@@ -1,32 +1,16 @@
-import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from "@mantine/core";
+import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
-import type { Metadata } from "next";
 import "./styles/globals.css";
 import { applicationTheme, applicationCSSVariablesResolver } from "./theme";
+import Home from "./page";
 
-export const metadata: Metadata = {
-    title: "JSONPath Playground",
-    description: "Playground for JSONPath query language.",
-};
-
-export default function RootLayout({
-    children,
-}: Readonly<{
-    children: React.ReactNode;
-}>) {
+export default function RootLayout() {
     return (
-        <html lang="en" {...mantineHtmlProps}>
-            <head>
-                <ColorSchemeScript />
-            </head>
-            <body>
-                <MantineProvider
-                    theme={applicationTheme}
-                    cssVariablesResolver={applicationCSSVariablesResolver}
-                    defaultColorScheme="auto">
-                    {children}
-                </MantineProvider>
-            </body>
-        </html>
+        <MantineProvider
+            theme={applicationTheme}
+            cssVariablesResolver={applicationCSSVariablesResolver}
+            defaultColorScheme="auto">
+            <Home />
+        </MantineProvider>
     );
 }

@@ -1,3 +1,12 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap");
+
+@font-face {
+    font-family: "Cascadia Mono";
+    src: url("../fonts/CascadiaMono.woff2") format("woff2");
+    font-weight: normal;
+    font-style: normal;
+}
+
 .mantine-Accordion-label {
     font-weight: 500;
 }
@@ -55,7 +64,7 @@ pre {
     margin: 0;
 }
 
-pre > code {
+pre>code {
     display: block;
     padding: 2px 5px;
 }
@@ -66,7 +75,7 @@ pre > code {
 }
 
 ::-webkit-scrollbar-track {
-    background: transparent; 
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -74,5 +83,5 @@ pre > code {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--mantine-color-dimmed); 
+    background: var(--mantine-color-dimmed);
 }

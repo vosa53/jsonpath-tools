@@ -26,7 +26,7 @@ export class LanguageServices {
     }
     
     private static createWorkerLanguageService(): LanguageService {
-        const worker = new Worker(new URL("./language-service-worker.ts", import.meta.url));
+        const worker = new Worker(new URL("./language-service-worker.ts", import.meta.url), { type: "module" });
         const languageService = new LanguageService(data => worker.postMessage(data));
         worker.addEventListener("message", e => languageService.receiveFromBackend(e.data));
         return languageService;

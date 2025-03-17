@@ -1,5 +1,3 @@
-"use client"
-
 import { JSONPathDiagnosticsType } from '@/jsonpath-tools/diagnostics';
 import { ActionIcon, AppShell, Divider, Flex, Indicator, Stack, Tabs } from '@mantine/core';
 import { IconBraces, IconEqual, IconExclamationCircle, IconListTree, IconPlayerPlay, IconRouteSquare, IconSitemap } from '@tabler/icons-react';

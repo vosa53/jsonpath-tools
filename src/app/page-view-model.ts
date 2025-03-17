@@ -339,7 +339,7 @@ function executeOperation(operation: Operation, queryArgument: JSONPathJSONValue
         throw new Error(`Unknown operation type: ${operation.type}.`);
 }
 
-const worker = new Worker(new URL("./custom-language-service-worker.ts", import.meta.url));
+const worker = new Worker(new URL("./custom-language-service-worker.ts", import.meta.url), { type: "module" });
 const languageService = new LanguageService(data => worker.postMessage({ type: "languageServiceData", data } as CustomLanguageServiceWorkerMessage));
 worker.addEventListener("message", e => {
     const message = e.data as CustomLanguageServiceWorkerMessage;
