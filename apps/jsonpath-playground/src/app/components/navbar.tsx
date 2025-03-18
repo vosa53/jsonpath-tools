@@ -1,4 +1,4 @@
-import { Accordion, Divider, Flex, Text } from "@mantine/core";
+import { Accordion, Anchor, Divider, Flex, Text } from "@mantine/core";
 import { IconHelp, IconMathFunction, IconSettings } from "@tabler/icons-react";
 import { memo } from "react";
 import { CustomFunction } from "../models/custom-function";
@@ -49,7 +49,7 @@ const Navbar = memo(({
                 </Accordion.Item>
             </Accordion>
             <Divider mt="auto" />
-            <Text p="xs" c="dimmed">The editor component is also available as a standalone library. Same for the parser.</Text>
+            <Text p="xs" c="dimmed">The editor component and parser are also available as standalone <Anchor href="https://vosa53.github.io/jsonpath-tools" target="_blank">libraries</Anchor>.</Text>
         </Flex>
     );
 });
