@@ -1,3 +1,0 @@
-[submodule "src/jsonpath-tools/jsonpath-compliance-test-suite"]
-	path = src/jsonpath-tools/jsonpath-compliance-test-suite
-	url = https://github.com/jsonpath-standard/jsonpath-compliance-test-suite.git
