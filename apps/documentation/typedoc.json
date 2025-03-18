@@ -1,0 +1,14 @@
+{
+    "entryPoints": [
+        "../jsonpath-playground/src/jsonpath-tools/data-types/data-types.ts"
+    ],
+    "plugin": [
+        "typedoc-plugin-markdown",
+        "typedoc-vitepress-theme"
+    ],
+    "readme": "none",
+    "indexFormat": "table",
+    "useCodeBlocks": true,
+    "disableSources": true,
+    "tsconfig": "../jsonpath-playground/tsconfig.app.json",
+}
