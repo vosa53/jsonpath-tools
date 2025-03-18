@@ -10,7 +10,7 @@ import { EditorView } from "codemirror";
 import { CSSProperties, KeyboardEventHandler, useEffect, useRef } from "react";
 import { highlightStyle } from "./highlight-style";
 import { tabKeymap } from "./tab-keymap";
-import { theme } from "./theme";
+import { themeCommon, themeDark, themeLight } from "./theme";
 
 export default function CodeMirrorEditor({
     value,
@@ -81,7 +81,7 @@ export default function CodeMirrorEditor({
                     ...tabKeymap
                 ]),
                 indentUnit.of("    "),
-                theme,
+                themeCommon,
                 themeCompartment.of(colorSchemeToTheme(colorScheme.colorScheme)),
                 syntaxHighlighting(highlightStyle),
                 readonlyCompartment.of(EditorState.readOnly.of(readonly)),
@@ -129,9 +129,7 @@ export default function CodeMirrorEditor({
 
 const themeCompartment = new Compartment();
 const readonlyCompartment = new Compartment();
-const lightTheme = EditorView.theme({}, { dark: false });
-const darkTheme = EditorView.theme({}, { dark: true });
 
 function colorSchemeToTheme(colorScheme: MantineColorScheme): Extension {
-    return colorScheme === "dark" ? darkTheme : lightTheme;
+    return colorScheme === "dark" ? themeDark : themeLight;
 }

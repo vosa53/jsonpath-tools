@@ -54,7 +54,7 @@ const JSONPanel = memo(({
                         </Popover.Target>
                         <Popover.Dropdown>
                             <Group align="end" gap="xs">
-                                <TextInput label="Current Normalized Path" value={currentNormalizedPath} readOnly flex="1 1 0" />
+                                <TextInput label="Normalized Path under the Caret" value={currentNormalizedPath} readOnly flex="1 1 0" />
                                 <CopyButton value={currentNormalizedPath}>
                                     {({ copied, copy }) => (
                                         <Button color={copied ? "teal" : "violet"} onClick={copy}>

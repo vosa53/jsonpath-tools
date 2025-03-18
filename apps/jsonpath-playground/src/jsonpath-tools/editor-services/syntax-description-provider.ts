@@ -73,7 +73,7 @@ export class SyntaxDescriptionProvider {
             text += "\n##### Return Type";
             text += `\n - \`${functionDefinition.returnType}\``;
         }
-        return new SyntaxDescription(`Function ${name}`, text);
+        return new SyntaxDescription(`Function \`${name}\``, text);
     }
 
     provideDescriptionForFilterSelector(): SyntaxDescription {

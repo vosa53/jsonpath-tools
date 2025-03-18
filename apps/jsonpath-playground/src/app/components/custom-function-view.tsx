@@ -23,15 +23,20 @@ export default function CustomFunctionView({
                 </ActionIcon>
             </Flex>
             <div>{customFunction.description}</div>
-            <strong>Parameters</strong>
-            <Box ml="md">
+            <Title order={5}>Parameters</Title>
+            <ul>
                 {customFunction.parameters.map((p, i) => (
-                    <div key={i}>
-                        <strong>{p.name}: {p.type}</strong>{" " + p.description}
-                    </div>
+                    <li key={i}>
+                        <code>{p.name}: {p.type}</code>{" " + p.description}
+                    </li>
                 ))}
-            </Box>
-            <strong>Returns: {customFunction.returnType}</strong>
+            </ul>
+            <Title order={5}>Return Type</Title>
+            <ul>
+                <li>
+                    <code>{customFunction.returnType}</code>
+                </li>
+            </ul>
         </Box>
     );
 }
