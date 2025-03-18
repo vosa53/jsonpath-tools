@@ -6,7 +6,7 @@ export const theme = EditorView.theme({
     "& .cm-content": { fontFamily: "var(--mantine-font-family-monospace)", paddingLeft: "2px", paddingRight: "2px" },
 
     // Lines.
-    "& .cm-activeLine": { backgroundColor: "transparent", outline: "2px solid var(--mantine-color-default-hover)" },
+    "& .cm-activeLine": { backgroundColor: "transparent", outline: "2px solid var(--application-color-code-current-line)" },
     "& .cm-gutters": { fontFamily: "var(--mantine-font-family-monospace)", backgroundColor: "var(--application-color-code-background)", borderRight: "none", padding: "0 5px 0 5px" },
     "& .cm-lineNumbers .cm-gutterElement": { color: "var(--mantine-color-dimmed)" },
     "& .cm-lineNumbers .cm-gutterElement.cm-activeLineGutter": { color: "var(--mantine-color-text)" },
