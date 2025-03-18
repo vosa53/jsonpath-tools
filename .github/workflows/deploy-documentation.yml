@@ -32,7 +32,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build with VitePress
-        run: npm run build --workspace @jsonpath-tools/documentation
+        run: |
+          npm run typedoc --workspace @jsonpath-tools/documentation
+          npm run build --workspace @jsonpath-tools/documentation
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
