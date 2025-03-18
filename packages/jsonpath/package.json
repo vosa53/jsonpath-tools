@@ -1,0 +1,8 @@
+{
+  "name": "@jsonpath-tools/jsonpath",
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "author": "Jan Jörka",
+  "license": "MIT",
+  "description": ""
+}
