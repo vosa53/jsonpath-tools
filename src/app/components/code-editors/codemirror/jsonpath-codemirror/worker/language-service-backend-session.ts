@@ -92,7 +92,6 @@ export class LanguageServiceBackendSession {
 
     updateQueryArgumentType(message: UpdateQueryArgumentTypeLanguageServiceMessage) {
         this.queryArgumentType = deserializeDataType(message.newQueryArgumentTypeSerialized);
-        debugger;
     }
 
     getCompletions(message: GetCompletionsLanguageServiceMessage): GetCompletionsLanguageServiceMessageResponse {
