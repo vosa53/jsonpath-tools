@@ -79,7 +79,11 @@ pre>code {
 }
 
 ::-webkit-scrollbar-track {
-    background: transparent;
+    background: none;
+}
+
+::-webkit-scrollbar-corner {
+    background: none;
 }
 
 ::-webkit-scrollbar-thumb {
