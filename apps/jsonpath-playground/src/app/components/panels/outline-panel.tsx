@@ -80,6 +80,10 @@ function getClassName(tree: JSONPathSyntaxTree): string {
     return classNameMap.get(tree.type) ?? "";
 }
 
+function getLabel(tree: JSONPathSyntaxTree): string {
+    return new SyntaxDescriptionProvider(defaultJSONPathOptions).provideDescription(tree)?.title ?? tree.type;
+}
+
 const classNameMap = new Map<JSONPathSyntaxTreeType, string>([
     [JSONPathSyntaxTreeType.query, classes.query],
     [JSONPathSyntaxTreeType.segment, classes.segment],
@@ -102,7 +106,3 @@ const classNameMap = new Map<JSONPathSyntaxTreeType, string>([
     [JSONPathSyntaxTreeType.paranthesisExpression, classes.paranthesisExpression],
     [JSONPathSyntaxTreeType.missingExpression, classes.missing]
 ]);
-
-function getLabel(tree: JSONPathSyntaxTree): string {
-    return new SyntaxDescriptionProvider(defaultJSONPathOptions).provideDescription(tree)?.title ?? tree.type;
-}

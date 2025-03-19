@@ -5,7 +5,7 @@ export const applicationTheme = createTheme({
     fontFamilyMonospace: "Cascadia Mono",
     primaryColor: "violet",
     breakpoints: {
-        xs: "36em",
+        xs: "28em",
         sm: "52em",
         md: "66em",
         lg: "74em",
