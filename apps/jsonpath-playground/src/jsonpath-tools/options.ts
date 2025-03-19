@@ -46,7 +46,7 @@ export const defaultJSONPathOptions: JSONPathOptions = {
             handler: (context: JSONPathFunctionContext, value: JSONPathFilterValue) => {
                 if (!isValueType(value)) throw new Error();
 
-                if (typeof value === "string") return value.length;
+                if (typeof value === "string") return [...value].length;
                 else if (Array.isArray(value)) return value.length;
                 else if (typeof value === "object" && value !== null) return Object.keys(value).length;
                 else return JSONPathNothing;
