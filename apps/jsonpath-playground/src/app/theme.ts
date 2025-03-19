@@ -3,7 +3,14 @@ import { alpha, createTheme, CSSVariablesResolver } from "@mantine/core";
 export const applicationTheme = createTheme({
     fontFamily: "Roboto",
     fontFamilyMonospace: "Cascadia Mono",
-    primaryColor: "violet"
+    primaryColor: "violet",
+    breakpoints: {
+        xs: "36em",
+        sm: "52em",
+        md: "66em",
+        lg: "74em",
+        xl: "90em"
+    }
 });
 
 export const applicationCSSVariablesResolver: CSSVariablesResolver = (theme) => ({

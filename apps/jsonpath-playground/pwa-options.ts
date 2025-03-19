@@ -13,7 +13,7 @@ export const pwaOptions: Partial<VitePWAOptions> = {
                 sizes: "any"
             }
         ],
-        theme_color: "#845ef7"
+        theme_color: "#7048e8"
     },
     devOptions: {
         // Comment to disable PWA functionality in development.

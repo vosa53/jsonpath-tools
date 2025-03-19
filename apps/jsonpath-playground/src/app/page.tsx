@@ -89,7 +89,8 @@ export default function Home() {
                                     onQueryArgumentTypeRawChanged={viewModel.onQueryArgumentTypeRawChanged} />
                             </Tabs.Panel>
                         </Tabs>
-                        <Divider size="xs" orientation="vertical" />
+                        <Divider size="xs" orientation="vertical" visibleFrom="sm" />
+                        <Divider size="xs" orientation="horizontal" hiddenFrom="sm" />
                         <Tabs defaultValue="result" flex="1" miw={0} display="flex" style={{ flexDirection: "column" }}>
                             <Tabs.List>
                                 <Tabs.Tab value="result" leftSection={<IconEqual size={20} />}>
