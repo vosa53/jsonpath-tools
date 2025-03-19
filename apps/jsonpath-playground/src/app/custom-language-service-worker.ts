@@ -1,7 +1,7 @@
 import { defaultJSONPathOptions, JSONPathFunctionHandler } from "@/jsonpath-tools/options";
 import { LanguageServiceBackend } from "./components/code-editors/codemirror/jsonpath-codemirror/worker/language-service-backend";
 import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";
-import { JSONPathNothing } from "@/jsonpath-tools/types";
+import { JSONPathLogicalFalse, JSONPathLogicalTrue, JSONPathNodeList, JSONPathNothing } from "@/jsonpath-tools/types";
 
 const customFunctions = new Map<string, JSONPathFunctionHandler>();
 
@@ -35,26 +35,34 @@ function resolveFunction(functionName: string): JSONPathFunctionHandler {
 
 function compileCustomFunction(customFunction: CustomLanguageServiceFunction): JSONPathFunctionHandler {
     try {
-        const compiledFunction = new Function("context", ...customFunction.parameterNames, customFunction.code) as JSONPathFunctionHandler;
-        return wrapWithTryCatch(compiledFunction, customFunction.name);
+        const compiledCustomFunction = new Function("jp", "context", ...customFunction.parameterNames, customFunction.code) as JSONPathFunctionHandler;
+        return createJSONPathFunctionHandler(compiledCustomFunction, customFunction.name);
     }
     catch (e) {
         return (context) => {
-            context.reportWarning(`Custom function '${customFunction.name}' was compiled with errors: ${e}`);
+            context.reportWarning(`Compilation of custom function '${customFunction.name}' failed: ${e}`);
             return JSONPathNothing;
         };
     }
 }
 
-function wrapWithTryCatch(functionHandler: JSONPathFunctionHandler, functionName: string): JSONPathFunctionHandler {
+function createJSONPathFunctionHandler(customFunction: Function, functionName: string): JSONPathFunctionHandler {
     return (context, ...args) => {
         try {
-            const result = functionHandler(context, ...args);
+            const result = customFunction(JSONPATH_LIBRARY, context, ...args);
             return result;
         }
         catch(e) {
-            context.reportWarning(`Exception while executing custom function '${functionName}': ${e}`);
+            context.reportWarning(`Error while executing custom function '${functionName}': ${e}`);
             return JSONPathNothing;
         }
     }
 }
+
+// TODO: Probably pass the whole library to custom functions (import *).
+const JSONPATH_LIBRARY = {
+    JSONPathNothing: JSONPathNothing,
+    JSONPathLogicalFalse: JSONPathLogicalFalse,
+    JSONPathLogicalTrue: JSONPathLogicalTrue,
+    JSONPathNodeList: JSONPathNodeList
+};
