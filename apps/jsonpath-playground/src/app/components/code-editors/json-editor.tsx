@@ -4,7 +4,7 @@ import { syntaxTree } from "@codemirror/language";
 import { linter } from "@codemirror/lint";
 import { StateEffect } from "@codemirror/state";
 import { EditorView } from "codemirror";
-import { useEffect, useRef } from "react";
+import { FocusEventHandler, useEffect, useRef } from "react";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
 import { getNodeAtPath, getPathAtTreeCursor, pathsHighlighter, setCurrentHighlightedPathEffect, setHighlightedPathsEffect } from "./codemirror/paths-highlighter";
 import { EMPTY_ARRAY, logPerformance } from "@/jsonpath-tools/utils";
@@ -17,7 +17,9 @@ export default function JSONEditor({
     currentPath = EMPTY_ARRAY,
     onValueChanged,
     onCurrentPathChanged,
-    onParsingProgressChanged
+    onParsingProgressChanged,
+    onFocus,
+    onBlur
 }: {
     value: string,
     readonly?: boolean,
@@ -25,7 +27,9 @@ export default function JSONEditor({
     currentPath?: JSONPathNormalizedPath,
     onValueChanged: (value: string) => void,
     onCurrentPathChanged?: (currentPathGetter: () => JSONPathNormalizedPath) => void,
-    onParsingProgressChanged?: (inProgress: boolean) => void
+    onParsingProgressChanged?: (inProgress: boolean) => void,
+    onFocus?: FocusEventHandler<HTMLElement>,
+    onBlur?: FocusEventHandler<HTMLElement>
 }) {
     const editorViewRef = useRef<EditorView>(null);
 
@@ -72,9 +76,11 @@ export default function JSONEditor({
         <CodeMirrorEditor
             value={value}
             readonly={readonly}
+            style={{ height: "100%" }}
             onValueChanged={onValueChanged}
             onExtensionsRequested={onEditorExtensionsRequested}
             onEditorViewCreated={onEditorViewCreated}
-            style={{ height: "100%" }} />
+            onFocus={onFocus}
+            onBlur={onBlur} />
     );
 }

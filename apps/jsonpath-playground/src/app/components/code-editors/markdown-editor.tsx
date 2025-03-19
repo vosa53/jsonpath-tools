@@ -1,13 +1,18 @@
 import { markdown } from "@codemirror/lang-markdown";
 import { EditorView } from "codemirror";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
+import { FocusEventHandler } from "react";
 
 export default function MarkdownEditor({
     value,
-    onValueChanged
+    onValueChanged,
+    onFocus,
+    onBlur
 }: {
     value: string,
-    onValueChanged: (value: string) => void
+    onValueChanged: (value: string) => void,
+    onFocus?: FocusEventHandler<HTMLElement>,
+    onBlur?: FocusEventHandler<HTMLElement>
 }) {
     const onEditorExtensionsRequested = () => {
         return [
@@ -20,11 +25,12 @@ export default function MarkdownEditor({
     };
 
     return (
-        <CodeMirrorEditor 
-            value={value} 
-            readonly={false} 
-            onValueChanged={onValueChanged} 
+        <CodeMirrorEditor
+            value={value}
+            style={{ height: "100%" }}
+            onValueChanged={onValueChanged}
             onExtensionsRequested={onEditorExtensionsRequested} 
-            style={{ height: "100%" }} />
+            onFocus={onFocus}
+            onBlur={onBlur} />
     );
 }

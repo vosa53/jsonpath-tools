@@ -64,6 +64,9 @@ export default function JSONPathEditor({
             editorViewRef.current.dispatch({ effects: setHighlightedRangeEffect.of(highlightedRange) });
     }, [highlightedRange]);
 
+    const currentOnRun = useRef<() => void>(undefined);
+    currentOnRun.current = onRun;
+
     const onEditorExtensionsRequested = () => {
         return [
             jsonPath({
@@ -84,7 +87,10 @@ export default function JSONPathEditor({
             Prec.highest(keymap.of([
                 {
                     key: "Ctrl-Enter",
-                    run: () => true
+                    run: () => {
+                        currentOnRun.current?.();
+                        return true;
+                    }
                 }
             ]))
         ];
@@ -103,13 +109,6 @@ export default function JSONPathEditor({
         onGetResultAvailable?.(() => getResult(view.state));
     };
 
-    const onKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
-        if (event.ctrlKey && event.key === "Enter") {
-            event.preventDefault();
-            onRun?.();
-        }
-    };
-
     return (
         <CodeMirrorEditor
             value={value}
@@ -117,7 +116,6 @@ export default function JSONPathEditor({
             onValueChanged={onValueChanged}
             onExtensionsRequested={onEditorExtensionsRequested}
             onEditorViewCreated={onEditorViewCreated}
-            onKeyDown={onKeyDown}
             style={{ maxHeight: "150px", flex: "1 1 0", overflow: "hidden" }} />
     );
 }

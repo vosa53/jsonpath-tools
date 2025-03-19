@@ -1,6 +1,6 @@
 import { JSONPathType } from "@/jsonpath-tools/options";
 import { ActionIcon, Button, Collapse, Flex, Group, Input, Select, Stack, TextInput } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { IconChevronDown, IconChevronUp, IconDeviceFloppy, IconHelp, IconPlus, IconTrash } from "@tabler/icons-react";
 import { CustomFunction } from "../models/custom-function";
@@ -11,11 +11,13 @@ import { EditorFormAdapter } from "./editor-form-adapter";
 export default function CustomFunctionEditor({
     customFunction,
     existsName,
-    onCustomFunctionChanged
+    onCustomFunctionSaved,
+    onCancelled
 }: {
     customFunction: CustomFunction,
     existsName: (name: string) => boolean,
-    onCustomFunctionChanged: (value: CustomFunction) => void
+    onCustomFunctionSaved: (value: CustomFunction) => void,
+    onCancelled: () => void
 }) {
     const form = useForm({
         mode: "uncontrolled",
@@ -35,11 +37,12 @@ export default function CustomFunctionEditor({
             name: (value) => validateName(value, existsName(value)),
             parameters: {
                 name: (value, values) => validateName(value, count(values.parameters, p => p.name === value) > 1)
-            }
+            },
+            code: isNotEmpty("Code can not be empty.")
         }
     });
     const onFormSubmit = (values: typeof form.values) => {
-        onCustomFunctionChanged({
+        onCustomFunctionSaved({
             name: values.name,
             description: values.description,
             parameters: values.parameters.map(p => ({
@@ -73,10 +76,12 @@ export default function CustomFunctionEditor({
                     {...form.getInputProps(`parameters.${i}.type`)}
                 />
                 <EditorFormAdapter
-                    editor={(value, onValueChange) =>
+                    editor={(value, onValueChange, onFocus, onBlur) =>
                         <MarkdownEditor
                             value={value}
-                            onValueChanged={onValueChange} />
+                            onValueChanged={onValueChange}
+                            onFocus={onFocus}
+                            onBlur={onBlur} />
                     }
                     style={{ width: "100%" }}
                     label="Description (Markdown)"
@@ -110,10 +115,12 @@ export default function CustomFunctionEditor({
                     {...form.getInputProps("returnType")}
                 />
                 <EditorFormAdapter
-                    editor={(value, onValueChange) =>
+                    editor={(value, onValueChange, onFocus, onBlur) =>
                         <MarkdownEditor
                             value={value}
-                            onValueChanged={onValueChange} />
+                            onValueChanged={onValueChange}
+                            onFocus={onFocus}
+                            onBlur={onBlur} />
                     }
                     style={{ width: "100%" }}
                     label="Description (Markdown)"
@@ -137,10 +144,12 @@ export default function CustomFunctionEditor({
                 </Input.Wrapper>
                 <div>
                     <EditorFormAdapter
-                        editor={(value, onValueChange) =>
+                        editor={(value, onValueChange, onFocus, onBlur) =>
                             <JavaScriptEditor
                                 value={value}
-                                onValueChanged={onValueChange} />
+                                onValueChanged={onValueChange}
+                                onFocus={onFocus}
+                                onBlur={onBlur} />
                         }
                         label="Code (JavaScript)"
                         key={form.key("code")}
@@ -160,7 +169,7 @@ export default function CustomFunctionEditor({
                     </Collapse>
                 </div>
                 <Group justify="end">
-                    <Button variant="default" type="button">Cancel</Button>
+                    <Button variant="default" type="button" onClick={onCancelled}>Cancel</Button>
                     <Button type="submit" leftSection={<IconDeviceFloppy size={14} />}>Save</Button>
                 </Group>
             </Stack>

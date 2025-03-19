@@ -1,5 +1,10 @@
 .input {
-    
+    padding: 4px 6px 4px 0;
+    transition: border-color 100ms ease;
+}
+
+.input:focus-within {
+    border-color: var(--mantine-primary-color-filled);
 }
 
 [data-mantine-color-scheme="dark"] .input {

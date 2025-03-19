@@ -26,7 +26,7 @@ export default function CustomFunctionsView({
     const [editedCustomFunction, setEditedCustomFunction] = useState<CustomFunction>(newCustomFunction);
     const [isCreatingNew, setIsCreatingNew] = useState(false);
 
-    const onEditedCustomFunctionChanged = (customFunction: CustomFunction) => {
+    const onEditedCustomFunctionSaved = (customFunction: CustomFunction) => {
         const newCustomFunctions = [...customFunctions];
         if (isCreatingNew)
             newCustomFunctions.push(customFunction);
@@ -43,7 +43,8 @@ export default function CustomFunctionsView({
                     customFunction={editedCustomFunction}
                     // TODO: Default functions.
                     existsName={(name) => customFunctions.some(cf => cf.name === name && cf !== editedCustomFunction)}
-                    onCustomFunctionChanged={onEditedCustomFunctionChanged} />
+                    onCustomFunctionSaved={onEditedCustomFunctionSaved}
+                    onCancelled={close} />
             </Modal>
             <Button
                 variant="outline"

@@ -20,10 +20,10 @@ const ResultPanel = memo(({
 }) => {
     const [modalOpened, { open, close }] = useDisclosure(false);
 
-    const onReplacementChanged = (replacement: ReplaceOperationReplacement) => {
+    const onReplacementSaved = (replacement: ReplaceOperationReplacement) => {
         onOperationChanged({ ...operation, replacement });
         close();
-    }
+    };
 
     return (
         <PanelShell
@@ -32,7 +32,8 @@ const ResultPanel = memo(({
                     <Modal opened={modalOpened} onClose={close} title={"Edit replacement value"} size="xl">
                         <ReplacementEditor
                             replacement={operation.replacement}
-                            onReplacementChanged={onReplacementChanged} />
+                            onReplacementSaved={onReplacementSaved} 
+                            onCancelled={close} />
                     </Modal>
                     <Select
                         size="xs"
@@ -64,10 +65,12 @@ export default ResultPanel;
 
 function ReplacementEditor({
     replacement,
-    onReplacementChanged
+    onReplacementSaved,
+    onCancelled
 }: {
     replacement: ReplaceOperationReplacement,
-    onReplacementChanged: (replacement: ReplaceOperationReplacement) => void
+    onReplacementSaved: (replacement: ReplaceOperationReplacement) => void,
+    onCancelled: () => void
 }) {
     const form = useForm({
         mode: "uncontrolled",
@@ -79,13 +82,8 @@ function ReplacementEditor({
             replacementText: (value) => validateJSONString(value)
         }
     });
-    /*const [previousCustomFunction, setPreviousCustomFunction] = useState(customFunction);
-    if (previousCustomFunction !== customFunction) {
-        setPreviousCustomFunction(customFunction);
-        form.reset();
-    }*/
     const onFormSubmit = (values: typeof form.values) => {
-        onReplacementChanged({
+        onReplacementSaved({
             replacement: JSON.parse(values.replacementText),
             replacementText: values.replacementText
         });
@@ -95,10 +93,12 @@ function ReplacementEditor({
         <form onSubmit={form.onSubmit(onFormSubmit)}>
             <Stack>
                 <EditorFormAdapter
-                    editor={(value, onValueChange) =>
+                    editor={(value, onValueChange, onFocus, onBlur) =>
                         <JSONEditor
                             value={value}
-                            onValueChanged={onValueChange} />
+                            onValueChanged={onValueChange}
+                            onFocus={onFocus}
+                            onBlur={onBlur} />
                     }
                     style={{ width: "100%" }}
                     label="Replacement JSON"
@@ -106,7 +106,7 @@ function ReplacementEditor({
                     {...form.getInputProps("replacementText")}
                 />
                 <Group justify="end">
-                    <Button variant="default" type="button">Cancel</Button>
+                    <Button variant="default" type="button" onClick={onCancelled}>Cancel</Button>
                     <Button type="submit" leftSection={<IconDeviceFloppy size={14} />}>Save</Button>
                 </Group>
             </Stack>
