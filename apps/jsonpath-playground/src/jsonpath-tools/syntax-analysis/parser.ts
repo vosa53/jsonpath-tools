@@ -1,7 +1,7 @@
 import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "../diagnostics";
 import { JSONPathAndExpression } from "../query/filter-expression/and-expression";
 import { JSONPathBooleanLiteral } from "../query/filter-expression/boolean-literal";
-import { JSONPathComparisonExpression } from "../query/filter-expression/comparison-expression";
+import { JSONPathComparisonExpression, JSONPathComparisonOperator } from "../query/filter-expression/comparison-expression";
 import { JSONPathFilterExpression } from "../query/filter-expression/filter-expression";
 import { JSONPathFilterQueryExpression } from "../query/filter-expression/filter-query-expression";
 import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
@@ -255,14 +255,14 @@ export class JSONPathParser {
         const left = this.parseNotExpression(context);
         this.skipWhitespace(context);
 
-        let operator = "";
+        let operator: JSONPathComparisonOperator;
         let operatorTokenType: JSONPathSyntaxTreeType;
-        if (context.current === "=" && context.next === "=") { operator = "=="; operatorTokenType = JSONPathSyntaxTreeType.doubleEqualsToken; }
-        else if (context.current === "!" && context.next === "=") { operator = "!="; operatorTokenType = JSONPathSyntaxTreeType.exclamationMarkEqualsToken; }
-        else if (context.current === "<" && context.next === "=") { operator = "<="; operatorTokenType = JSONPathSyntaxTreeType.lessThanEqualsToken; }
-        else if (context.current === ">" && context.next === "=") { operator = ">="; operatorTokenType = JSONPathSyntaxTreeType.greaterThanEqualsToken; }
-        else if (context.current === "<") { operator = "<"; operatorTokenType = JSONPathSyntaxTreeType.lessThanToken; }
-        else if (context.current === ">") { operator = ">"; operatorTokenType = JSONPathSyntaxTreeType.greaterThanToken; }
+        if (context.current === "=" && context.next === "=") { operator = JSONPathComparisonOperator.equals; operatorTokenType = JSONPathSyntaxTreeType.doubleEqualsToken; }
+        else if (context.current === "!" && context.next === "=") { operator = JSONPathComparisonOperator.notEquals; operatorTokenType = JSONPathSyntaxTreeType.exclamationMarkEqualsToken; }
+        else if (context.current === "<" && context.next === "=") { operator = JSONPathComparisonOperator.lessThanEquals; operatorTokenType = JSONPathSyntaxTreeType.lessThanEqualsToken; }
+        else if (context.current === ">" && context.next === "=") { operator = JSONPathComparisonOperator.greaterThanEquals; operatorTokenType = JSONPathSyntaxTreeType.greaterThanEqualsToken; }
+        else if (context.current === "<") { operator = JSONPathComparisonOperator.lessThan; operatorTokenType = JSONPathSyntaxTreeType.lessThanToken; }
+        else if (context.current === ">") { operator = JSONPathComparisonOperator.greaterThan; operatorTokenType = JSONPathSyntaxTreeType.greaterThanToken; }
         else return left;
         for (let i = 0; i < operator.length; i++) context.goNext();
         const operatorToken = context.collectToken(operatorTokenType);

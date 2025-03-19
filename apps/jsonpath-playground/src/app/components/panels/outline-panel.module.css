@@ -86,6 +86,26 @@
     background: var(--mantine-color-violet-light-hover);
 }
 
+.paranthesisExpression {
+    background: var(--mantine-color-grape-light);
+    border-color: var(--mantine-color-grape-light-color);
+    color: var(--mantine-color-grape-light-color);
+}
+
+.paranthesisExpression:hover {
+    background: var(--mantine-color-grape-light-hover);
+}
+
+.missing {
+    background: var(--mantine-color-gray-light);
+    border-color: var(--mantine-color-gray-light-color);
+    color: var(--mantine-color-gray-light-color);
+}
+
+.missing:hover {
+    background: var(--mantine-color-gray-light-hover);
+}
+
 /*export const highlightStyle = HighlightStyle.define([
     { tag: t.keyword, color: "var(--mantine-color-blue-text)" },
     { tag: t.bool, color: "var(--mantine-color-blue-text)" },

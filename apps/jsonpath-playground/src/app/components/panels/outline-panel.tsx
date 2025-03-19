@@ -1,24 +1,15 @@
+import { SyntaxDescriptionProvider } from "@/jsonpath-tools/editor-services/syntax-description-provider";
+import { defaultJSONPathOptions } from "@/jsonpath-tools/options";
 import { JSONPath } from "@/jsonpath-tools/query/json-path";
 import { JSONPathNode } from "@/jsonpath-tools/query/node";
 import { JSONPathSyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
-import { Box, Group, Paper, Stack, Text } from "@mantine/core";
-import classes from "./outline-panel.module.css"
-import { JSONPathToken } from "@/jsonpath-tools/query/token";
-import PanelShell from "../panel-shell";
-import { memo } from "react";
 import { JSONPathSyntaxTreeType } from "@/jsonpath-tools/query/syntax-tree-type";
-import { JSONPathQuery } from "@/jsonpath-tools/query/query";
-import { JSONPathSegment } from "@/jsonpath-tools/query/segment";
-import { JSONPathFilterSelector } from "@/jsonpath-tools/query/selectors/filter-selector";
-import { JSONPathNameSelector } from "@/jsonpath-tools/query/selectors/name-selector";
-import { JSONPathStringLiteral } from "@/jsonpath-tools/query/filter-expression/string-literal";
-import { JSONPathAndExpression } from "@/jsonpath-tools/query/filter-expression/and-expression";
-import { JSONPathOrExpression } from "@/jsonpath-tools/query/filter-expression/or-expression";
-import { JSONPathComparisonExpression } from "@/jsonpath-tools/query/filter-expression/comparison-expression";
-import { JSONPathFunctionExpression } from "@/jsonpath-tools/query/filter-expression/function-expression";
-import { JSONPathFilterQueryExpression } from "@/jsonpath-tools/query/filter-expression/filter-query-expression";
-import { SyntaxDescriptionProvider } from "@/jsonpath-tools/editor-services/syntax-description-provider";
-import { defaultJSONPathOptions } from "@/jsonpath-tools/options";
+import { JSONPathToken } from "@/jsonpath-tools/query/token";
+import { Box, Group, Paper, Stack, Text } from "@mantine/core";
+import { memo } from "react";
+import PanelShell from "../panel-shell";
+import classes from "./outline-panel.module.css";
+import { renderMarkdownToHTML } from "@/app/services/markdown";
 
 const OutlinePanel = memo(({
     query,
@@ -63,6 +54,7 @@ function OutlineView({
                 e.stopPropagation();
                 onSelectedNodeChanged(null);
             }}
+            style={{ minWidth: "300px" }}
         >
             <TreeLabel tree={tree} />
             {tree instanceof JSONPathNode && tree.children.length > 0 && (
@@ -79,8 +71,7 @@ function OutlineView({
 function TreeLabel({ tree }: { tree: JSONPathSyntaxTree }) {
     return (
         <Group className={classes.node}>
-            <Text fw="500">{getLabel(tree)}</Text>
-            {tree instanceof JSONPathToken && <Text c="dimmed">{tree.text}</Text>}
+            <Text fw="500" dangerouslySetInnerHTML={{ __html: renderMarkdownToHTML(getLabel(tree)) }}></Text>
         </Group>
     );
 }
@@ -93,7 +84,11 @@ const classNameMap = new Map<JSONPathSyntaxTreeType, string>([
     [JSONPathSyntaxTreeType.query, classes.query],
     [JSONPathSyntaxTreeType.segment, classes.segment],
     [JSONPathSyntaxTreeType.nameSelector, classes.selector],
+    [JSONPathSyntaxTreeType.indexSelector, classes.selector],
+    [JSONPathSyntaxTreeType.sliceSelector, classes.selector],
+    [JSONPathSyntaxTreeType.wildcardSelector, classes.selector],
     [JSONPathSyntaxTreeType.filterSelector, classes.selector],
+    [JSONPathSyntaxTreeType.missingSelector, classes.missing],
     [JSONPathSyntaxTreeType.functionExpression, classes.functionExpression],
     [JSONPathSyntaxTreeType.andExpression, classes.logicalOperator],
     [JSONPathSyntaxTreeType.orExpression, classes.logicalOperator],
@@ -103,20 +98,11 @@ const classNameMap = new Map<JSONPathSyntaxTreeType, string>([
     [JSONPathSyntaxTreeType.numberLiteral, classes.literal],
     [JSONPathSyntaxTreeType.nullLiteral, classes.literal],
     [JSONPathSyntaxTreeType.booleanLiteral, classes.literal],
-    [JSONPathSyntaxTreeType.filterQueryExpression, classes.filterQueryExpression]
+    [JSONPathSyntaxTreeType.filterQueryExpression, classes.filterQueryExpression],
+    [JSONPathSyntaxTreeType.paranthesisExpression, classes.paranthesisExpression],
+    [JSONPathSyntaxTreeType.missingExpression, classes.missing]
 ]);
 
 function getLabel(tree: JSONPathSyntaxTree): string {
     return new SyntaxDescriptionProvider(defaultJSONPathOptions).provideDescription(tree)?.title ?? tree.type;
-    if (tree instanceof JSONPathQuery) return "$ Query";
-    if (tree instanceof JSONPathSegment) return "[] Segment";
-    if (tree instanceof JSONPathFilterSelector) return "? Filter Selector";
-    if (tree instanceof JSONPathNameSelector) return ". Name Selector";
-    if (tree instanceof JSONPathStringLiteral) return "\"\" String";
-    if (tree instanceof JSONPathAndExpression) return "&& AND";
-    if (tree instanceof JSONPathOrExpression) return "&& OR";
-    if (tree instanceof JSONPathComparisonExpression) return "< Comparison";
-    if (tree instanceof JSONPathFunctionExpression) return "f() Function";
-    if (tree instanceof JSONPathFilterQueryExpression) return "@ Filter Query";
-    return tree.type;
 }

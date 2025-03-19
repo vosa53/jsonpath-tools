@@ -1,5 +1,7 @@
 import { JSONPathFunction, JSONPathOptions } from "../options";
+import { JSONPathComparisonExpression, JSONPathComparisonOperator } from "../query/filter-expression/comparison-expression";
 import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
+import { JSONPathQuery } from "../query/query";
 import { JSONPathSegment } from "../query/segment";
 import { JSONPathIndexSelector } from "../query/selectors/index-selector";
 import { JSONPathNameSelector } from "../query/selectors/name-selector";
@@ -9,7 +11,10 @@ import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
 
 export class SyntaxDescriptionProvider {
     private readonly descriptionProviders = new Map<JSONPathSyntaxTreeType, (node: JSONPathSyntaxTree) => SyntaxDescription>([
-        [JSONPathSyntaxTreeType.query, n => new SyntaxDescription("Query", "Selects particular children using a logical expression. Current child is represented with @.")],
+        [JSONPathSyntaxTreeType.query, n => {
+            const query = n as JSONPathQuery;
+            return this.provideDescriptionForQuery(query.isRelative);
+        }],
         [JSONPathSyntaxTreeType.segment, n => {
             const segment = n as JSONPathSegment;
             if (segment.isRecursive)
@@ -32,20 +37,26 @@ export class SyntaxDescriptionProvider {
             return this.provideDescriptionForSliceSelector(sliceSelector.start, sliceSelector.end, sliceSelector.step);
         }],
         [JSONPathSyntaxTreeType.wildcardSelector, n => this.provideDescriptionForWildcardSelector()],
+        [JSONPathSyntaxTreeType.missingSelector, n => this.provideDescriptionForMissingSelector()],
 
         [JSONPathSyntaxTreeType.paranthesisExpression, n => new SyntaxDescription("Paranthesis", "Paranthesis.")],
         [JSONPathSyntaxTreeType.andExpression, n => new SyntaxDescription("Logical AND", "Realizes operator AND.")],
         [JSONPathSyntaxTreeType.orExpression, n => new SyntaxDescription("Logical OR", "Realizes operator OR.")],
         [JSONPathSyntaxTreeType.notExpression, n => new SyntaxDescription("Logical NOT", "Realizes operator NOT.")],
-        [JSONPathSyntaxTreeType.comparisonExpression, n => new SyntaxDescription("Comparison", "Compares left and right.")],
+        [JSONPathSyntaxTreeType.comparisonExpression, n => {
+            const comparisonExpression = n as JSONPathComparisonExpression;
+            return this.provideDescriptionForComparisonExpression(comparisonExpression.operator);
+        }],
+        [JSONPathSyntaxTreeType.filterQueryExpression, n => new SyntaxDescription("Filter Query", "Query in filter expression.")],
         [JSONPathSyntaxTreeType.functionExpression, n => {
             const functionExpression = n as JSONPathFunctionExpression;
-            return this.provideDescriptionForFunction(functionExpression.name, this.options.functions[functionExpression.name]);
+            return this.provideDescriptionForFunctionExpression(functionExpression.name, this.options.functions[functionExpression.name]);
         }],
         [JSONPathSyntaxTreeType.stringLiteral, n => new SyntaxDescription("String Literal", "Realizes operator NOT.")],
         [JSONPathSyntaxTreeType.numberLiteral, n => new SyntaxDescription("Number Literal", "Realizes operator NOT.")],
         [JSONPathSyntaxTreeType.booleanLiteral, n => new SyntaxDescription("Boolean Literal", "Realizes operator NOT.")],
         [JSONPathSyntaxTreeType.nullLiteral, n => new SyntaxDescription("Null Literal", "Realizes operator NOT.")],
+        [JSONPathSyntaxTreeType.missingExpression, n => new SyntaxDescription("Missing Expression", "Missing Expression.")],
 
         [JSONPathSyntaxTreeType.dollarToken, n => this.provideDescriptionForDollarToken()],
         [JSONPathSyntaxTreeType.atToken, n => this.provideDescriptionForAtToken()]
@@ -63,17 +74,11 @@ export class SyntaxDescriptionProvider {
             return null;
     }
 
-    provideDescriptionForFunction(name: string, functionDefinition?: JSONPathFunction): SyntaxDescription {
-        let text = "";
-        if (functionDefinition !== undefined) {
-            text += functionDefinition.description;
-            text += "\n##### Parameters";
-            for (const parameter of functionDefinition.parameters)
-                text += `\n - \`${parameter.name}: ${parameter.type}\` ${parameter.description}`;
-            text += "\n##### Return Type";
-            text += `\n - \`${functionDefinition.returnType}\``;
-        }
-        return new SyntaxDescription(`Function \`${name}\``, text);
+    provideDescriptionForQuery(isRelative: boolean): SyntaxDescription {
+        return new SyntaxDescription(
+            isRelative ? "Relative Query" : "Absolute Query",
+            "Selects particular children using a logical expression. Current child is represented with @."
+        );
     }
 
     provideDescriptionForFilterSelector(): SyntaxDescription {
@@ -105,6 +110,35 @@ export class SyntaxDescriptionProvider {
 
     provideDescriptionForWildcardSelector(): SyntaxDescription {
         return new SyntaxDescription("Wildcard Selector", "Selects all members from an object.");
+    }
+
+    provideDescriptionForMissingSelector(): SyntaxDescription {
+        return new SyntaxDescription("Missing Selector", "Missing selector.");
+    }
+
+    provideDescriptionForComparisonExpression(operator: JSONPathComparisonOperator): SyntaxDescription {
+        let operatorDescription;
+        if (operator === JSONPathComparisonOperator.equals) operatorDescription = "Equality";
+        else if (operator === JSONPathComparisonOperator.notEquals) operatorDescription = "Inequality";
+        else if (operator === JSONPathComparisonOperator.lessThan) operatorDescription = "Less Than";
+        else if (operator === JSONPathComparisonOperator.greaterThan) operatorDescription = "Greater Than";
+        else if (operator === JSONPathComparisonOperator.lessThanEquals) operatorDescription = "Less Than Equals";
+        else if (operator === JSONPathComparisonOperator.greaterThanEquals) operatorDescription = "Greater Than Equals";
+        else throw new Error("Unknown operator.");
+        return new SyntaxDescription(`${operatorDescription} Comparison`, "Compares left and right.");
+    }
+
+    provideDescriptionForFunctionExpression(name: string, functionDefinition?: JSONPathFunction): SyntaxDescription {
+        let text = "";
+        if (functionDefinition !== undefined) {
+            text += functionDefinition.description;
+            text += "\n##### Parameters";
+            for (const parameter of functionDefinition.parameters)
+                text += `\n - \`${parameter.name}: ${parameter.type}\` ${parameter.description}`;
+            text += "\n##### Return Type";
+            text += `\n - \`${functionDefinition.returnType}\``;
+        }
+        return new SyntaxDescription(`Function \`${name}\``, text);
     }
 
     provideDescriptionForDollarToken(): SyntaxDescription {

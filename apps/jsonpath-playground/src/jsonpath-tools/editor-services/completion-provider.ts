@@ -134,7 +134,7 @@ export class CompletionProvider {
                 CompletionItemType.function,
                 functionDefinition[0],
                 functionDefinition[1].returnType,
-                () => this.syntaxDescriptionProvider.provideDescriptionForFunction(functionDefinition[0], functionDefinition[1]).toMarkdown()
+                () => this.syntaxDescriptionProvider.provideDescriptionForFunctionExpression(functionDefinition[0], functionDefinition[1]).toMarkdown()
             ));
         }
     }

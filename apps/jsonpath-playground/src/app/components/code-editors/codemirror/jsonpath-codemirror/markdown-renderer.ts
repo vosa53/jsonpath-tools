@@ -1,4 +1,4 @@
-import markdownit from "markdown-it"
+import markdownit from "markdown-it";
 
 export class MarkdownRenderer {
     private static readonly md = markdownit();

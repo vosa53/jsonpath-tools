@@ -15,6 +15,7 @@ export const highlightStyle = HighlightStyle.define([
     { tag: t.string, color: "var(--mantine-color-orange-text)" },
     { tag: t.propertyName, color: "var(--mantine-color-indigo-text)" },
     { tag: t.bracket, color: "var(--mantine-color-grape-text)" },
+    { tag: t.paren, color: "var(--mantine-color-grape-text)" },
     { tag: t.controlOperator, color: "var(--mantine-color-violet-text)" },
 
     // TODO: Adapt to the application style.
