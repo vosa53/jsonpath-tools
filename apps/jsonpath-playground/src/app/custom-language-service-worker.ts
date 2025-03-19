@@ -39,7 +39,6 @@ function compileCustomFunction(customFunction: CustomLanguageServiceFunction): J
         return wrapWithTryCatch(compiledFunction, customFunction.name);
     }
     catch (e) {
-        console.log("Cannot compile");
         return (context) => {
             context.reportWarning(`Custom function '${customFunction.name}' was compiled with errors: ${e}`);
             return JSONPathNothing;
@@ -47,17 +46,14 @@ function compileCustomFunction(customFunction: CustomLanguageServiceFunction): J
     }
 }
 
-// TODO: Remove console logs.
 function wrapWithTryCatch(functionHandler: JSONPathFunctionHandler, functionName: string): JSONPathFunctionHandler {
     return (context, ...args) => {
         try {
             const result = functionHandler(context, ...args);
-            console.log("Executing function: ", result);
             return result;
         }
         catch(e) {
             context.reportWarning(`Exception while executing custom function '${functionName}': ${e}`);
-            console.log("Function error.");
             return JSONPathNothing;
         }
     }

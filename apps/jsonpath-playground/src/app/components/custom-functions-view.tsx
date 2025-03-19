@@ -10,7 +10,7 @@ import CustomFunctionView from "./custom-function-view";
 const newCustomFunction: CustomFunction = {
     name: "",
     description: "",
-    code: "TODO",
+    code: "",
     parameters: [],
     returnType: JSONPathType.valueType
 };

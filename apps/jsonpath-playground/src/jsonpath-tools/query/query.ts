@@ -23,8 +23,18 @@ export class JSONPathQuery extends JSONPathNode {
     get type() { return JSONPathSyntaxTreeType.query; }
 
     get isSingular() {
-        // TODO: Disallow spaces 
-        return this.segments.every(s => !s.isRecursive && s.selectors.length === 1 && (s.selectors[0].selector instanceof JSONPathNameSelector || s.selectors[0].selector instanceof JSONPathIndexSelector));
+        return this.segments.every(s => {
+            if (s.isRecursive || s.selectors.length !== 1) 
+                return false;
+            const selector = s.selectors[0].selector;
+            if (!(selector instanceof JSONPathNameSelector || selector instanceof JSONPathIndexSelector))
+                return false;
+            if (selector.skippedTextBefore !== "")
+                return false;
+            if (s.closingBracketToken !== null && s.closingBracketToken.skippedTextBefore !== "")
+                return false;
+            return true;
+        });
     }
 
     select(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext | null): JSONPathNodeList {
@@ -46,7 +56,7 @@ export class JSONPathQuery extends JSONPathNode {
     toNormalizedPath(): JSONPathNormalizedPath | null {
         const segments: (string | number)[] = [];
         for (const segment of this.segments) {
-            if (segment.selectors.length !== 1)
+            if (segment.isRecursive || segment.selectors.length !== 1)
                 return null;
             const selector = segment.selectors[0].selector;
             if (selector instanceof JSONPathNameSelector)
