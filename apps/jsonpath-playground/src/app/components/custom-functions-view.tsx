@@ -41,7 +41,6 @@ export default function CustomFunctionsView({
             <Modal opened={opened} onClose={close} title={isCreatingNew ? "Create Custom Function" : "Edit Custom Function"} size="xl">
                 <CustomFunctionEditor
                     customFunction={editedCustomFunction}
-                    // TODO: Default functions.
                     existsName={(name) => customFunctions.some(cf => cf.name === name && cf !== editedCustomFunction)}
                     onCustomFunctionSaved={onEditedCustomFunctionSaved}
                     onCancelled={close} />

@@ -1,4 +1,4 @@
-import { JSONPathType } from "@/jsonpath-tools/options";
+import { defaultJSONPathOptions, JSONPathType } from "@/jsonpath-tools/options";
 import { ActionIcon, Button, Collapse, Flex, Group, Input, Select, Stack, TextInput } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -34,9 +34,9 @@ export default function CustomFunctionEditor({
             code: customFunction.code,
         },
         validate: {
-            name: (value) => validateName(value, existsName(value)),
+            name: (value) => validateName(value, existsName(value), reservedFunctionNames),
             parameters: {
-                name: (value, values) => validateName(value, count(values.parameters, p => p.name === value) > 1)
+                name: (value, values) => validateName(value, count(values.parameters, p => p.name === value) > 1, reservedParameterNames)
             },
             code: isNotEmpty("Code can not be empty.")
         }
@@ -177,8 +177,9 @@ export default function CustomFunctionEditor({
     );
 }
 
-function validateName(name: string, existsName: boolean): string | null {
-    if (existsName) return "Name is not unique.";
+function validateName(name: string, existsName: boolean, reservedNames: ReadonlySet<string>): string | null {
+    if (reservedNames.has(name)) return "This name is reserved.";
+    if (existsName) return "This name is already used.";
     else if (name.trim() === "") return "Name can not be empty.";
     else if (!/^[a-z][a-z0-9_]*$/.test(name)) return "Name can contain only lowercase ASCII letters, digits, or underscores and it must start with a lower case ASCII letter.";
     else return null;
@@ -190,3 +191,11 @@ function count<T>(array: T[], predicate: (item: T) => boolean): number {
         if (predicate(item)) count++;
     return count;
 }
+
+const reservedFunctionNames: ReadonlySet<string> = new Set([
+    ...Object.keys(defaultJSONPathOptions.functions)
+]);
+const reservedParameterNames: ReadonlySet<string> = new Set([
+    "context",
+    "jp"
+]);
