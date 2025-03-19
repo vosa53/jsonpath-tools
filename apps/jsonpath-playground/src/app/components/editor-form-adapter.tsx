@@ -7,6 +7,7 @@ export function EditorFormAdapter({
     editor,
     style,
     label,
+    description,
     value,
     defaultValue,
     onChange,
@@ -17,6 +18,7 @@ export function EditorFormAdapter({
     editor: (value: string, onValueChange: (value: string) => void) => ReactNode,
     style?: CSSProperties,
     label?: ReactNode,
+    description?: ReactNode,
     value?: string,
     defaultValue?: string,
     onChange?: (value: string) => void,
@@ -32,7 +34,7 @@ export function EditorFormAdapter({
     });
 
     return (
-        <InputWrapper label={label} error={error} style={style}>
+        <InputWrapper label={label} description={description} error={error} style={style}>
             <Paper withBorder p="3px 0" className={classes.input}>
                 {editor(_value, handleChange)}
             </Paper>

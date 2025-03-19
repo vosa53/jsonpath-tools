@@ -26,7 +26,7 @@ const Navbar = memo(({
                     </Accordion.Control>
                     <Accordion.Panel>
                         JSONPath defines a string syntax for selecting and extracting JSON
-                        (RFC 8259) values from within a given JSON value.
+                        (RFC 8259) values from within a given JSON value. TODO...
                     </Accordion.Panel>
                 </Accordion.Item>
 

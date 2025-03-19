@@ -1,7 +1,8 @@
 import { JSONPathType } from "@/jsonpath-tools/options";
-import { ActionIcon, Button, Flex, Group, Input, Select, Stack, TextInput } from "@mantine/core";
+import { ActionIcon, Button, Collapse, Flex, Group, Input, Select, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { IconDeviceFloppy, IconPlus, IconTrash } from "@tabler/icons-react";
+import { useDisclosure } from "@mantine/hooks";
+import { IconChevronDown, IconChevronUp, IconDeviceFloppy, IconHelp, IconPlus, IconTrash } from "@tabler/icons-react";
 import { CustomFunction } from "../models/custom-function";
 import JavaScriptEditor from "./code-editors/javascript-editor";
 import MarkdownEditor from "./code-editors/markdown-editor";
@@ -37,11 +38,6 @@ export default function CustomFunctionEditor({
             }
         }
     });
-    /*const [previousCustomFunction, setPreviousCustomFunction] = useState(customFunction);
-    if (previousCustomFunction !== customFunction) {
-        setPreviousCustomFunction(customFunction);
-        form.reset();
-    }*/
     const onFormSubmit = (values: typeof form.values) => {
         onCustomFunctionChanged({
             name: values.name,
@@ -55,6 +51,7 @@ export default function CustomFunctionEditor({
             code: values.code
         });
     };
+    const [documentationOpened, { toggle: documentationToggle }] = useDisclosure(false);
 
     const parameters = form.getValues().parameters.map((p, i) => (
         <Flex w="100%" align="center" gap="xs" key={i}>
@@ -82,7 +79,7 @@ export default function CustomFunctionEditor({
                             onValueChanged={onValueChange} />
                     }
                     style={{ width: "100%" }}
-                    label="Description"
+                    label="Description (Markdown)"
                     key={form.key(`parameters.${i}.description`)}
                     {...form.getInputProps(`parameters.${i}.description`)}
                 />
@@ -119,7 +116,7 @@ export default function CustomFunctionEditor({
                             onValueChanged={onValueChange} />
                     }
                     style={{ width: "100%" }}
-                    label="Description"
+                    label="Description (Markdown)"
                     key={form.key("description")}
                     {...form.getInputProps("description")}
                 />
@@ -138,16 +135,30 @@ export default function CustomFunctionEditor({
                         </Button>
                     </Stack>
                 </Input.Wrapper>
-                <EditorFormAdapter
-                    editor={(value, onValueChange) =>
-                        <JavaScriptEditor
-                            value={value}
-                            onValueChanged={onValueChange} />
-                    }
-                    label="Code"
-                    key={form.key("code")}
-                    {...form.getInputProps("code")}
-                />
+                <div>
+                    <EditorFormAdapter
+                        editor={(value, onValueChange) =>
+                            <JavaScriptEditor
+                                value={value}
+                                onValueChanged={onValueChange} />
+                        }
+                        label="Code (JavaScript)"
+                        key={form.key("code")}
+                        {...form.getInputProps("code")}
+                    />
+                    <Button
+                        variant="subtle"
+                        leftSection={<IconHelp size={14} />}
+                        rightSection={documentationOpened ? <IconChevronUp size={14} /> : <IconChevronDown size={14} />}
+                        size="xs"
+                        style={{ alignSelf: "start" }}
+                        onClick={documentationToggle}>
+                        Documentation
+                    </Button>
+                    <Collapse in={documentationOpened}>
+                        TODO...
+                    </Collapse>
+                </div>
                 <Group justify="end">
                     <Button variant="default" type="button">Cancel</Button>
                     <Button type="submit" leftSection={<IconDeviceFloppy size={14} />}>Save</Button>
