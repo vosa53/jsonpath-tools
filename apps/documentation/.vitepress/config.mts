@@ -8,16 +8,30 @@ export default defineConfig({
     themeConfig: {
         // https://vitepress.dev/reference/default-theme-config
         nav: [
-            { text: "Documentation", link: "/documentation" },
+            { text: "Documentation", link: "/introduction/overview" },
+            { text: "API Reference", link: "/api" },
             { text: "JSONPath Playground", link: "https://jsonpath-playground.pages.dev", target: "_blank" }
         ],
 
         sidebar: [
             {
-                text: "Documentation",
+                text: "Introduction",
                 items: [
-                    { text: "Documentation", link: "/documentation" },
-                    { text: "Get Started", link: "/api-examples" }
+                    { text: "Overview", link: "/introduction/overview" }
+                ]
+            },
+            {
+                text: "Evaluator",
+                items: [
+                    { text: "Get Started", link: "/evaluator/get-started" }
+                ]
+            },
+            {
+                text: "Editor",
+                items: [
+                    { text: "Get Started", link: "/editor/get-started" },
+                    { text: "React", link: "/editor/react-component" },
+                    { text: "CodeMirror", link: "/editor/codemirror-plugin" }
                 ]
             },
             {

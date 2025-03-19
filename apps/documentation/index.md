@@ -7,18 +7,26 @@ hero:
   tagline: Tools for JSONPath query language
   actions:
     - theme: brand
-      text: Get Started
-      link: /markdown-examples
+      text: Evaluator Quickstart
+      link: /evaluator/get-started
+    - theme: brand
+      text: Editor Quickstart
+      link: /editor/get-started
     - theme: alt
       text: Documentation
-      link: /api-examples
+      link: /introduction/overview
+    - theme: alt
+      text: API Reference
+      link: /api
 
 features:
-  - title: Evaluator
+  - title: Query Evaluator
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Editor for React
+  - title: Advanced Editor
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
   - title: CodeMirror Plugin
+    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: Standard Compliant
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
 ---
 
