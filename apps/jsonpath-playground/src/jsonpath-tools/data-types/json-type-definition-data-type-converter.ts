@@ -55,7 +55,6 @@ class JSONTypeDefinitionDataTypeConverterContext {
         const refType = this.createRefType(jsonTypeDefinition);
         if (refType !== null) return refType;
 
-        // TODO: Is this correct? Should not we exclude null (based on "nullable" property value)?
         return AnyDataType.create();
     }
 
@@ -139,8 +138,7 @@ class JSONTypeDefinitionDataTypeConverterContext {
         const types: DataType[] = [];
         for (const mappingEntry of Object.entries(jsonTypeDefinition.mapping)) {
             const discriminatorValue = mappingEntry[0];
-            // TODO: Add metadata.
-            const type = this.createPropertiesType(mappingEntry[1]);
+            const type = this.jsonTypeDefinitionToType(mappingEntry[1]);
             if (!(type instanceof ObjectDataType)) continue;
             const propertyTypesWithDiscriminator = new Map<string, DataType>(type.propertyTypes);
             propertyTypesWithDiscriminator.set(jsonTypeDefinition.discriminator, LiteralDataType.create(discriminatorValue));
