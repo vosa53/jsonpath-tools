@@ -1,5 +1,5 @@
 import { JSONPathJSONValue } from "../types";
-import { AnyDataType, LiteralDataType, NeverDataType, ObjectDataType, PrimitiveDataType, PrimitiveDataTypeType, DataType, DataTypeAnnotation, UnionDataType } from "./data-types";
+import { AnyDataType, LiteralDataType, NeverDataType, ObjectDataType, PrimitiveDataType, PrimitiveDataTypeType, DataType, DataTypeAnnotation, UnionDataType, ArrayDataType } from "./data-types";
 
 export function jsonTypeDefinitionToType(jsonTypeDefinition: any): DataType {
     const context = new JSONTypeDefinitionDataTypeConverterContext(
@@ -96,7 +96,8 @@ class JSONTypeDefinitionDataTypeConverterContext {
     private createElementsType(jsonTypeDefinition: any): DataType | null {
         if (jsonTypeDefinition.elements === undefined)
             return null;
-        return this.jsonTypeDefinitionToType(jsonTypeDefinition.elements);
+        const elementType = this.jsonTypeDefinitionToType(jsonTypeDefinition.elements);
+        return ArrayDataType.create([], elementType, 0);
     }
 
     private createPropertiesType(jsonTypeDefinition: any): DataType | null {
