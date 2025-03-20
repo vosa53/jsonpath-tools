@@ -58,8 +58,8 @@ const TypePanel = memo(({
         >
             {
                 queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema
-                    ? <JSONEditor value={queryArgumentTypeRaw.jsonSchemaText} onValueChanged={v => onQueryArgumentTypeRawChanged({ ...queryArgumentTypeRaw, jsonSchemaText: v })} />
-                    : <JSONEditor value={queryArgumentTypeRaw.jsonTypeDefinitionText} onValueChanged={v => onQueryArgumentTypeRawChanged({ ...queryArgumentTypeRaw, jsonTypeDefinitionText: v })} />
+                    ? <JSONEditor key={DataTypeRawFormat.jsonSchema} value={queryArgumentTypeRaw.jsonSchemaText} onValueChanged={v => onQueryArgumentTypeRawChanged({ ...queryArgumentTypeRaw, jsonSchemaText: v })} />
+                    : <JSONEditor key={DataTypeRawFormat.jsonTypeDefinition} value={queryArgumentTypeRaw.jsonTypeDefinitionText} onValueChanged={v => onQueryArgumentTypeRawChanged({ ...queryArgumentTypeRaw, jsonTypeDefinitionText: v })} />
             }
         </PanelShell>
     );

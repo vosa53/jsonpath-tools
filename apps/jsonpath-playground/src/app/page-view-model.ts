@@ -321,7 +321,7 @@ export const testJsonTypeDefinition = `{
     "id": { "type": "string" },
     "createdAt": { "type": "timestamp" },
     "karma": { "type": "int32" },
-    "isAdmin": { "type": "boolean" }
+    "isAdmin": { "type": "boolean", "metadata": "Whether the user is admin." }
   }
 }`;
 
