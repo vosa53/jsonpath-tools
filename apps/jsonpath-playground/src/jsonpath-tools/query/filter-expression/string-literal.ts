@@ -16,7 +16,7 @@ export class JSONPathStringLiteral extends JSONPathFilterExpression {
 
     get type() { return JSONPathSyntaxTreeType.stringLiteral; }
 
-    evaluate(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
+    protected evaluateImplementation(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
         return this.value;
     }
 }

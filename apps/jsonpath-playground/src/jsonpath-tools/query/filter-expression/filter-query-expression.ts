@@ -14,7 +14,7 @@ export class JSONPathFilterQueryExpression extends JSONPathFilterExpression {
 
     get type() { return JSONPathSyntaxTreeType.filterQueryExpression; }
 
-    evaluate(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
+    protected evaluateImplementation(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
         return this.query.select(queryContext, filterExpressionContext);
     }
 }

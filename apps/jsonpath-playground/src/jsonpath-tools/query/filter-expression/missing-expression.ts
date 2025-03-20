@@ -14,7 +14,7 @@ export class JSONPathMissingExpression extends JSONPathFilterExpression {
 
     get type() { return JSONPathSyntaxTreeType.missingExpression; }
 
-    evaluate(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
+    protected evaluateImplementation(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
         return JSONPathNothing;
     }
 }

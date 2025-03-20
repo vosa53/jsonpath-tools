@@ -16,7 +16,7 @@ export class JSONPathBooleanLiteral extends JSONPathFilterExpression {
 
     get type() { return JSONPathSyntaxTreeType.booleanLiteral; }
 
-    evaluate(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
+    protected evaluateImplementation(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
         return this.value;
     }
 }

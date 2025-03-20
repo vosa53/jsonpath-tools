@@ -16,7 +16,7 @@ export class JSONPathNotExpression extends JSONPathFilterExpression {
 
     get type() { return JSONPathSyntaxTreeType.notExpression; }
 
-    evaluate(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
+    protected evaluateImplementation(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
         const result = evaluateAsLogicalType(this.expression, queryContext, filterExpressionContext);
         return result === JSONPathLogicalTrue ? JSONPathLogicalFalse : JSONPathLogicalTrue;
     }

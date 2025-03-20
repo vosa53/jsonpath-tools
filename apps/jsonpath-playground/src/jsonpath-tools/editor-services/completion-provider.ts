@@ -8,9 +8,12 @@ import { LocatedNode } from "../query/located-node";
 import { JSONPathSegment } from "../query/segment";
 import { JSONPathSyntaxTree } from "../query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
-import { JSONPathJSONValue } from "../types";
+import { JSONPathFilterValue, JSONPathJSONValue, JSONPathValueType } from "../types";
 import { AnalysisDescriptionProvider } from "./analysis-description-provider";
 import { SyntaxDescriptionProvider } from "./syntax-description-provider";
+import { JSONPathComparisonExpression } from "../query/filter-expression/comparison-expression";
+import { JSONPathFilterExpression } from "../query/filter-expression/filter-expression";
+import { convertToValueType } from "../query/helpers";
 
 export class CompletionProvider {
     private readonly syntaxDescriptionProvider: SyntaxDescriptionProvider;
@@ -60,6 +63,12 @@ export class CompletionProvider {
             completions.push(new CompletionItem(CompletionItemType.syntax, "@", undefined, () => this.syntaxDescriptionProvider.provideDescriptionForAtToken().toMarkdown()));
             completions.push(new CompletionItem(CompletionItemType.syntax, "$", undefined, () => this.syntaxDescriptionProvider.provideDescriptionForDollarToken().toMarkdown()));
             this.completeFunctions(completions);
+            if (lastButOneNode.parent instanceof JSONPathComparisonExpression) {
+                const referenceExpression = lastButOneNode.parent.left === lastButOneNode
+                    ? lastButOneNode.parent.right
+                    : lastButOneNode.parent.left;
+                this.completeValues(completions, referenceExpression, query, queryArgument, queryArgumentType);
+            }
         }
         if (lastNode.type === JSONPathSyntaxTreeType.nameToken && lastButOneNode.type === JSONPathSyntaxTreeType.functionExpression)
             this.completeFunctions(completions);
@@ -89,7 +98,7 @@ export class CompletionProvider {
 
     private completeSegmentData(completions: CompletionItem[], segment: JSONPathSegment, query: JSONPath, queryArgument: JSONPathJSONValue, queryArgumentType: DataType) {
         let previousType: DataType;
-        const nodes = this.getAllNodesAtSegment(queryArgument, query, segment);
+        const nodes = this.getAllNodesOutputtedFromSegment(queryArgument, query, segment);
         const keysAndTypes = this.getDistinctKeysAndTypes(nodes);
         for (const [key, types] of keysAndTypes) {
             const typeText = Array.from(types).join(" | ");
@@ -104,7 +113,7 @@ export class CompletionProvider {
                     }
                 }
 
-                return this.syntaxDescriptionProvider.provideDescriptionForNameSelector(key).toMarkdown() + 
+                return this.syntaxDescriptionProvider.provideDescriptionForNameSelector(key).toMarkdown() +
                     this.analysisDescriptionProvider.provideDescription(typeText, Array.from(annotations));
             }));
         }
@@ -139,6 +148,21 @@ export class CompletionProvider {
         }
     }
 
+    private completeValues(completions: CompletionItem[], reference: JSONPathFilterExpression, query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType) {
+        if (queryArgument === undefined) return; // TODO
+
+        const values = this.getAllValuesOutputtedFromExpression(queryArgument, query, reference);
+        for (const value of values) {
+            if (typeof value === "string" || typeof value === "number") {
+                completions.push(new CompletionItem(
+                    CompletionItemType.literal,
+                    JSON.stringify(value),
+                    typeof value
+                ));
+            }
+        }
+    }
+
     private getDistinctKeysAndTypes(nodes: LocatedNode[]): Map<string, Set<string>> {
         const keysAndTypes = new Map<string, Set<string>>();
         for (const node of nodes) {
@@ -158,14 +182,28 @@ export class CompletionProvider {
         return keysAndTypes;
     }
 
-    private getAllNodesAtSegment(value: JSONPathJSONValue, jsonPath: JSONPath, segment: JSONPathSegment): LocatedNode[] {
+    private getAllNodesOutputtedFromSegment(queryArgument: JSONPathJSONValue, jsonPath: JSONPath, segment: JSONPathSegment): LocatedNode[] {
         const values: LocatedNode[] = [];
         const queryContext: JSONPathQueryContext = {
-            rootNode: value,
+            rootNode: queryArgument,
             options: this.options,
             segmentInstrumentationCallback(s, i) {
                 if (s === segment)
                     values.push(i);
+            }
+        };
+        jsonPath.select(queryContext);
+        return values;
+    }
+
+    private getAllValuesOutputtedFromExpression(queryArgument: JSONPathJSONValue, jsonPath: JSONPath, expression: JSONPathFilterExpression): JSONPathValueType[] {
+        const values: JSONPathValueType[] = [];
+        const queryContext: JSONPathQueryContext = {
+            rootNode: queryArgument,
+            options: this.options,
+            filterExpressionInstrumentationCallback(fe, o) {
+                if (fe === expression)
+                    values.push(convertToValueType(o));
             }
         };
         jsonPath.select(queryContext);

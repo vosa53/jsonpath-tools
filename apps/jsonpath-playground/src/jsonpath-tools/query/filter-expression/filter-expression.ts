@@ -4,5 +4,11 @@ import { JSONPathNode } from "../node";
 
 
 export abstract class JSONPathFilterExpression extends JSONPathNode {
-    abstract evaluate(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue;
+    evaluate(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
+        const output = this.evaluateImplementation(queryContext, filterExpressionContext);
+        queryContext.filterExpressionInstrumentationCallback?.(this, output);
+        return output;
+    }
+
+    protected abstract evaluateImplementation(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue;
 }

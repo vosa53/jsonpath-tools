@@ -15,7 +15,7 @@ export class JSONPathOrExpression extends JSONPathFilterExpression {
 
     get type() { return JSONPathSyntaxTreeType.orExpression; }
 
-    evaluate(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
+    protected evaluateImplementation(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
         for (const expression of this.expressions) {
             const result = evaluateAsLogicalType(expression.expression, queryContext, filterExpressionContext);
             if (result === JSONPathLogicalTrue)

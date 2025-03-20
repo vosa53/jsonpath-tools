@@ -22,7 +22,7 @@ export class JSONPathFunctionExpression extends JSONPathFilterExpression {
 
     get type() { return JSONPathSyntaxTreeType.functionExpression; }
 
-    evaluate(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
+    protected evaluateImplementation(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
         const functionDefinition = queryContext.options.functions[this.name];
         if (functionDefinition === undefined) return JSONPathNothing;
         

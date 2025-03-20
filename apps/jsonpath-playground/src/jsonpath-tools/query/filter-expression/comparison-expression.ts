@@ -18,7 +18,7 @@ export class JSONPathComparisonExpression extends JSONPathFilterExpression {
 
     get type() { return JSONPathSyntaxTreeType.comparisonExpression; }
 
-    evaluate(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
+    protected evaluateImplementation(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
         const leftValue = evaluateAsValueType(this.left, queryContext, filterExpressionContext);
         const rightValue = evaluateAsValueType(this.right, queryContext, filterExpressionContext);
 
