@@ -1,9 +1,9 @@
-import { Operation, OperationType, ReplaceOperationReplacement } from "@/app/models/operation";
-import { ActionIcon, Button, Group, Modal, Select, Stack } from "@mantine/core";
+import { Operation, OperationType, OperationReplacement, OperationReplacementType } from "@/app/models/operation";
+import { ActionIcon, Button, Group, InputWrapper, Modal, SegmentedControl, Select, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { IconDeviceFloppy, IconFileDownload } from "@tabler/icons-react";
-import { memo } from "react";
+import { memo, useState } from "react";
 import JSONEditor from "../code-editors/json-editor";
 import { EditorFormAdapter } from "../editor-form-adapter";
 import PanelShell from "../panel-shell";
@@ -20,7 +20,7 @@ const ResultPanel = memo(({
 }) => {
     const [modalOpened, { open, close }] = useDisclosure(false);
 
-    const onReplacementSaved = (replacement: ReplaceOperationReplacement) => {
+    const onReplacementSaved = (replacement: OperationReplacement) => {
         onOperationChanged({ ...operation, replacement });
         close();
     };
@@ -29,10 +29,10 @@ const ResultPanel = memo(({
         <PanelShell
             toolbar={
                 <Group gap="xs" w="100%">
-                    <Modal opened={modalOpened} onClose={close} title={"Edit replacement value"} size="xl">
+                    <Modal opened={modalOpened} onClose={close} title={"Edit Replacement"} size="xl">
                         <ReplacementEditor
                             replacement={operation.replacement}
-                            onReplacementSaved={onReplacementSaved} 
+                            onReplacementSaved={onReplacementSaved}
                             onCancelled={close} />
                     </Modal>
                     <Select
@@ -68,43 +68,79 @@ function ReplacementEditor({
     onReplacementSaved,
     onCancelled
 }: {
-    replacement: ReplaceOperationReplacement,
-    onReplacementSaved: (replacement: ReplaceOperationReplacement) => void,
+    replacement: OperationReplacement,
+    onReplacementSaved: (replacement: OperationReplacement) => void,
     onCancelled: () => void
 }) {
     const form = useForm({
         mode: "uncontrolled",
         validateInputOnBlur: true,
         initialValues: {
-            replacementText: replacement.replacementText
+            type: replacement.type,
+            jsonValueText: replacement.jsonValueText,
+            jsonPatchText: replacement.jsonPatchText
         },
         validate: {
-            replacementText: (value) => validateJSONString(value)
+            jsonValueText: (value, values) => values.type === OperationReplacementType.jsonValue ? validateJSONString(value) : null,
+            jsonPatchText: (value, values) => values.type === OperationReplacementType.jsonPatch ? validateJSONString(value) : null
         }
     });
     const onFormSubmit = (values: typeof form.values) => {
         onReplacementSaved({
-            replacement: JSON.parse(values.replacementText),
-            replacementText: values.replacementText
+            type: values.type,
+            jsonValueText: values.jsonValueText,
+            jsonPatchText: values.jsonPatchText
         });
     };
+    const [type, setType] = useState(replacement.type);
+    form.watch("type", ({ value }) => setType(value));
 
     return (
         <form onSubmit={form.onSubmit(onFormSubmit)}>
             <Stack>
-                <EditorFormAdapter
-                    editor={(value, onValueChange, onFocus, onBlur) =>
-                        <JSONEditor
-                            value={value}
-                            onValueChanged={onValueChange}
-                            onFocus={onFocus}
-                            onBlur={onBlur} />
-                    }
-                    style={{ width: "100%" }}
-                    label="Replacement JSON"
-                    key={form.key("replacementText")}
-                    {...form.getInputProps("replacementText")}
-                />
+                <InputWrapper label="Type">
+                    <div>
+                        <SegmentedControl
+                            color="violet"
+                            key={form.key("type")}
+                            {...form.getInputProps("type")}
+                            data={[
+                                { label: "JSON Value", value: OperationReplacementType.jsonValue },
+                                { label: "JSON Patch", value: OperationReplacementType.jsonPatch }
+                            ]}
+                        />
+                    </div>
+                </InputWrapper>
+                {
+                    type === OperationReplacementType.jsonValue &&
+                    <EditorFormAdapter
+                        editor={(value, onValueChange, onFocus, onBlur) =>
+                            <JSONEditor
+                                value={value}
+                                onValueChanged={onValueChange}
+                                onFocus={onFocus}
+                                onBlur={onBlur} />
+                        }
+                        label="JSON Value"
+                        key={form.key("jsonValueText")}
+                        {...form.getInputProps("jsonValueText")}
+                    />
+                }
+                {
+                    type === OperationReplacementType.jsonPatch &&
+                    <EditorFormAdapter
+                        editor={(value, onValueChange, onFocus, onBlur) =>
+                            <JSONEditor
+                                value={value}
+                                onValueChanged={onValueChange}
+                                onFocus={onFocus}
+                                onBlur={onBlur} />
+                        }
+                        label="JSON Patch"
+                        key={form.key("jsonPatchText")}
+                        {...form.getInputProps("jsonPatchText")}
+                    />
+                }
                 <Group justify="end">
                     <Button variant="default" type="button" onClick={onCancelled}>Cancel</Button>
                     <Button type="submit" leftSection={<IconDeviceFloppy size={14} />}>Save</Button>

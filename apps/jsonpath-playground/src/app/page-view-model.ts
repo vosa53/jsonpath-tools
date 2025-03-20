@@ -5,7 +5,7 @@ import { JSONPathJSONValue, JSONPathNothing } from "@/jsonpath-tools/types";
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { OperationCancelledError } from "./components/code-editors/codemirror/jsonpath-codemirror/cancellation-token";
 import { CustomFunction } from "./models/custom-function";
-import { Operation, OperationType } from "./models/operation";
+import { Operation, OperationReplacementType, OperationType } from "./models/operation";
 import { PathType } from "./models/path-type";
 import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
 import { Settings } from "./models/settings";
@@ -15,10 +15,11 @@ import { LanguageService } from "./components/code-editors/codemirror/jsonpath-c
 import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";
 import { TextRange } from "@/jsonpath-tools/text-range";
 import { JSONPathSyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
-import { jsonSchemaToType, RawJSONSchema } from "@/jsonpath-tools/data-types/json-schema-data-type-converter";
+import { jsonSchemaToType } from "@/jsonpath-tools/data-types/json-schema-data-type-converter";
 import { AnyDataType, DataType } from "@/jsonpath-tools/data-types/data-types";
 import { DataTypeRaw, DataTypeRawFormat } from "./models/data-type-raw";
 import { jsonTypeDefinitionToType } from "@/jsonpath-tools/data-types/json-type-definition-data-type-converter";
+import { applyPatch, JsonPatchError } from "fast-json-patch";
 
 interface State {
     customFunctions: readonly CustomFunction[];
@@ -36,6 +37,22 @@ export function usePageViewModel() {
     const [queryArgumentText, setQueryArgumentText] = useState<string>(testJson);
     const [queryArgumentTypeRaw, setQueryArgumentTypeRaw] = useState<DataTypeRaw>(testQueryArgumentTypeRaw);
     const [operation, setOperation] = useState<Operation>(testOperation);
+    const operationReplacementJSONValue = useMemo<JSONPathJSONValue | undefined>(() => {
+        try {
+            return JSON.parse(operation.replacement.jsonValueText);
+        }
+        catch {
+            return undefined;
+        }
+    }, [operation.replacement.jsonValueText]);
+    const operationReplacementJSONPatch = useMemo<JSONPathJSONValue | undefined>(() => {
+        try {
+            return JSON.parse(operation.replacement.jsonPatchText);
+        }
+        catch {
+            return undefined;
+        }
+    }, [operation.replacement.jsonPatchText]);
     const [pathType, setPathType] = useState<PathType>(PathType.normalizedPath);
     const [query, setQuery] = useState<JSONPath>(testQuery);
     const queryArgument = useMemo<JSONPathJSONValue | undefined>(() => {
@@ -74,11 +91,11 @@ export function usePageViewModel() {
     const resultText = useMemo(() => {
         if (queryArgument === undefined) return "";
         const operationResult = logPerformance("Execute operation on result", () => {
-            return executeOperation(operation, queryArgument, result as JSONPathJSONValue[], resultPaths);
+            return executeOperation(operation, queryArgument, result as JSONPathJSONValue[], resultPaths, operationReplacementJSONValue, operationReplacementJSONPatch);
         });
         if (operationResult === undefined) return "";
         else return logPerformance("Stringify result", () => JSON.stringify(operationResult, undefined, 4));
-    }, [result, operation]);
+    }, [result, operation, operationReplacementJSONValue, operationReplacementJSONPatch]);
     const resultPathsText = useMemo(() => {
         const resultPathsTransformed = logPerformance("Transform result paths", () => {
             return pathType === PathType.normalizedPath
@@ -321,22 +338,49 @@ const testSettings: Settings = {
 const testOperation: Operation = {
     type: OperationType.select,
     replacement: {
-        replacement: {},
-        replacementText: "{}"
+        type: OperationReplacementType.jsonValue,
+        jsonValueText: "{}",
+        jsonPatchText: "{}"
     }
 };
 const testQueryText = "$.books[?@.author == \"George Orwell\" && count(true, 25) > 42].title";
 const testQuery = new JSONPathParser().parse(testQueryText);
 
-function executeOperation(operation: Operation, queryArgument: JSONPathJSONValue, result: JSONPathJSONValue[], resultPaths: readonly JSONPathNormalizedPath[]): JSONPathJSONValue | undefined {
+function executeOperation(
+    operation: Operation,
+    queryArgument: JSONPathJSONValue,
+    result: JSONPathJSONValue[],
+    resultPaths: readonly JSONPathNormalizedPath[],
+    replacementJSONValue: JSONPathJSONValue | undefined,
+    replacementJSONPatch: JSONPathJSONValue | undefined
+): JSONPathJSONValue | undefined {
     if (operation.type === OperationType.select)
         return result;
-    else if (operation.type === OperationType.replace)
-        return replace(queryArgument, resultPaths, operation.replacement.replacement);
+    else if (operation.type === OperationType.replace) {
+        const replacer = operation.replacement.type === OperationReplacementType.jsonValue
+            ? () => replacementJSONValue!
+            : createJSONPatchReplacer(replacementJSONPatch!);
+        return replace(queryArgument, resultPaths, replacer);
+    }
     else if (operation.type === OperationType.delete)
         return remove(queryArgument, resultPaths);
     else
         throw new Error(`Unknown operation type: ${operation.type}.`);
+}
+
+function createJSONPatchReplacer(patch: JSONPathJSONValue): (value: JSONPathJSONValue) => JSONPathJSONValue {
+    return (value: JSONPathJSONValue) => {
+        try {
+            // @ts-ignore
+            return applyPatch(value, patch, true).newDocument;
+        }
+        catch (e) {
+            if (e instanceof JsonPatchError)
+                return value;
+            else
+                throw e;
+        }
+    };
 }
 
 const worker = new Worker(new URL("./custom-language-service-worker.ts", import.meta.url), { type: "module" });

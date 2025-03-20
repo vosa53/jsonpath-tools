@@ -11,33 +11,35 @@ export function toJSONPointer(path: JSONPathNormalizedPath): string {
     return "/" + path.join("/"); // TODO: Escaping.
 }
 
-export function replace(value: JSONPathJSONValue, paths: readonly JSONPathNormalizedPath[], replacement: JSONPathJSONValue): JSONPathJSONValue {
-    return replaceOrRemove(value, paths, replacement) as JSONPathJSONValue;
+export function replace(value: JSONPathJSONValue, paths: readonly JSONPathNormalizedPath[], replacer: (value: JSONPathJSONValue) => JSONPathJSONValue | undefined): JSONPathJSONValue {
+    return replaceOrRemove(value, paths, replacer) as JSONPathJSONValue;
 }
 
 export function remove(value: JSONPathJSONValue, paths: readonly JSONPathNormalizedPath[]): JSONPathJSONValue | undefined {
-    return replaceOrRemove(value, paths, undefined) as JSONPathJSONValue;
+    return replaceOrRemove(value, paths, () => undefined) as JSONPathJSONValue;
 }
 
-function replaceOrRemove(value: JSONPathJSONValue, paths: readonly JSONPathNormalizedPath[], replacement: JSONPathJSONValue | undefined): JSONPathJSONValue | undefined {
+function replaceOrRemove(value: JSONPathJSONValue, paths: readonly JSONPathNormalizedPath[], replacer: (value: JSONPathJSONValue) => JSONPathJSONValue | undefined): JSONPathJSONValue | undefined {
     if (paths.length === 0)
         return value;
     const sortedPaths = paths.toSorted(compareNormalizedPaths);
-    return replaceOrRemoveRecursive(value, sortedPaths, replacement, 0, 0, sortedPaths.length);
+    return replaceOrRemoveRecursive(value, sortedPaths, replacer, 0, 0, sortedPaths.length);
 }
 
 function replaceOrRemoveRecursive(
     value: JSONPathJSONValue, 
     paths: readonly JSONPathNormalizedPath[], 
-    replacement: JSONPathJSONValue | undefined, 
+    replacer: (value: JSONPathJSONValue) => JSONPathJSONValue | undefined, 
     level: number, 
     from: number, 
     to: number
 ): JSONPathJSONValue | undefined {
-    if (paths[from].length === level)
-        return replacement;
-    else if (value !== null && typeof value === "object") {
-        const newValue = Array.isArray(value) ? [...value] : { ...value };
+    const replaceCurrent = paths[from].length === level;
+    while (from < to && paths[from].length === level) from++;
+
+    let newValue: JSONPathJSONValue | undefined = value;
+    if (value !== null && typeof value === "object") {
+        newValue = Array.isArray(value) ? [...value] : { ...value };
         let removedIndexCount = 0;
         while (from < to) {
             const oldFrom = from;
@@ -46,7 +48,7 @@ function replaceOrRemoveRecursive(
                 from++;
             if (Array.isArray(newValue)) {
                 if (typeof propertyName === "number") {
-                    const result = replaceOrRemoveRecursive(newValue[propertyName], paths, replacement, level + 1, oldFrom, from);
+                    const result = replaceOrRemoveRecursive(newValue[propertyName], paths, replacer, level + 1, oldFrom, from);
                     if (result === undefined)
                         removedIndexCount++;
                     else
@@ -55,7 +57,7 @@ function replaceOrRemoveRecursive(
             }
             else {
                 if (typeof propertyName === "string") {
-                    const result = replaceOrRemoveRecursive(newValue[propertyName], paths, replacement, level + 1, oldFrom, from);
+                    const result = replaceOrRemoveRecursive(newValue[propertyName], paths, replacer, level + 1, oldFrom, from);
                     if (result === undefined)
                         delete newValue[propertyName];
                     else
@@ -70,10 +72,10 @@ function replaceOrRemoveRecursive(
         }
         if (Array.isArray(newValue))
             newValue.length -= removedIndexCount;
-        return newValue;
     }
-    else
-        return value;
+    if (replaceCurrent)
+        newValue = replacer(newValue);
+    return newValue;
 }
 
 function compareNormalizedPaths(pathA: JSONPathNormalizedPath, pathB: JSONPathNormalizedPath): number {
