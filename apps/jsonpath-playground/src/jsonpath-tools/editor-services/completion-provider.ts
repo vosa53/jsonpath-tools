@@ -25,15 +25,15 @@ export class CompletionProvider {
 
     provideCompletions(query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType, position: number): CompletionItem[] {
         const completions: CompletionItem[] = [];
-        const nodePaths = query.getTouchingAtPosition(position);
-        for (const nodePath of nodePaths)
-            this.provideCompletionsForNodePath(query, queryArgument, queryArgumentType, nodePath, completions);
+        const touchingNodes = query.getTouchingAtPosition(position);
+        for (const node of touchingNodes)
+            this.provideCompletionsForNode(query, queryArgument, queryArgumentType, node, completions);
         return completions;
     }
 
-    private provideCompletionsForNodePath(query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType, nodePath: JSONPathSyntaxTree[], completions: CompletionItem[]) {
-        const lastNode = nodePath[nodePath.length - 1];
-        const lastButOneNode = nodePath[nodePath.length - 2];
+    private provideCompletionsForNode(query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType, node: JSONPathSyntaxTree, completions: CompletionItem[]) {
+        const lastNode = node;
+        const lastButOneNode = node.parent!;
 
         if (
             (
@@ -44,11 +44,11 @@ export class CompletionProvider {
             lastButOneNode.type === JSONPathSyntaxTreeType.nameSelector ||
             lastButOneNode.type === JSONPathSyntaxTreeType.missingSelector
         ) {
-            const segment = nodePath[nodePath.length - 3] as JSONPathSegment;
+            const segment = lastButOneNode.parent as JSONPathSegment;
             this.completeSegment(completions, segment, query, queryArgument, queryArgumentType);
         }
         if (lastButOneNode.type === JSONPathSyntaxTreeType.missingSelector) {
-            const segment = nodePath[nodePath.length - 3] as JSONPathSegment;
+            const segment = lastButOneNode.parent as JSONPathSegment;
             completions.push(new CompletionItem(CompletionItemType.syntax, "*", undefined, () => this.syntaxDescriptionProvider.provideDescriptionForWildcardSelector().toMarkdown()));
             if (segment.openingBracketToken !== null) {
                 completions.push(new CompletionItem(CompletionItemType.syntax, "?", undefined, () => this.syntaxDescriptionProvider.provideDescriptionForFilterSelector().toMarkdown()));

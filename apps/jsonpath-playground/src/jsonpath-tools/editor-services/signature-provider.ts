@@ -1,6 +1,7 @@
 import { JSONPathOptions } from "../options";
 import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
 import { JSONPath } from "../query/json-path";
+import { JSONPathNode } from "../query/node";
 import { JSONPathSyntaxTree } from "../query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
 import { TextRange } from "../text-range";
@@ -11,14 +12,16 @@ export class SignatureProvider {
     ) { }
 
     provideSignature(query: JSONPath, position: number): Signature | null {
-        const nodePath = query.getContainingAtPosition(position);
-        if (nodePath.length === 0)
+        const node = query.getContainingAtPosition(position);
+        if (node === null)
             return null;
-        while (nodePath.length !== 0 && !this.isCorrectFunction(nodePath[nodePath.length - 1], position))
-            nodePath.pop();
-        if (nodePath.length === 0) 
+
+        let current: JSONPathSyntaxTree | null = node;
+        while (current !== null && !this.isCorrectFunction(current, position))
+            current = current.parent;
+        if (current === null) 
             return null;
-        const functionExpression = nodePath[nodePath.length - 1] as JSONPathFunctionExpression;
+        const functionExpression = current as JSONPathFunctionExpression;
         const functionDefinition = this.options.functions[functionExpression.name];
         if (functionDefinition === undefined)
             return null;

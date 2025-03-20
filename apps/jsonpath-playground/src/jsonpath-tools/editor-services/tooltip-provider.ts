@@ -22,12 +22,12 @@ export class TooltipProvider {
     }
 
     provideTooltip(query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType, position: number): Tooltip | null {
-        const nodePath = query.getAtPosition(position);
-        if (nodePath.length === 0)
+        const node = query.getAtPosition(position);
+        if (node === null)
             return null;
 
-        const lastNode = nodePath[nodePath.length - 1];
-        const lastButOneNode = nodePath[nodePath.length - 2];
+        const lastNode = node;
+        const lastButOneNode = node.parent!;
         if (lastNode.type === JSONPathSyntaxTreeType.questionMarkToken)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
         else if (lastNode.type === JSONPathSyntaxTreeType.dollarToken)

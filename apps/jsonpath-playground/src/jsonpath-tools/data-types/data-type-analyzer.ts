@@ -133,7 +133,7 @@ export class DataTypeAnalyzer {
 
     getIncomingTypeToSegment(tree: JSONPathSyntaxTree): DataType {
         let segment: JSONPathSyntaxTree = tree;
-        while (!(segment instanceof JSONPathSegment)) segment = segment.parent;
+        while (!(segment instanceof JSONPathSegment)) segment = segment.parent!;
         const query = segment.parent as JSONPathQuery;
         const segmentIndex = query.segments.indexOf(segment);
         const previousSegment = segmentIndex === 0 ? query.identifierToken : query.segments[segmentIndex - 1];

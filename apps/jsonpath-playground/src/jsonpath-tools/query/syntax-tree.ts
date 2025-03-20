@@ -1,5 +1,5 @@
 import { TextRange } from "../text-range";
-import { JSONPathNode } from "./node";
+import type { JSONPathNode } from "./node";
 import { JSONPathSyntaxTreeType } from "./syntax-tree-type";
 
 export abstract class JSONPathSyntaxTree {
@@ -9,7 +9,7 @@ export abstract class JSONPathSyntaxTree {
     ) { }
 
     // TODO
-    parent!: JSONPathNode;
+    parent: JSONPathNode | null = null;
 
     abstract readonly type: JSONPathSyntaxTreeType;
     abstract readonly skippedTextBefore: string;
@@ -24,69 +24,65 @@ export abstract class JSONPathSyntaxTree {
 
     abstract forEach(action: (tree: JSONPathSyntaxTree) => void | boolean): void;
 
-    getAtPosition(position: number): JSONPathSyntaxTree[] {
+    getAtPosition(position: number): JSONPathSyntaxTree | null {
         if (position < this.position)
-            return [];
+            return null;
         if (position >= this.position + this.length)
-            return [];
+            return null;
 
-        const path: JSONPathSyntaxTree[] = [this];
+        let current: JSONPathSyntaxTree = this;
         // @ts-ignore
-        while (path[path.length - 1].children !== undefined) {
-            const currentNode = path[path.length - 1] as JSONPathNode;
-            for (const child of currentNode.children) {
+        while (current.children !== undefined) {
+            for (const child of (current as JSONPathNode).children) {
                 if (child.position + child.length > position) {
-                    path.push(child);
+                    current = child;
                     break;
                 }
             }
-            if (currentNode === path[path.length - 1])
-                throw new Error("Children are not fully covering their parent.");
         }
-        return path;
+        return current;
     }
 
-    getTouchingAtPosition(position: number): JSONPathSyntaxTree[][] {
-        const results: JSONPathSyntaxTree[][] = [];
-        this.getTouchingAtPositionRecursive(position, [], results);
+    getTouchingAtPosition(position: number): JSONPathSyntaxTree[] {
+        const results: JSONPathSyntaxTree[] = [];
+        this.getTouchingAtPositionRecursive(position, results);
         return results;
     }
 
-    getContainingAtPosition(position: number): JSONPathSyntaxTree[] {
+    getContainingAtPosition(position: number): JSONPathSyntaxTree | null {
         if (position <= this.position)
-            return [];
+            return null;
         if (position >= this.position + this.length)
-            return [];
+            return null;
 
-        const path: JSONPathSyntaxTree[] = [this];
+        let current: JSONPathSyntaxTree = this;
         // @ts-ignore
-        while (path[path.length - 1].children !== undefined) {
-            const currentNode = path[path.length - 1] as JSONPathNode;
-            for (const child of currentNode.children) {
+        while (current.children !== undefined) {
+            let changed = false;
+            for (const child of (current as JSONPathNode).children) {
                 if (position > child.position && position < child.position + child.length) {
-                    path.push(child);
+                    current = child;
+                    changed = true;
                     break;
                 }
             }
-            if (currentNode === path[path.length - 1])
+            if (!changed)
                 break;
         }
-        return path;
+        return current;
     }
 
-    private getTouchingAtPositionRecursive(position: number, currentPath: JSONPathSyntaxTree[], results: JSONPathSyntaxTree[][]): void {
+    private getTouchingAtPositionRecursive(position: number, results: JSONPathSyntaxTree[]): void {
         if (this.position > position || this.position + this.length < position)
             return;
 
-        currentPath.push(this);
         // @ts-ignore
         if (this.children !== undefined) {
             // @ts-ignore
             for (const child of (this as JSONPathNode).children)
-                child.getTouchingAtPositionRecursive(position, currentPath, results);
+                child.getTouchingAtPositionRecursive(position, results);
         }
         else
-            results.push([...currentPath]);
-        currentPath.pop();
+            results.push(this);
     }
 }

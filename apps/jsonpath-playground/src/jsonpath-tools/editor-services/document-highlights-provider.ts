@@ -14,16 +14,16 @@ export class DocumentHighlightsProvider {
 
     provideHighlights(query: JSONPath, position: number): DocumentHighlight[] {
         const documentHighlights: DocumentHighlight[] = [];
-        const nodePaths = query.getTouchingAtPosition(position);
-        for (const nodePath of nodePaths)
-            this.provideHighlightsForNodePath(query, nodePath, documentHighlights);
+        const touchingNodes = query.getTouchingAtPosition(position);
+        for (const node of touchingNodes)
+            this.provideHighlightsForNode(query, node, documentHighlights);
         documentHighlights.sort((a, b) => a.range.position - b.range.position);
         return documentHighlights;
     }
 
-    private provideHighlightsForNodePath(query: JSONPath, nodePath: JSONPathSyntaxTree[], documentHighlights: DocumentHighlight[]) {
-        const lastNode = nodePath[nodePath.length - 1];
-        const lastButOneNode = nodePath[nodePath.length - 2];
+    private provideHighlightsForNode(query: JSONPath, node: JSONPathSyntaxTree, documentHighlights: DocumentHighlight[]) {
+        const lastNode = node;
+        const lastButOneNode = node.parent!;
 
         if (lastNode.type === JSONPathSyntaxTreeType.nameToken && lastButOneNode instanceof JSONPathFunctionExpression) {
             if (Object.hasOwn(this.options.functions, lastButOneNode.name))
@@ -34,13 +34,12 @@ export class DocumentHighlightsProvider {
         }
         if (lastNode.type === JSONPathSyntaxTreeType.questionMarkToken && lastButOneNode.type === JSONPathSyntaxTreeType.filterSelector ||
             lastNode.type === JSONPathSyntaxTreeType.atToken && lastButOneNode.type === JSONPathSyntaxTreeType.query) {
-                const path = [...nodePath];
-                while (path.length > 0 && !(path[path.length - 1] instanceof JSONPathFilterSelector))
-                    path.pop();
-                if (path.length > 0) {
-                    const filterSelector = path[path.length - 1] as JSONPathFilterSelector;
-                    documentHighlights.push(new DocumentHighlight(filterSelector.questionMarkToken.textRangeWithoutSkipped));
-                    this.highlightCurrentIdentifier(filterSelector.expression, documentHighlights);
+                let current: JSONPathSyntaxTree | null = node;
+                while (current !== null && !(current instanceof JSONPathFilterSelector))
+                    current = current.parent;
+                if (current !== null) {
+                    documentHighlights.push(new DocumentHighlight(current.questionMarkToken.textRangeWithoutSkipped));
+                    this.highlightCurrentIdentifier(current.expression, documentHighlights);
                 }
         }
     }
