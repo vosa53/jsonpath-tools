@@ -1,7 +1,7 @@
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 import { AnyDataType, ArrayDataType, intersectTypes, LiteralDataType, NeverDataType, ObjectDataType, PrimitiveDataType, PrimitiveDataTypeType, subtractTypes, DataType, DataTypeAnnotation, UnionDataType } from "./data-types";
 
-export function jsonSchemaToType(jsonSchema: any): DataType {
+export function jsonSchemaToType(jsonSchema: JSONSchema): DataType {
     const context = new JSONSchemaDataTypeConverterContext(
         jsonSchema
     );
@@ -9,15 +9,20 @@ export function jsonSchemaToType(jsonSchema: any): DataType {
 }
 
 class JSONSchemaDataTypeConverterContext {
-    private readonly visitedSchemas = new Map<JSONPathJSONValue, DataType>();
-    private readonly notExactSchemas: Set<JSONPathJSONValue> = new Set();
-    private readonly previousSchemas: Set<JSONPathJSONValue> = new Set();
+    private readonly visitedSchemas = new Map<JSONSchema, DataType>();
+    private readonly notExactSchemas: Set<JSONSchema> = new Set();
+    private readonly previousSchemas: Set<JSONSchema> = new Set();
 
     constructor(
-        readonly rootSchema: JSONPathJSONValue
+        readonly rootSchema: JSONSchema
     ) { }
 
-    jsonSchemaToType(jsonSchema: any): DataType {
+    jsonSchemaToType(jsonSchema: JSONSchema): DataType {
+        if (jsonSchema === true)
+            return AnyDataType.create();
+        if (jsonSchema === false)
+            return NeverDataType.create();
+
         const fromCache = this.visitedSchemas.get(jsonSchema);
         if (fromCache !== undefined) {
             if (this.notExactSchemas.has(jsonSchema) || this.previousSchemas.has(jsonSchema))
@@ -29,13 +34,6 @@ class JSONSchemaDataTypeConverterContext {
         const typeAnnotation = this.createTypeAnnotation(jsonSchema);
         const typeAnnotations = typeAnnotation !== null ? new Set([typeAnnotation]) : DataTypeAnnotation.EMPTY_SET;
         this.visitedSchemas.set(jsonSchema, AnyDataType.create(typeAnnotations));
-
-        if (jsonSchema === true)
-            return AnyDataType.create();
-        if (jsonSchema === false)
-            return NeverDataType.create();
-        if (typeof jsonSchema !== "object")
-            return NeverDataType.create();
 
         const types = [
             this.createNullType(jsonSchema),
@@ -69,25 +67,25 @@ class JSONSchemaDataTypeConverterContext {
         return resultType;
     }
 
-    private createNullType(jsonSchema: ObjectJsonSchema) {
+    private createNullType(jsonSchema: ObjectJSONSchema) {
         if (!this.isTypePermittedByTypeConstraint("null", jsonSchema))
             return NeverDataType.create();
         return PrimitiveDataType.create(PrimitiveDataTypeType.null);
     }
 
-    private createBooleanType(jsonSchema: ObjectJsonSchema) {
+    private createBooleanType(jsonSchema: ObjectJSONSchema) {
         if (!this.isTypePermittedByTypeConstraint("boolean", jsonSchema))
             return NeverDataType.create();
         return PrimitiveDataType.create(PrimitiveDataTypeType.boolean);
     }
 
-    private createStringType(jsonSchema: ObjectJsonSchema) {
+    private createStringType(jsonSchema: ObjectJSONSchema) {
         if (!this.isTypePermittedByTypeConstraint("string", jsonSchema))
             return NeverDataType.create();
         return PrimitiveDataType.create(PrimitiveDataTypeType.string);
     }
 
-    private createNumberType(jsonSchema: ObjectJsonSchema) {
+    private createNumberType(jsonSchema: ObjectJSONSchema) {
         if (!this.isTypePermittedByTypeConstraint("number", jsonSchema) && !this.isTypePermittedByTypeConstraint("integer", jsonSchema))
             return NeverDataType.create();
         if (this.isTypePermittedByTypeConstraint("integer", jsonSchema) && !this.isTypePermittedByTypeConstraint("number", jsonSchema))
@@ -95,7 +93,7 @@ class JSONSchemaDataTypeConverterContext {
         return PrimitiveDataType.create(PrimitiveDataTypeType.number);
     }
 
-    private createObjectType(jsonSchema: ObjectJsonSchema) {
+    private createObjectType(jsonSchema: ObjectJSONSchema) {
         if (!this.isTypePermittedByTypeConstraint("object", jsonSchema))
             return NeverDataType.create();
 
@@ -110,12 +108,12 @@ class JSONSchemaDataTypeConverterContext {
         return ObjectDataType.create(properties, restProperties, requiredProperties);
     }
 
-    private createArrayType(jsonSchema: ObjectJsonSchema) {
+    private createArrayType(jsonSchema: ObjectJSONSchema) {
         if (!this.isTypePermittedByTypeConstraint("array", jsonSchema))
             return NeverDataType.create();
 
         const prefixElementTypes: DataType[] = jsonSchema.prefixItems !== undefined
-            ? jsonSchema.prefixItems.map((v: any) => jsonSchemaToType(v))
+            ? jsonSchema.prefixItems.map(v => jsonSchemaToType(v))
             : [];
         const restElementType = jsonSchema.items !== undefined
             ? jsonSchemaToType(jsonSchema.items)
@@ -125,37 +123,37 @@ class JSONSchemaDataTypeConverterContext {
         return ArrayDataType.create(prefixElementTypes, restElementType, requiredElementsCount);
     }
 
-    private createEnumType(jsonSchema: ObjectJsonSchema) {
+    private createEnumType(jsonSchema: ObjectJSONSchema) {
         if (jsonSchema.enum === undefined)
             return AnyDataType.create();
-        const types = jsonSchema.enum.map((v: any) => this.createConstantType(v));
+        const types = jsonSchema.enum.map(v => this.createConstantType(v));
         return UnionDataType.create(types);
     }
 
-    private createConstType(jsonSchema: ObjectJsonSchema) {
+    private createConstType(jsonSchema: ObjectJSONSchema) {
         if (jsonSchema.const === undefined)
             return AnyDataType.create();
         return this.createConstantType(jsonSchema.const);
     }
 
-    private createAllOfType(jsonSchema: ObjectJsonSchema) {
+    private createAllOfType(jsonSchema: ObjectJSONSchema) {
         if (jsonSchema.allOf === undefined)
             return AnyDataType.create();
-        const types = jsonSchema.allOf.map((v: any) => jsonSchemaToType(v));
+        const types = jsonSchema.allOf.map(v => jsonSchemaToType(v));
         return types.reduce(intersectTypes, AnyDataType.create());
     }
 
-    private createAnyOfType(jsonSchema: ObjectJsonSchema) {
+    private createAnyOfType(jsonSchema: ObjectJSONSchema) {
         if (jsonSchema.anyOf === undefined)
             return AnyDataType.create();
-        const types = jsonSchema.anyOf.map((v: any) => jsonSchemaToType(v));
+        const types = jsonSchema.anyOf.map(v => jsonSchemaToType(v));
         return UnionDataType.create(types);
     }
 
-    private createOneOfType(jsonSchema: ObjectJsonSchema) {
+    private createOneOfType(jsonSchema: ObjectJSONSchema) {
         if (jsonSchema.oneOf === undefined)
             return AnyDataType.create();
-        const types = jsonSchema.oneOf.map((v: any) => jsonSchemaToType(v));
+        const types = jsonSchema.oneOf.map(v => jsonSchemaToType(v));
         for (let i = 0; i < types.length; i++) {
             for (let j = 0; j < types.length; j++) {
                 if (i !== j && !this.notExactSchemas.has(jsonSchema.oneOf[j]))
@@ -165,7 +163,7 @@ class JSONSchemaDataTypeConverterContext {
         return UnionDataType.create(types);
     }
 
-    private createNotType(jsonSchema: ObjectJsonSchema) {
+    private createNotType(jsonSchema: ObjectJSONSchema) {
         if (jsonSchema.not === undefined)
             return NeverDataType.create();
         const notType = jsonSchemaToType(jsonSchema.not);
@@ -194,7 +192,7 @@ class JSONSchemaDataTypeConverterContext {
         return ArrayDataType.create(prefixElementTypes, NeverDataType.create(), prefixElementTypes.length);
     }
 
-    private createTypeAnnotation(jsonSchema: ObjectJsonSchema): DataTypeAnnotation | null {
+    private createTypeAnnotation(jsonSchema: ObjectJSONSchema): DataTypeAnnotation | null {
         const title = jsonSchema.title;
         const description = jsonSchema.description;
         const readOnly = jsonSchema.readOnly;
@@ -215,12 +213,12 @@ class JSONSchemaDataTypeConverterContext {
         );
     }
 
-    private isTypePermittedByTypeConstraint(type: string, jsonSchema: ObjectJsonSchema): boolean {
+    private isTypePermittedByTypeConstraint(type: string, jsonSchema: ObjectJSONSchema): boolean {
         const typeConstraint = jsonSchema.type;
         return typeConstraint === undefined || typeConstraint === type || Array.isArray(typeConstraint) && typeConstraint.includes(type);
     }
 
-    private hasOnlyFullySupportedKeywords(jsonSchema: ObjectJsonSchema) {
+    private hasOnlyFullySupportedKeywords(jsonSchema: ObjectJSONSchema) {
         for (const property in jsonSchema) {
             if (!fullySupportedKeywords.has(property))
                 return false;
@@ -234,10 +232,6 @@ class JSONSchemaDataTypeConverterContext {
         }
     }
 }
-
-type ObjectJsonSchema = {
-    [key: string]: any
-};
 
 const fullySupportedKeywords: ReadonlySet<string> = new Set([
     "type",
@@ -264,3 +258,35 @@ const fullySupportedKeywords: ReadonlySet<string> = new Set([
     "$id",
     "$anchor"
 ]);
+
+export type JSONSchema = boolean | ObjectJSONSchema;
+
+export interface ObjectJSONSchema {
+    readonly type?: JSONSchemaType | readonly JSONSchemaType[],
+    readonly enum?: JSONPathJSONValue[],
+    readonly const?: JSONPathJSONValue,
+    readonly anyOf?: readonly JSONSchema[],
+    readonly allOf?: readonly JSONSchema[],
+    readonly oneOf?: readonly JSONSchema[],
+    readonly not?: JSONSchema,
+    readonly properties?: JSONSchemaDictionary,
+    readonly additionalProperties?: JSONSchema,
+    readonly required?: readonly string[],
+    readonly prefixItems?: readonly JSONSchema[],
+    readonly items?: JSONSchema,
+    readonly minItems?: number,
+    readonly title?: string,
+    readonly description?: string,
+    readonly deprecated?: boolean,
+    readonly readOnly?: boolean,
+    readonly writeOnly?: boolean,
+    readonly default?: JSONPathJSONValue,
+    readonly examples?: readonly JSONPathJSONValue[],
+    readonly $comment?: string,
+    readonly $schema?: string,
+    readonly $defs?: JSONSchemaDictionary,
+    readonly $id?: string,
+    readonly $anchor?: string
+}
+export type JSONSchemaDictionary = { readonly [key: string]: JSONSchema };
+export type JSONSchemaType = "null" | "boolean" | "string" | "number" | "integer" | "array" | "object";

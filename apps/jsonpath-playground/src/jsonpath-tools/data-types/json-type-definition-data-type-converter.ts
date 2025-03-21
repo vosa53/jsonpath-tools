@@ -1,7 +1,7 @@
 import { JSONPathJSONValue } from "../types";
 import { AnyDataType, LiteralDataType, NeverDataType, ObjectDataType, PrimitiveDataType, PrimitiveDataTypeType, DataType, DataTypeAnnotation, UnionDataType, ArrayDataType } from "./data-types";
 
-export function jsonTypeDefinitionToType(jsonTypeDefinition: any): DataType {
+export function jsonTypeDefinitionToType(jsonTypeDefinition: JSONTypeDefinition): DataType {
     const context = new JSONTypeDefinitionDataTypeConverterContext(
         jsonTypeDefinition.definitions ?? {}
     );
@@ -9,13 +9,13 @@ export function jsonTypeDefinitionToType(jsonTypeDefinition: any): DataType {
 }
 
 class JSONTypeDefinitionDataTypeConverterContext {
-    private readonly visitedSchemas = new Map<JSONPathJSONValue, DataType>();
+    private readonly visitedSchemas = new Map<JSONTypeDefinition, DataType>();
 
     constructor(
-        readonly definitions: { readonly [key: string]: JSONPathJSONValue }
+        readonly definitions: JSONTypeDefinitionDictionary
     ) { }
 
-    jsonTypeDefinitionToType(jsonTypeDefinition: any): DataType {
+    jsonTypeDefinitionToType(jsonTypeDefinition: JSONTypeDefinition): DataType {
         const fromCache = this.visitedSchemas.get(jsonTypeDefinition);
         if (fromCache !== undefined) 
             return fromCache;
@@ -33,7 +33,7 @@ class JSONTypeDefinitionDataTypeConverterContext {
         return type;
     }
 
-    private createTypeBasedOnShape(jsonTypeDefinition: any): DataType {
+    private createTypeBasedOnShape(jsonTypeDefinition: JSONTypeDefinition): DataType {
         const typeType = this.createTypeType(jsonTypeDefinition);
         if (typeType !== null) return typeType;
 
@@ -58,7 +58,7 @@ class JSONTypeDefinitionDataTypeConverterContext {
         return AnyDataType.create();
     }
 
-    private createTypeType(jsonTypeDefinition: any): DataType | null {
+    private createTypeType(jsonTypeDefinition: JSONTypeDefinition): DataType | null {
         if (jsonTypeDefinition.type === undefined)
             return null;
         switch (jsonTypeDefinition.type) {
@@ -81,7 +81,7 @@ class JSONTypeDefinitionDataTypeConverterContext {
         }
     }
 
-    private createEnumType(jsonTypeDefinition: any): DataType | null {
+    private createEnumType(jsonTypeDefinition: JSONTypeDefinition): DataType | null {
         if (jsonTypeDefinition.enum === undefined || !Array.isArray(jsonTypeDefinition.enum))
             return null;
         const memberLiterals: LiteralDataType[] = [];
@@ -92,14 +92,14 @@ class JSONTypeDefinitionDataTypeConverterContext {
         return UnionDataType.create(memberLiterals);
     }
 
-    private createElementsType(jsonTypeDefinition: any): DataType | null {
+    private createElementsType(jsonTypeDefinition: JSONTypeDefinition): DataType | null {
         if (jsonTypeDefinition.elements === undefined)
             return null;
         const elementType = this.jsonTypeDefinitionToType(jsonTypeDefinition.elements);
         return ArrayDataType.create([], elementType, 0);
     }
 
-    private createPropertiesType(jsonTypeDefinition: any): DataType | null {
+    private createPropertiesType(jsonTypeDefinition: JSONTypeDefinition): DataType | null {
         if (jsonTypeDefinition.properties === undefined && jsonTypeDefinition.optionalProperties === undefined && jsonTypeDefinition.additionalProperties === undefined)
             return null;
 
@@ -132,7 +132,7 @@ class JSONTypeDefinitionDataTypeConverterContext {
         return ObjectDataType.create(new Map<string, DataType>(), valueType, new Set<string>());
     }
 
-    private createDiscriminatorType(jsonTypeDefinition: any): DataType | null {
+    private createDiscriminatorType(jsonTypeDefinition: JSONTypeDefinition): DataType | null {
         if (jsonTypeDefinition.mapping === undefined || jsonTypeDefinition.discriminator === undefined)
             return null;
         const types: DataType[] = [];
@@ -150,7 +150,7 @@ class JSONTypeDefinitionDataTypeConverterContext {
         return UnionDataType.create(types);
     }
 
-    private createRefType(jsonTypeDefinition: any): DataType | null {
+    private createRefType(jsonTypeDefinition: JSONTypeDefinition): DataType | null {
         if (jsonTypeDefinition.ref === undefined)
             return null;
         if (!(jsonTypeDefinition.ref in this.definitions))
@@ -160,7 +160,7 @@ class JSONTypeDefinitionDataTypeConverterContext {
         return this.jsonTypeDefinitionToType(referencedJSONTypeDefinition);
     }
 
-    private createTypeAnnotation(jsonTypeDefinition: any): DataTypeAnnotation | null {
+    private createTypeAnnotation(jsonTypeDefinition: JSONTypeDefinition): DataTypeAnnotation | null {
         if (jsonTypeDefinition.metadata === undefined)
             return null;
 
@@ -174,3 +174,21 @@ class JSONTypeDefinitionDataTypeConverterContext {
         return new DataTypeAnnotation("", description, false, false, false, undefined, []);
     }
 }
+
+export interface JSONTypeDefinition {
+    readonly type?: JSONTypeDefinitionType;
+    readonly enum?: readonly string[];
+    readonly elements?: JSONTypeDefinition;
+    readonly properties?: JSONTypeDefinitionDictionary;
+    readonly optionalProperties?: JSONTypeDefinitionDictionary;
+    readonly additionalProperties?: boolean;
+    readonly discriminator?: string;
+    readonly mapping?: JSONTypeDefinitionDictionary;
+    readonly ref?: string;
+    readonly nullable?: boolean;
+    readonly metadata?: JSONPathJSONValue;
+    readonly definitions?: JSONTypeDefinitionDictionary
+}
+
+export type JSONTypeDefinitionType = "boolean" | "string" | "timestamp" | "float32" | "float64" | "int8" | "uint8" | "int16" | "uint16" | "int32" | "uint32";
+export type JSONTypeDefinitionDictionary = { readonly [key: string]: JSONTypeDefinition };
