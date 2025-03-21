@@ -1,55 +1,19 @@
-import { DynamicAnalysisResult, DynamicAnalyzer } from "@/jsonpath-tools/analyzers/dynamic-analyzer";
-import { AnyDataType, DataType } from "@/jsonpath-tools/data-types/data-types";
-import { CompletionItem, CompletionProvider } from "@/jsonpath-tools/editor-services/completion-service";
-import { DocumentHighlightsService } from "@/jsonpath-tools/editor-services/document-highlights-service";
-import { FormattingService } from "@/jsonpath-tools/editor-services/formatting-service";
-import { SignatureHelpService } from "@/jsonpath-tools/editor-services/signature-help-service";
-import { TooltipService } from "@/jsonpath-tools/editor-services/tooltip-service";
-import { defaultJSONPathOptions, JSONPathFunction, JSONPathFunctionHandler, JSONPathOptions } from "@/jsonpath-tools/options";
-import { JSONPath } from "@/jsonpath-tools/query/json-path";
-import { TypeChecker } from "@/jsonpath-tools/semantic-analysis/type-checker";
-import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
-import { JSONPathJSONValue, JSONPathNodeList } from "@/jsonpath-tools/types";
+import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-service";
+import { EditorService } from "@/jsonpath-tools/editor-services/editor-service";
+import { JSONPathFunction, JSONPathFunctionHandler } from "@/jsonpath-tools/options";
 import { logPerformance } from "@/jsonpath-tools/utils";
 import { deserializeDataType } from "./data-type-serializer";
 import { DisconnectLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
 import { SimpleRPCTopic } from "./simple-rpc";
-import { StaticAnalyzer } from "@/jsonpath-tools/analyzers/static-analyzer";
 
 export class LanguageServiceBackendSession {
-    private readonly parser: JSONPathParser;
-    private options: JSONPathOptions;
-    private typeChecker: TypeChecker;
-    private completionProvider: CompletionProvider;
-    private signatureProvider: SignatureHelpService;
-    private documentHighlightsProvider: DocumentHighlightsService;
-    private tooltipProvider: TooltipService;
-    private staticAnalyzer: StaticAnalyzer;
-    private dynamicAnalyzer: DynamicAnalyzer;
-    private formatter: FormattingService;
-    private query: JSONPath;
-    private queryArgument: JSONPathJSONValue | undefined;
-    private queryArgumentType: DataType;
-    private dynamicAnalysisResult: DynamicAnalysisResult | null;
-    private lastCompletions: readonly CompletionItem[];
+    private readonly editorService = new EditorService();
+    private lastCompletions: readonly CompletionItem[] = [];
 
-    constructor(private readonly rpcTopic: SimpleRPCTopic, private readonly resolveFunctionHandler: (functionName: string) => JSONPathFunctionHandler) {
-        this.parser = new JSONPathParser();
-        this.options = defaultJSONPathOptions;
-        this.typeChecker = new TypeChecker(this.options);
-        this.completionProvider = new CompletionProvider(this.options);
-        this.signatureProvider = new SignatureHelpService(this.options);
-        this.documentHighlightsProvider = new DocumentHighlightsService(this.options);
-        this.tooltipProvider = new TooltipService(this.options);
-        this.staticAnalyzer = new StaticAnalyzer(this.options);
-        this.dynamicAnalyzer = new DynamicAnalyzer(this.options);
-        this.formatter = new FormattingService();
-        this.query = this.parser.parse("");
-        this.queryArgument = undefined;
-        this.queryArgumentType = AnyDataType.create();
-        this.dynamicAnalysisResult = null;
-        this.lastCompletions = [];
-    }
+    constructor(
+        private readonly rpcTopic: SimpleRPCTopic, 
+        private readonly resolveFunctionHandler: (functionName: string) => JSONPathFunctionHandler
+    ) { }
 
     updateOptions(message: UpdateOptionsLanguageServiceMessage) {
         const functions: [string, JSONPathFunction][] = Object.entries(message.newOptions.functions).map(([name, f]) => [
@@ -67,35 +31,27 @@ export class LanguageServiceBackendSession {
                 handler: this.resolveFunctionHandler(name)
             }
         ]);
-        this.options = {
+        const newOptions = {
             functions: Object.fromEntries(functions)
         };
-        this.typeChecker = new TypeChecker(this.options);
-        this.completionProvider = new CompletionProvider(this.options);
-        this.signatureProvider = new SignatureHelpService(this.options);
-        this.documentHighlightsProvider = new DocumentHighlightsService(this.options);
-        this.tooltipProvider = new TooltipService(this.options);
-        this.staticAnalyzer = new StaticAnalyzer(this.options);
-        this.dynamicAnalyzer = new DynamicAnalyzer(this.options);
-        this.dynamicAnalysisResult = null;
+        this.editorService.updateOptions(newOptions);
     }
 
     updateQuery(message: UpdateQueryLanguageServiceMessage) {
-        this.query = this.parser.parse(message.newQuery);
-        this.dynamicAnalysisResult = null;
+        this.editorService.updateQuery(message.newQuery);
     }
 
     updateQueryArgument(message: UpdateQueryArgumentLanguageServiceMessage) {
-        this.queryArgument = message.newQueryArgument;
-        this.dynamicAnalysisResult = null;
+        this.editorService.updateQueryArgument(message.newQueryArgument);
     }
 
     updateQueryArgumentType(message: UpdateQueryArgumentTypeLanguageServiceMessage) {
-        this.queryArgumentType = deserializeDataType(message.newQueryArgumentTypeSerialized);
+        const newQueryArgumentType = deserializeDataType(message.newQueryArgumentTypeSerialized);
+        this.editorService.updateQueryArgumentType(newQueryArgumentType);
     }
 
     getCompletions(message: GetCompletionsLanguageServiceMessage): GetCompletionsLanguageServiceMessageResponse {
-        const completions = logPerformance("Get completions", () => this.completionProvider.provideCompletions(this.query, this.queryArgument, this.queryArgumentType, message.position));
+        const completions = this.editorService.getCompletions(message.position);
         this.lastCompletions = completions;
 
         return {
@@ -113,54 +69,37 @@ export class LanguageServiceBackendSession {
     }
 
     getSignature(message: GetSignatureLanguageServiceMessage): GetSignatureLanguageServiceMessageResponse {
-        const signature = this.signatureProvider.provideSignature(this.query, message.position);
-
         return {
-            signature: signature
+            signature: this.editorService.getSignature(message.position)
         };
     }
 
     getDocumentHighlights(message: GetDocumentHighlightsLanguageServiceMessage): GetDocumentHighlightsLanguageServiceMessageResponse {
-        const documentHighlights = this.documentHighlightsProvider.provideHighlights(this.query, message.position);
-
         return {
-            documentHighlights: documentHighlights
+            documentHighlights: this.editorService.getDocumentHighlights(message.position)
         };
     }
 
     getTooltip(message: GetTooltipLanguageServiceMessage): GetTooltipLanguageServiceMessageResponse {
-        const tooltip = this.tooltipProvider.provideTooltip(this.query, this.queryArgument, this.queryArgumentType, message.position);
-
         return {
-            tooltip: tooltip
+            tooltip: this.editorService.getTooltip(message.position)
         };
     }
 
     getDiagnostics(message: GetDiagnosticsLanguageServiceMessage): GetDiagnosticsLanguageServiceMessageResponse {
-        const syntaxDiagnostics = this.query.syntaxDiagnostics;
-        const typeCheckerDiagnostics = this.typeChecker.check(this.query);
-        const analysisDiagnostics = this.queryArgument === undefined 
-            ? this.staticAnalyzer.analyze(this.query, this.queryArgumentType)
-            : this.getDynamicAnalysisResult().diagnostics;
-        const diagnostics = [...syntaxDiagnostics, ...typeCheckerDiagnostics, ...analysisDiagnostics];
-        diagnostics.sort((a, b) => a.textRange.position - b.textRange.position);
-
         return {
-            diagnostics: diagnostics
+            diagnostics: this.editorService.getDiagnostics()
         };
     }
 
     getFormattingEdits(message: GetFormattingEditsLanguageServiceMessage): GetFormattingEditsLanguageServiceMessageResponse {
-        const formattingEdits = this.formatter.format(this.query);
-
         return {
-            formattingEdits: formattingEdits
+            formattingEdits: this.editorService.getFormattingEdits()
         };
     }
 
     getResult(message: GetResultLanguageServiceMessage): GetResultLanguageServiceMessageResponse {
-        const result = this.getDynamicAnalysisResult().queryResult;
-
+        const result = this.editorService.getResult();
         return {
             nodes: result.nodes.map(n => n.value),
             paths: result.nodes.map(n => n.buildPath())
@@ -169,15 +108,5 @@ export class LanguageServiceBackendSession {
 
     disconnect(message: DisconnectLanguageServiceMessage) {
         this.rpcTopic.dispose();
-    }
-
-    private getDynamicAnalysisResult(): DynamicAnalysisResult {
-        if (this.dynamicAnalysisResult === null) {
-            if (this.queryArgument !== undefined)
-                this.dynamicAnalysisResult = logPerformance("Execute query and analyze (on worker)", () => this.dynamicAnalyzer.analyze(this.query, this.queryArgument!));
-            else
-                this.dynamicAnalysisResult = { diagnostics: [], queryResult: new JSONPathNodeList([]) };
-        }
-        return this.dynamicAnalysisResult;
     }
 }
