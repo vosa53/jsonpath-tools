@@ -1,4 +1,3 @@
-import { RawJSONSchema } from "@/jsonpath-tools/data-types/json-schema-data-type-converter";
 import { JSONPathDiagnostics } from "@/jsonpath-tools/diagnostics";
 import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-provider";
 import { DocumentHighlight } from "@/jsonpath-tools/editor-services/document-highlights-provider";

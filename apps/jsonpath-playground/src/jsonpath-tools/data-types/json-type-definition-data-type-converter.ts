@@ -22,7 +22,7 @@ class JSONTypeDefinitionDataTypeConverterContext {
 
         const typeAnnotation = this.createTypeAnnotation(jsonTypeDefinition);
         const typeAnnotations = typeAnnotation !== null ? new Set([typeAnnotation]) : DataTypeAnnotation.EMPTY_SET;
-        this.visitedSchemas.set(jsonTypeDefinition, AnyDataType.create(typeAnnotations))
+        this.visitedSchemas.set(jsonTypeDefinition, AnyDataType.create(typeAnnotations));
 
         let type = this.createTypeBasedOnShape(jsonTypeDefinition);
         if (jsonTypeDefinition.nullable === true)

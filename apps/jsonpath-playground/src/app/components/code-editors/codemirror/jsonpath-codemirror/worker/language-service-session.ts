@@ -1,5 +1,4 @@
 import { JSONPathDiagnostics } from "@/jsonpath-tools/diagnostics";
-import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-provider";
 import { JSONPathOptions } from "@/jsonpath-tools/options";
 import { JSONPathJSONValue } from "@/jsonpath-tools/types";
 import { CancellationToken } from "../cancellation-token";
@@ -9,7 +8,6 @@ import { Signature } from "@/jsonpath-tools/editor-services/signature-provider";
 import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-provider";
 import { DocumentHighlight } from "@/jsonpath-tools/editor-services/document-highlights-provider";
 import { TextChange } from "@/jsonpath-tools/text-change";
-import { RawJSONSchema } from "@/jsonpath-tools/data-types/json-schema-data-type-converter";
 import { DataType } from "@/jsonpath-tools/data-types/data-types";
 import { serializeDataType } from "./data-type-serializer";
 
