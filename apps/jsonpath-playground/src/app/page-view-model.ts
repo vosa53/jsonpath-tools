@@ -69,9 +69,11 @@ export function usePageViewModel() {
                 ? queryArgumentTypeRaw.jsonSchemaText
                 : queryArgumentTypeRaw.jsonTypeDefinitionText;
             const json = logPerformance("Parse query argument type raw", () => JSON.parse(jsonText));
-            return queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema
-                ? jsonSchemaToType(json)
-                : jsonTypeDefinitionToType(json);
+            return logPerformance("Transform type", () => {
+                return queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema
+                    ? jsonSchemaToType(json)
+                    : jsonTypeDefinitionToType(json);
+            });
         }
         catch {
             return AnyDataType.create();
