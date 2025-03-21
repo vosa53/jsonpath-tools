@@ -1,4 +1,4 @@
-import { Signature } from "@/jsonpath-tools/editor-services/signature-provider";
+import { Signature } from "@/jsonpath-tools/editor-services/signature-help-service";
 import { EditorState, Extension, StateEffect, StateField, Transaction } from "@codemirror/state";
 import { EditorView, showTooltip, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";

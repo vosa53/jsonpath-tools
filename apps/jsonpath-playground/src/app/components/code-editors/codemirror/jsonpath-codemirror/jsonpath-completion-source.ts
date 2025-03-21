@@ -1,4 +1,4 @@
-import { CompletionItemType } from "@/jsonpath-tools/editor-services/completion-provider";
+import { CompletionItemType } from "@/jsonpath-tools/editor-services/completion-service";
 import { Completion, CompletionContext, CompletionSource, snippetCompletion } from "@codemirror/autocomplete";
 import { OperationCancelledError } from "./cancellation-token";
 import { languageServiceSessionStateField } from "./jsonpath-state";

@@ -7,7 +7,7 @@ import { JSONPathSyntaxTree } from "../query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
 import { TextRange } from "../text-range";
 
-export class DocumentHighlightsProvider {
+export class DocumentHighlightsService {
     constructor(
         private readonly options: JSONPathOptions
     ) { }

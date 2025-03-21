@@ -9,7 +9,7 @@ import { JSONPathSliceSelector } from "../query/selectors/slice-selector";
 import { JSONPathSyntaxTree } from "../query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
 
-export class SyntaxDescriptionProvider {
+export class SyntaxDescriptionService {
     private readonly descriptionProviders = new Map<JSONPathSyntaxTreeType, (node: JSONPathSyntaxTree) => SyntaxDescription>([
         [JSONPathSyntaxTreeType.query, n => {
             const query = n as JSONPathQuery;

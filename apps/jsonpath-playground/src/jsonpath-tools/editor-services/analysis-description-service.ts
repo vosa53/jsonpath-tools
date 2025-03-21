@@ -1,6 +1,6 @@
 import { DataTypeAnnotation } from "../data-types/data-types";
 
-export class AnalysisDescriptionProvider {
+export class AnalysisDescriptionService {
     provideDescription(type?: string, annotations?: DataTypeAnnotation[]): string {
         let text = "";
         if (type !== undefined)

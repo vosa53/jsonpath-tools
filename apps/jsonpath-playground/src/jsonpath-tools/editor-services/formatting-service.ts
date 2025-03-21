@@ -14,7 +14,7 @@ import { JSONPathSyntaxTree } from "../query/syntax-tree";
 import { TextChange } from "../text-change";
 import { TextRange } from "../text-range";
 
-export class Formatter {
+export class FormattingService {
     format(query: JSONPath): TextChange[] {
         const context = new FormatterContext();
         this.formatTree(query, 0, context);

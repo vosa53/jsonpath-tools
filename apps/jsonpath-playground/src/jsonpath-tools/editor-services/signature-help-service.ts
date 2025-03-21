@@ -1,12 +1,10 @@
 import { JSONPathOptions } from "../options";
 import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
 import { JSONPath } from "../query/json-path";
-import { JSONPathNode } from "../query/node";
 import { JSONPathSyntaxTree } from "../query/syntax-tree";
-import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
 import { TextRange } from "../text-range";
 
-export class SignatureProvider {
+export class SignatureHelpService {
     constructor(
         private readonly options: JSONPathOptions
     ) { }

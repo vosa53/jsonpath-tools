@@ -1,4 +1,4 @@
-import { SyntaxDescriptionProvider } from "@/jsonpath-tools/editor-services/syntax-description-provider";
+import { SyntaxDescriptionService } from "@/jsonpath-tools/editor-services/syntax-description-service";
 import { defaultJSONPathOptions } from "@/jsonpath-tools/options";
 import { JSONPath } from "@/jsonpath-tools/query/json-path";
 import { JSONPathNode } from "@/jsonpath-tools/query/node";
@@ -81,7 +81,7 @@ function getClassName(tree: JSONPathSyntaxTree): string {
 }
 
 function getLabel(tree: JSONPathSyntaxTree): string {
-    return new SyntaxDescriptionProvider(defaultJSONPathOptions).provideDescription(tree)?.title ?? tree.type;
+    return new SyntaxDescriptionService(defaultJSONPathOptions).provideDescription(tree)?.title ?? tree.type;
 }
 
 const classNameMap = new Map<JSONPathSyntaxTreeType, string>([

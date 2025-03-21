@@ -7,18 +7,18 @@ import { JSONPathSyntaxTree } from "../query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
 import { TextRange } from "../text-range";
 import { JSONPathJSONValue } from "../types";
-import { AnalysisDescriptionProvider } from "./analysis-description-provider";
-import { SyntaxDescriptionProvider } from "./syntax-description-provider";
+import { AnalysisDescriptionService } from "./analysis-description-service";
+import { SyntaxDescriptionService } from "./syntax-description-service";
 
-export class TooltipProvider {
-    private readonly syntaxDescriptionProvider: SyntaxDescriptionProvider;
-    private readonly analysisDescriptionProvider: AnalysisDescriptionProvider;
+export class TooltipService {
+    private readonly syntaxDescriptionProvider: SyntaxDescriptionService;
+    private readonly analysisDescriptionProvider: AnalysisDescriptionService;
 
     constructor(
         private readonly options: JSONPathOptions
     ) {
-        this.syntaxDescriptionProvider = new SyntaxDescriptionProvider(options);
-        this.analysisDescriptionProvider = new AnalysisDescriptionProvider();
+        this.syntaxDescriptionProvider = new SyntaxDescriptionService(options);
+        this.analysisDescriptionProvider = new AnalysisDescriptionService();
     }
 
     provideTooltip(query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType, position: number): Tooltip | null {

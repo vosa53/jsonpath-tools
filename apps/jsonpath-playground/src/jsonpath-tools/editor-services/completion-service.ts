@@ -1,29 +1,29 @@
-import { getJSONTypeName } from "../data-types/json-types";
 import { DataTypeAnalyzer } from "../data-types/data-type-analyzer";
 import { DataType, DataTypeAnnotation } from "../data-types/data-types";
+import { getJSONTypeName } from "../data-types/json-types";
 import { JSONPathOptions } from "../options";
 import { JSONPathQueryContext } from "../query/evaluation";
+import { JSONPathComparisonExpression } from "../query/filter-expression/comparison-expression";
+import { JSONPathFilterExpression } from "../query/filter-expression/filter-expression";
+import { convertToValueType } from "../query/helpers";
 import { JSONPath } from "../query/json-path";
 import { LocatedNode } from "../query/located-node";
 import { JSONPathSegment } from "../query/segment";
 import { JSONPathSyntaxTree } from "../query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
-import { JSONPathFilterValue, JSONPathJSONValue, JSONPathValueType } from "../types";
-import { AnalysisDescriptionProvider } from "./analysis-description-provider";
-import { SyntaxDescriptionProvider } from "./syntax-description-provider";
-import { JSONPathComparisonExpression } from "../query/filter-expression/comparison-expression";
-import { JSONPathFilterExpression } from "../query/filter-expression/filter-expression";
-import { convertToValueType } from "../query/helpers";
+import { JSONPathJSONValue, JSONPathValueType } from "../types";
+import { AnalysisDescriptionService } from "./analysis-description-service";
+import { SyntaxDescriptionService } from "./syntax-description-service";
 
 export class CompletionProvider {
-    private readonly syntaxDescriptionProvider: SyntaxDescriptionProvider;
-    private readonly analysisDescriptionProvider: AnalysisDescriptionProvider;
+    private readonly syntaxDescriptionProvider: SyntaxDescriptionService;
+    private readonly analysisDescriptionProvider: AnalysisDescriptionService;
 
     constructor(
         private readonly options: JSONPathOptions
     ) {
-        this.syntaxDescriptionProvider = new SyntaxDescriptionProvider(options);
-        this.analysisDescriptionProvider = new AnalysisDescriptionProvider();
+        this.syntaxDescriptionProvider = new SyntaxDescriptionService(options);
+        this.analysisDescriptionProvider = new AnalysisDescriptionService();
     }
 
     provideCompletions(query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType, position: number): CompletionItem[] {
