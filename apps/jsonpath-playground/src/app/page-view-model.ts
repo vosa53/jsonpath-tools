@@ -71,7 +71,7 @@ export function usePageViewModel() {
             const json = logPerformance("Parse query argument type raw", () => JSON.parse(jsonText));
             return logPerformance("Transform type", () => {
                 return queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema
-                    ? jsonSchemaToType(json)
+                    ? jsonSchemaToType({ schema: json })
                     : jsonTypeDefinitionToType(json);
             });
         }

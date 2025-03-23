@@ -2,18 +2,17 @@ import { JSONPathJSONValue } from "../types";
 import { AnyDataType, LiteralDataType, NeverDataType, ObjectDataType, PrimitiveDataType, PrimitiveDataTypeType, DataType, DataTypeAnnotation, UnionDataType, ArrayDataType } from "./data-types";
 
 export function jsonTypeDefinitionToType(jsonTypeDefinition: JSONTypeDefinition): DataType {
-    const context = new JSONTypeDefinitionDataTypeConverterContext(
-        jsonTypeDefinition.definitions ?? {}
-    );
+    const context = new JSONTypeDefinitionDataTypeConverterContext(jsonTypeDefinition);
     return context.jsonTypeDefinitionToType(jsonTypeDefinition);
 }
 
 class JSONTypeDefinitionDataTypeConverterContext {
     private readonly visitedSchemas = new Map<JSONTypeDefinition, DataType>();
+    private readonly definitions: JSONTypeDefinitionDictionary;
 
-    constructor(
-        readonly definitions: JSONTypeDefinitionDictionary
-    ) { }
+    constructor(jsonTypeDefinition: JSONTypeDefinition) { 
+        this.definitions = jsonTypeDefinition.definitions ?? {};
+    }
 
     jsonTypeDefinitionToType(jsonTypeDefinition: JSONTypeDefinition): DataType {
         const fromCache = this.visitedSchemas.get(jsonTypeDefinition);
