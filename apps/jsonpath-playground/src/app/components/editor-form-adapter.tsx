@@ -39,7 +39,7 @@ export function EditorFormAdapter({
                 className={classes.input} 
                 withBorder 
                 style={{ borderColor: error !== undefined ? "var(--mantine-color-error)" : undefined }}
-                mb={error !== undefined ? "calc(var(--mantine-spacing-xs) / 2)" : undefined}>
+                mb={error !== undefined || description !== undefined ? "calc(var(--mantine-spacing-xs) / 2)" : undefined}>
                 {editor(_value, handleChange, onFocus, onBlur)}
             </Paper>
         </InputWrapper>

@@ -19,7 +19,8 @@ import { jsonSchemaToType } from "@/jsonpath-tools/data-types/json-schema-data-t
 import { AnyDataType, DataType } from "@/jsonpath-tools/data-types/data-types";
 import { DataTypeRaw, DataTypeRawFormat } from "./models/data-type-raw";
 import { jsonTypeDefinitionToType } from "@/jsonpath-tools/data-types/json-type-definition-data-type-converter";
-import { applyPatch, JsonPatchError } from "fast-json-patch";
+import { isValidJSONSchema, isValidJSONTypeDefinition } from "./json-schemas/json-schemas";
+import { JSONPatch, applyJSONPatch } from "./json-patch/json-patch";
 
 interface State {
     customFunctions: readonly CustomFunction[];
@@ -45,7 +46,7 @@ export function usePageViewModel() {
             return undefined;
         }
     }, [operation.replacement.jsonValueText]);
-    const operationReplacementJSONPatch = useMemo<JSONPathJSONValue | undefined>(() => {
+    const operationReplacementJSONPatch = useMemo<JSONPatch | undefined>(() => {
         try {
             return JSON.parse(operation.replacement.jsonPatchText);
         }
@@ -64,19 +65,24 @@ export function usePageViewModel() {
         }
     }, [queryArgumentText]);
     const queryArgumentType = useMemo<DataType>(() => {
+        let json: JSONPathJSONValue;
+        const jsonText = queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema
+            ? queryArgumentTypeRaw.jsonSchemaText
+            : queryArgumentTypeRaw.jsonTypeDefinitionText;
         try {
-            const jsonText = queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema
-                ? queryArgumentTypeRaw.jsonSchemaText
-                : queryArgumentTypeRaw.jsonTypeDefinitionText;
-            const json = logPerformance("Parse query argument type raw", () => JSON.parse(jsonText));
-            return logPerformance("Transform type", () => {
-                return queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema
-                    ? jsonSchemaToType({ schema: json })
-                    : jsonTypeDefinitionToType(json);
-            });
+            json = logPerformance("Parse query argument type raw", () => JSON.parse(jsonText));
         }
         catch {
             return AnyDataType.create();
+        }
+
+        if (queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema) {
+            if (!isValidJSONSchema(json)) return AnyDataType.create();
+            else return jsonSchemaToType({ schema: json });
+        }
+        else {
+            if (!isValidJSONTypeDefinition(json)) return AnyDataType.create();
+            else return jsonTypeDefinitionToType(json);
         }
     }, [queryArgumentTypeRaw]);
     const options = useMemo<JSONPathOptions>(() => {
@@ -342,7 +348,7 @@ const testOperation: Operation = {
     replacement: {
         type: OperationReplacementType.jsonValue,
         jsonValueText: "{}",
-        jsonPatchText: "{}"
+        jsonPatchText: "[]"
     }
 };
 const testQueryText = "$.books[?@.author == \"George Orwell\" && count(true, 25) > 42].title";
@@ -354,35 +360,20 @@ function executeOperation(
     result: JSONPathJSONValue[],
     resultPaths: readonly JSONPathNormalizedPath[],
     replacementJSONValue: JSONPathJSONValue | undefined,
-    replacementJSONPatch: JSONPathJSONValue | undefined
+    replacementJSONPatch: JSONPatch | undefined
 ): JSONPathJSONValue | undefined {
     if (operation.type === OperationType.select)
         return result;
     else if (operation.type === OperationType.replace) {
         const replacer = operation.replacement.type === OperationReplacementType.jsonValue
-            ? () => replacementJSONValue!
-            : createJSONPatchReplacer(replacementJSONPatch!);
+            ? (v: JSONPathJSONValue) => replacementJSONValue!
+            : (v: JSONPathJSONValue) => applyJSONPatch(v, replacementJSONPatch!);
         return replace(queryArgument, resultPaths, replacer);
     }
     else if (operation.type === OperationType.delete)
         return remove(queryArgument, resultPaths);
     else
         throw new Error(`Unknown operation type: ${operation.type}.`);
-}
-
-function createJSONPatchReplacer(patch: JSONPathJSONValue): (value: JSONPathJSONValue) => JSONPathJSONValue {
-    return (value: JSONPathJSONValue) => {
-        try {
-            // @ts-ignore
-            return applyPatch(value, patch, true).newDocument;
-        }
-        catch (e) {
-            if (e instanceof JsonPatchError)
-                return value;
-            else
-                throw e;
-        }
-    };
 }
 
 const worker = new Worker(new URL("./custom-language-service-worker.ts", import.meta.url), { type: "module" });

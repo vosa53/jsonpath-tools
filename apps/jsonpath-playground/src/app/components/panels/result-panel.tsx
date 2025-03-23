@@ -8,6 +8,8 @@ import JSONEditor from "../code-editors/json-editor";
 import { EditorFormAdapter } from "../editor-form-adapter";
 import PanelShell from "../panel-shell";
 import { saveTextFile } from "@/app/services/files";
+import { isJSONString } from "@/app/validators/is-json-string";
+import { isJSONPatchString } from "@/app/validators/is-json-patch-string";
 
 const ResultPanel = memo(({
     resultText,
@@ -81,8 +83,8 @@ function ReplacementEditor({
             jsonPatchText: replacement.jsonPatchText
         },
         validate: {
-            jsonValueText: (value, values) => values.type === OperationReplacementType.jsonValue ? validateJSONString(value) : null,
-            jsonPatchText: (value, values) => values.type === OperationReplacementType.jsonPatch ? validateJSONString(value) : null
+            jsonValueText: (value, values) => values.type === OperationReplacementType.jsonValue ? isJSONString(value) : null,
+            jsonPatchText: (value, values) => values.type === OperationReplacementType.jsonPatch ? isJSONPatchString(value) : null
         }
     });
     const onFormSubmit = (values: typeof form.values) => {
@@ -122,6 +124,7 @@ function ReplacementEditor({
                                 onBlur={onBlur} />
                         }
                         label="JSON Value"
+                        description="JSON Value that will be used to replace the result nodes in the input JSON."
                         key={form.key("jsonValueText")}
                         {...form.getInputProps("jsonValueText")}
                     />
@@ -137,6 +140,7 @@ function ReplacementEditor({
                                 onBlur={onBlur} />
                         }
                         label="JSON Patch"
+                        description="JSON Patch (RFC 6902) document that will be applied to every result node in the input JSON (post-order, i.e. descendants first)."
                         key={form.key("jsonPatchText")}
                         {...form.getInputProps("jsonPatchText")}
                     />
@@ -148,14 +152,4 @@ function ReplacementEditor({
             </Stack>
         </form>
     );
-}
-
-function validateJSONString(value: string): string | null {
-    try {
-        JSON.parse(value);
-        return null;
-    }
-    catch (e) {
-        return "Invalid JSON: " + e;
-    }
 }

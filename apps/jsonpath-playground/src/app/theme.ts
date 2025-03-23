@@ -1,4 +1,4 @@
-import { alpha, createTheme, CSSVariablesResolver } from "@mantine/core";
+import { alpha, createTheme, CSSVariablesResolver, Input } from "@mantine/core";
 
 export const applicationTheme = createTheme({
     fontFamily: "Roboto",
@@ -10,6 +10,13 @@ export const applicationTheme = createTheme({
         md: "66em",
         lg: "74em",
         xl: "90em"
+    },
+    components: {
+        InputWrapper: Input.Wrapper.extend({
+            defaultProps: {
+                inputWrapperOrder: ["label", "input", "description", "error"]
+            }
+        })
     }
 });
 

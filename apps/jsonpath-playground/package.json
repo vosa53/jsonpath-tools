@@ -12,6 +12,7 @@
         "test": "vitest"
     },
     "dependencies": {
+        "ajv": "^8.17.1",
         "@codemirror/lang-javascript": "^6.2.3",
         "@codemirror/lang-json": "^6.0.1",
         "@codemirror/lang-markdown": "^6.3.2",

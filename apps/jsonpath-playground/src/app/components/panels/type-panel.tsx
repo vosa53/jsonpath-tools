@@ -20,9 +20,10 @@ const TypePanel = memo(({
                 <Group gap="xs" w="100%">
                     <Select
                         size="xs"
+                        w="200px"
                         allowDeselect={false}
                         data={[
-                            { label: "JSON Schema", value: DataTypeRawFormat.jsonSchema },
+                            { label: "JSON Schema Draft 2020-12", value: DataTypeRawFormat.jsonSchema },
                             { label: "JSON Type Definition", value: DataTypeRawFormat.jsonTypeDefinition }
                         ]}
                         value={queryArgumentTypeRaw.format}
