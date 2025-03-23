@@ -7,9 +7,21 @@ export interface Example {
 
 export const examples: readonly Example[] = [
     {
-        name: "Some example",
-        jsonText: `"json"`,
-        jsonSchemaText: `"json schema"`,
-        jsonTypeDefinitionText: `"json type definition"`
+        name: "Some Example 1",
+        jsonText: `"TODO: JSON"`,
+        jsonSchemaText: `"TODO: JSON Schema"`,
+        jsonTypeDefinitionText: `"TODO: JSON Type Definition"`
+    },
+    {
+        name: "Some Example 2",
+        jsonText: `"TODO: JSON"`,
+        jsonSchemaText: `"TODO: JSON Schema"`,
+        jsonTypeDefinitionText: `"TODO: JSON Type Definition"`
+    },
+    {
+        name: "Some Example 3",
+        jsonText: `"TODO: JSON"`,
+        jsonSchemaText: `"TODO: JSON Schema"`,
+        jsonTypeDefinitionText: `"TODO: JSON Type Definition"`
     }
 ];
