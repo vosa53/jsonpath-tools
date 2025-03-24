@@ -21,6 +21,7 @@ import { DataTypeRaw, DataTypeRawFormat } from "./models/data-type-raw";
 import { jsonTypeDefinitionToType } from "@/jsonpath-tools/data-types/json-type-definition-data-type-converter";
 import { isValidJSONSchema, isValidJSONTypeDefinition } from "./json-schemas/json-schemas";
 import { JSONPatch, applyJSONPatch } from "./json-patch/json-patch";
+import { examples } from "./models/examples";
 
 interface State {
     customFunctions: readonly CustomFunction[];
@@ -35,7 +36,7 @@ export function usePageViewModel() {
     const [customFunctions, setCustomFunctions] = useState<readonly CustomFunction[]>([]);
     const [settings, setSettings] = useState<Settings>(testSettings);
     const [queryText, setQueryText] = useState<string>(testQueryText);
-    const [queryArgumentText, setQueryArgumentText] = useState<string>(testJson);
+    const [queryArgumentText, setQueryArgumentText] = useState<string>(examples[0].jsonText);
     const [queryArgumentTypeRaw, setQueryArgumentTypeRaw] = useState<DataTypeRaw>(testQueryArgumentTypeRaw);
     const [operation, setOperation] = useState<Operation>(testOperation);
     const operationReplacementJSONValue = useMemo<JSONPathJSONValue | undefined>(() => {
@@ -237,106 +238,10 @@ export function usePageViewModel() {
     };
 }
 
-export const testJson = `{
-    "store": {
-        "books": [
-            {
-                "category": "reference",
-                "author": "Nigel Rees",
-                "title": "Sayings of the Century",
-                "price": 8.95
-            },
-            {
-                "category": "fiction",
-                "author": "Evelyn Waugh",
-                "title": "Sword of Honour",
-                "price": 12.99
-            },
-            {
-                "category": "fiction",
-                "author": "Herman Melville",
-                "title": "Moby Dick",
-                "isbn": "0-553-21311-3",
-                "price": 8.99
-            },
-            {
-                "category": "fiction",
-                "author": "J. R. R. Tolkien",
-                "title": "The Lord of the Rings",
-                "isbn": "0-395-19395-8",
-                "price": 22.99
-            }
-        ],
-        "bicycle": {
-            "color": "red",
-            "price": 399
-        }
-    }
-}`;
-
-export const testJsonSchema = `{
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Store Schema",
-    "description": "Schema for a store containing books and a bicycle.",
-    "type": "object",
-    "properties": {
-        "store": {
-            "title": "Store",
-            "description": "The main store object containing books and a bicycle.",
-            "type": "object",
-            "properties": {
-                "books": {
-                    "title": "Books",
-                    "description": "A collection of books available in the store.",
-                    "type": "array",
-                    "items": {
-                        "title": "Book",
-                        "description": "Details of a single book.",
-                        "type": "object",
-                        "properties": {
-                            "category": { "title": "Category", "description": "The category of the book.", "type": "string" },
-                            "author": { "title": "Author", "description": "The author of the book.", "type": "string" },
-                            "title": { "title": "Title", "description": "The title of the book.", "type": "string" },
-                            "isbn": { "title": "ISBN", "description": "The ISBN identifier of the book.", "type": "string" },
-                            "price": { "title": "Price", "description": "The price of the book.", "type": "number" }
-                        },
-                        "required": ["category", "author", "title", "price"],
-                        "additionalProperties": false
-                    }
-                },
-                "bicycle": {
-                    "title": "Bicycle",
-                    "description": "Details of a bicycle available in the store.",
-                    "type": "object",
-                    "properties": {
-                        "color": { "title": "Color", "description": "The color of the bicycle.", "type": "string" },
-                        "price": { "title": "Price", "description": "The price of the bicycle.", "type": "number" }
-                    },
-                    "required": ["color", "price"],
-                    "additionalProperties": false
-                }
-            },
-            "required": ["books", "bicycle"],
-            "additionalProperties": false
-        }
-    },
-    "required": ["store"],
-    "additionalProperties": false
-}`;
-
-export const testJsonTypeDefinition = `{
-  "properties": {
-    "id": { "type": "string" },
-    "createdAt": { "type": "timestamp" },
-    "karma": { "type": "int32" },
-    "isAdmin": { "type": "boolean", "metadata": "Whether the user is admin." }
-  }
-}`;
-
 const testQueryArgumentTypeRaw: DataTypeRaw = {
     format: DataTypeRawFormat.jsonSchema,
-    jsonSchemaText: testJsonSchema,
-    jsonTypeDefinitionText: testJsonTypeDefinition
+    jsonSchemaText: examples[0].jsonSchemaText,
+    jsonTypeDefinitionText: examples[0].jsonTypeDefinitionText
 };
 
 const testSettings: Settings = {
