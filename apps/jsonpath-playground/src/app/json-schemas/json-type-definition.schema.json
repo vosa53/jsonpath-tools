@@ -1,1 +1,42 @@
-{}
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$defs": {
+        "jsonTypeDefinition": {
+            "type": "object",
+            "properties": {
+                "type": { "$ref": "#/$defs/jsonTypeDefinitionType" },
+                "enum": { "type": "array", "items": { "type": "string" } },
+                "elements": { "$ref": "#/$defs/jsonTypeDefinition" },
+                "properties": { "$ref": "#/$defs/jsonTypeDefinitionDictionary" },
+                "optionalProperties": { "$ref": "#/$defs/jsonTypeDefinitionDictionary" },
+                "additionalProperties": { "type": "boolean" },
+                "discriminator": { "type": "string" },
+                "mapping": { "$ref": "#/$defs/jsonTypeDefinitionDictionary" },
+                "ref": { "type": "string" },
+                "nullable": { "type": "boolean" },
+                "metadata": { },
+                "definitions": { "$ref": "#/$defs/jsonTypeDefinitionDictionary" }
+            }
+        },
+        "jsonTypeDefinitionDictionary": {
+            "type": "object",
+            "additionalProperties": { "$ref": "#/$defs/jsonTypeDefinition" }
+        },
+        "jsonTypeDefinitionType": {
+            "enum": [
+                "boolean",
+                "string",
+                "timestamp",
+                "float32",
+                "float64",
+                "int8",
+                "uint8",
+                "int16",
+                "uint16",
+                "int32",
+                "uint32"
+            ]
+        }
+    },
+    "$ref": "#/$defs/jsonTypeDefinition"
+}

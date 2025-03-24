@@ -68,10 +68,14 @@ export default function Home() {
                         <Tabs defaultValue="data" flex="1" miw={0} display="flex" style={{ flexDirection: "column" }}>
                             <Tabs.List>
                                 <Tabs.Tab value="data" leftSection={<IconBraces size={20} />}>
-                                    Data
+                                    <Indicator color="red" label="!" size={16} offset={-4} disabled={viewModel.isQueryArgumentValid}>
+                                        Data
+                                    </Indicator>
                                 </Tabs.Tab>
                                 <Tabs.Tab value="type" leftSection={<IconSitemap size={20} />}>
-                                    Schema
+                                    <Indicator color="red" label="!" size={16} offset={-4} disabled={viewModel.isQueryArgumentTypeValid}>
+                                        Schema
+                                    </Indicator>
                                 </Tabs.Tab>
                             </Tabs.List>
                             <Tabs.Panel value="data" flex="1 1 0" mih={0}>

@@ -1,1 +1,63 @@
-{}
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$defs": {
+        "jsonSchema": {
+            "oneOf": [
+                { "type": "boolean" },
+                { "$ref": "#/$defs/objectJSONSchema" }
+            ]
+        },
+        "objectJSONSchema": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "oneOf": [
+                        { "$ref": "#/$defs/jsonSchemaType" },
+                        { "type": "array", "items": { "$ref": "#/$defs/jsonSchemaType" } }
+                    ]
+                },
+                "enum": { "type": "array", "items": { } },
+                "const": { },
+                "anyOf": { "type": "array", "items": { "$ref": "#/$defs/jsonSchema" } },
+                "allOf": { "type": "array", "items": { "$ref": "#/$defs/jsonSchema" } },
+                "oneOf": { "type": "array", "items": { "$ref": "#/$defs/jsonSchema" } },
+                "not": { "$ref": "#/$defs/jsonSchema" },
+                "properties": { "$ref": "#/$defs/jsonSchemaDictionary" },
+                "additionalProperties": { "$ref": "#/$defs/jsonSchema" },
+                "required": { "type": "array", "items": { "type": "string" } },
+                "prefixItems": { "type": "array", "items": { "$ref": "#/$defs/jsonSchema" } },
+                "items": { "$ref": "#/$defs/jsonSchema" },
+                "minItems": { "type": "integer" },
+                "title": { "type": "string" },
+                "description": { "type": "string" },
+                "deprecated": { "type": "boolean" },
+                "readOnly": { "type": "boolean" },
+                "writeOnly": { "type": "boolean" },
+                "default": { },
+                "examples": { "type": "array", "items": { } },
+                "$comment": { "type": "string" },
+                "$schema": { "type": "string" },
+                "$defs": { "$ref": "#/$defs/jsonSchemaDictionary" },
+                "$id": { "type": "string" },
+                "$anchor": { "type": "string" },
+                "$ref": { "type": "string" }
+            }
+        },
+        "jsonSchemaDictionary": {
+            "type": "object",
+            "additionalProperties": { "$ref": "#/$defs/jsonSchema" }
+        },
+        "jsonSchemaType": {
+            "enum": [
+                "null", 
+                "boolean", 
+                "string", 
+                "number", 
+                "integer", 
+                "array", 
+                "object"
+            ]
+        }
+    },
+    "$ref": "#/$defs/jsonSchema"
+}

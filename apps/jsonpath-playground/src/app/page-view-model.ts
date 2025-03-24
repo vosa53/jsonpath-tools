@@ -57,15 +57,15 @@ export function usePageViewModel() {
     }, [operation.replacement.jsonPatchText]);
     const [pathType, setPathType] = useState<PathType>(PathType.normalizedPath);
     const [query, setQuery] = useState<JSONPath>(testQuery);
-    const queryArgument = useMemo<JSONPathJSONValue | undefined>(() => {
+    const [queryArgument, isQueryArgumentValid] = useMemo<[JSONPathJSONValue | undefined, boolean]>(() => {
         try {
-            return logPerformance("Parse query argument", () => JSON.parse(queryArgumentText));
+            return [logPerformance("Parse query argument", () => JSON.parse(queryArgumentText)), true];
         }
         catch {
-            return undefined;
+            return [undefined, false];
         }
     }, [queryArgumentText]);
-    const queryArgumentType = useMemo<DataType>(() => {
+    const [queryArgumentType, isQueryArgumentTypeValid] = useMemo<[DataType, boolean]>(() => {
         let json: JSONPathJSONValue;
         const jsonText = queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema
             ? queryArgumentTypeRaw.jsonSchemaText
@@ -74,16 +74,16 @@ export function usePageViewModel() {
             json = logPerformance("Parse query argument type raw", () => JSON.parse(jsonText));
         }
         catch {
-            return AnyDataType.create();
+            return [AnyDataType.create(), false];
         }
 
         if (queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema) {
-            if (!isValidJSONSchema(json)) return AnyDataType.create();
-            else return jsonSchemaToType({ schema: json });
+            if (!isValidJSONSchema(json)) return [AnyDataType.create(), false];
+            else return [jsonSchemaToType({ schema: json }), true];
         }
         else {
-            if (!isValidJSONTypeDefinition(json)) return AnyDataType.create();
-            else return jsonTypeDefinitionToType(json);
+            if (!isValidJSONTypeDefinition(json)) return [AnyDataType.create(), false];
+            else return [jsonTypeDefinitionToType(json), true];
         }
     }, [queryArgumentTypeRaw]);
     const options = useMemo<JSONPathOptions>(() => {
@@ -227,6 +227,8 @@ export function usePageViewModel() {
         query,
         queryArgument,
         queryArgumentType,
+        isQueryArgumentValid,
+        isQueryArgumentTypeValid,
         options,
         resultPaths,
         resultText,
