@@ -1,5 +1,5 @@
 import { Operation, OperationType, OperationReplacement, OperationReplacementType } from "@/app/models/operation";
-import { ActionIcon, Button, Group, InputWrapper, Modal, SegmentedControl, Select, Stack } from "@mantine/core";
+import { ActionIcon, Anchor, Button, Group, InputWrapper, Modal, SegmentedControl, Select, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { IconDeviceFloppy, IconFileDownload } from "@tabler/icons-react";
@@ -124,7 +124,7 @@ function ReplacementEditor({
                                 onBlur={onBlur} />
                         }
                         label="JSON Value"
-                        description="JSON Value that will be used to replace the result nodes in the input JSON."
+                        description="JSON value that will be used to replace the result nodes in the input JSON."
                         key={form.key("jsonValueText")}
                         {...form.getInputProps("jsonValueText")}
                     />
@@ -140,7 +140,11 @@ function ReplacementEditor({
                                 onBlur={onBlur} />
                         }
                         label="JSON Patch"
-                        description="JSON Patch (RFC 6902) document that will be applied to every result node in the input JSON (post-order, i.e. descendants first)."
+                        description={
+                            <>
+                                JSON Patch (<a href="https://datatracker.ietf.org/doc/html/rfc6902" target="_blank">RFC 6902</a>) document that will be applied to every result node in the input JSON (post-order, i.e. descendants first).
+                            </>
+                        }
                         key={form.key("jsonPatchText")}
                         {...form.getInputProps("jsonPatchText")}
                     />
