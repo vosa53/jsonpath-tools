@@ -3,6 +3,7 @@ import { EditorState, Extension, StateEffect, StateField, Transaction } from "@c
 import { EditorView, showTooltip, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";
 import { languageServiceSessionStateField } from "./jsonpath-state";
+import { MarkdownRenderer } from "./markdown-renderer";
 
 export function jsonPathSignatureHelp(): Extension {
     return [
@@ -102,7 +103,7 @@ function createElementForSignature(signature: Signature): HTMLElement {
         signatureElement.appendChild(afterActiveParameterElement);
 
         const activeParameterDocumentationElement = document.createElement("div");
-        activeParameterDocumentationElement.textContent = activeParameter.documentation;
+        activeParameterDocumentationElement.innerHTML = MarkdownRenderer.renderToHTML(activeParameter.documentation);
         tooltipElement.appendChild(activeParameterDocumentationElement);
     }
     else
