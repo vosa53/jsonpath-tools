@@ -3,8 +3,16 @@ import { DataTypeAnnotation } from "../data-types/data-types";
 export class AnalysisDescriptionService {
     provideDescription(type?: string, annotations?: DataTypeAnnotation[]): string {
         let text = "";
-        if (type !== undefined)
-            text += `\n\n---\n\n##### Type: \`${type}\``;
+        if (type !== undefined) {
+            text += `\n\n---\n\n##### Type`;
+            if (type.length < 50 && type.indexOf("\n") === -1)
+                text += ": `" + type + "`";
+            else {
+                text += "\n\n```jsonpath-data-type\n";
+                text += type;
+                text += "\n```";
+            }
+        }
 
         if (annotations !== undefined) {
             for (const annotation of annotations) {

@@ -1,6 +1,8 @@
 import { JSONPathJSONValue, JSONPathNothing } from "@/jsonpath-tools/types";
 import { JSONPathNormalizedPath } from "../transformations";
 
+const INDENTATION_SPACE_COUNT = 4;
+
 export class DataTypeAnnotation {
     constructor(
         readonly title: string,
@@ -61,6 +63,25 @@ export abstract class DataType {
 
     abstract changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: DataType) => DataType): DataType;
     abstract setPathExistence(path: JSONPathNormalizedPath): DataType;
+    abstract toStringInternal(simplified: boolean, multiline: boolean, level: number): string;
+    
+    toString(simplified = false, multiline = false): string {
+        return this.toStringInternal(simplified, multiline, 0);
+    }
+
+    protected createIndentationString(level: number): string {
+        const INDENTATION_SIZE = 2;
+        return " ".repeat(INDENTATION_SIZE * level);
+    }
+
+    protected coerceMultiline(strings: string[], multiline: boolean): boolean {
+        const MAX_STRING_LENGTH = 30;
+        const MAX_STRING_COUNT = 3;
+        if (!multiline) return multiline;
+        if (strings.length > MAX_STRING_COUNT) return multiline;
+        if (!strings.every(s => s.length <= MAX_STRING_LENGTH && s.indexOf("\n") === -1)) return multiline;
+        return false;
+    }
 }
 
 export enum PrimitiveDataTypeType {
@@ -114,7 +135,7 @@ export class LiteralDataType extends DataType {
         return NeverDataType.create();
     }
 
-    toString(): string {
+    toStringInternal(simplified: boolean, multiline: boolean, level: number): string {
         return JSON.stringify(this.value);
     }
 
@@ -159,7 +180,7 @@ export class PrimitiveDataType extends DataType {
         return NeverDataType.create();
     }
 
-    toString(): string {
+    toStringInternal(simplified: boolean, multiline: boolean, level: number): string {
         return this.type;
     }
 
@@ -218,9 +239,22 @@ export class ObjectDataType extends DataType {
         return type;
     }
 
-    toString(): string {
-        const propertyTypeStrings = [...this.propertyTypes].map(([propertyName, propertyType]) => `${propertyName}${this.requiredProperties.has(propertyName) ? "" : "?"}: ${propertyType}`);
-        return `{${propertyTypeStrings.join(", ")}, ...: ${this.restPropertyType}}`;
+    toStringInternal(simplified: boolean, multiline: boolean, level: number): string {
+        if (simplified) 
+            return "object";
+        const propertyTypeStrings = this.propertyTypes.entries().map(([propertyName, propertyType]) => `${propertyName}${this.requiredProperties.has(propertyName) ? "" : "?"}: ${propertyType.toStringInternal(simplified, multiline, level + 1)}`).toArray();
+        if (!(this.restPropertyType instanceof NeverDataType))
+            propertyTypeStrings.push(`...: ${this.restPropertyType.toStringInternal(simplified, multiline, level + 1)}`);
+
+        multiline = this.coerceMultiline(propertyTypeStrings, multiline);
+        let text = "{";
+        if (multiline) text += "\n" + this.createIndentationString(level + 1);
+        else text += " ";
+        text += propertyTypeStrings.join(multiline ? ",\n" + this.createIndentationString(level + 1) : ", ");
+        if (multiline) text += "\n" + this.createIndentationString(level);
+        else text += " ";
+        text += "}";
+        return text;
     }
 
     changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: DataType) => DataType): DataType {
@@ -312,8 +346,20 @@ export class ArrayDataType extends DataType {
         }
     }
 
-    toString(): string {
-        return `[${this.prefixElementTypes.join(", ")}, ...: ${this.restElementType}]`;
+    toStringInternal(simplified: boolean, multiline: boolean, level: number): string {
+        if (simplified)
+            return "array";
+        const elementTypeStrings = this.prefixElementTypes.map(t => t.toStringInternal(simplified, multiline, level + 1));
+        if (!(this.restElementType instanceof NeverDataType))
+            elementTypeStrings.push(`...: ${this.restElementType.toStringInternal(simplified, multiline, level + 1)}`);
+
+        multiline = this.coerceMultiline(elementTypeStrings, multiline);
+        let text = "[";
+        if (multiline) text += "\n" + this.createIndentationString(level + 1);
+        text += elementTypeStrings.join(multiline ? ",\n" + this.createIndentationString(level + 1) : ", ");
+        if (multiline) text += "\n" + this.createIndentationString(level);
+        text += "]";
+        return text;
     }
 
     changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: DataType) => DataType): DataType {
@@ -408,8 +454,10 @@ export class UnionDataType extends DataType {
         return UnionDataType.create(types);
     }
 
-    toString(): string {
-        return `(${this.types.join(" | ")})`;
+    toStringInternal(simplified: boolean, multiline: boolean, level: number): string {
+        const typeStrings = this.types.map(t => t.toStringInternal(simplified, multiline, level + 1));
+        multiline = this.coerceMultiline(typeStrings, multiline);
+        return `${typeStrings.join(multiline ? " |\n" + this.createIndentationString(level + 1) : " | ")}`;
     }
 
     changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: DataType) => DataType): DataType {
@@ -459,7 +507,7 @@ export class NeverDataType extends DataType {
         return NeverDataType.create();
     }
 
-    toString(): string {
+    toStringInternal(simplified: boolean, multiline: boolean, level: number): string {
         return "never";
     }
 
@@ -508,7 +556,7 @@ export class AnyDataType extends DataType {
         return AnyDataType.create();
     }
 
-    toString(): string {
+    toStringInternal(simplified: boolean, multiline: boolean, level: number): string {
         return "any";
     }
 

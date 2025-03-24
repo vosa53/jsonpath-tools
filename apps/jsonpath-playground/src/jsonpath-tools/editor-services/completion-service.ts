@@ -87,8 +87,9 @@ export class CompletionProvider {
         for (const pathSegment of pathsSegments) {
             const pahtSegmentString = pathSegment.toString();
             const pathSegmentType = previousType.getTypeAtPathSegment(pathSegment);
-            const pathSegmentTypeString = pathSegmentType.toString();
-            completions.push(new CompletionItem(CompletionItemType.name, pahtSegmentString, pathSegmentTypeString, () => {
+            const pathSegmentTypeStringSimplified = pathSegmentType.toString(true);
+            completions.push(new CompletionItem(CompletionItemType.name, pahtSegmentString, pathSegmentTypeStringSimplified, () => {
+                const pathSegmentTypeString = pathSegmentType.toString(false, true);
                 const annotations = pathSegmentType.collectAnnotations();
                 return this.syntaxDescriptionProvider.provideDescriptionForNameSelector(pahtSegmentString).toMarkdown() +
                     this.analysisDescriptionProvider.provideDescription(pathSegmentTypeString, Array.from(annotations));

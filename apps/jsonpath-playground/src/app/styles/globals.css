@@ -57,20 +57,26 @@ hr {
     border-top: 1px solid var(--mantine-color-default-border);
 }
 
+pre, code {
+    border-radius: var(--mantine-radius-default);
+    background: var(--application-color-code-block);
+}
+
 code {
     font-family: var(--mantine-font-family-monospace);
-    background: var(--application-color-code-block);
-    border-radius: var(--mantine-radius-default);
     padding: 2px;
 }
 
 pre {
     margin: 0;
+    overflow: auto;
+    max-height: 300px;
 }
 
 pre>code {
     display: block;
     padding: 2px 5px;
+    border-radius: 0;
 }
 
 ::-webkit-scrollbar {

@@ -95,7 +95,7 @@ export class TooltipService {
                 typeAnnotations.add(new DataTypeAnnotation("", "", false, false, false, undefined, [example]));
         }
         else {
-            typeName = type.toString();
+            typeName = type.toString(false, true);
         }
 
         text += this.analysisDescriptionProvider.provideDescription(typeName, Array.from(typeAnnotations));
