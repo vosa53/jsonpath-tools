@@ -5,7 +5,7 @@ import { lintKeymap } from "@codemirror/lint";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { Compartment, EditorState, Extension } from "@codemirror/state";
 import { crosshairCursor, drawSelection, dropCursor, highlightActiveLine, highlightActiveLineGutter, highlightSpecialChars, keymap, lineNumbers, rectangularSelection } from "@codemirror/view";
-import { MantineColorScheme, useMantineColorScheme } from "@mantine/core";
+import { useComputedColorScheme } from "@mantine/core";
 import { EditorView } from "codemirror";
 import { CSSProperties, FocusEventHandler, useEffect, useRef } from "react";
 import { highlightStyle } from "./highlight-style";
@@ -34,15 +34,15 @@ export default function CodeMirrorEditor({
     const containerElementRef = useRef<HTMLDivElement>(null);
     const valueInEditorRef = useRef("");
     const editorViewRef = useRef<EditorView>(null);
-    const colorScheme = useMantineColorScheme();
+    const colorScheme = useComputedColorScheme();
 
     useEffect(() => {
         if (editorViewRef.current !== null) {
             editorViewRef.current.dispatch({
-                effects: themeCompartment.reconfigure(colorSchemeToTheme(colorScheme.colorScheme))
+                effects: themeCompartment.reconfigure(colorSchemeToTheme(colorScheme))
             });
         }
-    }, [colorScheme.colorScheme]);
+    }, [colorScheme]);
 
     useEffect(() => {
         if (editorViewRef.current !== null) {
@@ -84,7 +84,7 @@ export default function CodeMirrorEditor({
                 ]),
                 indentUnit.of("    "),
                 themeCommon,
-                themeCompartment.of(colorSchemeToTheme(colorScheme.colorScheme)),
+                themeCompartment.of(colorSchemeToTheme(colorScheme)),
                 syntaxHighlighting(highlightStyle),
                 readonlyCompartment.of(EditorState.readOnly.of(readonly)),
                 EditorView.updateListener.of(u => {
@@ -132,6 +132,6 @@ export default function CodeMirrorEditor({
 const themeCompartment = new Compartment();
 const readonlyCompartment = new Compartment();
 
-function colorSchemeToTheme(colorScheme: MantineColorScheme): Extension {
+function colorSchemeToTheme(colorScheme: "light" | "dark"): Extension {
     return colorScheme === "dark" ? themeDark : themeLight;
 }
