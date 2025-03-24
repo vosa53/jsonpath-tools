@@ -150,17 +150,31 @@ export class CompletionProvider {
     }
 
     private completeValues(completions: CompletionItem[], reference: JSONPathFilterExpression, query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType) {
-        if (queryArgument === undefined) return; // TODO
+        const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType, this.options);
 
-        const values = this.getAllValuesOutputtedFromExpression(queryArgument, query, reference);
-        for (const value of values) {
-            if (typeof value === "string" || typeof value === "number") {
-                completions.push(new CompletionItem(
-                    CompletionItemType.literal,
-                    JSON.stringify(value),
-                    typeof value
-                ));
-            }
+        const literals = queryArgument !== undefined
+            ? this.getAllLiteralsOutputtedFromExpression(queryArgument, query, reference)
+            : typeAnalyzer.getType(reference).collectKnownLiterals();
+        for (const literal of literals) {
+            completions.push(new CompletionItem(
+                CompletionItemType.literal,
+                JSON.stringify(literal),
+                undefined,
+                () => {
+                    let description;
+                    if (typeof literal === "string")
+                        description = this.syntaxDescriptionProvider.provideDescriptionForStringLiteralExpression(literal);
+                    else if (typeof literal === "number")
+                        description = this.syntaxDescriptionProvider.provideDescriptionForNumberLiteralExpression(literal);
+                    else if (typeof literal === "boolean")
+                        description = this.syntaxDescriptionProvider.provideDescriptionForBooleanLiteralExpression(literal);
+                    else if (literal === null)
+                        description = this.syntaxDescriptionProvider.provideDescriptionForNullLiteralExpression();
+                    else
+                        throw new Error("Unsupported literal type.");
+                    return description.toMarkdown();
+                }
+            ));
         }
     }
 
@@ -197,18 +211,22 @@ export class CompletionProvider {
         return values;
     }
 
-    private getAllValuesOutputtedFromExpression(queryArgument: JSONPathJSONValue, jsonPath: JSONPath, expression: JSONPathFilterExpression): JSONPathValueType[] {
-        const values: JSONPathValueType[] = [];
+    private getAllLiteralsOutputtedFromExpression(queryArgument: JSONPathJSONValue, jsonPath: JSONPath, expression: JSONPathFilterExpression): Set<string | number | boolean | null> {
+        const literals = new Set<string | number | boolean | null>();
         const queryContext: JSONPathQueryContext = {
             rootNode: queryArgument,
             options: this.options,
             filterExpressionInstrumentationCallback(fe, o) {
-                if (fe === expression)
-                    values.push(convertToValueType(o));
+                if (fe === expression) {
+                    const value = convertToValueType(o);
+                    const type = typeof value;
+                    if (type === "string" || type === "number" || type === "boolean" || value === null)
+                        literals.add(value as string | number | boolean | null);
+                }
             }
         };
         jsonPath.select(queryContext);
-        return values;
+        return literals;
     }
 }
 

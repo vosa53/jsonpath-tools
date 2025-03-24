@@ -87,16 +87,15 @@ export class TooltipService {
         const type = typeAnalyzer.getType(node);
 
         const typeAnnotations = type.collectAnnotations();
-        let typeName: string;
+        let typeName: string | undefined;
         if (queryArgument !== undefined) {
             const { typeNames, example } = this.findTypeNamesAndExample(node, query, queryArgument);
-            typeName = Array.from(typeNames).join(" | ");
+            typeName = typeNames.size === 0 ? undefined : Array.from(typeNames).join(" | ");
             if (example !== undefined)
                 typeAnnotations.add(new DataTypeAnnotation("", "", false, false, false, undefined, [example]));
         }
-        else {
+        else
             typeName = type.toString(false, true);
-        }
 
         text += this.analysisDescriptionProvider.provideDescription(typeName, Array.from(typeAnnotations));
 

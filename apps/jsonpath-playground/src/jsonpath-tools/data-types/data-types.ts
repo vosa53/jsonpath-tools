@@ -46,11 +46,18 @@ export abstract class DataType {
     abstract getDescendantType(): DataType;
     abstract getTypeAtPathSegment(segment: string | number): DataType;
     abstract collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void;
+    abstract collectKnownLiteralsToSet(literals: Set<string | number | boolean | null>): void;
 
     collectKnownPathSegments(): Set<string | number> {
         const knownPathSegments = new Set<string | number>();
         this.collectKnownPathSegmentsToSet(knownPathSegments);
         return knownPathSegments;
+    }
+
+    collectKnownLiterals(): Set<string | number | boolean | null> {
+        const knownLitarals = new Set<string | number | boolean | null>();
+        this.collectKnownLiteralsToSet(knownLitarals);
+        return knownLitarals;
     }
 
     getTypeAtPath(path: JSONPathNormalizedPath): DataType {
@@ -131,6 +138,10 @@ export class LiteralDataType extends DataType {
         return;
     }
 
+    collectKnownLiteralsToSet(literals: Set<string | number | boolean | null>): void {
+        literals.add(this.value);
+    }
+
     getTypeAtPathSegment(segment: string | number): DataType {
         return NeverDataType.create();
     }
@@ -174,6 +185,15 @@ export class PrimitiveDataType extends DataType {
 
     collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
         return;
+    }
+
+    collectKnownLiteralsToSet(literals: Set<string | number | boolean | null>): void {
+        if (this.type === PrimitiveDataTypeType.null)
+            literals.add(null);
+        else if (this.type === PrimitiveDataTypeType.boolean) {
+            literals.add(false);
+            literals.add(true);
+        }
     }
 
     getTypeAtPathSegment(segment: string | number): DataType {
@@ -227,6 +247,10 @@ export class ObjectDataType extends DataType {
     collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
         for (const propertyName of this.propertyTypes.keys())
             pathSegments.add(propertyName);
+    }
+
+    collectKnownLiteralsToSet(literals: Set<string | number | boolean | null>): void {
+        return;
     }
 
     getTypeAtPathSegment(segment: string | number): DataType {
@@ -312,6 +336,10 @@ export class ArrayDataType extends DataType {
     collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
         for (let i = 0; i < this.prefixElementTypes.length; i++)
             pathSegments.add(i);
+    }
+
+    collectKnownLiteralsToSet(literals: Set<string | number | boolean | null>): void {
+        return;
     }
 
     getTypeAtPathSegment(segment: string | number): DataType {
@@ -449,6 +477,11 @@ export class UnionDataType extends DataType {
             type.collectKnownPathSegmentsToSet(pathSegments);
     }
 
+    collectKnownLiteralsToSet(literals: Set<string | number | boolean | null>): void {
+        for (const type of this.types)
+            type.collectKnownLiteralsToSet(literals);
+    }
+
     getTypeAtPathSegment(segment: string | number): DataType {
         const types = this.types.map(type => type.getTypeAtPathSegment(segment));
         return UnionDataType.create(types);
@@ -503,6 +536,10 @@ export class NeverDataType extends DataType {
         return;
     }
 
+    collectKnownLiteralsToSet(literals: Set<string | number | boolean | null>): void {
+        return;
+    }
+
     getTypeAtPathSegment(segment: string | number): DataType {
         return NeverDataType.create();
     }
@@ -549,6 +586,10 @@ export class AnyDataType extends DataType {
     }
 
     collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
+        return;
+    }
+
+    collectKnownLiteralsToSet(literals: Set<string | number | boolean | null>): void {
         return;
     }
 

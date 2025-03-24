@@ -1,6 +1,9 @@
 import { JSONPathFunction, JSONPathOptions } from "../options";
+import { JSONPathBooleanLiteral } from "../query/filter-expression/boolean-literal";
 import { JSONPathComparisonExpression, JSONPathComparisonOperator } from "../query/filter-expression/comparison-expression";
 import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
+import { JSONPathNumberLiteral } from "../query/filter-expression/number-literal";
+import { JSONPathStringLiteral } from "../query/filter-expression/string-literal";
 import { JSONPathQuery } from "../query/query";
 import { JSONPathSegment } from "../query/segment";
 import { JSONPathIndexSelector } from "../query/selectors/index-selector";
@@ -52,10 +55,19 @@ export class SyntaxDescriptionService {
             const functionExpression = n as JSONPathFunctionExpression;
             return this.provideDescriptionForFunctionExpression(functionExpression.name, this.options.functions[functionExpression.name]);
         }],
-        [JSONPathSyntaxTreeType.stringLiteral, n => new SyntaxDescription("String Literal", "Realizes operator NOT.")],
-        [JSONPathSyntaxTreeType.numberLiteral, n => new SyntaxDescription("Number Literal", "Realizes operator NOT.")],
-        [JSONPathSyntaxTreeType.booleanLiteral, n => new SyntaxDescription("Boolean Literal", "Realizes operator NOT.")],
-        [JSONPathSyntaxTreeType.nullLiteral, n => new SyntaxDescription("Null Literal", "Realizes operator NOT.")],
+        [JSONPathSyntaxTreeType.stringLiteral, n => {
+            const stringLiteral = n as JSONPathStringLiteral;
+            return this.provideDescriptionForStringLiteralExpression(stringLiteral.value);
+        }],
+        [JSONPathSyntaxTreeType.numberLiteral, n => {
+            const numberLiteral = n as JSONPathNumberLiteral;
+            return this.provideDescriptionForNumberLiteralExpression(numberLiteral.value);
+        }],
+        [JSONPathSyntaxTreeType.booleanLiteral, n => {
+            const booleanLiteral = n as JSONPathBooleanLiteral;
+            return this.provideDescriptionForBooleanLiteralExpression(booleanLiteral.value);
+        }],
+        [JSONPathSyntaxTreeType.nullLiteral, n => this.provideDescriptionForNullLiteralExpression()],
         [JSONPathSyntaxTreeType.missingExpression, n => new SyntaxDescription("Missing Expression", "Missing Expression.")],
 
         [JSONPathSyntaxTreeType.dollarToken, n => this.provideDescriptionForDollarToken()],
@@ -141,12 +153,36 @@ export class SyntaxDescriptionService {
         return new SyntaxDescription(`Function \`${name}\``, text);
     }
 
+    provideDescriptionForStringLiteralExpression(value: string): SyntaxDescription {
+        return this.createLiteralDescription("String Literal", value);
+    }
+
+    provideDescriptionForNumberLiteralExpression(value: number): SyntaxDescription {
+        return this.createLiteralDescription("Number Literal", value);
+    }
+
+    provideDescriptionForBooleanLiteralExpression(value: boolean): SyntaxDescription {
+        return this.createLiteralDescription("Boolean Literal", value);
+    }
+
+    provideDescriptionForNullLiteralExpression(): SyntaxDescription {
+        return this.createLiteralDescription("Null Literal", null);
+    }
+
     provideDescriptionForDollarToken(): SyntaxDescription {
         return new SyntaxDescription("Root Identifier", "Identifies root object.");
     }
 
     provideDescriptionForAtToken(): SyntaxDescription {
         return new SyntaxDescription("Current Identifier", "Identifies current object.");
+    }
+
+    private createLiteralDescription(title: string, value: string | number | boolean | null): SyntaxDescription {
+        let text = "##### Value\n\n";
+        text += "```\n";
+        text += value === null ? "null" : value.toString()
+        text += "\n```";
+        return new SyntaxDescription(title, text);
     }
 }
 
