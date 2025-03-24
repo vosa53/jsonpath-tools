@@ -1,6 +1,8 @@
 import { AnyDataType, ArrayDataType, DataType, DataTypeAnnotation, LiteralDataType, NeverDataType, ObjectDataType, PrimitiveDataType, UnionDataType } from "@/jsonpath-tools/data-types/data-types";
 
 export function serializeDataType(type: DataType) {
+    const fromCache = serializedTypeCache.get(type);
+    if (fromCache !== undefined) return fromCache;
     let serializedType: any;
     if (type instanceof AnyDataType)
         serializedType = { kind: "any" };
@@ -19,11 +21,14 @@ export function serializeDataType(type: DataType) {
     else
         throw new Error("Unsupported data type.");
 
-    serializedType.annotations = type.annotations.values().map(serializeAnnotation).toArray()
+    serializedType.annotations = type.annotations.values().map(serializeAnnotation).toArray();
+    serializedTypeCache.set(type, serializedType);
     return serializedType;
 }
 
 export function deserializeDataType(serializedType: any): DataType {
+    const fromCache = deserializedTypeCache.get(serializedType);
+    if (fromCache !== undefined) return fromCache;
     let type: DataType;
     if (serializedType.kind === "any")
         type = AnyDataType.create();
@@ -54,11 +59,14 @@ export function deserializeDataType(serializedType: any): DataType {
 
     if (serializedType.annotations.length !== 0)
         type = type.withAnnotations(new Set(serializedType.annotations.map(deserializeAnnotation)));
+    deserializedTypeCache.set(serializedType, type);
     return type;
 }
 
 function serializeAnnotation(annotation: DataTypeAnnotation) {
-    return {
+    const fromCache = serializedAnnotationCache.get(annotation);
+    if (fromCache !== undefined) return fromCache;
+    const serializedAnnotation = {
         title: annotation.title,
         description: annotation.description,
         deprecated: annotation.deprecated,
@@ -67,16 +75,27 @@ function serializeAnnotation(annotation: DataTypeAnnotation) {
         defaultValue: annotation.defaultValue,
         exampleValues: annotation.exampleValues
     };
+    serializedAnnotationCache.set(annotation, serializedAnnotation);
+    return serializedAnnotation;
 }
 
 function deserializeAnnotation(serializedAnnotation: any): DataTypeAnnotation {
-    return {
-        title: serializedAnnotation.title,
-        description: serializedAnnotation.description,
-        deprecated: serializedAnnotation.deprecated,
-        readOnly: serializedAnnotation.readOnly,
-        writeOnly: serializedAnnotation.writeOnly,
-        defaultValue: serializedAnnotation.defaultValue,
-        exampleValues: serializedAnnotation.exampleValues
-    };
+    const fromCache = deserializedAnnotationCache.get(serializedAnnotation);
+    if (fromCache !== undefined) return fromCache;
+    const annotation = new DataTypeAnnotation(
+        serializedAnnotation.title,
+        serializedAnnotation.description,
+        serializedAnnotation.deprecated,
+        serializedAnnotation.readOnly,
+        serializedAnnotation.writeOnly,
+        serializedAnnotation.defaultValue,
+        serializedAnnotation.exampleValues
+    );
+    deserializedAnnotationCache.set(serializedAnnotation, annotation);
+    return annotation;
 }
+
+const serializedTypeCache = new WeakMap<DataType, any>();
+const deserializedTypeCache = new WeakMap<any, DataType>();
+const serializedAnnotationCache = new WeakMap<DataTypeAnnotation, any>();
+const deserializedAnnotationCache = new WeakMap<any, DataTypeAnnotation>();
