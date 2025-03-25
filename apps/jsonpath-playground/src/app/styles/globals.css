@@ -48,6 +48,17 @@ ul {
     margin: 0;
 }
 
+.with-spacing h1,
+.with-spacing h2,
+.with-spacing h3,
+.with-spacing h4,
+.with-spacing h5,
+.with-spacing h6,
+.with-spacing p,
+.with-spacing ul {
+    margin: 0.75em 0 0.75em 0;
+}
+
 ul {
     padding-left: 30px;
 }

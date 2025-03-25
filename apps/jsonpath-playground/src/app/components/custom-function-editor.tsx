@@ -7,6 +7,8 @@ import { CustomFunction } from "../models/custom-function";
 import JavaScriptEditor from "./code-editors/javascript-editor";
 import MarkdownEditor from "./code-editors/markdown-editor";
 import { EditorFormAdapter } from "./editor-form-adapter";
+import documentationMarkdown from "./custom-function-editor-documentation.md?raw";
+import { MarkdownView } from "./markdown-view";
 
 export default function CustomFunctionEditor({
     customFunction,
@@ -165,7 +167,7 @@ export default function CustomFunctionEditor({
                         Documentation
                     </Button>
                     <Collapse in={documentationOpened}>
-                        TODO...
+                        <MarkdownView markdown={documentationMarkdown} withSpacing />
                     </Collapse>
                 </div>
                 <Group justify="end">

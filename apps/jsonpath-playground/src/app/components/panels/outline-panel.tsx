@@ -9,7 +9,7 @@ import { Box, Group, Paper, Stack, Text } from "@mantine/core";
 import { memo } from "react";
 import PanelShell from "../panel-shell";
 import classes from "./outline-panel.module.css";
-import { renderMarkdownToHTML } from "@/app/services/markdown";
+import { MarkdownView } from "../markdown-view";
 
 const OutlinePanel = memo(({
     query,
@@ -71,7 +71,9 @@ function OutlineView({
 function TreeLabel({ tree }: { tree: JSONPathSyntaxTree }) {
     return (
         <Group className={classes.node}>
-            <Text fw="500" dangerouslySetInnerHTML={{ __html: renderMarkdownToHTML(getLabel(tree)) }}></Text>
+            <Text fw="500">
+                <MarkdownView markdown={getLabel(tree)} />
+            </Text>
         </Group>
     );
 }
@@ -81,7 +83,7 @@ function getClassName(tree: JSONPathSyntaxTree): string {
 }
 
 function getLabel(tree: JSONPathSyntaxTree): string {
-    return new SyntaxDescriptionService(defaultJSONPathOptions).provideDescription(tree)?.title ?? tree.type;
+    return syntaxDescriptionService.provideDescription(tree)?.title ?? tree.type;
 }
 
 const classNameMap = new Map<JSONPathSyntaxTreeType, string>([
@@ -106,3 +108,5 @@ const classNameMap = new Map<JSONPathSyntaxTreeType, string>([
     [JSONPathSyntaxTreeType.paranthesisExpression, classes.paranthesisExpression],
     [JSONPathSyntaxTreeType.missingExpression, classes.missing]
 ]);
+
+const syntaxDescriptionService = new SyntaxDescriptionService(defaultJSONPathOptions);

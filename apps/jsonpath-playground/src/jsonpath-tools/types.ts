@@ -8,7 +8,7 @@ export const JSONPathLogicalFalse: unique symbol = Symbol("LogicalFalse");
 
 export class JSONPathNodeList {
     constructor(
-        readonly nodes: LocatedNode[]
+        readonly nodes: readonly LocatedNode[]
     ) { }
 
     static readonly empty = new JSONPathNodeList([]);

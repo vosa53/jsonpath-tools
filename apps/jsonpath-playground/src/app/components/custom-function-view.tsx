@@ -1,6 +1,7 @@
 import { ActionIcon, Box, Flex, Title } from "@mantine/core";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { CustomFunction } from "../models/custom-function";
+import { MarkdownView } from "./markdown-view";
 
 export default function CustomFunctionView({
     customFunction,
@@ -22,12 +23,12 @@ export default function CustomFunctionView({
                     <IconTrash size={20} />
                 </ActionIcon>
             </Flex>
-            <div>{customFunction.description}</div>
+            <MarkdownView markdown={customFunction.description} />
             <Title order={5}>Parameters</Title>
             <ul>
                 {customFunction.parameters.map((p, i) => (
                     <li key={i}>
-                        <code>{p.name}: {p.type}</code>{" " + p.description}
+                        <code>{p.name}: {p.type}</code>: <MarkdownView markdown={p.description} />
                     </li>
                 ))}
             </ul>

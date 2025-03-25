@@ -2,6 +2,7 @@ import { defaultJSONPathOptions, JSONPathFunctionHandler } from "@/jsonpath-tool
 import { LanguageServiceBackend } from "./components/code-editors/codemirror/jsonpath-codemirror/worker/language-service-backend";
 import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";
 import { JSONPathLogicalFalse, JSONPathLogicalTrue, JSONPathNodeList, JSONPathNothing } from "@/jsonpath-tools/types";
+import { LocatedNode } from "@/jsonpath-tools/query/located-node";
 
 const customFunctions = new Map<string, JSONPathFunctionHandler>();
 
@@ -61,8 +62,9 @@ function createJSONPathFunctionHandler(customFunction: Function, functionName: s
 
 // TODO: Probably pass the whole library to custom functions (import *).
 const JSONPATH_LIBRARY = {
-    JSONPathNothing: JSONPathNothing,
-    JSONPathLogicalFalse: JSONPathLogicalFalse,
-    JSONPathLogicalTrue: JSONPathLogicalTrue,
-    JSONPathNodeList: JSONPathNodeList
+    JSONPathNothing,
+    JSONPathLogicalFalse,
+    JSONPathLogicalTrue,
+    JSONPathNodeList,
+    LocatedNode
 };
