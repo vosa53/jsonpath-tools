@@ -23,8 +23,8 @@ const Navbar = memo(({
 }) => {
     return (
         <Flex direction="column" h="100%">
-            <Accordion>
-                <Accordion.Item value="jsonPathGuide">
+            <Accordion className={classes.accordion}>
+                <Accordion.Item value="jsonPathGuide" className={classes.accordionItem}>
                     <Accordion.Control icon={<IconHelp size={20} />}>
                         JSONPath Guide
                     </Accordion.Control>
@@ -33,7 +33,7 @@ const Navbar = memo(({
                     </Accordion.Panel>
                 </Accordion.Item>
 
-                <Accordion.Item value="applicationGuide">
+                <Accordion.Item value="applicationGuide" className={classes.accordionItem}>
                     <Accordion.Control icon={<IconHelp size={20} />}>
                         Application Guide
                     </Accordion.Control>
@@ -42,7 +42,7 @@ const Navbar = memo(({
                     </Accordion.Panel>
                 </Accordion.Item>
 
-                <Accordion.Item value="customFunctions">
+                <Accordion.Item value="customFunctions" className={classes.accordionItem}>
                     <Accordion.Control icon={<IconMathFunction size={20} />}>
                         Custom Functions
                     </Accordion.Control>
@@ -51,7 +51,7 @@ const Navbar = memo(({
                     </Accordion.Panel>
                 </Accordion.Item>
 
-                <Accordion.Item value="settings">
+                <Accordion.Item value="settings" className={classes.accordionItem}>
                     <Accordion.Control icon={<IconSettings size={20} />}>
                         Settings
                     </Accordion.Control>

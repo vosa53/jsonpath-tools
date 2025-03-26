@@ -1,4 +1,15 @@
+.accordion {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.accordionItem {
+    min-height: 50px;
+    display: flex;
+    flex-direction: column;
+}
+
 .accordionPanel {
-    max-height: 600px;
     overflow: auto;
 }
