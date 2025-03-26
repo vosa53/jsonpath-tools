@@ -5,6 +5,8 @@ import { CustomFunction } from "../models/custom-function";
 import { Settings } from "../models/settings";
 import CustomFunctionsView from "./custom-functions-view";
 import SettingsEditor from "./settings-editor";
+import { MarkdownView } from "./markdown-view";
+import jsonPathGuide from "./jsonpath-guide.md?raw"
 
 const Navbar = memo(({
     customFunctions,
@@ -22,13 +24,10 @@ const Navbar = memo(({
             <Accordion>
                 <Accordion.Item value="reference">
                     <Accordion.Control icon={<IconHelp size={20} />}>
-                        Language Reference
+                        JSONPath Guide
                     </Accordion.Control>
-                    <Accordion.Panel>
-                        <p>
-                            TODO
-                        </p>
-                        <Anchor href="https://datatracker.ietf.org/doc/rfc9535/" target="_blank">RFC 9535</Anchor>
+                    <Accordion.Panel style={{ overflow: "auto", maxHeight: "600px" }}>
+                        <MarkdownView markdown={jsonPathGuide} withSpacing />
                     </Accordion.Panel>
                 </Accordion.Item>
 

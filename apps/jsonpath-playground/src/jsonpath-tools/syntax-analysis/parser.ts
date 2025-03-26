@@ -169,7 +169,7 @@ export class JSONPathParser {
         const firstColonToken = context.collectToken(JSONPathSyntaxTreeType.colonToken);
         this.skipWhitespace(context);
         // @ts-ignore
-        const end = this.isDigit(context.current) || context.current === "-" ? this.parseNumber(context) : null;
+        const end = JSONPathCharacters.isDigit(context.current) || context.current === "-" ? this.parseNumber(context) : null;
         this.skipWhitespace(context);
         let secondColonToken: JSONPathToken | null = null;
         let step: { token: JSONPathToken, value: number } | null = null;
@@ -178,7 +178,7 @@ export class JSONPathParser {
             secondColonToken = context.collectToken(JSONPathSyntaxTreeType.colonToken);
             this.skipWhitespace(context);
             // @ts-ignore
-            step = this.isDigit(context.current) || context.current === "-" ? this.parseNumber(context) : null
+            step = JSONPathCharacters.isDigit(context.current) || context.current === "-" ? this.parseNumber(context) : null
         }
 
         if (indexOrStart !== null) this.checkIsInteger(indexOrStart.token, context);
