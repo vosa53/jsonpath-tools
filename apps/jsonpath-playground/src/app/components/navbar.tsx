@@ -35,7 +35,7 @@ const Navbar = memo(({
                     <Accordion.Control icon={<IconMathFunction size={20} />}>
                         Custom Functions
                     </Accordion.Control>
-                    <Accordion.Panel>
+                    <Accordion.Panel style={{ overflow: "auto", maxHeight: "600px" }}>
                         <CustomFunctionsView customFunctions={customFunctions} onCustomFunctionsChanged={onCustomFunctionsChanged} />
                     </Accordion.Panel>
                 </Accordion.Item>

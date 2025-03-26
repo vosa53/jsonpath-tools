@@ -21,9 +21,9 @@ export class SyntaxDescriptionService {
         [JSONPathSyntaxTreeType.segment, n => {
             const segment = n as JSONPathSegment;
             if (segment.isDescendant)
-                return new SyntaxDescription("Descendant Segment", "Selects an object at the given index from an array.");
+                return new SyntaxDescription("Descendant Segment", "Selects values with its selectors from the current value **and all its descendants**.");
             else
-                return new SyntaxDescription("Child Segment", "Selects an object at the given index from an array.");
+                return new SyntaxDescription("Child Segment", "Selects values with its selectors from the current value.");
         }],
 
         [JSONPathSyntaxTreeType.filterSelector, n => this.provideDescriptionForFilterSelector()],
@@ -42,15 +42,15 @@ export class SyntaxDescriptionService {
         [JSONPathSyntaxTreeType.wildcardSelector, n => this.provideDescriptionForWildcardSelector()],
         [JSONPathSyntaxTreeType.missingSelector, n => this.provideDescriptionForMissingSelector()],
 
-        [JSONPathSyntaxTreeType.paranthesisExpression, n => new SyntaxDescription("Paranthesis", "Paranthesis.")],
-        [JSONPathSyntaxTreeType.andExpression, n => new SyntaxDescription("Logical AND", "Realizes operator AND.")],
-        [JSONPathSyntaxTreeType.orExpression, n => new SyntaxDescription("Logical OR", "Realizes operator OR.")],
-        [JSONPathSyntaxTreeType.notExpression, n => new SyntaxDescription("Logical NOT", "Realizes operator NOT.")],
+        [JSONPathSyntaxTreeType.paranthesisExpression, n => new SyntaxDescription("Paranthesis", "Used to change logical operators priorities.")],
+        [JSONPathSyntaxTreeType.andExpression, n => new SyntaxDescription("Logical AND", "Realizes a logical operation AND.")],
+        [JSONPathSyntaxTreeType.orExpression, n => new SyntaxDescription("Logical OR", "Realizes a logical operation OR.")],
+        [JSONPathSyntaxTreeType.notExpression, n => new SyntaxDescription("Logical NOT", "Realizes a logical operation NOT.")],
         [JSONPathSyntaxTreeType.comparisonExpression, n => {
             const comparisonExpression = n as JSONPathComparisonExpression;
             return this.provideDescriptionForComparisonExpression(comparisonExpression.operator);
         }],
-        [JSONPathSyntaxTreeType.filterQueryExpression, n => new SyntaxDescription("Filter Query", "Query in filter expression.")],
+        [JSONPathSyntaxTreeType.filterQueryExpression, n => new SyntaxDescription("Filter Query", "Query in filter expression. When used on its own it is considered an existence test.")],
         [JSONPathSyntaxTreeType.functionExpression, n => {
             const functionExpression = n as JSONPathFunctionExpression;
             return this.provideDescriptionForFunctionExpression(functionExpression.name, this.options.functions[functionExpression.name]);
@@ -68,7 +68,7 @@ export class SyntaxDescriptionService {
             return this.provideDescriptionForBooleanLiteralExpression(booleanLiteral.value);
         }],
         [JSONPathSyntaxTreeType.nullLiteral, n => this.provideDescriptionForNullLiteralExpression()],
-        [JSONPathSyntaxTreeType.missingExpression, n => new SyntaxDescription("Missing Expression", "Missing Expression.")],
+        [JSONPathSyntaxTreeType.missingExpression, n => new SyntaxDescription("Missing Expression", "Represents a mising expression (syntax error).")],
 
         [JSONPathSyntaxTreeType.dollarToken, n => this.provideDescriptionForDollarToken()],
         [JSONPathSyntaxTreeType.atToken, n => this.provideDescriptionForAtToken()]
@@ -89,43 +89,43 @@ export class SyntaxDescriptionService {
     provideDescriptionForQuery(isRelative: boolean): SyntaxDescription {
         return new SyntaxDescription(
             isRelative ? "Relative Query" : "Absolute Query",
-            "Selects particular children using a logical expression. Current child is represented with @."
+            "A sequence of segments that consists of selectors to select or filter values from objects/arrays."
         );
     }
 
     provideDescriptionForFilterSelector(): SyntaxDescription {
-        return new SyntaxDescription("Filter Selector", "Selects particular children using a logical expression. Current child is represented with `@`.");
+        return new SyntaxDescription("Filter Selector", "Selects values from an array/object that satisfy a logical expression. Current tested value is represented with `@`.");
     }
 
     provideDescriptionForIndexSelector(index?: number): SyntaxDescription {
         if (index === undefined)
-            return new SyntaxDescription("Index Selector", "Selects an object at the given index from an array.");
+            return new SyntaxDescription("Index Selector", "Selects a value at the given index from an array.");
         else
-            return new SyntaxDescription(`Index Selector \`${index}\``, `Selects an object at the index \`${index}\` from an array.`)
+            return new SyntaxDescription(`Index Selector \`${index}\``, `Selects a value at the index \`${index}\` from an array.`);
     }
 
     provideDescriptionForNameSelector(name?: string): SyntaxDescription {
         if (name === undefined)
-            return new SyntaxDescription("Name Selector", "Selects a property from the object.");
+            return new SyntaxDescription("Name Selector", "Selects a property from an object.");
         else
-            return new SyntaxDescription(`Name Selector \`${name}\``, `Selects a property \`${name}\` from the object.`);
+            return new SyntaxDescription(`Name Selector \`${name}\``, `Selects the property \`${name}\` from an object.`);
     }
 
     provideDescriptionForSliceSelector(start?: number | null, end?: number | null, step?: number | null): SyntaxDescription {
         if (start === undefined || end === undefined || step === undefined)
-            return new SyntaxDescription("Slice Selector", "Selects a range from an array.");
+            return new SyntaxDescription("Slice Selector", "Selects values in the given range from an array.");
         else {
             const rangeText = `${start ?? ""}:${end ?? ""}:${step ?? ""}`;
-            return new SyntaxDescription(`Slice Selector \`${rangeText}\``, `Selects a range \`${rangeText}\` from an array.`);
+            return new SyntaxDescription(`Slice Selector \`${rangeText}\``, `Selects values in the range \`${rangeText}\` from an array.`);
         }
     }
 
     provideDescriptionForWildcardSelector(): SyntaxDescription {
-        return new SyntaxDescription("Wildcard Selector", "Selects all members from an object.");
+        return new SyntaxDescription("Wildcard Selector", "Selects all values from an array/object.");
     }
 
     provideDescriptionForMissingSelector(): SyntaxDescription {
-        return new SyntaxDescription("Missing Selector", "Missing selector.");
+        return new SyntaxDescription("Missing Selector", "Represents a mising selector (syntax error).");
     }
 
     provideDescriptionForComparisonExpression(operator: JSONPathComparisonOperator): SyntaxDescription {
@@ -170,15 +170,16 @@ export class SyntaxDescriptionService {
     }
 
     provideDescriptionForDollarToken(): SyntaxDescription {
-        return new SyntaxDescription("Root Identifier", "Identifies root object.");
+        return new SyntaxDescription("Root Identifier", "Represents the root query argument.");
     }
 
     provideDescriptionForAtToken(): SyntaxDescription {
-        return new SyntaxDescription("Current Identifier", "Identifies current object.");
+        return new SyntaxDescription("Current Identifier", "Represents the current value in the filter selector expression.");
     }
 
     private createLiteralDescription(title: string, value: string | number | boolean | null): SyntaxDescription {
-        let text = "##### Value\n\n";
+        let text = "An expression with a constant value.\n\n"
+        text += "##### Value\n\n";
         text += "```\n";
         text += value === null ? "null" : value.toString()
         text += "\n```";

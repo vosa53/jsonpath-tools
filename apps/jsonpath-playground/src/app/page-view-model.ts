@@ -258,7 +258,7 @@ const testOperation: Operation = {
         jsonPatchText: "[]"
     }
 };
-const testQueryText = "$.books[?@.author == \"George Orwell\" && count(true, 25) > 42].title";
+const testQueryText = `$..inventory[?@.features[?@ == "Bluetooth"] && match(@.make, "[tT].+")]`;
 const testQuery = new JSONPathParser().parse(testQueryText);
 
 function executeOperation(

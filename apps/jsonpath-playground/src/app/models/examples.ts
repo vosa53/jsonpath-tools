@@ -89,8 +89,8 @@ export const examples: readonly Example[] = [
 `,
         jsonSchemaText: `{
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "title": "Car Dealership Data Schema",
-    "description": "Schema for representing a car dealership's inventory, employees, and location details.",
+    "title": "Car Dealership Data",
+    "description": "Data representing a car dealership's inventory, employees, and location details.",
     "type": "object",
     "properties": {
         "dealership": {
@@ -249,6 +249,7 @@ export const examples: readonly Example[] = [
 }
 `,
         jsonTypeDefinitionText: `{
+    "metadata": "Data representing a car dealership's inventory, employees, and location details.",
     "properties": {
         "dealership": {
             "metadata": "Details of the car dealership",

@@ -1,10 +1,10 @@
-JSONPath ([RFC 9535](https://datatracker.ietf.org/doc/rfc9535/)) is a simple query language to extract values from a JSON document.
+JSONPath ([RFC 9535](https://datatracker.ietf.org/doc/rfc9535/)) is a simple query language to extract or select values in a JSON document.
 
-A query is a sequence of *segments* that consists of *selectors* to select or filter values from objects/arrays. The character `$` represents the query argument and every query has to start with it.
+JSONPath *query* is a sequence of *segments* that consist of *selectors* to select or filter values from objects/arrays. Each selector works with the values outputed by the previous selector. The character `$` represents the query argument (JSON document root), and every query has to start with it.
 
 ### Name Selector
 
-The most simple is a *name selector*, which selects a value from the object property:
+The most simple selector is a *name selector*, which selects a value from the object property:
 
 ```jsonpath
 $.dealership.location
@@ -25,7 +25,7 @@ Arrays are indexed **from zero**. It is also possible to index from end, negativ
 ```jsonpath
 $.dealership.inventory[-1]
 ```
-The previous query selects the **last** item from the inventory (at `length - 1`).
+The previous query selects the **last** item from the inventory (item at `length - 1`).
 
 ### Wildcard Selector
 
@@ -41,7 +41,7 @@ $.dealership.inventory.*
 ### Slice selector
 To select a range of elements from an array, the *slice selector* is available. Its parameters are start index (inclusive), end index (exclusive), and step. It uses the syntax: `start:end:step`. Each of these parameters can be omitted, in which case a default value is used.
 
-For the following examples suppose 5 elements.
+For the following examples suppose 5 elements in the `inventory` array.
 
 Selects elements at `2`, `3`:
 ```jsonpath
@@ -75,7 +75,7 @@ $.dealership.inventory[::-1]
 ```
 
 ### Filter Selector
-The most powerful is a *filter selector*. It allows to select array/object values based on a boolean condition with nested queries. It is preceded by `?` character. The current filtered element in the expression is represented with a `@` character.
+The most powerful is a *filter selector*. It allows to select array/object values based on a logical expression with nested queries. It is preceded by `?` character. The current filtered value in the expression is represented with a `@` character.
 
 A simple filter can look like this:
 ```jsonpath
@@ -86,20 +86,20 @@ It selects all values where `make` property is equal to `Ford`.
 #### Comparison operators
 
 All available comparison operators are summarized in this table:
-| Operator | Description           |
-|----------|-----------------------|
-| ==       | Equal                 |
-| !=       | Not equal             |
-| <        | Lower than            |
-| >        | Greater than          |
-| <=       | Lower than or equal   |
-| >=       | Greater than or equal |
+| Operator | Description             |
+|----------|-------------------------|
+| `==`       | Equal                 |
+| `!=`       | Not equal             |
+| `<`        | Lower than            |
+| `>`        | Greater than          |
+| `<=`       | Lower than or equal   |
+| `>=`       | Greater than or equal |
 
 #### Existence test
 
 If no operator is used, the nested query is considered an existence test. Empty subquery result means `LogicalFalse` and not empty `LogicalTrue`.
 
-For example, the following example selects all cars that have Bluetooth between their features:
+For example, the following example selects all cars that have `Bluetooth` element between their features:
 ```jsonpath
 $.dealership.inventory[?@.features[?@ == "Bluetooth"]]
 ```
@@ -107,11 +107,11 @@ $.dealership.inventory[?@.features[?@ == "Bluetooth"]]
 #### Logical operators
 
 Logical expressions can be combined with the following operators:
-| Operator | Description                     |
-|----------|---------------------------------|
-| &&       | Logical AND (all true)          |
-| \|\|     | Logical OR (some true)          |
-| !        | Logical NOT (not true)          |
+| Operator | Description                       |
+|----------|-----------------------------------|
+| `&&`       | Logical AND (all true)          |
+| `\|\|`     | Logical OR (some true)          |
+| `!`        | Logical NOT (not true)          |
 
 Operator `&&` has higher precedence than `||`. It is also possible to use parenthesis `(` and `)` to change the precedences.
 
@@ -121,7 +121,7 @@ Filter expressions can also use *functions*. These functions use a simple type s
 
 - `ValueType`: JSON value (object, array, number, ...) or a special value `Nothing`.
 - `LogicalType`: Represents logical expression values, either `LogicalTrue` or `LogicalFalse`. **Note: These values are distinct from the JSON values `true` and `false`.**
-- `NodesType`: List of JSON values. Represents a result of a query.
+- `NodesType`: Lists of JSON values along with their positions (*nodelist*). Represents a result of a query.
 
 A type `NodesType` can be implicitly converted to `LogicalType` (similar to the previously mentioned existence test).
 
@@ -132,11 +132,15 @@ There are 5 built-in functions:
 - `search(): LogicalType`
 - `value(): ValueType`
 
+TODO
+
 #### I-Regexp - Regular expressions
 
 To ensure interoperability between programming languages, JSONPath filter functions use a simplified, standardized subset of common regular expressions called *I-Regexp* ([RFC 9485](https://datatracker.ietf.org/doc/rfc9485/)).
 
 I-Regexp supports the following patterns:
+
+TODO
 
 It lacks more advanced features like lookahead or capture groups.
 
@@ -167,6 +171,19 @@ Equivalent to a longer form:
 $..["id"]
 ```
 
-### Query result
+### Query output
 
-TODO...
+The output of each query is a sequence of JSON values, along with their positions in the query argument (*nodes*) called *nodelist*. 
+
+A special form of a JSONPath query, called a *normalized path*, can be used to uniquely identify a node in the query argument. A normalized path is a JSONPath query syntactically constrained in a way that each node corresponds to exactly one normalized path, and each normalized path leads to at most one node.
+
+For example, consider this query, which outputs one node:
+```jsonpath
+$.dealership.inventory[-1]
+```
+
+The normalized path to the result node of this query is the following:
+
+```jsonpath
+$["dealership"]["inventory"][4]
+```
