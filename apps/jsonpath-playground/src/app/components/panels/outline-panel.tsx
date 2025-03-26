@@ -71,9 +71,9 @@ function OutlineView({
 function TreeLabel({ tree }: { tree: JSONPathSyntaxTree }) {
     return (
         <Group className={classes.node}>
-            <Text fw="500">
+            <div style={{ fontWeight: "500" }}>
                 <MarkdownView markdown={getLabel(tree)} />
-            </Text>
+            </div>
         </Group>
     );
 }
