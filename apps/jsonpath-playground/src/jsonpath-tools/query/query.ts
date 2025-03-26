@@ -38,7 +38,9 @@ export class JSONPathQuery extends JSONPathNode {
     }
 
     select(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext | null): JSONPathNodeList {
-        const inputValue = this.isRelative && filterExpressionContext !== null ? filterExpressionContext.currentNode : queryContext.rootNode;
+        if (this.isRelative && filterExpressionContext === null)
+            return JSONPathNodeList.empty;
+        const inputValue = this.isRelative ? filterExpressionContext!.currentNode : queryContext.rootNode;
         const input = new LocatedNode(inputValue, "", null);
         let inputs = [input];
         let outputs: LocatedNode[] = [];

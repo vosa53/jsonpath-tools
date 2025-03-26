@@ -18,7 +18,7 @@ export class DocumentHighlightsService {
         for (const node of touchingNodes)
             this.provideHighlightsForNode(query, node, documentHighlights);
         documentHighlights.sort((a, b) => a.range.position - b.range.position);
-        return documentHighlights;
+        return documentHighlights.filter(h => h.range.length !== 0);
     }
 
     private provideHighlightsForNode(query: JSONPath, node: JSONPathSyntaxTree, documentHighlights: DocumentHighlight[]) {

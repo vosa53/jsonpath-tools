@@ -22,10 +22,16 @@ export function jsonPathCompletionSource(): CompletionSource {
                             type: convertCompletionItemTypeToCodemirrorType(c.type),
                             detail: c.detail,
                             info: async () => {
-                                const description = await languageServiceSession.resolveCompletion(i);
-                                const element = document.createElement("div");
-                                element.innerHTML = MarkdownRenderer.renderToHTML(description);
-                                return element;
+                                try {
+                                    const description = await languageServiceSession.resolveCompletion(i);
+                                    const element = document.createElement("div");
+                                    element.innerHTML = MarkdownRenderer.renderToHTML(description);
+                                    return element;
+                                }
+                                catch (error) {
+                                    if (error instanceof OperationCancelledError) return null;
+                                    else throw error;
+                                }
                             },
                             apply: (view, completion) => {
                                 const cFrom = c.range.position;
