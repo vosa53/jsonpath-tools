@@ -59,6 +59,10 @@ ul {
     margin: 0.75em 0 0.75em 0;
 }
 
+.with-spacing ul ul {
+    margin: 0;
+}
+
 ul {
     padding-left: 30px;
 }
