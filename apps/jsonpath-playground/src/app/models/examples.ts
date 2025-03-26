@@ -89,6 +89,27 @@ export const examples: readonly Example[] = [
 `,
         jsonSchemaText: `{
     "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$defs": {
+        "gcsCoordinates": {
+            "title": "GCS Coordinates",
+            "description": "Geographic Coordinate System coordinates (latitude and longtitude)",
+            "type": "array",
+            "prefixItems": [
+                {
+                    "title": "Latitude",
+                    "description": "Latitude of the GCS coordinates",
+                    "type": "number"
+                },
+                {
+                    "title": "Longtitude",
+                    "description": "Longtitude of the GCS coordinates",
+                    "type": "number"
+                }
+            ],
+            "items": false,
+            "minItems": 2
+        }
+    },
     "title": "Car Dealership Data",
     "description": "Data representing a car dealership's inventory, employees, and location details.",
     "type": "object",
@@ -127,23 +148,7 @@ export const examples: readonly Example[] = [
                             "pattern": "^[0-9]{5}$"
                         },
                         "coordinates": {
-                            "title": "GCS Coordinates",
-                            "description": "Geographic Coordinate System coordinates (latitude and longtitude)",
-                            "type": "array",
-                            "prefixItems": [
-                                {
-                                    "title": "Latitude",
-                                    "description": "Latitude of the GCS coordinates",
-                                    "type": "number"
-                                },
-                                {
-                                    "title": "Longtitude",
-                                    "description": "Longtitude of the GCS coordinates",
-                                    "type": "number"
-                                }
-                            ],
-                            "items": false,
-                            "minItems": 2
+                            "$ref": "#/$defs/gcsCoordinates"
                         }
                     },
                     "required": ["city", "state", "zip", "coordinates"],
@@ -249,6 +254,15 @@ export const examples: readonly Example[] = [
 }
 `,
         jsonTypeDefinitionText: `{
+    "definitions": {
+        "gcsCoordinates": {
+            "metadata": "Geographic Coordinate System coordinates (latitude and longtitude)",
+            "elements": {
+                "metadata": "Latitude/Longtitude of the GCS coordinates",
+                "type": "float64"
+            }
+        }
+    },
     "metadata": "Data representing a car dealership's inventory, employees, and location details.",
     "properties": {
         "dealership": {
@@ -274,11 +288,7 @@ export const examples: readonly Example[] = [
                             "type": "string"
                         },
                         "coordinates": {
-                            "metadata": "Geographic Coordinate System coordinates (latitude and longtitude)",
-                            "elements": {
-                                "metadata": "Latitude/Longtitude of the GCS coordinates",
-                                "type": "float64"
-                            }
+                            "ref": "gcsCoordinates"
                         }
                     }
                 },

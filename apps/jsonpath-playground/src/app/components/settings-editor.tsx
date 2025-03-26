@@ -17,7 +17,7 @@ export default function SettingsEditor({
             />
             <Switch
                 defaultChecked
-                label="Auto Save"
+                label="Auto Save (TODO)"
                 onChange={e => onSettingsChanged({ ...settings, autoSave: e.currentTarget.checked })}
             />
         </Stack>
