@@ -5,6 +5,7 @@ import { parser as jsonParser } from "@lezer/json";
 import { parser as jsonPathDataTypeParser } from "./data-type/data-type-parser"
 import { Parser } from "@lezer/common";
 import { highlightStyle } from "../highlight-style";
+import MarkdownIt from "markdown-it";
 
 export class MarkdownRenderer {
     private static readonly md = markdownit({
@@ -16,7 +17,8 @@ export class MarkdownRenderer {
             else
                 return highlight(code, parser, highlightStyle);
         }
-    });
+    })
+        .use(markdownItLinksTargetBlank);
 
     static renderToHTML(markdown: string): string {
         return this.md.render(markdown);
@@ -28,7 +30,7 @@ const parserMap = new Map<string, Parser>([
     ["jsonpath-data-type", jsonPathDataTypeParser]
 ]);
 
-function highlight(code: string, parser: Parser, highlighter: Highlighter): string {
+export function highlight(code: string, parser: Parser, highlighter: Highlighter): string {
     const highlightedContainer = document.createElement("pre");
     const tree = parser.parse(code);
 
@@ -54,3 +56,13 @@ function highlight(code: string, parser: Parser, highlighter: Highlighter): stri
 
     return highlightedContainer.innerHTML;
 }
+
+// Adapted from: https://github.com/markdown-it/markdown-it/blob/master/docs/architecture.md#renderer
+export function markdownItLinksTargetBlank(md: MarkdownIt) {
+    const defaultLinkOpen = md.renderer.rules.link_open ?? ((tokens, idx, options, env, self) => self.renderToken(tokens, idx, options));
+
+    md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
+        tokens[idx].attrSet("target", "_blank");
+        return defaultLinkOpen(tokens, idx, options, env, self);
+    };
+};
