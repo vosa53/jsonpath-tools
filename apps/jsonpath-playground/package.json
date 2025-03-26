@@ -7,6 +7,7 @@
         "dev": "vite",
         "dev-local-network": "vite --host 0.0.0.0",
         "build": "tsc -b && vite build",
+        "build-data-type-grammar": "lezer-generator src\\app\\components\\code-editors\\codemirror\\jsonpath-codemirror\\data-type\\data-type.grammar -o src\\app\\components\\code-editors\\codemirror\\jsonpath-codemirror\\data-type\\data-type-parser.ts",
         "lint": "eslint .",
         "preview": "vite preview",
         "test": "vitest"
@@ -30,6 +31,7 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.21.0",
+        "@lezer/generator": "^1.7.2",
         "@types/markdown-it": "^14.1.2",
         "@types/react": "^19.0.10",
         "@types/react-dom": "^19.0.4",

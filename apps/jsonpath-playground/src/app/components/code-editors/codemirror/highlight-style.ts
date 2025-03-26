@@ -14,8 +14,9 @@ export const highlightStyle = HighlightStyle.define([
     { tag: t.className, color: "var(--mantine-color-yellow-text)" },
     { tag: t.string, color: "var(--mantine-color-orange-text)" },
     { tag: t.propertyName, color: "var(--mantine-color-indigo-text)" },
-    { tag: t.bracket, color: "var(--mantine-color-grape-text)" },
+    { tag: t.squareBracket, color: "var(--mantine-color-grape-text)" },
     { tag: t.paren, color: "var(--mantine-color-grape-text)" },
+    { tag: t.brace, color: "var(--mantine-color-yellow-text)" },
     { tag: t.controlOperator, color: "var(--mantine-color-violet-text)" },
 
     // TODO: Adapt to the application style.
@@ -31,7 +32,7 @@ export const highlightStyle = HighlightStyle.define([
     { tag: [t.regexp, t.escape, t.special(t.string)], color: "#e40" },
     { tag: t.definition(t.variableName), color: "var(--mantine-color-yellow-text)" },
     { tag: t.local(t.variableName), color: "#30a" },
-    { tag: [t.typeName, t.namespace], color: "#085" },
+    { tag: [t.typeName, t.namespace], color: "var(--mantine-color-green-text)" },
     { tag: [t.special(t.variableName), t.macroName], color: "#256" },
     { tag: t.definition(t.propertyName), color: "var(--mantine-color-yellow-text)" },
     { tag: t.comment, color: "var(--mantine-color-green-text)" },

@@ -91,8 +91,8 @@ class CodeMirrorJSONPathParser extends Parser {
         super();
         this.nodeSet = nodeSet.extend(
             styleTags({
-                [JSONPathSyntaxTreeType.openingBracketToken]: t.bracket,
-                [JSONPathSyntaxTreeType.closingBracketToken]: t.bracket,
+                [JSONPathSyntaxTreeType.openingBracketToken]: t.squareBracket,
+                [JSONPathSyntaxTreeType.closingBracketToken]: t.squareBracket,
                 [JSONPathSyntaxTreeType.openingParanthesisToken]: t.paren,
                 [JSONPathSyntaxTreeType.closingParanthesisToken]: t.paren,
                 [JSONPathSyntaxTreeType.dollarToken]: t.variableName,

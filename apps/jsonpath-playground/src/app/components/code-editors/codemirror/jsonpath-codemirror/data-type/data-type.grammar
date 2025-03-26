@@ -1,0 +1,46 @@
+// Adapted from: https://github.com/lezer-parser/json/blob/main/src/json.grammar
+@top JSONPathDataType { dataType }
+
+dataType { Union }
+dataTypeExceptUnion { StringLiteral | NumberLiteral | BooleanLiteral | Primitive | Object | Array }
+
+StringLiteral { string }
+NumberLiteral { number }
+BooleanLiteral { true | false }
+Primitive { identifier }
+Object { "{" commaList<Property>? "}" }
+Array  { "[" commaList<ArrayItem>? "]" }
+Union { barList<dataTypeExceptUnion> }
+
+Property { (PropertyName | "...") "?"? ":" dataType }
+PropertyName { identifier }
+ArrayItem { dataType | ("..." ":" dataType) }
+
+kw<word> { @specialize<identifier, word> }
+true { kw<"true"> }
+false { kw<"false"> }
+commaList<item> { item ("," item)* }
+barList<item> { item ("|" item)* }
+
+@tokens {
+    number { '-'? int frac? exp?  }
+    int  { '0' | $[1-9] @digit* }
+    frac { '.' @digit+ }
+    exp  { $[eE] $[+\-]? @digit+ }
+
+    string { '"' char* '"' }
+    char { $[\u{20}\u{21}\u{23}-\u{5b}\u{5d}-\u{10ffff}] | "\\" esc }
+    esc  { $["\\\/bfnrt] | "u" hex hex hex hex }
+    hex  { $[0-9a-fA-F] }
+    identifier { $[a-zA-Z]+ }
+
+    whitespace { $[ \n\r\t] }
+
+    "{" "}" "[" "]" "," "|" ":" "..." "?"
+}
+
+@skip { whitespace }
+
+@external propSource jsonPathDataTypeStyleTags from "./data-type-style-tags"
+
+@detectDelim
