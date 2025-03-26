@@ -150,7 +150,7 @@ export class DataTypeAnalyzer {
         const segmentIndex = query.segments.indexOf(segment);
         const previousSegment = segmentIndex === 0 ? query.identifierToken : query.segments[segmentIndex - 1];
         const previousSegmentType = this.getType(previousSegment);
-        if (segment.isRecursive)
+        if (segment.isDescendant)
             return UnionDataType.create([previousSegmentType, previousSegmentType.getDescendantType()]);
         else
             return previousSegmentType;

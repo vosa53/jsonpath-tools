@@ -20,7 +20,7 @@ export class SyntaxDescriptionService {
         }],
         [JSONPathSyntaxTreeType.segment, n => {
             const segment = n as JSONPathSegment;
-            if (segment.isRecursive)
+            if (segment.isDescendant)
                 return new SyntaxDescription("Descendant Segment", "Selects an object at the given index from an array.");
             else
                 return new SyntaxDescription("Child Segment", "Selects an object at the given index from an array.");
@@ -94,7 +94,7 @@ export class SyntaxDescriptionService {
     }
 
     provideDescriptionForFilterSelector(): SyntaxDescription {
-        return new SyntaxDescription("Filter Selector", "Selects particular children using a logical expression. Current child is represented with @.");
+        return new SyntaxDescription("Filter Selector", "Selects particular children using a logical expression. Current child is represented with `@`.");
     }
 
     provideDescriptionForIndexSelector(index?: number): SyntaxDescription {

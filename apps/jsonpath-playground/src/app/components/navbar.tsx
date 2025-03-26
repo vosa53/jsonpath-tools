@@ -28,9 +28,7 @@ const Navbar = memo(({
                         <p>
                             TODO
                         </p>
-                        <p>
-                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas sollicitudin. Etiam ligula pede, sagittis quis, interdum ultricies, scelerisque eu.
-                        </p>
+                        <Anchor href="https://datatracker.ietf.org/doc/rfc9535/" target="_blank">RFC 9535</Anchor>
                     </Accordion.Panel>
                 </Accordion.Item>
 

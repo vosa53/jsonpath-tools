@@ -13,12 +13,16 @@ export class JSONPathSegment extends JSONPathNode {
         readonly selectors: readonly { selector: JSONPathSelector; commaToken: JSONPathToken | null; }[],
         readonly closingBracketToken: JSONPathToken | null,
 
-        readonly isRecursive: boolean
+        readonly isDescendant: boolean
     ) {
         super([dotToken, openingBracketToken, ...selectors.flatMap(s => [s.selector, s.commaToken]), closingBracketToken]);
     }
 
     get type() { return JSONPathSyntaxTreeType.segment; }
+
+    get usesBracketNotation(): boolean {
+        return this.openingBracketToken !== null || this.closingBracketToken !== null;
+    }
 
     select(input: LocatedNode, output: PushOnlyArray<LocatedNode>, queryContext: JSONPathQueryContext) {
         const outputStartIndex = output.length;
@@ -29,7 +33,7 @@ export class JSONPathSegment extends JSONPathNode {
             queryContext.selectorInstrumentationCallback?.(selector.selector, input, output, selectorOutputStartIndex, output.length - selectorOutputStartIndex);
         }
 
-        if (this.isRecursive) {
+        if (this.isDescendant) {
             if (Array.isArray(input.value)) {
                 for (let i = 0; i < input.value.length; i++)
                     this.select(new LocatedNode(input.value[i], i, input), output, queryContext);

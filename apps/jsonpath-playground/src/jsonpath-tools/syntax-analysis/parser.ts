@@ -55,7 +55,7 @@ export class JSONPathParser {
             // If not global, look whether it is . or [.
             if (allowedRelative && context.current !== "." && context.current !== "[")
                 break;
-            context.skipWhile(c => c !== "." && c !== "[" && !this.isNameFirstCharacter(c), "Invalid characters.");
+            context.skipWhile(c => c !== "." && c !== "[" && !JSONPathCharacters.isNameFirst(c), "Invalid characters.");
             if (context.current !== null) {
                 const segment = this.parseSegment(context);
                 segments.push(segment);
@@ -85,7 +85,7 @@ export class JSONPathParser {
             const wildcardSelector = this.parseWildcardSelector(context);
             return new JSONPathSegment(dotToken, null, [{ selector: wildcardSelector, commaToken: null }], null, isRecursive);
         }
-        else if (context.current !== null && this.isNameFirstCharacter(context.current)) {
+        else if (context.current !== null && JSONPathCharacters.isNameFirst(context.current)) {
             const nameSelector = this.parseMemberNameShorthand(context);
             return new JSONPathSegment(dotToken, null, [{ selector: nameSelector, commaToken: null }], null, isRecursive);
         }
@@ -137,7 +137,7 @@ export class JSONPathParser {
             return this.parseNameSelector(context);
         else if (context.current === "*")
             return this.parseWildcardSelector(context);
-        else if (context.current === "-" || (context.current !== null && this.isDigit(context.current)) || context.current === ":")
+        else if (context.current === "-" || (context.current !== null && JSONPathCharacters.isDigit(context.current)) || context.current === ":")
             return this.parseSliceOrIndexSelector(context);
         else if (context.current === "?")
             return this.parseFilterSelector(context);
@@ -297,9 +297,9 @@ export class JSONPathParser {
             return this.parseParanthesisExpression(context);
         else if (context.current === "\"" || context.current === "'")
             return this.parseStringLiteral(context);
-        else if (this.isDigit(context.current) || context.current === "-")
+        else if (JSONPathCharacters.isDigit(context.current) || context.current === "-")
             return this.parseNumberLiteral(context);
-        else if (this.isNameFirstCharacter(context.current))
+        else if (JSONPathCharacters.isNameFirst(context.current))
             return this.parseFunctionOrLiteral(context);
         else {
             context.addError("Expected expression.");
@@ -385,7 +385,7 @@ export class JSONPathParser {
 
     private parseName(context: ParserContext): { token: JSONPathToken, value: string } {
         context.goNext();
-        while (this.isNameCharacter(context.current))
+        while (JSONPathCharacters.isName(context.current))
             context.goNext();
         const token = context.collectToken(JSONPathSyntaxTreeType.nameToken);
         return { token, value: token.text };
@@ -395,9 +395,9 @@ export class JSONPathParser {
         type HexCharacterLiteral = { range: TextRange, value: string };
         const checkSurrogates = (previous: HexCharacterLiteral | null, current: HexCharacterLiteral | null) => {
             const errorMessage = "Unpaired surrogate.";
-            if (current !== null && this.isLowSurrogate(current.value) && (previous === null || !this.isHighSurrogate(previous.value)))
+            if (current !== null && JSONPathCharacters.isLowSurrogate(current.value) && (previous === null || !JSONPathCharacters.isHighSurrogate(previous.value)))
                 context.addError(errorMessage, current.range);
-            if (previous !== null && this.isHighSurrogate(previous.value) && (current === null || !this.isLowSurrogate(current.value)))
+            if (previous !== null && JSONPathCharacters.isHighSurrogate(previous.value) && (current === null || !JSONPathCharacters.isLowSurrogate(current.value)))
                 context.addError(errorMessage, previous.range);
         };
 
@@ -418,7 +418,7 @@ export class JSONPathParser {
                 else if (context.current === "u") {
                     let characterCodeString = "";
                     for (let i = 0; i < 4; i++) {
-                        if (context.next === null || !this.isDigit(context.next) && !(context.next >= "a" && context.next <= "f") && !(context.next >= "A" && context.next <= "F")) {
+                        if (context.next === null || !JSONPathCharacters.isDigit(context.next) && !(context.next >= "a" && context.next <= "f") && !(context.next >= "A" && context.next <= "F")) {
                             context.addError("Expected a hexadecimal digit.");
                             break;
                         }
@@ -435,7 +435,7 @@ export class JSONPathParser {
                 else
                     context.addError("Invalid escape sequence.");
             }
-            else if (this.isStringCharacter(context.current))
+            else if (JSONPathCharacters.isString(context.current))
                 value += context.current;
             else
                 context.addError("Invalid character in string.");
@@ -457,20 +457,20 @@ export class JSONPathParser {
         if (context.current === "-")
             context.goNext();
 
-        if (!this.isDigit(context.current)) {
+        if (!JSONPathCharacters.isDigit(context.current)) {
             context.addError("Expected a digit.");
             return { token: context.collectToken(JSONPathSyntaxTreeType.numberToken), value: 0 };
         }
-        if (context.current === "0" && this.isDigit(context.next))
+        if (context.current === "0" && JSONPathCharacters.isDigit(context.next))
             context.addError("Leading zeros are not allowed.");
 
-        while (this.isDigit(context.current))
+        while (JSONPathCharacters.isDigit(context.current))
             context.goNext();
 
         if (context.current === ".") {
             context.goNext();
-            if (this.isDigit(context.current)) {
-                while (this.isDigit(context.current))
+            if (JSONPathCharacters.isDigit(context.current)) {
+                while (JSONPathCharacters.isDigit(context.current))
                     context.goNext();
             }
             else
@@ -482,8 +482,8 @@ export class JSONPathParser {
             // @ts-ignore
             if (context.current === "+" || context.current === "-") 
                 context.goNext();
-            if (this.isDigit(context.current)) {
-                while (this.isDigit(context.current))
+            if (JSONPathCharacters.isDigit(context.current)) {
+                while (JSONPathCharacters.isDigit(context.current))
                     context.goNext();
             }
             else
@@ -496,51 +496,7 @@ export class JSONPathParser {
     }
 
     private skipWhitespace(context: ParserContext, allowed = true) {
-        context.skipWhile(c => this.isBlank(c), allowed ? null : "Whitespace is not allowed here.");
-    }
-
-    private isHighSurrogate(character: string) {
-        return character >= "\uD800" && character <= "\uDBFF";
-    }
-
-    private isLowSurrogate(character: string) {
-        return character >= "\uDC00" && character <= "\uDFFF";
-    }
-
-    private isBlank(character: string | null) {
-        return character === " " || character === "\t" || character === "\n" || character === "\r";
-    }
-
-    private isDigit(character: string | null) {
-        return character !== null && character >= "0" && character <= "9";
-    }
-
-    private isAlpha(character: string | null) {
-        return character !== null && (character >= "a" && character <= "z" || character >= "A" && character <= "Z");
-    }
-
-    private isLowercaseAlpha(character: string | null) {
-        return character !== null && (character >= "a" && character <= "z");
-    }
-
-    private isNameFirstCharacter(character: string | null) {
-        return this.isAlpha(character) || character === "_" || character !== null && character >= "\u0080"; // Non-ASCII characters.
-    }
-
-    private isNameCharacter(character: string | null) {
-        return this.isNameFirstCharacter(character) || this.isDigit(character);
-    }
-
-    private isFunctionNameFirstCharacter(character: string | null) {
-        return this.isLowercaseAlpha(character);
-    }
-
-    private isFunctionNameCharacter(character: string | null) {
-        return this.isFunctionNameFirstCharacter(character)  || character === "_" || this.isDigit(character);
-    }
-
-    private isStringCharacter(character: string | null) {
-        return character !== null && character !== "\\" && character >= "\u0020";
+        context.skipWhile(c => JSONPathCharacters.isBlank(c), allowed ? null : "Whitespace is not allowed here.");
     }
 
     private changeTokenType(token: JSONPathToken, newType: JSONPathSyntaxTreeType): JSONPathToken {
@@ -573,9 +529,9 @@ export class JSONPathParser {
     }
 
     private checkFunctionName(nameToken: JSONPathToken, context: ParserContext) {
-        if (!this.isFunctionNameFirstCharacter(nameToken.text[0]))
+        if (!JSONPathCharacters.isFunctionNameFirst(nameToken.text[0]))
             context.addError("Function name must start with a lowercase ASCII letter.", nameToken.textRangeWithoutSkipped);
-        if (!nameToken.text.substring(1).split("").every(c => this.isFunctionNameCharacter(c)))
+        if (!nameToken.text.substring(1).split("").every(c => JSONPathCharacters.isFunctionName(c)))
             context.addError("Function name can contain only lowercase ASCII letters, digits or '_'.", nameToken.textRangeWithoutSkipped);
     }
 }
@@ -644,5 +600,51 @@ class ParserContext {
         this._skippedCount = 0;
         this._collectedCount = 0;
         return new JSONPathToken(type, position, collectedText, skippedText);
+    }
+}
+
+export class JSONPathCharacters {
+    static isHighSurrogate(character: string) {
+        return character >= "\uD800" && character <= "\uDBFF";
+    }
+
+    static isLowSurrogate(character: string) {
+        return character >= "\uDC00" && character <= "\uDFFF";
+    }
+
+    static isBlank(character: string | null) {
+        return character === " " || character === "\t" || character === "\n" || character === "\r";
+    }
+
+    static isDigit(character: string | null) {
+        return character !== null && character >= "0" && character <= "9";
+    }
+
+    static isAlpha(character: string | null) {
+        return character !== null && (character >= "a" && character <= "z" || character >= "A" && character <= "Z");
+    }
+
+    static isLowercaseAlpha(character: string | null) {
+        return character !== null && (character >= "a" && character <= "z");
+    }
+
+    static isNameFirst(character: string | null) {
+        return this.isAlpha(character) || character === "_" || character !== null && character >= "\u0080"; // Non-ASCII characters.
+    }
+
+    static isName(character: string | null) {
+        return this.isNameFirst(character) || this.isDigit(character);
+    }
+
+    static isFunctionNameFirst(character: string | null) {
+        return this.isLowercaseAlpha(character);
+    }
+
+    static isFunctionName(character: string | null) {
+        return this.isFunctionNameFirst(character)  || character === "_" || this.isDigit(character);
+    }
+
+    static isString(character: string | null) {
+        return character !== null && character !== "\\" && character >= "\u0020";
     }
 }

@@ -1,5 +1,5 @@
-import { CompletionItemType } from "@/jsonpath-tools/editor-services/completion-service";
-import { Completion, CompletionContext, CompletionSource, snippetCompletion } from "@codemirror/autocomplete";
+import { CompletionItemTextType, CompletionItemType } from "@/jsonpath-tools/editor-services/completion-service";
+import { Completion, CompletionContext, CompletionSource, insertCompletionText, pickedCompletion, snippet } from "@codemirror/autocomplete";
 import { OperationCancelledError } from "./cancellation-token";
 import { languageServiceSessionStateField } from "./jsonpath-state";
 import { MarkdownRenderer } from "./markdown-renderer";
@@ -7,17 +7,18 @@ import { MarkdownRenderer } from "./markdown-renderer";
 
 export function jsonPathCompletionSource(): CompletionSource {
     return async (context: CompletionContext) => {
-        const word = context.matchBefore(/\w*/)!;
-        if (context.explicit || word.from !== word.to || context.matchBefore(/\.|,\s?|\[/)) {
+        // TODO: Add all word and number characters.
+        if (context.explicit || context.matchBefore(/\w|\.|\[|\(|,\s|"|'|\?/)) {
+            const word = context.matchBefore(/[\w"]*/);
             const languageServiceSession = context.state.field(languageServiceSessionStateField);
             try {
                 const completions = await languageServiceSession.getCompletions(context.pos);
 
                 return {
-                    from: word.from,
+                    from: word!.from,
                     options: completions.map((c, i) => {
                         let completion: Completion = {
-                            label: c.text,
+                            label: c.label,
                             type: convertCompletionItemTypeToCodemirrorType(c.type),
                             detail: c.detail,
                             info: async () => {
@@ -25,10 +26,19 @@ export function jsonPathCompletionSource(): CompletionSource {
                                 const element = document.createElement("div");
                                 element.innerHTML = MarkdownRenderer.renderToHTML(description);
                                 return element;
+                            },
+                            apply: (view, completion) => {
+                                const cFrom = c.range.position;
+                                const cTo = c.range.position + c.range.length;
+                                if (c.textType == CompletionItemTextType.snippet)
+                                    return snippet(c.text)(view, completion, cFrom, cTo);
+                                const insertTransaction = insertCompletionText(view.state, c.text, cFrom, cTo);
+                                view.dispatch({
+                                    ...insertTransaction,
+                                    annotations: pickedCompletion.of(completion)
+                                });
                             }
                         };
-                        if (c.isSnippet)
-                            completion = snippetCompletion(c.text, completion);
                         return completion;
                     })
                 };

@@ -9,9 +9,13 @@ import { convertToValueType } from "../query/helpers";
 import { JSONPath } from "../query/json-path";
 import { LocatedNode } from "../query/located-node";
 import { JSONPathSegment } from "../query/segment";
+import { JSONPathSelector } from "../query/selectors/selector";
 import { JSONPathSyntaxTree } from "../query/syntax-tree";
 import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
-import { JSONPathJSONValue, JSONPathValueType } from "../types";
+import { serializeJSONPathLiteral, serializeJSONPathString } from "../serialization";
+import { JSONPathCharacters } from "../syntax-analysis/parser";
+import { TextRange } from "../text-range";
+import { JSONPathJSONValue } from "../types";
 import { AnalysisDescriptionService } from "./analysis-description-service";
 import { SyntaxDescriptionService } from "./syntax-description-service";
 
@@ -38,72 +42,79 @@ export class CompletionProvider {
         const lastNode = node;
         const lastButOneNode = node.parent!;
 
-        if (
-            (
-                lastNode.type === JSONPathSyntaxTreeType.nameToken ||
-                lastNode.type === JSONPathSyntaxTreeType.dotToken ||
-                lastNode.type === JSONPathSyntaxTreeType.doubleDotToken
-            ) &&
-            lastButOneNode.type === JSONPathSyntaxTreeType.nameSelector ||
-            lastButOneNode.type === JSONPathSyntaxTreeType.missingSelector
-        ) {
+        if (lastButOneNode instanceof JSONPathSelector) {
+            const range = lastButOneNode.textRangeWithoutSkipped;
             const segment = lastButOneNode.parent as JSONPathSegment;
-            this.completeSegment(completions, segment, query, queryArgument, queryArgumentType);
-        }
-        if (lastButOneNode.type === JSONPathSyntaxTreeType.missingSelector) {
-            const segment = lastButOneNode.parent as JSONPathSegment;
-            completions.push(new CompletionItem(CompletionItemType.syntax, "*", undefined, () => this.syntaxDescriptionProvider.provideDescriptionForWildcardSelector().toMarkdown()));
-            if (segment.openingBracketToken !== null) {
-                completions.push(new CompletionItem(CompletionItemType.syntax, "?", undefined, () => this.syntaxDescriptionProvider.provideDescriptionForFilterSelector().toMarkdown()));
-                completions.push(new CompletionItem(CompletionItemType.syntax, "::", undefined, () => this.syntaxDescriptionProvider.provideDescriptionForSliceSelector().toMarkdown()));
-                completions.push(new CompletionItem(CompletionItemType.syntax, "${start}:${end}:${step}", undefined, () => this.syntaxDescriptionProvider.provideDescriptionForSliceSelector().toMarkdown(), true));
+            this.completeSelector(completions, lastButOneNode, segment, query, queryArgument, queryArgumentType);
+            completions.push(new CompletionItem(CompletionItemType.syntax, "*", range, undefined, undefined, () => this.syntaxDescriptionProvider.provideDescriptionForWildcardSelector().toMarkdown()));
+            if (segment.usesBracketNotation) {
+                completions.push(new CompletionItem(CompletionItemType.syntax, "?", range, undefined, undefined, () => this.syntaxDescriptionProvider.provideDescriptionForFilterSelector().toMarkdown()));
+                completions.push(new CompletionItem(CompletionItemType.syntax, "::", range, undefined, undefined, () => this.syntaxDescriptionProvider.provideDescriptionForSliceSelector().toMarkdown()));
+                completions.push(new CompletionItem(CompletionItemType.syntax, "${start}:${end}:${step}", range, "start:end:step", undefined, () => this.syntaxDescriptionProvider.provideDescriptionForSliceSelector().toMarkdown(), CompletionItemTextType.snippet));
             }
         }
         if (lastButOneNode.type === JSONPathSyntaxTreeType.missingExpression) {
-            completions.push(new CompletionItem(CompletionItemType.syntax, "@", undefined, () => this.syntaxDescriptionProvider.provideDescriptionForAtToken().toMarkdown()));
-            completions.push(new CompletionItem(CompletionItemType.syntax, "$", undefined, () => this.syntaxDescriptionProvider.provideDescriptionForDollarToken().toMarkdown()));
-            this.completeFunctions(completions);
+            const range = lastButOneNode.textRangeWithoutSkipped;
+            completions.push(new CompletionItem(CompletionItemType.syntax, "@", range, undefined, undefined, () => this.syntaxDescriptionProvider.provideDescriptionForAtToken().toMarkdown()));
+            completions.push(new CompletionItem(CompletionItemType.syntax, "$", range, undefined, undefined, () => this.syntaxDescriptionProvider.provideDescriptionForDollarToken().toMarkdown()));
+        }
+        if (
+            lastButOneNode.type === JSONPathSyntaxTreeType.missingExpression ||
+            lastButOneNode.type === JSONPathSyntaxTreeType.stringLiteral ||
+            lastButOneNode.type === JSONPathSyntaxTreeType.numberLiteral ||
+            lastButOneNode.type === JSONPathSyntaxTreeType.booleanLiteral ||
+            lastButOneNode.type === JSONPathSyntaxTreeType.nullLiteral
+        ) {
+            const range = lastButOneNode.textRangeWithoutSkipped;
             if (lastButOneNode.parent instanceof JSONPathComparisonExpression) {
                 const referenceExpression = lastButOneNode.parent.left === lastButOneNode
                     ? lastButOneNode.parent.right
                     : lastButOneNode.parent.left;
-                this.completeValues(completions, referenceExpression, query, queryArgument, queryArgumentType);
+                this.completeValues(completions, range, referenceExpression, query, queryArgument, queryArgumentType);
             }
         }
-        if (lastNode.type === JSONPathSyntaxTreeType.nameToken && lastButOneNode.type === JSONPathSyntaxTreeType.functionExpression)
-            this.completeFunctions(completions);
+        if (lastButOneNode.type === JSONPathSyntaxTreeType.missingExpression ||
+            lastNode.type === JSONPathSyntaxTreeType.nameToken && (
+                lastButOneNode.type === JSONPathSyntaxTreeType.functionExpression ||
+                lastButOneNode.type === JSONPathSyntaxTreeType.booleanLiteral ||
+                lastButOneNode.type === JSONPathSyntaxTreeType.nullLiteral
+            )) {
+            const range = lastButOneNode.textRangeWithoutSkipped;
+            this.completeFunctions(completions, lastNode.textRangeWithoutSkipped);
+            completions.push(new CompletionItem(CompletionItemType.syntax, "true", range, undefined, undefined, () => this.syntaxDescriptionProvider.provideDescriptionForAtToken().toMarkdown()));
+            completions.push(new CompletionItem(CompletionItemType.syntax, "false", range, undefined, undefined, () => this.syntaxDescriptionProvider.provideDescriptionForAtToken().toMarkdown()));
+            completions.push(new CompletionItem(CompletionItemType.syntax, "null", range, undefined, undefined, () => this.syntaxDescriptionProvider.provideDescriptionForAtToken().toMarkdown()));
+        }
     }
 
-    private completeSegment(completions: CompletionItem[], segment: JSONPathSegment, query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType) {
+    private completeSelector(completions: CompletionItem[], selector: JSONPathSelector, segment: JSONPathSegment, query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType) {
         if (queryArgument !== undefined)
-            this.completeSegmentData(completions, segment, query, queryArgument, queryArgumentType);
+            this.completeSelectorData(completions, selector, segment, query, queryArgument, queryArgumentType);
         else
-            this.completeSegmentType(completions, segment, queryArgumentType);
+            this.completeSelectorType(completions, selector, segment, queryArgumentType);
     }
 
-    private completeSegmentType(completions: CompletionItem[], segment: JSONPathSegment, queryArgumentType: DataType) {
+    private completeSelectorType(completions: CompletionItem[], selector: JSONPathSelector, segment: JSONPathSegment, queryArgumentType: DataType) {
         const previousType = this.getIncomingType(segment, queryArgumentType);
         const pathsSegments = previousType.collectKnownPathSegments();
         for (const pathSegment of pathsSegments) {
-            const pahtSegmentString = pathSegment.toString();
             const pathSegmentType = previousType.getTypeAtPathSegment(pathSegment);
             const pathSegmentTypeStringSimplified = pathSegmentType.toString(true);
-            completions.push(new CompletionItem(CompletionItemType.name, pahtSegmentString, pathSegmentTypeStringSimplified, () => {
+            completions.push(this.createSelectorCompletionItem(selector, segment, pathSegment, pathSegmentTypeStringSimplified, () => {
                 const pathSegmentTypeString = pathSegmentType.toString(false, true);
                 const annotations = pathSegmentType.collectAnnotations();
-                return this.syntaxDescriptionProvider.provideDescriptionForNameSelector(pahtSegmentString).toMarkdown() +
-                    this.analysisDescriptionProvider.provideDescription(pathSegmentTypeString, Array.from(annotations));
+                return this.createSelectorCompletionItemDescription(pathSegment, pathSegmentTypeString, Array.from(annotations));
             }));
         }
     }
 
-    private completeSegmentData(completions: CompletionItem[], segment: JSONPathSegment, query: JSONPath, queryArgument: JSONPathJSONValue, queryArgumentType: DataType) {
+    private completeSelectorData(completions: CompletionItem[], selector: JSONPathSelector, segment: JSONPathSegment, query: JSONPath, queryArgument: JSONPathJSONValue, queryArgumentType: DataType) {
         let previousType: DataType;
         const nodes = this.getAllNodesOutputtedFromSegment(queryArgument, query, segment);
         const keysAndTypes = this.getDistinctKeysAndTypes(nodes);
         for (const [key, types] of keysAndTypes) {
             const typeText = Array.from(types).join(" | ");
-            completions.push(new CompletionItem(CompletionItemType.name, key, typeText, () => {
+            completions.push(this.createSelectorCompletionItem(selector, segment, key, typeText, () => {
                 previousType ??= this.getIncomingType(segment, queryArgumentType);
                 const annotations = previousType.getTypeAtPathSegment(key).collectAnnotations();
                 if (types.has("string") || types.has("number")) {
@@ -114,10 +125,79 @@ export class CompletionProvider {
                     }
                 }
 
-                return this.syntaxDescriptionProvider.provideDescriptionForNameSelector(key).toMarkdown() +
-                    this.analysisDescriptionProvider.provideDescription(typeText, Array.from(annotations));
+                return this.createSelectorCompletionItemDescription(key, typeText, Array.from(annotations));
             }));
         }
+    }
+
+    private completeFunctions(completions: CompletionItem[], range: TextRange) {
+        for (const functionDefinition of Object.entries(this.options.functions)) {
+            completions.push(new CompletionItem(
+                CompletionItemType.function,
+                functionDefinition[0],
+                range,
+                undefined,
+                functionDefinition[1].returnType,
+                () => this.syntaxDescriptionProvider.provideDescriptionForFunctionExpression(functionDefinition[0], functionDefinition[1]).toMarkdown()
+            ));
+        }
+    }
+
+    private completeValues(completions: CompletionItem[], range: TextRange, reference: JSONPathFilterExpression, query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType) {
+        const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType, this.options);
+
+        const literals = queryArgument !== undefined
+            ? this.getAllLiteralsOutputtedFromExpression(queryArgument, query, reference)
+            : typeAnalyzer.getType(reference).collectKnownLiterals();
+        for (const literal of literals) {
+            const literalType = typeof literal;
+            completions.push(new CompletionItem(
+                CompletionItemType.literal,
+                serializeJSONPathLiteral(literal),
+                range,
+                undefined,
+                literalType,
+                () => {
+                    let description;
+                    if (literalType === "string")
+                        description = this.syntaxDescriptionProvider.provideDescriptionForStringLiteralExpression(literal as string);
+                    else if (literalType === "number")
+                        description = this.syntaxDescriptionProvider.provideDescriptionForNumberLiteralExpression(literal as number);
+                    else if (literalType === "boolean")
+                        description = this.syntaxDescriptionProvider.provideDescriptionForBooleanLiteralExpression(literal as boolean);
+                    else if (literal === null)
+                        description = this.syntaxDescriptionProvider.provideDescriptionForNullLiteralExpression();
+                    else
+                        throw new Error("Unsupported literal type.");
+                    return description.toMarkdown();
+                }
+            ));
+        }
+    }
+
+    private createSelectorCompletionItem(selector: JSONPathSelector, segment: JSONPathSegment, pathSegment: string | number, typeText: string, resolveDescription: () => string): CompletionItem {
+        const isValidName = typeof pathSegment === "string" && this.isValidName(pathSegment);
+        const useBracketNotation = !isValidName || segment.usesBracketNotation;
+        const willUseBracketNotation = useBracketNotation && !segment.usesBracketNotation;
+        const range = willUseBracketNotation && !segment.isDescendant
+            ? segment.textRangeWithoutSkipped
+            : selector.textRangeWithoutSkipped;
+        let text = typeof pathSegment === "number"
+            ? pathSegment.toString()
+            : (
+                useBracketNotation ? serializeJSONPathString(pathSegment) : pathSegment
+            );
+        if (willUseBracketNotation)
+            text = `[${text}]`;
+        const label = !segment.usesBracketNotation && typeof pathSegment === "string" ? pathSegment : text;
+        return new CompletionItem(CompletionItemType.name, text, range, label, typeText, resolveDescription);
+    }
+
+    private createSelectorCompletionItemDescription(pathSegment: string | number, type: string, annotations: DataTypeAnnotation[]): string {
+        const syntaxDescription = typeof pathSegment === "string"
+            ? this.syntaxDescriptionProvider.provideDescriptionForNameSelector(pathSegment)
+            : this.syntaxDescriptionProvider.provideDescriptionForIndexSelector(pathSegment);
+        return syntaxDescription.toMarkdown() + this.analysisDescriptionProvider.provideDescription(type, annotations);
     }
 
     private getIncomingType(segment: JSONPathSegment, queryArgumentType: DataType): DataType {
@@ -136,46 +216,6 @@ export class CompletionProvider {
             }
         }
         return undefined;
-    }
-
-    private completeFunctions(completions: CompletionItem[]) {
-        for (const functionDefinition of Object.entries(this.options.functions)) {
-            completions.push(new CompletionItem(
-                CompletionItemType.function,
-                functionDefinition[0],
-                functionDefinition[1].returnType,
-                () => this.syntaxDescriptionProvider.provideDescriptionForFunctionExpression(functionDefinition[0], functionDefinition[1]).toMarkdown()
-            ));
-        }
-    }
-
-    private completeValues(completions: CompletionItem[], reference: JSONPathFilterExpression, query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType) {
-        const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType, this.options);
-
-        const literals = queryArgument !== undefined
-            ? this.getAllLiteralsOutputtedFromExpression(queryArgument, query, reference)
-            : typeAnalyzer.getType(reference).collectKnownLiterals();
-        for (const literal of literals) {
-            completions.push(new CompletionItem(
-                CompletionItemType.literal,
-                JSON.stringify(literal),
-                undefined,
-                () => {
-                    let description;
-                    if (typeof literal === "string")
-                        description = this.syntaxDescriptionProvider.provideDescriptionForStringLiteralExpression(literal);
-                    else if (typeof literal === "number")
-                        description = this.syntaxDescriptionProvider.provideDescriptionForNumberLiteralExpression(literal);
-                    else if (typeof literal === "boolean")
-                        description = this.syntaxDescriptionProvider.provideDescriptionForBooleanLiteralExpression(literal);
-                    else if (literal === null)
-                        description = this.syntaxDescriptionProvider.provideDescriptionForNullLiteralExpression();
-                    else
-                        throw new Error("Unsupported literal type.");
-                    return description.toMarkdown();
-                }
-            ));
-        }
     }
 
     private getDistinctKeysAndTypes(nodes: LocatedNode[]): Map<string, Set<string>> {
@@ -228,15 +268,29 @@ export class CompletionProvider {
         jsonPath.select(queryContext);
         return literals;
     }
+
+    private isValidName(text: string): boolean {
+        if (text.length === 0)
+            return false;
+        if (!JSONPathCharacters.isNameFirst(text[0]))
+            return false;
+        for (let i = 1; i < text.length; i++) {
+            if (!JSONPathCharacters.isName(text[i]))
+                return false;
+        }
+        return true;
+    }
 }
 
 export class CompletionItem {
     constructor(
         readonly type: CompletionItemType,
         readonly text: string,
+        readonly range: TextRange,
+        readonly label: string = text,
         readonly detail?: string,
         readonly resolveDescription?: () => string,
-        readonly isSnippet: boolean = false
+        readonly textType: CompletionItemTextType = CompletionItemTextType.plain
     ) { }
 }
 
@@ -245,4 +299,9 @@ export enum CompletionItemType {
     literal,
     function,
     syntax
+}
+
+export enum CompletionItemTextType {
+    plain,
+    snippet
 }

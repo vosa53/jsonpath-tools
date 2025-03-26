@@ -24,7 +24,7 @@ export class JSONPathQuery extends JSONPathNode {
 
     get isSingular() {
         return this.segments.every(s => {
-            if (s.isRecursive || s.selectors.length !== 1) 
+            if (s.isDescendant || s.selectors.length !== 1) 
                 return false;
             const selector = s.selectors[0].selector;
             if (!(selector instanceof JSONPathNameSelector || selector instanceof JSONPathIndexSelector))
@@ -56,7 +56,7 @@ export class JSONPathQuery extends JSONPathNode {
     toNormalizedPath(): JSONPathNormalizedPath | null {
         const segments: (string | number)[] = [];
         for (const segment of this.segments) {
-            if (segment.isRecursive || segment.selectors.length !== 1)
+            if (segment.isDescendant || segment.selectors.length !== 1)
                 return null;
             const selector = segment.selectors[0].selector;
             if (selector instanceof JSONPathNameSelector)
