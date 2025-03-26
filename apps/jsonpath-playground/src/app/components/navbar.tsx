@@ -6,7 +6,9 @@ import { Settings } from "../models/settings";
 import CustomFunctionsView from "./custom-functions-view";
 import SettingsEditor from "./settings-editor";
 import { MarkdownView } from "./markdown-view";
-import jsonPathGuide from "./jsonpath-guide.md?raw"
+import jsonPathGuide from "./jsonpath-guide.md?raw";
+import applicationGuide from "./application-guide.md?raw";
+import classes from "./navbar.module.css";
 
 const Navbar = memo(({
     customFunctions,
@@ -22,20 +24,29 @@ const Navbar = memo(({
     return (
         <Flex direction="column" h="100%">
             <Accordion>
-                <Accordion.Item value="reference">
+                <Accordion.Item value="jsonPathGuide">
                     <Accordion.Control icon={<IconHelp size={20} />}>
                         JSONPath Guide
                     </Accordion.Control>
-                    <Accordion.Panel style={{ overflow: "auto", maxHeight: "600px" }}>
+                    <Accordion.Panel className={classes.accordionPanel}>
                         <MarkdownView markdown={jsonPathGuide} withSpacing />
                     </Accordion.Panel>
                 </Accordion.Item>
 
-                <Accordion.Item value="print">
+                <Accordion.Item value="applicationGuide">
+                    <Accordion.Control icon={<IconHelp size={20} />}>
+                        Application Guide
+                    </Accordion.Control>
+                    <Accordion.Panel className={classes.accordionPanel}>
+                        <MarkdownView markdown={applicationGuide} withSpacing />
+                    </Accordion.Panel>
+                </Accordion.Item>
+
+                <Accordion.Item value="customFunctions">
                     <Accordion.Control icon={<IconMathFunction size={20} />}>
                         Custom Functions
                     </Accordion.Control>
-                    <Accordion.Panel style={{ overflow: "auto", maxHeight: "600px" }}>
+                    <Accordion.Panel className={classes.accordionPanel}>
                         <CustomFunctionsView customFunctions={customFunctions} onCustomFunctionsChanged={onCustomFunctionsChanged} />
                     </Accordion.Panel>
                 </Accordion.Item>
@@ -44,7 +55,7 @@ const Navbar = memo(({
                     <Accordion.Control icon={<IconSettings size={20} />}>
                         Settings
                     </Accordion.Control>
-                    <Accordion.Panel>
+                    <Accordion.Panel className={classes.accordionPanel}>
                         <SettingsEditor settings={settings} onSettingsChanged={onSettingsChanged} />
                     </Accordion.Panel>
                 </Accordion.Item>
