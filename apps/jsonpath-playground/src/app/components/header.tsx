@@ -1,4 +1,4 @@
-import { ActionIcon, Burger, Flex, Group, Title, useMantineColorScheme } from "@mantine/core";
+import { ActionIcon, Burger, Flex, Group, Indicator, Title, useMantineColorScheme } from "@mantine/core";
 import { IconBrandGithub, IconMoon, IconRoute, IconSun } from "@tabler/icons-react";
 import { memo } from "react";
 
@@ -21,8 +21,10 @@ const Header = memo(({
                     size="sm"
                     color="violet.4" />
                 <IconRoute size={33} stroke={2} />
-                <Title order={1} size="24" pl="xs" fw="600" visibleFrom="xs">JSONPath Playground</Title>
-                <Title order={1} size="20" pl="xs" fw="600" hiddenFrom="xs">JSONPath Playground</Title>
+                <Indicator color="violet" label="RFC 9535" size={16}>
+                    <Title order={1} size="24" pl="xs" fw="600" visibleFrom="xs">JSONPath Playground</Title>
+                    <Title order={1} size="20" pl="xs" fw="600" hiddenFrom="xs">JSONPath Playground</Title>
+                </Indicator>
             </Group>
             <Group pr="xs">
                 <ActionIcon variant="subtle" color="violet" size="lg" aria-label="GitHub Page" visibleFrom="xs" component="a" href="https://github.com/vosa53/jsonpath-tools" target="_blank">

@@ -1,9 +1,9 @@
-Code should be a JavaScript function body (*without* a function signature). Like this:
+The code should be a JavaScript function body (*without* a function signature). Like this:
 ```javascript
 return Math.sqrt(someArgument);
 ```
 
-Parameters can be used directly by their names and result value should be returned from the function. 
+Parameters can be used directly by their names, and the result value should be returned from the function. 
 
 ### JSONPath values representation
 
@@ -11,15 +11,15 @@ Parameters can be used directly by their names and result value should be return
 
 `LogicalType` values are represented by symbols `jp.JSONPathLogicalTrue` and `jp.JSONPathLogicalFalse`. 
 
-`NodesType` values corresponds to a class `jp.JSONPathNodeList`.
+`NodesType` values correspond to the class `jp.JSONPathNodeList`.
 
 ### Error reporting
 
-Function always needs to return some valid JSONPath value and should't throw errors, but users can be notified with a warning. Functions `context.reportWarning(message: string)` and `context.reportParameterWarning(parameterIndex: number, message: string)` are used for this purpose.
+The function always needs to return some valid JSONPath value and shouldn't throw errors, but users can be notified with a warning. Functions `context.reportWarning(message: string)` and `context.reportParameterWarning(parameterIndex: number, message: string)` are used for this purpose.
 
 ### Full API reference
 
-Following symbols and classes are available to the function in a `jp` parameter, e.g.: `jp.JSONPathNodeList`. Current function context value is available in a parameter `context`.
+The following symbols and classes are available to the function via the `jp` parameter, e.g.: `jp.JSONPathNodeList`. The function current context value is available via the `context` parameter.
 
 ```typescript
 interface JSONPathFunctionContext {
