@@ -19,6 +19,6 @@ export const parser = LRParser.deserialize({
   tokenData: "(]~RcXY!^YZ!^]^!^pq!^rs!c|}${}!O%Q!O!P&z!Q!R%Z!R![&i![!]']!a!b'b!c!}'g!}#O'r#P#Q'w#T#o'g#o#p'|#p#q(R#q#r(W~!cOj~~!fWpq!cqr!crs#Os#O!c#O#P#T#P;'S!c;'S;=`$u<%lO!c~#TOm~~#WXrs!c!P!Q!c#O#P!c#U#V!c#Y#Z!c#b#c!c#f#g!c#h#i!c#i#j#s~#vR!Q![$P!c!i$P#T#Z$P~$SR!Q![$]!c!i$]#T#Z$]~$`R!Q![$i!c!i$i#T#Z$i~$lR!Q![!c!c!i!c#T#Z!c~$xP;=`<%l!c~%QO_~~%TQ!Q!R%Z!R![&i~%`Rn~!O!P%i!g!h%}#X#Y%}~%lP!Q![%o~%tRn~!Q![%o!g!h%}#X#Y%}~&QR{|&Z}!O&Z!Q![&a~&^P!Q![&a~&fPn~!Q![&a~&nSn~!O!P%i!Q![&i!g!h%}#X#Y%}~&}P!O!P'Q~'TP!O!P'W~']O[~~'bO^~~'gO]~~'lQo~!c!}'g#T#o'g~'wOa~~'|O`~~(ROW~~(WOd~~(]OV~",
   tokenizers: [0],
   topRules: {"JSONPathDataType":[0,1]},
-  specialized: [{term: 31, get: (value) => spec_identifier[value] || -1}],
+  specialized: [{term: 31, get: (value: keyof typeof spec_identifier) => spec_identifier[value] || -1}],
   tokenPrec: 0
 })
