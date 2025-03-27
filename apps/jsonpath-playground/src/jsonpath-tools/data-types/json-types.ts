@@ -1,6 +1,6 @@
-import { JSONPathJSONValue } from "@/jsonpath-tools/types";
+import { JSONValue } from "@/jsonpath-tools/types";
 
-export function getJSONTypeName(value: JSONPathJSONValue): string {
+export function getJSONTypeName(value: JSONValue): string {
     const javaScriptType = typeof value;
     if (javaScriptType == "object") {
         if (value === null)

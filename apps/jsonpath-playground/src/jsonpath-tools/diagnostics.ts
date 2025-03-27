@@ -1,12 +1,12 @@
 import { TextRange } from "./text-range";
 
-export interface JSONPathDiagnostics {
-    readonly type: JSONPathDiagnosticsType;
+export interface Diagnostics {
+    readonly type: DiagnosticsType;
     readonly message: string;
     readonly textRange: TextRange;
 }
 
-export enum JSONPathDiagnosticsType {
+export enum DiagnosticsType {
     warning = "Warning",
     error = "Error"
 }

@@ -1,17 +1,17 @@
-import { JSONPathQueryContext, PushOnlyArray } from "../evaluation";
-import { LocatedNode } from "../located-node";
-import { JSONPathSyntaxTreeType } from "../syntax-tree-type";
-import { JSONPathToken } from "../token";
-import { JSONPathSelector } from "./selector";
+import { QueryContext, PushOnlyArray } from "../evaluation";
+import { Node } from "../located-node";
+import { SyntaxTreeType } from "../syntax-tree-type";
+import { SyntaxTreeToken } from "../token";
+import { Selector } from "./selector";
 
 
-export class JSONPathSliceSelector extends JSONPathSelector {
+export class SliceSelector extends Selector {
     constructor(
-        readonly startToken: JSONPathToken | null,
-        readonly firstColonToken: JSONPathToken,
-        readonly endToken: JSONPathToken | null,
-        readonly secondColonToken: JSONPathToken | null,
-        readonly stepToken: JSONPathToken | null,
+        readonly startToken: SyntaxTreeToken | null,
+        readonly firstColonToken: SyntaxTreeToken,
+        readonly endToken: SyntaxTreeToken | null,
+        readonly secondColonToken: SyntaxTreeToken | null,
+        readonly stepToken: SyntaxTreeToken | null,
 
         readonly start: number | null,
         readonly end: number | null,
@@ -20,9 +20,9 @@ export class JSONPathSliceSelector extends JSONPathSelector {
         super([startToken, firstColonToken, endToken, secondColonToken, stepToken]);
     }
 
-    get type() { return JSONPathSyntaxTreeType.sliceSelector; }
+    get type() { return SyntaxTreeType.sliceSelector; }
 
-    select(input: LocatedNode, output: PushOnlyArray<LocatedNode>, queryContext: JSONPathQueryContext): void {
+    select(input: Node, output: PushOnlyArray<Node>, queryContext: QueryContext): void {
         const isArray = Array.isArray(input.value);
         if (!isArray)
             return;
@@ -39,11 +39,11 @@ export class JSONPathSliceSelector extends JSONPathSelector {
 
         if (step > 0) {
             for (let i = lower; i < upper; i += step)
-                output.push(new LocatedNode(input.value[i], i, input));
+                output.push(new Node(input.value[i], i, input));
         }
         else {
             for (let i = upper; i > lower; i += step)
-                output.push(new LocatedNode(input.value[i], i, input));
+                output.push(new Node(input.value[i], i, input));
         }
     }
 }

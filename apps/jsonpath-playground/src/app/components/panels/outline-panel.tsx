@@ -1,10 +1,10 @@
 import { SyntaxDescriptionService } from "@/jsonpath-tools/editor-services/syntax-description-service";
-import { defaultJSONPathOptions } from "@/jsonpath-tools/options";
-import { JSONPath } from "@/jsonpath-tools/query/json-path";
-import { JSONPathNode } from "@/jsonpath-tools/query/node";
-import { JSONPathSyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
-import { JSONPathSyntaxTreeType } from "@/jsonpath-tools/query/syntax-tree-type";
-import { JSONPathToken } from "@/jsonpath-tools/query/token";
+import { defaultQueryOptions } from "@/jsonpath-tools/options";
+import { Query } from "@/jsonpath-tools/query/json-path";
+import { SyntaxTreeNode } from "@/jsonpath-tools/query/node";
+import { SyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
+import { SyntaxTreeType } from "@/jsonpath-tools/query/syntax-tree-type";
+import { SyntaxTreeToken } from "@/jsonpath-tools/query/token";
 import { Box, Group, Paper, Stack, Text } from "@mantine/core";
 import { memo } from "react";
 import PanelShell from "../panel-shell";
@@ -15,8 +15,8 @@ const OutlinePanel = memo(({
     query,
     onSelectedNodeChanged
 }: {
-    query: JSONPath,
-    onSelectedNodeChanged: (node: JSONPathSyntaxTree | null) => void
+    query: Query,
+    onSelectedNodeChanged: (node: SyntaxTree | null) => void
 }) => {
     return (
         <PanelShell
@@ -37,10 +37,10 @@ function OutlineView({
     tree,
     onSelectedNodeChanged
 }: {
-    tree: JSONPathSyntaxTree,
-    onSelectedNodeChanged: (node: JSONPathSyntaxTree | null) => void
+    tree: SyntaxTree,
+    onSelectedNodeChanged: (node: SyntaxTree | null) => void
 }) {
-    if (tree instanceof JSONPathToken) return (<></>);
+    if (tree instanceof SyntaxTreeToken) return (<></>);
     return (
         <Paper
             p="xs"
@@ -57,7 +57,7 @@ function OutlineView({
             style={{ minWidth: "300px" }}
         >
             <TreeLabel tree={tree} />
-            {tree instanceof JSONPathNode && tree.children.length > 0 && (
+            {tree instanceof SyntaxTreeNode && tree.children.length > 0 && (
                 <Stack className={classes.children} mt="xs" bg="var(--mantine-color-body)" gap="xs">
                     {tree.children.map((c, i) => (
                         <OutlineView key={i} tree={c} onSelectedNodeChanged={onSelectedNodeChanged} />
@@ -68,7 +68,7 @@ function OutlineView({
     );
 }
 
-function TreeLabel({ tree }: { tree: JSONPathSyntaxTree }) {
+function TreeLabel({ tree }: { tree: SyntaxTree }) {
     return (
         <Group className={classes.node}>
             <div style={{ fontWeight: "500" }}>
@@ -78,35 +78,35 @@ function TreeLabel({ tree }: { tree: JSONPathSyntaxTree }) {
     );
 }
 
-function getClassName(tree: JSONPathSyntaxTree): string {
+function getClassName(tree: SyntaxTree): string {
     return classNameMap.get(tree.type) ?? "";
 }
 
-function getLabel(tree: JSONPathSyntaxTree): string {
+function getLabel(tree: SyntaxTree): string {
     return syntaxDescriptionService.provideDescription(tree)?.title ?? tree.type;
 }
 
-const classNameMap = new Map<JSONPathSyntaxTreeType, string>([
-    [JSONPathSyntaxTreeType.query, classes.query],
-    [JSONPathSyntaxTreeType.segment, classes.segment],
-    [JSONPathSyntaxTreeType.nameSelector, classes.selector],
-    [JSONPathSyntaxTreeType.indexSelector, classes.selector],
-    [JSONPathSyntaxTreeType.sliceSelector, classes.selector],
-    [JSONPathSyntaxTreeType.wildcardSelector, classes.selector],
-    [JSONPathSyntaxTreeType.filterSelector, classes.selector],
-    [JSONPathSyntaxTreeType.missingSelector, classes.missing],
-    [JSONPathSyntaxTreeType.functionExpression, classes.functionExpression],
-    [JSONPathSyntaxTreeType.andExpression, classes.logicalOperator],
-    [JSONPathSyntaxTreeType.orExpression, classes.logicalOperator],
-    [JSONPathSyntaxTreeType.notExpression, classes.logicalOperator],
-    [JSONPathSyntaxTreeType.comparisonExpression, classes.comparisonOperator],
-    [JSONPathSyntaxTreeType.stringLiteral, classes.literal],
-    [JSONPathSyntaxTreeType.numberLiteral, classes.literal],
-    [JSONPathSyntaxTreeType.nullLiteral, classes.literal],
-    [JSONPathSyntaxTreeType.booleanLiteral, classes.literal],
-    [JSONPathSyntaxTreeType.filterQueryExpression, classes.filterQueryExpression],
-    [JSONPathSyntaxTreeType.paranthesisExpression, classes.paranthesisExpression],
-    [JSONPathSyntaxTreeType.missingExpression, classes.missing]
+const classNameMap = new Map<SyntaxTreeType, string>([
+    [SyntaxTreeType.query, classes.query],
+    [SyntaxTreeType.segment, classes.segment],
+    [SyntaxTreeType.nameSelector, classes.selector],
+    [SyntaxTreeType.indexSelector, classes.selector],
+    [SyntaxTreeType.sliceSelector, classes.selector],
+    [SyntaxTreeType.wildcardSelector, classes.selector],
+    [SyntaxTreeType.filterSelector, classes.selector],
+    [SyntaxTreeType.missingSelector, classes.missing],
+    [SyntaxTreeType.functionExpression, classes.functionExpression],
+    [SyntaxTreeType.andExpression, classes.logicalOperator],
+    [SyntaxTreeType.orExpression, classes.logicalOperator],
+    [SyntaxTreeType.notExpression, classes.logicalOperator],
+    [SyntaxTreeType.comparisonExpression, classes.comparisonOperator],
+    [SyntaxTreeType.stringLiteral, classes.literal],
+    [SyntaxTreeType.numberLiteral, classes.literal],
+    [SyntaxTreeType.nullLiteral, classes.literal],
+    [SyntaxTreeType.booleanLiteral, classes.literal],
+    [SyntaxTreeType.filterQueryExpression, classes.filterQueryExpression],
+    [SyntaxTreeType.paranthesisExpression, classes.paranthesisExpression],
+    [SyntaxTreeType.missingExpression, classes.missing]
 ]);
 
-const syntaxDescriptionService = new SyntaxDescriptionService(defaultJSONPathOptions);
+const syntaxDescriptionService = new SyntaxDescriptionService(defaultQueryOptions);

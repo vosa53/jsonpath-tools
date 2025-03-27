@@ -1,25 +1,25 @@
-import { JSONPathDiagnostics } from "../diagnostics";
-import { JSONPathNodeList } from "../types";
-import { JSONPathQueryContext } from "./evaluation";
-import { JSONPathNode } from "./node";
-import { JSONPathQuery } from "./query";
-import { JSONPathSyntaxTreeType } from "./syntax-tree-type";
-import { JSONPathToken } from "./token";
+import { Diagnostics } from "../diagnostics";
+import { NodeList } from "../types";
+import { QueryContext } from "./evaluation";
+import { SyntaxTreeNode } from "./node";
+import { SubQuery } from "./query";
+import { SyntaxTreeType } from "./syntax-tree-type";
+import { SyntaxTreeToken } from "./token";
 
 
-export class JSONPath extends JSONPathNode {
+export class Query extends SyntaxTreeNode {
     constructor(
-        readonly query: JSONPathQuery,
-        readonly endOfFileToken: JSONPathToken,
+        readonly query: SubQuery,
+        readonly endOfFileToken: SyntaxTreeToken,
 
-        readonly syntaxDiagnostics: readonly JSONPathDiagnostics[]
+        readonly syntaxDiagnostics: readonly Diagnostics[]
     ) {
         super([query, endOfFileToken]);
     }
 
-    get type() { return JSONPathSyntaxTreeType.root; }
+    get type() { return SyntaxTreeType.root; }
 
-    select(queryContext: JSONPathQueryContext): JSONPathNodeList {
+    select(queryContext: QueryContext): NodeList {
         return this.query.select(queryContext, null);
     }
 }

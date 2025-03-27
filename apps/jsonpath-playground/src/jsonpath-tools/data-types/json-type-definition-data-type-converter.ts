@@ -1,4 +1,4 @@
-import { JSONPathJSONValue } from "../types";
+import { JSONValue } from "../types";
 import { AnyDataType, LiteralDataType, NeverDataType, ObjectDataType, PrimitiveDataType, PrimitiveDataTypeType, DataType, DataTypeAnnotation, UnionDataType, ArrayDataType } from "./data-types";
 
 export function jsonTypeDefinitionToType(jsonTypeDefinition: JSONTypeDefinition): DataType {
@@ -185,7 +185,7 @@ export interface JSONTypeDefinition {
     readonly mapping?: JSONTypeDefinitionDictionary;
     readonly ref?: string;
     readonly nullable?: boolean;
-    readonly metadata?: JSONPathJSONValue;
+    readonly metadata?: JSONValue;
     readonly definitions?: JSONTypeDefinitionDictionary
 }
 

@@ -1,21 +1,21 @@
 import { DataTypeAnalyzer } from "../data-types/data-type-analyzer";
 import { DataType, DataTypeAnnotation } from "../data-types/data-types";
 import { getJSONTypeName } from "../data-types/json-types";
-import { JSONPathOptions } from "../options";
-import { JSONPathQueryContext } from "../query/evaluation";
-import { JSONPathComparisonExpression } from "../query/filter-expression/comparison-expression";
-import { JSONPathFilterExpression } from "../query/filter-expression/filter-expression";
+import { QueryOptions } from "../options";
+import { QueryContext } from "../query/evaluation";
+import { ComparisonExpression } from "../query/filter-expression/comparison-expression";
+import { FilterExpression } from "../query/filter-expression/filter-expression";
 import { convertToValueType } from "../query/helpers";
-import { JSONPath } from "../query/json-path";
-import { LocatedNode } from "../query/located-node";
-import { JSONPathSegment } from "../query/segment";
-import { JSONPathSelector } from "../query/selectors/selector";
-import { JSONPathSyntaxTree } from "../query/syntax-tree";
-import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
-import { serializeJSONPathLiteral, serializeJSONPathString } from "../serialization";
-import { JSONPathCharacters } from "../syntax-analysis/parser";
+import { Query } from "../query/json-path";
+import { Node } from "../query/located-node";
+import { Segment } from "../query/segment";
+import { Selector } from "../query/selectors/selector";
+import { SyntaxTree } from "../query/syntax-tree";
+import { SyntaxTreeType } from "../query/syntax-tree-type";
+import { serializeLiteral, serializeString } from "../serialization";
+import { Characters } from "../syntax-analysis/parser";
 import { TextRange } from "../text-range";
-import { JSONPathJSONValue } from "../types";
+import { JSONValue } from "../types";
 import { AnalysisDescriptionService } from "./analysis-description-service";
 import { SyntaxDescriptionService } from "./syntax-description-service";
 
@@ -24,13 +24,13 @@ export class CompletionProvider {
     private readonly analysisDescriptionProvider: AnalysisDescriptionService;
 
     constructor(
-        private readonly options: JSONPathOptions
+        private readonly options: QueryOptions
     ) {
         this.syntaxDescriptionProvider = new SyntaxDescriptionService(options);
         this.analysisDescriptionProvider = new AnalysisDescriptionService();
     }
 
-    provideCompletions(query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType, position: number): CompletionItem[] {
+    provideCompletions(query: Query, queryArgument: JSONValue | undefined, queryArgumentType: DataType, position: number): CompletionItem[] {
         const completions: CompletionItem[] = [];
         const touchingNodes = query.getTouchingAtPosition(position);
         for (const node of touchingNodes)
@@ -38,13 +38,13 @@ export class CompletionProvider {
         return completions;
     }
 
-    private provideCompletionsForNode(query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType, node: JSONPathSyntaxTree, completions: CompletionItem[]) {
+    private provideCompletionsForNode(query: Query, queryArgument: JSONValue | undefined, queryArgumentType: DataType, node: SyntaxTree, completions: CompletionItem[]) {
         const lastNode = node;
         const lastButOneNode = node.parent!;
 
-        if (lastButOneNode instanceof JSONPathSelector) {
+        if (lastButOneNode instanceof Selector) {
             const range = lastButOneNode.textRangeWithoutSkipped;
-            const segment = lastButOneNode.parent as JSONPathSegment;
+            const segment = lastButOneNode.parent as Segment;
             this.completeSelector(completions, lastButOneNode, segment, query, queryArgument, queryArgumentType);
             completions.push(new CompletionItem(CompletionItemType.syntax, "*", range, undefined, undefined, () => this.syntaxDescriptionProvider.provideDescriptionForWildcardSelector().toMarkdown()));
             if (segment.usesBracketNotation) {
@@ -53,31 +53,31 @@ export class CompletionProvider {
                 completions.push(new CompletionItem(CompletionItemType.syntax, "${start}:${end}:${step}", range, "start:end:step", undefined, () => this.syntaxDescriptionProvider.provideDescriptionForSliceSelector().toMarkdown(), CompletionItemTextType.snippet));
             }
         }
-        if (lastButOneNode.type === JSONPathSyntaxTreeType.missingExpression) {
+        if (lastButOneNode.type === SyntaxTreeType.missingExpression) {
             const range = lastButOneNode.textRangeWithoutSkipped;
             completions.push(new CompletionItem(CompletionItemType.syntax, "@", range, undefined, undefined, () => this.syntaxDescriptionProvider.provideDescriptionForAtToken().toMarkdown()));
             completions.push(new CompletionItem(CompletionItemType.syntax, "$", range, undefined, undefined, () => this.syntaxDescriptionProvider.provideDescriptionForDollarToken().toMarkdown()));
         }
         if (
-            lastButOneNode.type === JSONPathSyntaxTreeType.missingExpression ||
-            lastButOneNode.type === JSONPathSyntaxTreeType.stringLiteral ||
-            lastButOneNode.type === JSONPathSyntaxTreeType.numberLiteral ||
-            lastButOneNode.type === JSONPathSyntaxTreeType.booleanLiteral ||
-            lastButOneNode.type === JSONPathSyntaxTreeType.nullLiteral
+            lastButOneNode.type === SyntaxTreeType.missingExpression ||
+            lastButOneNode.type === SyntaxTreeType.stringLiteral ||
+            lastButOneNode.type === SyntaxTreeType.numberLiteral ||
+            lastButOneNode.type === SyntaxTreeType.booleanLiteral ||
+            lastButOneNode.type === SyntaxTreeType.nullLiteral
         ) {
             const range = lastButOneNode.textRangeWithoutSkipped;
-            if (lastButOneNode.parent instanceof JSONPathComparisonExpression) {
+            if (lastButOneNode.parent instanceof ComparisonExpression) {
                 const referenceExpression = lastButOneNode.parent.left === lastButOneNode
                     ? lastButOneNode.parent.right
                     : lastButOneNode.parent.left;
                 this.completeValues(completions, range, referenceExpression, query, queryArgument, queryArgumentType);
             }
         }
-        if (lastButOneNode.type === JSONPathSyntaxTreeType.missingExpression ||
-            lastNode.type === JSONPathSyntaxTreeType.nameToken && (
-                lastButOneNode.type === JSONPathSyntaxTreeType.functionExpression ||
-                lastButOneNode.type === JSONPathSyntaxTreeType.booleanLiteral ||
-                lastButOneNode.type === JSONPathSyntaxTreeType.nullLiteral
+        if (lastButOneNode.type === SyntaxTreeType.missingExpression ||
+            lastNode.type === SyntaxTreeType.nameToken && (
+                lastButOneNode.type === SyntaxTreeType.functionExpression ||
+                lastButOneNode.type === SyntaxTreeType.booleanLiteral ||
+                lastButOneNode.type === SyntaxTreeType.nullLiteral
             )) {
             const range = lastButOneNode.textRangeWithoutSkipped;
             this.completeFunctions(completions, lastNode.textRangeWithoutSkipped);
@@ -87,14 +87,14 @@ export class CompletionProvider {
         }
     }
 
-    private completeSelector(completions: CompletionItem[], selector: JSONPathSelector, segment: JSONPathSegment, query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType) {
+    private completeSelector(completions: CompletionItem[], selector: Selector, segment: Segment, query: Query, queryArgument: JSONValue | undefined, queryArgumentType: DataType) {
         if (queryArgument !== undefined)
             this.completeSelectorData(completions, selector, segment, query, queryArgument, queryArgumentType);
         else
             this.completeSelectorType(completions, selector, segment, queryArgumentType);
     }
 
-    private completeSelectorType(completions: CompletionItem[], selector: JSONPathSelector, segment: JSONPathSegment, queryArgumentType: DataType) {
+    private completeSelectorType(completions: CompletionItem[], selector: Selector, segment: Segment, queryArgumentType: DataType) {
         const previousType = this.getIncomingType(segment, queryArgumentType);
         const pathsSegments = previousType.collectKnownPathSegments();
         for (const pathSegment of pathsSegments) {
@@ -108,7 +108,7 @@ export class CompletionProvider {
         }
     }
 
-    private completeSelectorData(completions: CompletionItem[], selector: JSONPathSelector, segment: JSONPathSegment, query: JSONPath, queryArgument: JSONPathJSONValue, queryArgumentType: DataType) {
+    private completeSelectorData(completions: CompletionItem[], selector: Selector, segment: Segment, query: Query, queryArgument: JSONValue, queryArgumentType: DataType) {
         let previousType: DataType;
         const nodes = this.getAllNodesOutputtedFromSegment(queryArgument, query, segment);
         const keysAndTypes = this.getDistinctKeysAndTypes(nodes);
@@ -143,7 +143,7 @@ export class CompletionProvider {
         }
     }
 
-    private completeValues(completions: CompletionItem[], range: TextRange, reference: JSONPathFilterExpression, query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType) {
+    private completeValues(completions: CompletionItem[], range: TextRange, reference: FilterExpression, query: Query, queryArgument: JSONValue | undefined, queryArgumentType: DataType) {
         const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType, this.options);
 
         const literals = queryArgument !== undefined
@@ -153,7 +153,7 @@ export class CompletionProvider {
             const literalType = typeof literal;
             completions.push(new CompletionItem(
                 CompletionItemType.literal,
-                serializeJSONPathLiteral(literal),
+                serializeLiteral(literal),
                 range,
                 undefined,
                 literalType,
@@ -175,7 +175,7 @@ export class CompletionProvider {
         }
     }
 
-    private createSelectorCompletionItem(selector: JSONPathSelector, segment: JSONPathSegment, pathSegment: string | number, typeText: string, resolveDescription: () => string): CompletionItem {
+    private createSelectorCompletionItem(selector: Selector, segment: Segment, pathSegment: string | number, typeText: string, resolveDescription: () => string): CompletionItem {
         const isValidName = typeof pathSegment === "string" && this.isValidName(pathSegment);
         const useBracketNotation = !isValidName || segment.usesBracketNotation;
         const willUseBracketNotation = useBracketNotation && !segment.usesBracketNotation;
@@ -185,7 +185,7 @@ export class CompletionProvider {
         let text = typeof pathSegment === "number"
             ? pathSegment.toString()
             : (
-                useBracketNotation ? serializeJSONPathString(pathSegment) : pathSegment
+                useBracketNotation ? serializeString(pathSegment) : pathSegment
             );
         if (willUseBracketNotation)
             text = `[${text}]`;
@@ -200,12 +200,12 @@ export class CompletionProvider {
         return syntaxDescription.toMarkdown() + this.analysisDescriptionProvider.provideDescription(type, annotations);
     }
 
-    private getIncomingType(segment: JSONPathSegment, queryArgumentType: DataType): DataType {
+    private getIncomingType(segment: Segment, queryArgumentType: DataType): DataType {
         const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType, this.options);
         return typeAnalyzer.getIncomingTypeToSegment(segment);
     }
 
-    private getStringOrNumberExample(nodes: LocatedNode[], property: string): JSONPathJSONValue | undefined {
+    private getStringOrNumberExample(nodes: Node[], property: string): JSONValue | undefined {
         for (const node of nodes) {
             const value = node.value;
             if (typeof value === "object" && value !== null && !Array.isArray(value)) {
@@ -218,7 +218,7 @@ export class CompletionProvider {
         return undefined;
     }
 
-    private getDistinctKeysAndTypes(nodes: LocatedNode[]): Map<string, Set<string>> {
+    private getDistinctKeysAndTypes(nodes: Node[]): Map<string, Set<string>> {
         const keysAndTypes = new Map<string, Set<string>>();
         for (const node of nodes) {
             const value = node.value;
@@ -237,9 +237,9 @@ export class CompletionProvider {
         return keysAndTypes;
     }
 
-    private getAllNodesOutputtedFromSegment(queryArgument: JSONPathJSONValue, jsonPath: JSONPath, segment: JSONPathSegment): LocatedNode[] {
-        const values: LocatedNode[] = [];
-        const queryContext: JSONPathQueryContext = {
+    private getAllNodesOutputtedFromSegment(queryArgument: JSONValue, jsonPath: Query, segment: Segment): Node[] {
+        const values: Node[] = [];
+        const queryContext: QueryContext = {
             rootNode: queryArgument,
             options: this.options,
             segmentInstrumentationCallback(s, i) {
@@ -251,9 +251,9 @@ export class CompletionProvider {
         return values;
     }
 
-    private getAllLiteralsOutputtedFromExpression(queryArgument: JSONPathJSONValue, jsonPath: JSONPath, expression: JSONPathFilterExpression): Set<string | number | boolean | null> {
+    private getAllLiteralsOutputtedFromExpression(queryArgument: JSONValue, jsonPath: Query, expression: FilterExpression): Set<string | number | boolean | null> {
         const literals = new Set<string | number | boolean | null>();
-        const queryContext: JSONPathQueryContext = {
+        const queryContext: QueryContext = {
             rootNode: queryArgument,
             options: this.options,
             filterExpressionInstrumentationCallback(fe, o) {
@@ -272,10 +272,10 @@ export class CompletionProvider {
     private isValidName(text: string): boolean {
         if (text.length === 0)
             return false;
-        if (!JSONPathCharacters.isNameFirst(text[0]))
+        if (!Characters.isNameFirst(text[0]))
             return false;
         for (let i = 1; i < text.length; i++) {
-            if (!JSONPathCharacters.isName(text[i]))
+            if (!Characters.isName(text[i]))
                 return false;
         }
         return true;

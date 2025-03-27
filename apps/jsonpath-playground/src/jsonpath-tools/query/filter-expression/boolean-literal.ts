@@ -1,22 +1,22 @@
-import { JSONPathFilterValue } from "../../types";
-import { JSONPathFilterExpressionContext, JSONPathQueryContext } from "../evaluation";
-import { JSONPathSyntaxTreeType } from "../syntax-tree-type";
-import { JSONPathToken } from "../token";
-import { JSONPathFilterExpression } from "./filter-expression";
+import { FilterValue } from "../../types";
+import { FilterExpressionContext, QueryContext } from "../evaluation";
+import { SyntaxTreeType } from "../syntax-tree-type";
+import { SyntaxTreeToken } from "../token";
+import { FilterExpression } from "./filter-expression";
 
 
-export class JSONPathBooleanLiteral extends JSONPathFilterExpression {
+export class BooleanLiteralExpression extends FilterExpression {
     constructor(
-        readonly valueToken: JSONPathToken,
+        readonly valueToken: SyntaxTreeToken,
 
         readonly value: boolean
     ) {
         super([valueToken]);
     }
 
-    get type() { return JSONPathSyntaxTreeType.booleanLiteral; }
+    get type() { return SyntaxTreeType.booleanLiteral; }
 
-    protected evaluateImplementation(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
+    protected evaluateImplementation(queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): FilterValue {
         return this.value;
     }
 }

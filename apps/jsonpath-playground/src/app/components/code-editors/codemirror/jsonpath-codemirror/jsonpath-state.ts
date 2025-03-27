@@ -1,5 +1,5 @@
-import { JSONPathOptions } from "@/jsonpath-tools/options";
-import { JSONPathJSONValue } from "@/jsonpath-tools/types";
+import { QueryOptions } from "@/jsonpath-tools/options";
+import { JSONValue } from "@/jsonpath-tools/types";
 import { EditorState, Extension, Facet, StateEffect, StateField } from "@codemirror/state";
 import { EditorView, PluginValue, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { LanguageService } from "./worker/language-service";
@@ -12,8 +12,8 @@ export function jsonPathState(): Extension {
     ];
 }
 
-export const updateOptionsEffect = StateEffect.define<JSONPathOptions>();
-export const updateQueryArgumentEffect = StateEffect.define<JSONPathJSONValue | undefined>();
+export const updateOptionsEffect = StateEffect.define<QueryOptions>();
+export const updateQueryArgumentEffect = StateEffect.define<JSONValue | undefined>();
 export const updateQueryArgumentTypeEffect = StateEffect.define<DataType>();
 export const jsonPathConfigFacet = Facet.define<{
     languageService: LanguageService
@@ -65,7 +65,7 @@ const jsonPathPlugin = ViewPlugin.fromClass(JSONPathPlugin, {
     }
 });
 
-export function getResult(state: EditorState): Promise<{ nodes: readonly JSONPathJSONValue[], paths: readonly (string | number)[][] }> {
+export function getResult(state: EditorState): Promise<{ nodes: readonly JSONValue[], paths: readonly (string | number)[][] }> {
     const languageServiceSession = state.field(languageServiceSessionStateField);
     return languageServiceSession.getResult();
 }

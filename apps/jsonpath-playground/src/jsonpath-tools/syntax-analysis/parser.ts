@@ -1,42 +1,42 @@
-import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "../diagnostics";
-import { JSONPathAndExpression } from "../query/filter-expression/and-expression";
-import { JSONPathBooleanLiteral } from "../query/filter-expression/boolean-literal";
-import { JSONPathComparisonExpression, JSONPathComparisonOperator } from "../query/filter-expression/comparison-expression";
-import { JSONPathFilterExpression } from "../query/filter-expression/filter-expression";
-import { JSONPathFilterQueryExpression } from "../query/filter-expression/filter-query-expression";
-import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
-import { JSONPathMissingExpression } from "../query/filter-expression/missing-expression";
-import { JSONPathNotExpression } from "../query/filter-expression/not-expression";
-import { JSONPathNullLiteral } from "../query/filter-expression/null-literal";
-import { JSONPathNumberLiteral } from "../query/filter-expression/number-literal";
-import { JSONPathOrExpression } from "../query/filter-expression/or-expression";
-import { JSONPathParanthesisExpression } from "../query/filter-expression/paranthesis-expression";
-import { JSONPathStringLiteral } from "../query/filter-expression/string-literal";
-import { JSONPath } from "../query/json-path";
-import { JSONPathQuery } from "../query/query";
-import { JSONPathSegment } from "../query/segment";
-import { JSONPathFilterSelector } from "../query/selectors/filter-selector";
-import { JSONPathIndexSelector } from "../query/selectors/index-selector";
-import { JSONPathMissingSelector } from "../query/selectors/missing-selector";
-import { JSONPathNameSelector } from "../query/selectors/name-selector";
-import { JSONPathSelector } from "../query/selectors/selector";
-import { JSONPathSliceSelector } from "../query/selectors/slice-selector";
-import { JSONPathWildcardSelector } from "../query/selectors/wildcard-selector";
-import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
-import { JSONPathToken } from "../query/token";
+import { Diagnostics, DiagnosticsType } from "../diagnostics";
+import { AndExpression } from "../query/filter-expression/and-expression";
+import { BooleanLiteralExpression } from "../query/filter-expression/boolean-literal";
+import { ComparisonExpression, JSONPathComparisonOperator } from "../query/filter-expression/comparison-expression";
+import { FilterExpression } from "../query/filter-expression/filter-expression";
+import { FilterQueryExpression } from "../query/filter-expression/filter-query-expression";
+import { FunctionExpression } from "../query/filter-expression/function-expression";
+import { MissingExpression } from "../query/filter-expression/missing-expression";
+import { NotExpression } from "../query/filter-expression/not-expression";
+import { NullLiteralExpression } from "../query/filter-expression/null-literal";
+import { NumberLiteralExpression } from "../query/filter-expression/number-literal";
+import { OrExpression } from "../query/filter-expression/or-expression";
+import { ParanthesisExpression } from "../query/filter-expression/paranthesis-expression";
+import { StringLiteralExpression } from "../query/filter-expression/string-literal";
+import { Query } from "../query/json-path";
+import { SubQuery } from "../query/query";
+import { Segment } from "../query/segment";
+import { FilterSelector } from "../query/selectors/filter-selector";
+import { IndexSelector } from "../query/selectors/index-selector";
+import { MissingSelector } from "../query/selectors/missing-selector";
+import { NameSelector } from "../query/selectors/name-selector";
+import { Selector } from "../query/selectors/selector";
+import { SliceSelector } from "../query/selectors/slice-selector";
+import { WildcardSelector } from "../query/selectors/wildcard-selector";
+import { SyntaxTreeType } from "../query/syntax-tree-type";
+import { SyntaxTreeToken } from "../query/token";
 import { TextRange } from "../text-range";
 
-export class JSONPathParser {
-    parse(input: string): JSONPath {
+export class Parser {
+    parse(input: string): Query {
         const context = new ParserContext(input);
         const query = this.parseQuery(context, false);
-        const endOfFileToken = context.collectToken(JSONPathSyntaxTreeType.endOfFileToken);
+        const endOfFileToken = context.collectToken(SyntaxTreeType.endOfFileToken);
 
         if (endOfFileToken.skippedTextBefore.length !== 0) context.addError("Whitespace is not allowed here", endOfFileToken.textRange);
-        return new JSONPath(query, endOfFileToken, context.diagnostics);
+        return new Query(query, endOfFileToken, context.diagnostics);
     }
 
-    private parseQuery(context: ParserContext, allowedRelative: boolean): JSONPathQuery {
+    private parseQuery(context: ParserContext, allowedRelative: boolean): SubQuery {
         this.skipWhitespace(context, false);
 
         const isRelative = context.current === "@";
@@ -44,33 +44,33 @@ export class JSONPathParser {
             context.goNext();
         else
             context.addError(`Expected $ ${allowedRelative ? "or @" : ""}.`);
-        const identifier = context.collectToken(isRelative ? JSONPathSyntaxTreeType.atToken : JSONPathSyntaxTreeType.dollarToken);
+        const identifier = context.collectToken(isRelative ? SyntaxTreeType.atToken : SyntaxTreeType.dollarToken);
         if (isRelative && !allowedRelative)
             context.addError("Relative queries are not allowed here.", identifier.textRangeWithoutSkipped);
         
-        const segments: JSONPathSegment[] = [];
+        const segments: Segment[] = [];
         while (context.current !== null) {
             this.skipWhitespace(context);
 
             // If not global, look whether it is . or [.
             if (allowedRelative && context.current !== "." && context.current !== "[")
                 break;
-            context.skipWhile(c => c !== "." && c !== "[" && !JSONPathCharacters.isNameFirst(c), "Invalid characters.");
+            context.skipWhile(c => c !== "." && c !== "[" && !Characters.isNameFirst(c), "Invalid characters.");
             if (context.current !== null) {
                 const segment = this.parseSegment(context);
                 segments.push(segment);
             }
         }
 
-        return new JSONPathQuery(identifier, segments, isRelative);
+        return new SubQuery(identifier, segments, isRelative);
     }
 
-    private parseSegment(context: ParserContext): JSONPathSegment {
+    private parseSegment(context: ParserContext): Segment {
         const hasDot = context.current === ".";
         if (hasDot) context.goNext();
         const isRecursive = context.current === ".";
         if (isRecursive) context.goNext();
-        const dotToken = hasDot ? context.collectToken(isRecursive ? JSONPathSyntaxTreeType.doubleDotToken : JSONPathSyntaxTreeType.dotToken) : null;
+        const dotToken = hasDot ? context.collectToken(isRecursive ? SyntaxTreeType.doubleDotToken : SyntaxTreeType.dotToken) : null;
 
         this.skipWhitespace(context, false);
 
@@ -83,36 +83,36 @@ export class JSONPathParser {
         }
         else if (context.current === "*") {
             const wildcardSelector = this.parseWildcardSelector(context);
-            return new JSONPathSegment(dotToken, null, [{ selector: wildcardSelector, commaToken: null }], null, isRecursive);
+            return new Segment(dotToken, null, [{ selector: wildcardSelector, commaToken: null }], null, isRecursive);
         }
-        else if (context.current !== null && JSONPathCharacters.isNameFirst(context.current)) {
+        else if (context.current !== null && Characters.isNameFirst(context.current)) {
             const nameSelector = this.parseMemberNameShorthand(context);
-            return new JSONPathSegment(dotToken, null, [{ selector: nameSelector, commaToken: null }], null, isRecursive);
+            return new Segment(dotToken, null, [{ selector: nameSelector, commaToken: null }], null, isRecursive);
         }
         else {
             context.addError("Expected a selector/selectors.");
-            const missingSelector = new JSONPathMissingSelector(context.collectToken(JSONPathSyntaxTreeType.missingToken));
-            return new JSONPathSegment(dotToken, null, [{ selector: missingSelector, commaToken: null }], null, isRecursive);
+            const missingSelector = new MissingSelector(context.collectToken(SyntaxTreeType.missingToken));
+            return new Segment(dotToken, null, [{ selector: missingSelector, commaToken: null }], null, isRecursive);
         }
     }
 
-    private parseMemberNameShorthand(context: ParserContext): JSONPathNameSelector {
+    private parseMemberNameShorthand(context: ParserContext): NameSelector {
         const name = this.parseName(context);
-        return new JSONPathNameSelector(name.token, name.value);
+        return new NameSelector(name.token, name.value);
     }
 
-    private parseBracketedSelection(context: ParserContext, dotToken: JSONPathToken | null, isRecursive: boolean): JSONPathSegment {
+    private parseBracketedSelection(context: ParserContext, dotToken: SyntaxTreeToken | null, isRecursive: boolean): Segment {
         context.goNext();
-        const openingToken = context.collectToken(JSONPathSyntaxTreeType.openingBracketToken);
+        const openingToken = context.collectToken(SyntaxTreeType.openingBracketToken);
 
-        const selectors: { selector: JSONPathSelector, commaToken: JSONPathToken | null }[] = [];
+        const selectors: { selector: Selector, commaToken: SyntaxTreeToken | null }[] = [];
         this.skipWhitespace(context);
         selectors.push({ selector: this.parseSelector(context), commaToken: null });
         this.skipWhitespace(context);
         this.skipToSelector(context);
         while (context.current === ",") {
             context.goNext();
-            const commaToken = context.collectToken(JSONPathSyntaxTreeType.commaToken);
+            const commaToken = context.collectToken(SyntaxTreeType.commaToken);
             selectors[selectors.length - 1].commaToken = commaToken;
             this.skipWhitespace(context);
             selectors.push({ selector: this.parseSelector(context), commaToken: null });
@@ -124,68 +124,68 @@ export class JSONPathParser {
             context.goNext();
         else
             context.addError("Expected ']'.");
-        const closingToken = context.collectToken(JSONPathSyntaxTreeType.closingBracketToken);
-        return new JSONPathSegment(dotToken, openingToken, selectors, closingToken, isRecursive);
+        const closingToken = context.collectToken(SyntaxTreeType.closingBracketToken);
+        return new Segment(dotToken, openingToken, selectors, closingToken, isRecursive);
     }
 
     private skipToSelector(context: ParserContext) {
         context.skipWhile(c => c !== "[" && c !== "." && c !== "]" && c !== ",", "Invalid characters");
     }
 
-    private parseSelector(context: ParserContext): JSONPathSelector {
+    private parseSelector(context: ParserContext): Selector {
         if (context.current === "\"" || context.current === "'")
             return this.parseNameSelector(context);
         else if (context.current === "*")
             return this.parseWildcardSelector(context);
-        else if (context.current === "-" || (context.current !== null && JSONPathCharacters.isDigit(context.current)) || context.current === ":")
+        else if (context.current === "-" || (context.current !== null && Characters.isDigit(context.current)) || context.current === ":")
             return this.parseSliceOrIndexSelector(context);
         else if (context.current === "?")
             return this.parseFilterSelector(context);
         else {
             context.addError("Expected selector.");
-            return new JSONPathMissingSelector(context.collectToken(JSONPathSyntaxTreeType.missingToken));
+            return new MissingSelector(context.collectToken(SyntaxTreeType.missingToken));
         }
     }
 
-    private parseNameSelector(context: ParserContext): JSONPathNameSelector {
+    private parseNameSelector(context: ParserContext): NameSelector {
         const string = this.parseString(context);
-        return new JSONPathNameSelector(string.token, string.value);
+        return new NameSelector(string.token, string.value);
     }
 
     private parseWildcardSelector(context: ParserContext) {
         context.goNext();
-        const starToken = context.collectToken(JSONPathSyntaxTreeType.starToken);
-        return new JSONPathWildcardSelector(starToken);
+        const starToken = context.collectToken(SyntaxTreeType.starToken);
+        return new WildcardSelector(starToken);
     }
 
-    private parseSliceOrIndexSelector(context: ParserContext): JSONPathIndexSelector | JSONPathSliceSelector {
+    private parseSliceOrIndexSelector(context: ParserContext): IndexSelector | SliceSelector {
         const indexOrStart = context.current !== ":" ? this.parseNumber(context) : null;
         this.skipWhitespace(context);
         if (context.current !== ":") {
             this.checkIsInteger(indexOrStart!.token, context);
-            return new JSONPathIndexSelector(indexOrStart!.token, indexOrStart!.value);
+            return new IndexSelector(indexOrStart!.token, indexOrStart!.value);
         }
         context.goNext();
-        const firstColonToken = context.collectToken(JSONPathSyntaxTreeType.colonToken);
+        const firstColonToken = context.collectToken(SyntaxTreeType.colonToken);
         this.skipWhitespace(context);
         // @ts-ignore
-        const end = JSONPathCharacters.isDigit(context.current) || context.current === "-" ? this.parseNumber(context) : null;
+        const end = Characters.isDigit(context.current) || context.current === "-" ? this.parseNumber(context) : null;
         this.skipWhitespace(context);
-        let secondColonToken: JSONPathToken | null = null;
-        let step: { token: JSONPathToken, value: number } | null = null;
+        let secondColonToken: SyntaxTreeToken | null = null;
+        let step: { token: SyntaxTreeToken, value: number } | null = null;
         if (context.current === ":") {
             context.goNext();
-            secondColonToken = context.collectToken(JSONPathSyntaxTreeType.colonToken);
+            secondColonToken = context.collectToken(SyntaxTreeType.colonToken);
             this.skipWhitespace(context);
             // @ts-ignore
-            step = JSONPathCharacters.isDigit(context.current) || context.current === "-" ? this.parseNumber(context) : null
+            step = Characters.isDigit(context.current) || context.current === "-" ? this.parseNumber(context) : null
         }
 
         if (indexOrStart !== null) this.checkIsInteger(indexOrStart.token, context);
         if (end !== null) this.checkIsInteger(end.token, context);
         if (step !== null) this.checkIsInteger(step.token, context);
 
-        return new JSONPathSliceSelector(
+        return new SliceSelector(
             indexOrStart?.token ?? null, 
             firstColonToken, 
             end?.token ?? null, 
@@ -197,28 +197,28 @@ export class JSONPathParser {
         );
     }
 
-    private parseFilterSelector(context: ParserContext): JSONPathFilterSelector {
+    private parseFilterSelector(context: ParserContext): FilterSelector {
         context.goNext();
-        const questionMarkToken = context.collectToken(JSONPathSyntaxTreeType.questionMarkToken);
+        const questionMarkToken = context.collectToken(SyntaxTreeType.questionMarkToken);
         this.skipWhitespace(context);
         const filterExpression = this.parseFilterExpression(context);
         this.checkLogicalExpressionOperand(filterExpression, context);
         // TODO: If null, skip to '[', ']', '.', ',', '(', ')'
-        return new JSONPathFilterSelector(questionMarkToken, filterExpression);
+        return new FilterSelector(questionMarkToken, filterExpression);
     }
 
-    private parseFilterExpression(context: ParserContext): JSONPathFilterExpression {
+    private parseFilterExpression(context: ParserContext): FilterExpression {
         return this.parseOrExpression(context);
     }
 
-    private parseOrExpression(context: ParserContext): JSONPathFilterExpression {
-        const andExpressions: { expression: JSONPathFilterExpression, orToken: JSONPathToken | null }[] = [];
+    private parseOrExpression(context: ParserContext): FilterExpression {
+        const andExpressions: { expression: FilterExpression, orToken: SyntaxTreeToken | null }[] = [];
         andExpressions.push({ expression: this.parseAndExpression(context), orToken: null });
         this.skipWhitespace(context);
         while (context.current === "|" && context.next === "|") {
             context.goNext();
             context.goNext();
-            const orToken = context.collectToken(JSONPathSyntaxTreeType.doubleBarToken);
+            const orToken = context.collectToken(SyntaxTreeType.doubleBarToken);
             andExpressions[andExpressions.length - 1].orToken = orToken;
             this.skipWhitespace(context);
             andExpressions.push({ expression: this.parseAndExpression(context), orToken: null });
@@ -228,17 +228,17 @@ export class JSONPathParser {
         if (andExpressions.length === 1) return andExpressions[0].expression;
 
         andExpressions.forEach(e => { if (e.expression !== null) this.checkLogicalExpressionOperand(e.expression, context); });
-        return new JSONPathOrExpression(andExpressions);
+        return new OrExpression(andExpressions);
     }
 
-    private parseAndExpression(context: ParserContext): JSONPathFilterExpression {
-        const basicExpressions: { expression: JSONPathFilterExpression, andToken: JSONPathToken | null }[] = [];
+    private parseAndExpression(context: ParserContext): FilterExpression {
+        const basicExpressions: { expression: FilterExpression, andToken: SyntaxTreeToken | null }[] = [];
         basicExpressions.push({ expression: this.parseComparisonExpression(context), andToken: null });
         this.skipWhitespace(context);
         while (context.current === "&" && context.next === "&") {
             context.goNext();
             context.goNext();
-            const andToken = context.collectToken(JSONPathSyntaxTreeType.doubleAmpersandToken);
+            const andToken = context.collectToken(SyntaxTreeType.doubleAmpersandToken);
             basicExpressions[basicExpressions.length - 1].andToken = andToken;
             this.skipWhitespace(context);
             basicExpressions.push({ expression: this.parseComparisonExpression(context), andToken: null });
@@ -248,21 +248,21 @@ export class JSONPathParser {
         if (basicExpressions.length === 1) return basicExpressions[0].expression;
 
         basicExpressions.forEach(e => { if (e.expression !== null) this.checkLogicalExpressionOperand(e.expression, context); });
-        return new JSONPathAndExpression(basicExpressions);
+        return new AndExpression(basicExpressions);
     }
 
-    private parseComparisonExpression(context: ParserContext): JSONPathFilterExpression {
+    private parseComparisonExpression(context: ParserContext): FilterExpression {
         const left = this.parseNotExpression(context);
         this.skipWhitespace(context);
 
         let operator: JSONPathComparisonOperator;
-        let operatorTokenType: JSONPathSyntaxTreeType;
-        if (context.current === "=" && context.next === "=") { operator = JSONPathComparisonOperator.equals; operatorTokenType = JSONPathSyntaxTreeType.doubleEqualsToken; }
-        else if (context.current === "!" && context.next === "=") { operator = JSONPathComparisonOperator.notEquals; operatorTokenType = JSONPathSyntaxTreeType.exclamationMarkEqualsToken; }
-        else if (context.current === "<" && context.next === "=") { operator = JSONPathComparisonOperator.lessThanEquals; operatorTokenType = JSONPathSyntaxTreeType.lessThanEqualsToken; }
-        else if (context.current === ">" && context.next === "=") { operator = JSONPathComparisonOperator.greaterThanEquals; operatorTokenType = JSONPathSyntaxTreeType.greaterThanEqualsToken; }
-        else if (context.current === "<") { operator = JSONPathComparisonOperator.lessThan; operatorTokenType = JSONPathSyntaxTreeType.lessThanToken; }
-        else if (context.current === ">") { operator = JSONPathComparisonOperator.greaterThan; operatorTokenType = JSONPathSyntaxTreeType.greaterThanToken; }
+        let operatorTokenType: SyntaxTreeType;
+        if (context.current === "=" && context.next === "=") { operator = JSONPathComparisonOperator.equals; operatorTokenType = SyntaxTreeType.doubleEqualsToken; }
+        else if (context.current === "!" && context.next === "=") { operator = JSONPathComparisonOperator.notEquals; operatorTokenType = SyntaxTreeType.exclamationMarkEqualsToken; }
+        else if (context.current === "<" && context.next === "=") { operator = JSONPathComparisonOperator.lessThanEquals; operatorTokenType = SyntaxTreeType.lessThanEqualsToken; }
+        else if (context.current === ">" && context.next === "=") { operator = JSONPathComparisonOperator.greaterThanEquals; operatorTokenType = SyntaxTreeType.greaterThanEqualsToken; }
+        else if (context.current === "<") { operator = JSONPathComparisonOperator.lessThan; operatorTokenType = SyntaxTreeType.lessThanToken; }
+        else if (context.current === ">") { operator = JSONPathComparisonOperator.greaterThan; operatorTokenType = SyntaxTreeType.greaterThanToken; }
         else return left;
         for (let i = 0; i < operator.length; i++) context.goNext();
         const operatorToken = context.collectToken(operatorTokenType);
@@ -272,49 +272,49 @@ export class JSONPathParser {
 
         this.checkComparisionExpressionOperand(left, context);
         this.checkComparisionExpressionOperand(right, context);
-        return new JSONPathComparisonExpression(left, operatorToken, right, operator);
+        return new ComparisonExpression(left, operatorToken, right, operator);
     }
 
-    private parseNotExpression(context: ParserContext): JSONPathFilterExpression {
+    private parseNotExpression(context: ParserContext): FilterExpression {
         if (context.current !== "!")
             return this.parseBasicExpression(context);
 
         context.goNext();
-        const exlamationMarkToken = context.collectToken(JSONPathSyntaxTreeType.exclamationMarkToken);
+        const exlamationMarkToken = context.collectToken(SyntaxTreeType.exclamationMarkToken);
         this.skipWhitespace(context);
         const basicExpression = this.parseNotExpression(context);
 
         this.checkLogicalExpressionOperand(basicExpression, context);
-        if (basicExpression instanceof JSONPathNotExpression)
+        if (basicExpression instanceof NotExpression)
             context.addError("Multiple negation is not allowed.", basicExpression.exlamationMarkToken.textRangeWithoutSkipped);
-        return new JSONPathNotExpression(exlamationMarkToken, basicExpression);
+        return new NotExpression(exlamationMarkToken, basicExpression);
     }
 
-    private parseBasicExpression(context: ParserContext): JSONPathFilterExpression {
+    private parseBasicExpression(context: ParserContext): FilterExpression {
         if (context.current === "$" || context.current === "@")
             return this.parseFilterQueryExpression(context);
         else if (context.current === "(")
             return this.parseParanthesisExpression(context);
         else if (context.current === "\"" || context.current === "'")
             return this.parseStringLiteral(context);
-        else if (JSONPathCharacters.isDigit(context.current) || context.current === "-")
+        else if (Characters.isDigit(context.current) || context.current === "-")
             return this.parseNumberLiteral(context);
-        else if (JSONPathCharacters.isNameFirst(context.current))
+        else if (Characters.isNameFirst(context.current))
             return this.parseFunctionOrLiteral(context);
         else {
             context.addError("Expected expression.");
-            return new JSONPathMissingExpression(context.collectToken(JSONPathSyntaxTreeType.missingToken));
+            return new MissingExpression(context.collectToken(SyntaxTreeType.missingToken));
         }
     }
 
-    private parseFilterQueryExpression(context: ParserContext): JSONPathFilterQueryExpression {
+    private parseFilterQueryExpression(context: ParserContext): FilterQueryExpression {
         const query = this.parseQuery(context, true);
-        return new JSONPathFilterQueryExpression(query);
+        return new FilterQueryExpression(query);
     }
 
-    private parseParanthesisExpression(context: ParserContext): JSONPathParanthesisExpression {
+    private parseParanthesisExpression(context: ParserContext): ParanthesisExpression {
         context.goNext();
-        const openingParanthesisToken = context.collectToken(JSONPathSyntaxTreeType.openingParanthesisToken);
+        const openingParanthesisToken = context.collectToken(SyntaxTreeType.openingParanthesisToken);
         this.skipWhitespace(context);
         const expression = this.parseFilterExpression(context);
         this.skipWhitespace(context);
@@ -322,58 +322,58 @@ export class JSONPathParser {
             context.goNext();
         else
             context.addError("Expected ')'.");
-        const closingParanthesisToken = context.collectToken(JSONPathSyntaxTreeType.closingParanthesisToken);
+        const closingParanthesisToken = context.collectToken(SyntaxTreeType.closingParanthesisToken);
 
         this.checkLogicalExpressionOperand(expression, context);
-        return new JSONPathParanthesisExpression(openingParanthesisToken, expression, closingParanthesisToken);
+        return new ParanthesisExpression(openingParanthesisToken, expression, closingParanthesisToken);
     }
 
-    private parseStringLiteral(context: ParserContext): JSONPathStringLiteral {
+    private parseStringLiteral(context: ParserContext): StringLiteralExpression {
         const string = this.parseString(context);
-        return new JSONPathStringLiteral(string.token, string.value);
+        return new StringLiteralExpression(string.token, string.value);
     }
 
-    private parseNumberLiteral(context: ParserContext): JSONPathNumberLiteral {
+    private parseNumberLiteral(context: ParserContext): NumberLiteralExpression {
         const integer = this.parseNumber(context);
-        return new JSONPathNumberLiteral(integer.token, integer.value);
+        return new NumberLiteralExpression(integer.token, integer.value);
     }
 
-    private parseFunctionOrLiteral(context: ParserContext): JSONPathFilterExpression {
+    private parseFunctionOrLiteral(context: ParserContext): FilterExpression {
         const name = this.parseName(context);
         this.skipWhitespace(context, false);
 
         const hasOpeningParanthesis = context.current === "(";
         if (!hasOpeningParanthesis) {
-            if (name.value === "true") return new JSONPathBooleanLiteral(this.changeTokenType(name.token, JSONPathSyntaxTreeType.trueToken), true);
-            else if (name.value === "false") return new JSONPathBooleanLiteral(this.changeTokenType(name.token, JSONPathSyntaxTreeType.falseToken), false);
-            else if (name.value === "null") return new JSONPathNullLiteral(this.changeTokenType(name.token, JSONPathSyntaxTreeType.nullToken));
+            if (name.value === "true") return new BooleanLiteralExpression(this.changeTokenType(name.token, SyntaxTreeType.trueToken), true);
+            else if (name.value === "false") return new BooleanLiteralExpression(this.changeTokenType(name.token, SyntaxTreeType.falseToken), false);
+            else if (name.value === "null") return new NullLiteralExpression(this.changeTokenType(name.token, SyntaxTreeType.nullToken));
             else context.addError("Expected '('.");
         }
         else
             context.goNext();
 
-        const openingParanthesisToken = context.collectToken(JSONPathSyntaxTreeType.openingParanthesisToken);
+        const openingParanthesisToken = context.collectToken(SyntaxTreeType.openingParanthesisToken);
         this.skipWhitespace(context);
         const args = hasOpeningParanthesis ? this.parseFunctionArguments(context) : [];
         if (context.current === ")")
             context.goNext();
         else
             context.addError("Expected ')'.");
-        const closingParanthesisToken = context.collectToken(JSONPathSyntaxTreeType.closingParanthesisToken);
+        const closingParanthesisToken = context.collectToken(SyntaxTreeType.closingParanthesisToken);
 
         this.checkFunctionName(name.token, context);
-        return new JSONPathFunctionExpression(name.token, openingParanthesisToken, args, closingParanthesisToken, name.value);
+        return new FunctionExpression(name.token, openingParanthesisToken, args, closingParanthesisToken, name.value);
     }
 
-    private parseFunctionArguments(context: ParserContext): { arg: JSONPathFilterExpression, commaToken: JSONPathToken | null }[] {
-        const args: { arg: JSONPathFilterExpression, commaToken: JSONPathToken | null }[] = [];
+    private parseFunctionArguments(context: ParserContext): { arg: FilterExpression, commaToken: SyntaxTreeToken | null }[] {
+        const args: { arg: FilterExpression, commaToken: SyntaxTreeToken | null }[] = [];
         if (context.current === ")") return args;
 
         args.push({ arg: this.parseFilterExpression(context), commaToken: null });
         this.skipWhitespace(context);
         while (context.current === ",") {
             context.goNext();
-            const commaToken = context.collectToken(JSONPathSyntaxTreeType.commaToken);
+            const commaToken = context.collectToken(SyntaxTreeType.commaToken);
             args[args.length - 1].commaToken = commaToken;
             this.skipWhitespace(context);
             args.push({ arg: this.parseFilterExpression(context), commaToken: null });
@@ -383,21 +383,21 @@ export class JSONPathParser {
         return args;
     }
 
-    private parseName(context: ParserContext): { token: JSONPathToken, value: string } {
+    private parseName(context: ParserContext): { token: SyntaxTreeToken, value: string } {
         context.goNext();
-        while (JSONPathCharacters.isName(context.current))
+        while (Characters.isName(context.current))
             context.goNext();
-        const token = context.collectToken(JSONPathSyntaxTreeType.nameToken);
+        const token = context.collectToken(SyntaxTreeType.nameToken);
         return { token, value: token.text };
     }
 
-    private parseString(context: ParserContext): { token: JSONPathToken, value: string } {
+    private parseString(context: ParserContext): { token: SyntaxTreeToken, value: string } {
         type HexCharacterLiteral = { range: TextRange, value: string };
         const checkSurrogates = (previous: HexCharacterLiteral | null, current: HexCharacterLiteral | null) => {
             const errorMessage = "Unpaired surrogate.";
-            if (current !== null && JSONPathCharacters.isLowSurrogate(current.value) && (previous === null || !JSONPathCharacters.isHighSurrogate(previous.value)))
+            if (current !== null && Characters.isLowSurrogate(current.value) && (previous === null || !Characters.isHighSurrogate(previous.value)))
                 context.addError(errorMessage, current.range);
-            if (previous !== null && JSONPathCharacters.isHighSurrogate(previous.value) && (current === null || !JSONPathCharacters.isLowSurrogate(current.value)))
+            if (previous !== null && Characters.isHighSurrogate(previous.value) && (current === null || !Characters.isLowSurrogate(current.value)))
                 context.addError(errorMessage, previous.range);
         };
 
@@ -418,7 +418,7 @@ export class JSONPathParser {
                 else if (context.current === "u") {
                     let characterCodeString = "";
                     for (let i = 0; i < 4; i++) {
-                        if (context.next === null || !JSONPathCharacters.isDigit(context.next) && !(context.next >= "a" && context.next <= "f") && !(context.next >= "A" && context.next <= "F")) {
+                        if (context.next === null || !Characters.isDigit(context.next) && !(context.next >= "a" && context.next <= "f") && !(context.next >= "A" && context.next <= "F")) {
                             context.addError("Expected a hexadecimal digit.");
                             break;
                         }
@@ -435,7 +435,7 @@ export class JSONPathParser {
                 else
                     context.addError("Invalid escape sequence.");
             }
-            else if (JSONPathCharacters.isString(context.current))
+            else if (Characters.isString(context.current))
                 value += context.current;
             else
                 context.addError("Invalid character in string.");
@@ -449,28 +449,28 @@ export class JSONPathParser {
             context.goNext();
         else
             context.addError(`Expected '${quote}'.`);
-        const token = context.collectToken(JSONPathSyntaxTreeType.stringToken);
+        const token = context.collectToken(SyntaxTreeType.stringToken);
         return { token, value };
     }
 
-    private parseNumber(context: ParserContext): { token: JSONPathToken, value: number } {
+    private parseNumber(context: ParserContext): { token: SyntaxTreeToken, value: number } {
         if (context.current === "-")
             context.goNext();
 
-        if (!JSONPathCharacters.isDigit(context.current)) {
+        if (!Characters.isDigit(context.current)) {
             context.addError("Expected a digit.");
-            return { token: context.collectToken(JSONPathSyntaxTreeType.numberToken), value: 0 };
+            return { token: context.collectToken(SyntaxTreeType.numberToken), value: 0 };
         }
-        if (context.current === "0" && JSONPathCharacters.isDigit(context.next))
+        if (context.current === "0" && Characters.isDigit(context.next))
             context.addError("Leading zeros are not allowed.");
 
-        while (JSONPathCharacters.isDigit(context.current))
+        while (Characters.isDigit(context.current))
             context.goNext();
 
         if (context.current === ".") {
             context.goNext();
-            if (JSONPathCharacters.isDigit(context.current)) {
-                while (JSONPathCharacters.isDigit(context.current))
+            if (Characters.isDigit(context.current)) {
+                while (Characters.isDigit(context.current))
                     context.goNext();
             }
             else
@@ -482,44 +482,44 @@ export class JSONPathParser {
             // @ts-ignore
             if (context.current === "+" || context.current === "-") 
                 context.goNext();
-            if (JSONPathCharacters.isDigit(context.current)) {
-                while (JSONPathCharacters.isDigit(context.current))
+            if (Characters.isDigit(context.current)) {
+                while (Characters.isDigit(context.current))
                     context.goNext();
             }
             else
                 context.addError("Expected a digit.");
         }
 
-        const token = context.collectToken(JSONPathSyntaxTreeType.numberToken);
+        const token = context.collectToken(SyntaxTreeType.numberToken);
         const value = parseFloat(token.text);
         return { token, value };
     }
 
     private skipWhitespace(context: ParserContext, allowed = true) {
-        context.skipWhile(c => JSONPathCharacters.isBlank(c), allowed ? null : "Whitespace is not allowed here.");
+        context.skipWhile(c => Characters.isBlank(c), allowed ? null : "Whitespace is not allowed here.");
     }
 
-    private changeTokenType(token: JSONPathToken, newType: JSONPathSyntaxTreeType): JSONPathToken {
-        return new JSONPathToken(newType, token.position, token.text, token.skippedTextBefore);
+    private changeTokenType(token: SyntaxTreeToken, newType: SyntaxTreeType): SyntaxTreeToken {
+        return new SyntaxTreeToken(newType, token.position, token.text, token.skippedTextBefore);
     }
 
-    private checkComparisionExpressionOperand(operand: JSONPathFilterExpression, context: ParserContext) {
-        if (operand instanceof JSONPathFilterQueryExpression) {
+    private checkComparisionExpressionOperand(operand: FilterExpression, context: ParserContext) {
+        if (operand instanceof FilterQueryExpression) {
             if (!operand.query.isSingular)
                 context.addError("Query in comparison expression must be singular.", operand.textRangeWithoutSkipped);
         }
-        else if (operand instanceof JSONPathParanthesisExpression)
+        else if (operand instanceof ParanthesisExpression)
             context.addError("Comparison expression operand can not be in paranthesis.", operand.textRangeWithoutSkipped);
-        else if (operand instanceof JSONPathNotExpression)
+        else if (operand instanceof NotExpression)
             context.addError("Comparison expression operand can not be negated.", operand.exlamationMarkToken.textRangeWithoutSkipped);
     }
 
-    private checkLogicalExpressionOperand(operand: JSONPathFilterExpression, context: ParserContext) {
-        if (operand instanceof JSONPathBooleanLiteral || operand instanceof JSONPathNullLiteral || operand instanceof JSONPathStringLiteral || operand instanceof JSONPathNumberLiteral)
+    private checkLogicalExpressionOperand(operand: FilterExpression, context: ParserContext) {
+        if (operand instanceof BooleanLiteralExpression || operand instanceof NullLiteralExpression || operand instanceof StringLiteralExpression || operand instanceof NumberLiteralExpression)
             context.addError("Only logical expression is allowed here.", operand.textRangeWithoutSkipped);
     }
 
-    private checkIsInteger(numberToken: JSONPathToken, context: ParserContext) {
+    private checkIsInteger(numberToken: SyntaxTreeToken, context: ParserContext) {
         if (numberToken.text === "-0")
             context.addError("Negative zero is not allowed"), numberToken.textRangeWithoutSkipped;
         if (numberToken.text.includes("."))
@@ -528,10 +528,10 @@ export class JSONPathParser {
             context.addError("Exponential notation (e/E) is not allowed here.", numberToken.textRangeWithoutSkipped);
     }
 
-    private checkFunctionName(nameToken: JSONPathToken, context: ParserContext) {
-        if (!JSONPathCharacters.isFunctionNameFirst(nameToken.text[0]))
+    private checkFunctionName(nameToken: SyntaxTreeToken, context: ParserContext) {
+        if (!Characters.isFunctionNameFirst(nameToken.text[0]))
             context.addError("Function name must start with a lowercase ASCII letter.", nameToken.textRangeWithoutSkipped);
-        if (!nameToken.text.substring(1).split("").every(c => JSONPathCharacters.isFunctionName(c)))
+        if (!nameToken.text.substring(1).split("").every(c => Characters.isFunctionName(c)))
             context.addError("Function name can contain only lowercase ASCII letters, digits or '_'.", nameToken.textRangeWithoutSkipped);
     }
 }
@@ -540,7 +540,7 @@ class ParserContext {
     private _currentIndex = 0;
     private _skippedCount = 0;
     private _collectedCount = 0;
-    private _diagnostics: JSONPathDiagnostics[] = [];
+    private _diagnostics: Diagnostics[] = [];
 
     constructor(readonly input: string) {
 
@@ -562,7 +562,7 @@ class ParserContext {
             : null;
     }
 
-    get diagnostics(): readonly JSONPathDiagnostics[] {
+    get diagnostics(): readonly Diagnostics[] {
         return this._diagnostics;
     }
 
@@ -589,21 +589,21 @@ class ParserContext {
 
     addError(message: string, textRange?: TextRange) {
         textRange ??= new TextRange(this._currentIndex, this.currentIndex < this.input.length ? 1 : 0);
-        const diagnostics: JSONPathDiagnostics = { type: JSONPathDiagnosticsType.error, message, textRange };
+        const diagnostics: Diagnostics = { type: DiagnosticsType.error, message, textRange };
         this._diagnostics.push(diagnostics);
     }
 
-    collectToken(type: JSONPathSyntaxTreeType): JSONPathToken {
+    collectToken(type: SyntaxTreeType): SyntaxTreeToken {
         const position = this._currentIndex - this._collectedCount - this._skippedCount;
         const skippedText = this.input.substring(this._currentIndex - this._collectedCount - this._skippedCount, this._currentIndex - this._collectedCount);
         const collectedText = this.input.substring(this._currentIndex - this._collectedCount, this._currentIndex);
         this._skippedCount = 0;
         this._collectedCount = 0;
-        return new JSONPathToken(type, position, collectedText, skippedText);
+        return new SyntaxTreeToken(type, position, collectedText, skippedText);
     }
 }
 
-export class JSONPathCharacters {
+export class Characters {
     static isHighSurrogate(character: string) {
         return character >= "\uD800" && character <= "\uDBFF";
     }

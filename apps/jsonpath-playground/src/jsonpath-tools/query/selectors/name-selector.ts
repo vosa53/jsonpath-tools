@@ -1,24 +1,24 @@
-import { JSONPathQueryContext, PushOnlyArray } from "../evaluation";
-import { LocatedNode } from "../located-node";
-import { JSONPathSyntaxTreeType } from "../syntax-tree-type";
-import { JSONPathToken } from "../token";
-import { JSONPathSelector } from "./selector";
+import { QueryContext, PushOnlyArray } from "../evaluation";
+import { Node } from "../located-node";
+import { SyntaxTreeType } from "../syntax-tree-type";
+import { SyntaxTreeToken } from "../token";
+import { Selector } from "./selector";
 
 
-export class JSONPathNameSelector extends JSONPathSelector {
+export class NameSelector extends Selector {
     constructor(
-        readonly nameToken: JSONPathToken,
+        readonly nameToken: SyntaxTreeToken,
 
         readonly name: string
     ) {
         super([nameToken]);
     }
 
-    get type() { return JSONPathSyntaxTreeType.nameSelector; }
+    get type() { return SyntaxTreeType.nameSelector; }
 
-    select(input: LocatedNode, output: PushOnlyArray<LocatedNode>, queryContext: JSONPathQueryContext): void {
+    select(input: Node, output: PushOnlyArray<Node>, queryContext: QueryContext): void {
         const isObject = typeof input.value === "object" && !Array.isArray(input.value) && input.value !== null;
         if (isObject && input.value.hasOwnProperty(this.name))
-            output.push(new LocatedNode(input.value[this.name], this.name, input));
+            output.push(new Node(input.value[this.name], this.name, input));
     }
 }

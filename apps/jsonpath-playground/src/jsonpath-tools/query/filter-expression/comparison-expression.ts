@@ -1,24 +1,24 @@
-import { deepEquals, JSONPathFilterValue, JSONPathLogicalFalse, JSONPathLogicalTrue, JSONPathNothing, JSONPathValueType } from "../../types";
-import { JSONPathFilterExpressionContext, JSONPathQueryContext } from "../evaluation";
+import { deepEquals, FilterValue, LogicalFalse, LogicalTrue, Nothing, ValueType } from "../../types";
+import { FilterExpressionContext, QueryContext } from "../evaluation";
 import { evaluateAsValueType } from "../helpers";
-import { JSONPathSyntaxTreeType } from "../syntax-tree-type";
-import { JSONPathToken } from "../token";
-import { JSONPathFilterExpression } from "./filter-expression";
+import { SyntaxTreeType } from "../syntax-tree-type";
+import { SyntaxTreeToken } from "../token";
+import { FilterExpression } from "./filter-expression";
 
-export class JSONPathComparisonExpression extends JSONPathFilterExpression {
+export class ComparisonExpression extends FilterExpression {
     constructor(
-        readonly left: JSONPathFilterExpression,
-        readonly operatorToken: JSONPathToken,
-        readonly right: JSONPathFilterExpression,
+        readonly left: FilterExpression,
+        readonly operatorToken: SyntaxTreeToken,
+        readonly right: FilterExpression,
 
         readonly operator: JSONPathComparisonOperator
     ) {
         super([left, operatorToken, right]);
     }
 
-    get type() { return JSONPathSyntaxTreeType.comparisonExpression; }
+    get type() { return SyntaxTreeType.comparisonExpression; }
 
-    protected evaluateImplementation(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
+    protected evaluateImplementation(queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): FilterValue {
         const leftValue = evaluateAsValueType(this.left, queryContext, filterExpressionContext);
         const rightValue = evaluateAsValueType(this.right, queryContext, filterExpressionContext);
 
@@ -37,18 +37,18 @@ export class JSONPathComparisonExpression extends JSONPathFilterExpression {
             result = this.isLower(rightValue, leftValue) || this.isEqual(leftValue, rightValue);
         else
             throw new Error("Unknown operator.");
-        return result ? JSONPathLogicalTrue : JSONPathLogicalFalse;
+        return result ? LogicalTrue : LogicalFalse;
     }
 
-    private isEqual(left: JSONPathValueType, right: JSONPathValueType): boolean {
-        if (left === JSONPathNothing || right === JSONPathNothing)
-            return left === JSONPathNothing && right === JSONPathNothing;
+    private isEqual(left: ValueType, right: ValueType): boolean {
+        if (left === Nothing || right === Nothing)
+            return left === Nothing && right === Nothing;
 
         return deepEquals(left, right);
     }
 
-    private isLower(left: JSONPathValueType, right: JSONPathValueType): boolean {
-        if (left === JSONPathNothing || right === JSONPathNothing)
+    private isLower(left: ValueType, right: ValueType): boolean {
+        if (left === Nothing || right === Nothing)
             return false;
         if (typeof left === "number" && typeof right === "number")
             return left < right;

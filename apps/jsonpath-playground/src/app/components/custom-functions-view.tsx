@@ -1,4 +1,4 @@
-import { JSONPathType } from "@/jsonpath-tools/options";
+import { Type } from "@/jsonpath-tools/options";
 import { Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
@@ -12,7 +12,7 @@ const newCustomFunction: CustomFunction = {
     description: "",
     code: "",
     parameters: [],
-    returnType: JSONPathType.valueType
+    returnType: Type.valueType
 };
 
 export default function CustomFunctionsView({

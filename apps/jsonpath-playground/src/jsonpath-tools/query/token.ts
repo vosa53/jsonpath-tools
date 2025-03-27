@@ -1,11 +1,11 @@
 import { TextRange } from "../text-range";
-import { JSONPathSyntaxTree } from "./syntax-tree";
-import { JSONPathSyntaxTreeType } from "./syntax-tree-type";
+import { SyntaxTree } from "./syntax-tree";
+import { SyntaxTreeType } from "./syntax-tree-type";
 
 
-export class JSONPathToken extends JSONPathSyntaxTree {
+export class SyntaxTreeToken extends SyntaxTree {
     constructor(
-        readonly type: JSONPathSyntaxTreeType,
+        readonly type: SyntaxTreeType,
         readonly position: number,
         readonly text: string,
         readonly skippedTextBefore: string
@@ -13,7 +13,7 @@ export class JSONPathToken extends JSONPathSyntaxTree {
         super(position, skippedTextBefore.length + text.length);
     }
     
-    forEach(action: (tree: JSONPathSyntaxTree) => void | boolean): void {
+    forEach(action: (tree: SyntaxTree) => void | boolean): void {
         action(this);
     }
 }

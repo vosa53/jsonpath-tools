@@ -1,4 +1,4 @@
-import { JSONPathNormalizedPath } from "@/jsonpath-tools/transformations";
+import { NormalizedPath } from "@/jsonpath-tools/transformations";
 import { json, jsonParseLinter } from "@codemirror/lang-json";
 import { syntaxTree } from "@codemirror/language";
 import { linter } from "@codemirror/lint";
@@ -23,10 +23,10 @@ export default function JSONEditor({
 }: {
     value: string,
     readonly?: boolean,
-    paths?: readonly JSONPathNormalizedPath[],
-    currentPath?: JSONPathNormalizedPath,
+    paths?: readonly NormalizedPath[],
+    currentPath?: NormalizedPath,
     onValueChanged: (value: string) => void,
-    onCurrentPathChanged?: (currentPathGetter: () => JSONPathNormalizedPath) => void,
+    onCurrentPathChanged?: (currentPathGetter: () => NormalizedPath) => void,
     onParsingProgressChanged?: (inProgress: boolean) => void,
     onFocus?: FocusEventHandler<HTMLElement>,
     onBlur?: FocusEventHandler<HTMLElement>

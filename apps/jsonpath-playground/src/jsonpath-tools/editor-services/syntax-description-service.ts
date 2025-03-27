@@ -1,84 +1,84 @@
-import { JSONPathFunction, JSONPathOptions } from "../options";
-import { JSONPathBooleanLiteral } from "../query/filter-expression/boolean-literal";
-import { JSONPathComparisonExpression, JSONPathComparisonOperator } from "../query/filter-expression/comparison-expression";
-import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
-import { JSONPathNumberLiteral } from "../query/filter-expression/number-literal";
-import { JSONPathStringLiteral } from "../query/filter-expression/string-literal";
-import { JSONPathQuery } from "../query/query";
-import { JSONPathSegment } from "../query/segment";
-import { JSONPathIndexSelector } from "../query/selectors/index-selector";
-import { JSONPathNameSelector } from "../query/selectors/name-selector";
-import { JSONPathSliceSelector } from "../query/selectors/slice-selector";
-import { JSONPathSyntaxTree } from "../query/syntax-tree";
-import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
+import { Function, QueryOptions } from "../options";
+import { BooleanLiteralExpression } from "../query/filter-expression/boolean-literal";
+import { ComparisonExpression, JSONPathComparisonOperator } from "../query/filter-expression/comparison-expression";
+import { FunctionExpression } from "../query/filter-expression/function-expression";
+import { NumberLiteralExpression } from "../query/filter-expression/number-literal";
+import { StringLiteralExpression } from "../query/filter-expression/string-literal";
+import { SubQuery } from "../query/query";
+import { Segment } from "../query/segment";
+import { IndexSelector } from "../query/selectors/index-selector";
+import { NameSelector } from "../query/selectors/name-selector";
+import { SliceSelector } from "../query/selectors/slice-selector";
+import { SyntaxTree } from "../query/syntax-tree";
+import { SyntaxTreeType } from "../query/syntax-tree-type";
 
 export class SyntaxDescriptionService {
-    private readonly descriptionProviders = new Map<JSONPathSyntaxTreeType, (node: JSONPathSyntaxTree) => SyntaxDescription>([
-        [JSONPathSyntaxTreeType.query, n => {
-            const query = n as JSONPathQuery;
+    private readonly descriptionProviders = new Map<SyntaxTreeType, (node: SyntaxTree) => SyntaxDescription>([
+        [SyntaxTreeType.query, n => {
+            const query = n as SubQuery;
             return this.provideDescriptionForQuery(query.isRelative);
         }],
-        [JSONPathSyntaxTreeType.segment, n => {
-            const segment = n as JSONPathSegment;
+        [SyntaxTreeType.segment, n => {
+            const segment = n as Segment;
             if (segment.isDescendant)
                 return new SyntaxDescription("Descendant Segment", "Selects values with its selectors from the current value **and all its descendants**.");
             else
                 return new SyntaxDescription("Child Segment", "Selects values with its selectors from the current value.");
         }],
 
-        [JSONPathSyntaxTreeType.filterSelector, n => this.provideDescriptionForFilterSelector()],
-        [JSONPathSyntaxTreeType.indexSelector, n => {
-            const indexSelector = n as JSONPathIndexSelector;
+        [SyntaxTreeType.filterSelector, n => this.provideDescriptionForFilterSelector()],
+        [SyntaxTreeType.indexSelector, n => {
+            const indexSelector = n as IndexSelector;
             return this.provideDescriptionForIndexSelector(indexSelector.index);
         }],
-        [JSONPathSyntaxTreeType.nameSelector, n => {
-            const nameSelector = n as JSONPathNameSelector;
+        [SyntaxTreeType.nameSelector, n => {
+            const nameSelector = n as NameSelector;
             return this.provideDescriptionForNameSelector(nameSelector.name);
         }],
-        [JSONPathSyntaxTreeType.sliceSelector, n => {
-            const sliceSelector = n as JSONPathSliceSelector;
+        [SyntaxTreeType.sliceSelector, n => {
+            const sliceSelector = n as SliceSelector;
             return this.provideDescriptionForSliceSelector(sliceSelector.start, sliceSelector.end, sliceSelector.step);
         }],
-        [JSONPathSyntaxTreeType.wildcardSelector, n => this.provideDescriptionForWildcardSelector()],
-        [JSONPathSyntaxTreeType.missingSelector, n => this.provideDescriptionForMissingSelector()],
+        [SyntaxTreeType.wildcardSelector, n => this.provideDescriptionForWildcardSelector()],
+        [SyntaxTreeType.missingSelector, n => this.provideDescriptionForMissingSelector()],
 
-        [JSONPathSyntaxTreeType.paranthesisExpression, n => new SyntaxDescription("Paranthesis", "Used to change logical operators priorities.")],
-        [JSONPathSyntaxTreeType.andExpression, n => new SyntaxDescription("Logical AND", "Realizes a logical operation AND.")],
-        [JSONPathSyntaxTreeType.orExpression, n => new SyntaxDescription("Logical OR", "Realizes a logical operation OR.")],
-        [JSONPathSyntaxTreeType.notExpression, n => new SyntaxDescription("Logical NOT", "Realizes a logical operation NOT.")],
-        [JSONPathSyntaxTreeType.comparisonExpression, n => {
-            const comparisonExpression = n as JSONPathComparisonExpression;
+        [SyntaxTreeType.paranthesisExpression, n => new SyntaxDescription("Paranthesis", "Used to change logical operators priorities.")],
+        [SyntaxTreeType.andExpression, n => new SyntaxDescription("Logical AND", "Realizes a logical operation AND.")],
+        [SyntaxTreeType.orExpression, n => new SyntaxDescription("Logical OR", "Realizes a logical operation OR.")],
+        [SyntaxTreeType.notExpression, n => new SyntaxDescription("Logical NOT", "Realizes a logical operation NOT.")],
+        [SyntaxTreeType.comparisonExpression, n => {
+            const comparisonExpression = n as ComparisonExpression;
             return this.provideDescriptionForComparisonExpression(comparisonExpression.operator);
         }],
-        [JSONPathSyntaxTreeType.filterQueryExpression, n => new SyntaxDescription("Filter Query", "Query in filter expression. When used on its own it is considered an existence test.")],
-        [JSONPathSyntaxTreeType.functionExpression, n => {
-            const functionExpression = n as JSONPathFunctionExpression;
+        [SyntaxTreeType.filterQueryExpression, n => new SyntaxDescription("Filter Query", "Query in filter expression. When used on its own it is considered an existence test.")],
+        [SyntaxTreeType.functionExpression, n => {
+            const functionExpression = n as FunctionExpression;
             return this.provideDescriptionForFunctionExpression(functionExpression.name, this.options.functions[functionExpression.name]);
         }],
-        [JSONPathSyntaxTreeType.stringLiteral, n => {
-            const stringLiteral = n as JSONPathStringLiteral;
+        [SyntaxTreeType.stringLiteral, n => {
+            const stringLiteral = n as StringLiteralExpression;
             return this.provideDescriptionForStringLiteralExpression(stringLiteral.value);
         }],
-        [JSONPathSyntaxTreeType.numberLiteral, n => {
-            const numberLiteral = n as JSONPathNumberLiteral;
+        [SyntaxTreeType.numberLiteral, n => {
+            const numberLiteral = n as NumberLiteralExpression;
             return this.provideDescriptionForNumberLiteralExpression(numberLiteral.value);
         }],
-        [JSONPathSyntaxTreeType.booleanLiteral, n => {
-            const booleanLiteral = n as JSONPathBooleanLiteral;
+        [SyntaxTreeType.booleanLiteral, n => {
+            const booleanLiteral = n as BooleanLiteralExpression;
             return this.provideDescriptionForBooleanLiteralExpression(booleanLiteral.value);
         }],
-        [JSONPathSyntaxTreeType.nullLiteral, n => this.provideDescriptionForNullLiteralExpression()],
-        [JSONPathSyntaxTreeType.missingExpression, n => new SyntaxDescription("Missing Expression", "Represents a mising expression (syntax error).")],
+        [SyntaxTreeType.nullLiteral, n => this.provideDescriptionForNullLiteralExpression()],
+        [SyntaxTreeType.missingExpression, n => new SyntaxDescription("Missing Expression", "Represents a mising expression (syntax error).")],
 
-        [JSONPathSyntaxTreeType.dollarToken, n => this.provideDescriptionForDollarToken()],
-        [JSONPathSyntaxTreeType.atToken, n => this.provideDescriptionForAtToken()]
+        [SyntaxTreeType.dollarToken, n => this.provideDescriptionForDollarToken()],
+        [SyntaxTreeType.atToken, n => this.provideDescriptionForAtToken()]
     ]);
 
     constructor(
-        private readonly options: JSONPathOptions
+        private readonly options: QueryOptions
     ) { }
 
-    provideDescription(node: JSONPathSyntaxTree): SyntaxDescription | null {
+    provideDescription(node: SyntaxTree): SyntaxDescription | null {
         const descriptionProvider = this.descriptionProviders.get(node.type);
         if (descriptionProvider !== undefined)
             return descriptionProvider(node);
@@ -140,7 +140,7 @@ export class SyntaxDescriptionService {
         return new SyntaxDescription(`${operatorDescription} Comparison`, "Compares left and right.");
     }
 
-    provideDescriptionForFunctionExpression(name: string, functionDefinition?: JSONPathFunction): SyntaxDescription {
+    provideDescriptionForFunctionExpression(name: string, functionDefinition?: Function): SyntaxDescription {
         let text = "";
         if (functionDefinition !== undefined) {
             text += functionDefinition.description;

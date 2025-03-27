@@ -1,18 +1,18 @@
-import { JSONPathQueryContext, PushOnlyArray } from "../evaluation";
-import { LocatedNode } from "../located-node";
-import { JSONPathSyntaxTreeType } from "../syntax-tree-type";
-import { JSONPathToken } from "../token";
-import { JSONPathSelector } from "./selector";
+import { QueryContext, PushOnlyArray } from "../evaluation";
+import { Node } from "../located-node";
+import { SyntaxTreeType } from "../syntax-tree-type";
+import { SyntaxTreeToken } from "../token";
+import { Selector } from "./selector";
 
 
-export class JSONPathMissingSelector extends JSONPathSelector {
+export class MissingSelector extends Selector {
     constructor(
-            readonly missingToken: JSONPathToken
+            readonly missingToken: SyntaxTreeToken
         ) {
             super([missingToken]);
         }
 
-    get type() { return JSONPathSyntaxTreeType.missingSelector; }
+    get type() { return SyntaxTreeType.missingSelector; }
 
-    select(input: LocatedNode, output: PushOnlyArray<LocatedNode>, queryContext: JSONPathQueryContext): void { }
+    select(input: Node, output: PushOnlyArray<Node>, queryContext: QueryContext): void { }
 }

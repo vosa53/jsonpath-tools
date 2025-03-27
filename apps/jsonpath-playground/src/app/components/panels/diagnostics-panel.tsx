@@ -1,4 +1,4 @@
-import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "@/jsonpath-tools/diagnostics";
+import { Diagnostics, DiagnosticsType } from "@/jsonpath-tools/diagnostics";
 import { Checkbox, DefaultMantineColor, Group, Table, ThemeIcon } from "@mantine/core";
 import { IconAlertTriangle, IconAlertTriangleFilled, IconExclamationCircle, IconExclamationCircleFilled } from "@tabler/icons-react";
 import { memo, ReactNode, useMemo, useState } from "react";
@@ -8,17 +8,17 @@ const DiagnosticsPanel = memo(({
     diagnostics,
     onSelectedDiagnosticsChanged
 }: {
-    diagnostics: readonly JSONPathDiagnostics[],
-    onSelectedDiagnosticsChanged: (diagnostics: JSONPathDiagnostics | null) => void
+    diagnostics: readonly Diagnostics[],
+    onSelectedDiagnosticsChanged: (diagnostics: Diagnostics | null) => void
 }) => {
     const [filters, setFilters] = useState<DiagnosticsFilters>({ showErrors: true, showWarnings: true });
     const {filteredDiagnostics, errorCount, warningCount} = useMemo(() => {
         const filteredDiagnostics = diagnostics.filter(d => 
-            d.type === JSONPathDiagnosticsType.error && filters.showErrors || 
-            d.type === JSONPathDiagnosticsType.warning && filters.showWarnings
+            d.type === DiagnosticsType.error && filters.showErrors || 
+            d.type === DiagnosticsType.warning && filters.showWarnings
         );
-        const errorCount = diagnostics.filter(d => d.type === JSONPathDiagnosticsType.error).length;
-        const warningCount = diagnostics.filter(d => d.type === JSONPathDiagnosticsType.warning).length;
+        const errorCount = diagnostics.filter(d => d.type === DiagnosticsType.error).length;
+        const warningCount = diagnostics.filter(d => d.type === DiagnosticsType.warning).length;
         return { filteredDiagnostics, errorCount, warningCount };
     }, [diagnostics, filters]);
 
@@ -51,8 +51,8 @@ function DiagnosticsView({
     diagnostics,
     onSelectedDiagnosticsChanged
 }: { 
-    diagnostics: readonly JSONPathDiagnostics[],
-    onSelectedDiagnosticsChanged: (diagnostics: JSONPathDiagnostics | null) => void
+    diagnostics: readonly Diagnostics[],
+    onSelectedDiagnosticsChanged: (diagnostics: Diagnostics | null) => void
 }) {
     return (
         <Table>
@@ -78,15 +78,15 @@ function DiagnosticsView({
     );
 }
 
-function DiagnosticsIcon({ diagnosticsType }: { diagnosticsType: JSONPathDiagnosticsType }) {
+function DiagnosticsIcon({ diagnosticsType }: { diagnosticsType: DiagnosticsType }) {
     const ICON_SIZE = 20;
     let iconColor: DefaultMantineColor;
     let icon: ReactNode;
-    if (diagnosticsType === JSONPathDiagnosticsType.error) {
+    if (diagnosticsType === DiagnosticsType.error) {
         iconColor = "red.7";
         icon = <IconExclamationCircleFilled size={ICON_SIZE} />;
     }
-    else if (diagnosticsType === JSONPathDiagnosticsType.warning) {
+    else if (diagnosticsType === DiagnosticsType.warning) {
         iconColor = "yellow.4";
         icon = <IconAlertTriangleFilled size={ICON_SIZE} />;
     }

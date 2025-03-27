@@ -1,4 +1,4 @@
-import { JSONPathDiagnostics } from "@/jsonpath-tools/diagnostics";
+import { Diagnostics } from "@/jsonpath-tools/diagnostics";
 import { Language, LanguageSupport } from "@codemirror/language";
 import { linter } from "@codemirror/lint";
 import { jsonPathCompletionSource } from "./jsonpath-completion-source";
@@ -17,7 +17,7 @@ export const jsonPathLanguage = new Language(jsonPathLanguageFacet, jsonPathPars
 
 export function jsonPath(options: {
     languageService?: LanguageService,
-    onDiagnosticsCreated?: (diagnostics: readonly JSONPathDiagnostics[]) => void
+    onDiagnosticsCreated?: (diagnostics: readonly Diagnostics[]) => void
 }): LanguageSupport {
     return new LanguageSupport(jsonPathLanguage, [
         jsonPathConfigFacet.of({

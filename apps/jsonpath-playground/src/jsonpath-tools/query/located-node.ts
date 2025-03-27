@@ -1,10 +1,10 @@
-import { JSONPathJSONValue } from "../types";
+import { JSONValue } from "../types";
 
-export class LocatedNode {
+export class Node {
     constructor(
-        readonly value: JSONPathJSONValue,
+        readonly value: JSONValue,
         readonly pathSegment: string | number,
-        readonly parent: LocatedNode | null
+        readonly parent: Node | null
     ) { }
 
     buildPath(): (string | number)[] {

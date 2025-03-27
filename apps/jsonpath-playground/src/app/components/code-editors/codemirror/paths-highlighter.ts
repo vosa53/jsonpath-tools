@@ -1,4 +1,4 @@
-import { JSONPathNormalizedPath } from "@/jsonpath-tools/transformations";
+import { NormalizedPath } from "@/jsonpath-tools/transformations";
 import { logPerformance } from "@/jsonpath-tools/utils";
 import { syntaxTree } from "@codemirror/language";
 import { EditorState, Extension, Range, StateEffect, StateField, Text } from "@codemirror/state";
@@ -12,10 +12,10 @@ export function pathsHighlighter(): Extension {
     ];
 }
 
-export const setCurrentHighlightedPathEffect = StateEffect.define<JSONPathNormalizedPath>();
-export const setHighlightedPathsEffect = StateEffect.define<readonly JSONPathNormalizedPath[]>();
+export const setCurrentHighlightedPathEffect = StateEffect.define<NormalizedPath>();
+export const setHighlightedPathsEffect = StateEffect.define<readonly NormalizedPath[]>();
 
-export function getPathAtTreeCursor(cursor: TreeCursor, state: EditorState): JSONPathNormalizedPath {
+export function getPathAtTreeCursor(cursor: TreeCursor, state: EditorState): NormalizedPath {
     const path: (string | number)[] = [];
 
     while (!valueNodeNames.has(cursor.name) && cursor.parent());
@@ -37,7 +37,7 @@ export function getPathAtTreeCursor(cursor: TreeCursor, state: EditorState): JSO
     return path;
 }
 
-export function getNodeAtPath(path: JSONPathNormalizedPath, state: EditorState): SyntaxNode | null {
+export function getNodeAtPath(path: NormalizedPath, state: EditorState): SyntaxNode | null {
     const cursor = syntaxTree(state).cursor();
     cursor.firstChild();
     for (const pathSegment of path) {

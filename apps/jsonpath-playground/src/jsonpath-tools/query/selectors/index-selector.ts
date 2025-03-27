@@ -1,27 +1,27 @@
-import { JSONPathQueryContext, PushOnlyArray } from "../evaluation";
-import { LocatedNode } from "../located-node";
-import { JSONPathSyntaxTreeType } from "../syntax-tree-type";
-import { JSONPathToken } from "../token";
-import { JSONPathSelector } from "./selector";
+import { QueryContext, PushOnlyArray } from "../evaluation";
+import { Node } from "../located-node";
+import { SyntaxTreeType } from "../syntax-tree-type";
+import { SyntaxTreeToken } from "../token";
+import { Selector } from "./selector";
 
 
-export class JSONPathIndexSelector extends JSONPathSelector {
+export class IndexSelector extends Selector {
     constructor(
-        readonly indexToken: JSONPathToken,
+        readonly indexToken: SyntaxTreeToken,
 
         readonly index: number
     ) {
         super([indexToken]);
     }
 
-    get type() { return JSONPathSyntaxTreeType.indexSelector; }
+    get type() { return SyntaxTreeType.indexSelector; }
 
-    select(input: LocatedNode, output: PushOnlyArray<LocatedNode>, queryContext: JSONPathQueryContext): void {
+    select(input: Node, output: PushOnlyArray<Node>, queryContext: QueryContext): void {
         const isArray = Array.isArray(input.value);
         if (isArray) {
             const index = this.index < 0 ? input.value.length + this.index : this.index;
             if (index >= 0 && index < input.value.length)
-                output.push(new LocatedNode(input.value[index], index, input));
+                output.push(new Node(input.value[index], index, input));
         }
     }
 }

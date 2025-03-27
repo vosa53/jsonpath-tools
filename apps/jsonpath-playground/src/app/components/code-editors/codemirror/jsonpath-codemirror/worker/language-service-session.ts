@@ -1,6 +1,6 @@
-import { JSONPathDiagnostics } from "@/jsonpath-tools/diagnostics";
-import { JSONPathOptions } from "@/jsonpath-tools/options";
-import { JSONPathJSONValue } from "@/jsonpath-tools/types";
+import { Diagnostics } from "@/jsonpath-tools/diagnostics";
+import { QueryOptions } from "@/jsonpath-tools/options";
+import { JSONValue } from "@/jsonpath-tools/types";
 import { CancellationToken } from "../cancellation-token";
 import { GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, SerializableCompletionItem, SerializableJSONPathFunction, SerializableJSONPathOptions, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage as UpdateQueryArgumentTypeLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
 import { SimpleRPCTopic } from "./simple-rpc";
@@ -18,7 +18,7 @@ export class LanguageServiceSession {
 
     constructor(readonly rpcTopic: SimpleRPCTopic) { }
 
-    updateOptions(newOptions: JSONPathOptions) {
+    updateOptions(newOptions: QueryOptions) {
         const serializableFunctions: [string, SerializableJSONPathFunction][] = Object.entries(newOptions.functions).map(([name, f]) => [
             name,
             {
@@ -50,7 +50,7 @@ export class LanguageServiceSession {
         });
     }
 
-    updateQueryArgument(newQueryArgument: JSONPathJSONValue | undefined) {
+    updateQueryArgument(newQueryArgument: JSONValue | undefined) {
         this.cancelQueue();
         this.rpcTopic.sendNotification<UpdateQueryArgumentLanguageServiceMessage>("updateQueryArgument", {
             newQueryArgument: newQueryArgument
@@ -99,7 +99,7 @@ export class LanguageServiceSession {
         return response.tooltip;
     }
 
-    async getDiagnostics(): Promise<readonly JSONPathDiagnostics[]> {
+    async getDiagnostics(): Promise<readonly Diagnostics[]> {
         const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse>("getDiagnostics", {
         }), this.cancellationToken);
         return response.diagnostics;
@@ -111,7 +111,7 @@ export class LanguageServiceSession {
         return response.formattingEdits;
     }
 
-    async getResult(): Promise<{ nodes: readonly JSONPathJSONValue[], paths: readonly (string | number)[][] }> {
+    async getResult(): Promise<{ nodes: readonly JSONValue[], paths: readonly (string | number)[][] }> {
         const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse>("getResult", {
         }), this.cancellationToken);
         return response;

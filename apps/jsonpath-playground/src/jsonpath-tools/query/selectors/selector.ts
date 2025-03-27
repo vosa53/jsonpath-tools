@@ -1,8 +1,8 @@
-import { JSONPathQueryContext, PushOnlyArray } from "../evaluation";
-import { LocatedNode } from "../located-node";
-import { JSONPathNode } from "../node";
+import { QueryContext, PushOnlyArray } from "../evaluation";
+import { Node } from "../located-node";
+import { SyntaxTreeNode } from "../node";
 
 
-export abstract class JSONPathSelector extends JSONPathNode {
-    abstract select(input: LocatedNode, output: PushOnlyArray<LocatedNode>, queryContext: JSONPathQueryContext): void;
+export abstract class Selector extends SyntaxTreeNode {
+    abstract select(input: Node, output: PushOnlyArray<Node>, queryContext: QueryContext): void;
 }

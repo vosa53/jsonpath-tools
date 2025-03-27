@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
 import cts from "./jsonpath-compliance-test-suite/cts.json";
-import { JSONPathParser } from './syntax-analysis/parser';
+import { Parser } from './syntax-analysis/parser';
 import { TypeChecker } from './semantic-analysis/type-checker';
-import { defaultJSONPathOptions } from './options';
+import { defaultQueryOptions } from './options';
 import { deepEquals } from './types';
 
 describe("JSONPath Compliance Test Suite", () => {
     for (const test of cts.tests) {
         it(test.name, () => {
-            const parser = new JSONPathParser();
-            const typeChecker = new TypeChecker(defaultJSONPathOptions);
+            const parser = new Parser();
+            const typeChecker = new TypeChecker(defaultQueryOptions);
             const pathSource = test.selector;
             const path = parser.parse(pathSource);
             const errorsCount = path.syntaxDiagnostics.length + typeChecker.check(path).length;
@@ -22,7 +22,7 @@ describe("JSONPath Compliance Test Suite", () => {
                 expect(errorsCount).toBe(0);
                 if (test.document !== undefined) {
                     // @ts-ignore
-                    const result = path.select({ rootNode: test.document, options: defaultJSONPathOptions }).nodes.map(n => n.value);
+                    const result = path.select({ rootNode: test.document, options: defaultQueryOptions }).nodes.map(n => n.value);
                     if (test.results !== undefined) {
                         // @ts-ignore
                         expect(test.results.some(r => deepEquals(r, result))).toBeTruthy();

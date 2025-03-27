@@ -1,55 +1,55 @@
-import { JSONPathType } from "../options";
-import { isLogicalType, isNodesType, isValueType, JSONPathFilterValue, JSONPathLogicalFalse, JSONPathLogicalTrue, JSONPathLogicalType, JSONPathNodeList, JSONPathNodesType, JSONPathNothing, JSONPathValueType } from "../types";
-import { JSONPathFilterExpressionContext, JSONPathQueryContext } from "./evaluation";
-import { JSONPathFilterExpression } from "./filter-expression/filter-expression";
+import { Type } from "../options";
+import { isLogicalType, isNodesType, isValueType, FilterValue, LogicalFalse, LogicalTrue, LogicalType, NodeList, NodesType, Nothing, ValueType } from "../types";
+import { FilterExpressionContext, QueryContext } from "./evaluation";
+import { FilterExpression } from "./filter-expression/filter-expression";
 
-export function evaluateAsLogicalType(expression: JSONPathFilterExpression, queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathLogicalType {
+export function evaluateAsLogicalType(expression: FilterExpression, queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): LogicalType {
     const value = expression.evaluate(queryContext, filterExpressionContext);
     return convertToLogicalType(value);
 }
 
-export function evaluateAsValueType(expression: JSONPathFilterExpression, queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathValueType {
+export function evaluateAsValueType(expression: FilterExpression, queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): ValueType {
     const value = expression.evaluate(queryContext, filterExpressionContext);
     return convertToValueType(value);
 
 }
 
-export function evaluateAsNodesType(expression: JSONPathFilterExpression, queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathNodesType {
+export function evaluateAsNodesType(expression: FilterExpression, queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): NodesType {
     const value = expression.evaluate(queryContext, filterExpressionContext);
     return convertToNodesType(value);
 }
 
-export function evaluateAs(expression: JSONPathFilterExpression, type: JSONPathType, queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
-    if (type === JSONPathType.logicalType)
+export function evaluateAs(expression: FilterExpression, type: Type, queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): FilterValue {
+    if (type === Type.logicalType)
         return evaluateAsLogicalType(expression, queryContext, filterExpressionContext);
-    else if (type === JSONPathType.valueType)
+    else if (type === Type.valueType)
         return evaluateAsValueType(expression, queryContext, filterExpressionContext);
     else
         return evaluateAsNodesType(expression, queryContext, filterExpressionContext);
 }
 
-export function convertToLogicalType(value: JSONPathFilterValue): JSONPathLogicalType {
+export function convertToLogicalType(value: FilterValue): LogicalType {
     if (isLogicalType(value)) return value;
 
     // Implicit conversion.
     if (isNodesType(value))
-        return value.nodes.length !== 0 ? JSONPathLogicalTrue : JSONPathLogicalFalse;
+        return value.nodes.length !== 0 ? LogicalTrue : LogicalFalse;
 
-    return JSONPathLogicalFalse;
+    return LogicalFalse;
 }
 
-export function convertToValueType(value: JSONPathFilterValue): JSONPathValueType {
+export function convertToValueType(value: FilterValue): ValueType {
     if (isValueType(value)) return value;
 
     // Implicit conversion.
     if (isNodesType(value))
-        return value.nodes.length !== 0 ? value.nodes[0].value : JSONPathNothing;
+        return value.nodes.length !== 0 ? value.nodes[0].value : Nothing;
 
-    return JSONPathNothing;
+    return Nothing;
 }
 
-export function convertToNodesType(value: JSONPathFilterValue): JSONPathNodesType {
+export function convertToNodesType(value: FilterValue): NodesType {
     if (isNodesType(value)) return value;
 
-    return JSONPathNodeList.empty;
+    return NodeList.empty;
 }

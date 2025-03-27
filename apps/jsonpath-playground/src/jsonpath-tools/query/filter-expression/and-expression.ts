@@ -1,26 +1,26 @@
-import { JSONPathFilterValue, JSONPathLogicalFalse, JSONPathLogicalTrue } from "../../types";
-import { JSONPathFilterExpressionContext, JSONPathQueryContext } from "../evaluation";
+import { FilterValue, LogicalFalse, LogicalTrue } from "../../types";
+import { FilterExpressionContext, QueryContext } from "../evaluation";
 import { evaluateAsLogicalType } from "../helpers";
-import { JSONPathSyntaxTreeType } from "../syntax-tree-type";
-import { JSONPathToken } from "../token";
-import { JSONPathFilterExpression } from "./filter-expression";
+import { SyntaxTreeType } from "../syntax-tree-type";
+import { SyntaxTreeToken } from "../token";
+import { FilterExpression } from "./filter-expression";
 
 
-export class JSONPathAndExpression extends JSONPathFilterExpression {
+export class AndExpression extends FilterExpression {
     constructor(
-        readonly expressions: { expression: JSONPathFilterExpression; andToken: JSONPathToken | null; }[]
+        readonly expressions: { expression: FilterExpression; andToken: SyntaxTreeToken | null; }[]
     ) {
         super(expressions.flatMap(e => [e.expression, e.andToken]));
     }
 
-    get type() { return JSONPathSyntaxTreeType.andExpression; }
+    get type() { return SyntaxTreeType.andExpression; }
 
-    protected evaluateImplementation(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
+    protected evaluateImplementation(queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): FilterValue {
         for (const expression of this.expressions) {
             const result = evaluateAsLogicalType(expression.expression, queryContext, filterExpressionContext);
-            if (result === JSONPathLogicalFalse)
-                return JSONPathLogicalFalse;
+            if (result === LogicalFalse)
+                return LogicalFalse;
         }
-        return JSONPathLogicalTrue;
+        return LogicalTrue;
     }
 }

@@ -1,12 +1,12 @@
 import { getJSONTypeName } from "../data-types/json-types";
 import { DataTypeAnalyzer } from "../data-types/data-type-analyzer";
 import { DataType, DataTypeAnnotation } from "../data-types/data-types";
-import { JSONPathOptions } from "../options";
-import { JSONPath } from "../query/json-path";
-import { JSONPathSyntaxTree } from "../query/syntax-tree";
-import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
+import { QueryOptions } from "../options";
+import { Query } from "../query/json-path";
+import { SyntaxTree } from "../query/syntax-tree";
+import { SyntaxTreeType } from "../query/syntax-tree-type";
 import { TextRange } from "../text-range";
-import { JSONPathJSONValue } from "../types";
+import { JSONValue } from "../types";
 import { AnalysisDescriptionService } from "./analysis-description-service";
 import { SyntaxDescriptionService } from "./syntax-description-service";
 
@@ -15,69 +15,69 @@ export class TooltipService {
     private readonly analysisDescriptionProvider: AnalysisDescriptionService;
 
     constructor(
-        private readonly options: JSONPathOptions
+        private readonly options: QueryOptions
     ) {
         this.syntaxDescriptionProvider = new SyntaxDescriptionService(options);
         this.analysisDescriptionProvider = new AnalysisDescriptionService();
     }
 
-    provideTooltip(query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType, position: number): Tooltip | null {
+    provideTooltip(query: Query, queryArgument: JSONValue | undefined, queryArgumentType: DataType, position: number): Tooltip | null {
         const node = query.getAtPosition(position);
         if (node === null)
             return null;
 
         const lastNode = node;
         const lastButOneNode = node.parent!;
-        if ((lastNode.type === JSONPathSyntaxTreeType.dotToken || lastNode.type === JSONPathSyntaxTreeType.doubleDotToken) && lastButOneNode.type === JSONPathSyntaxTreeType.segment)
+        if ((lastNode.type === SyntaxTreeType.dotToken || lastNode.type === SyntaxTreeType.doubleDotToken) && lastButOneNode.type === SyntaxTreeType.segment)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if ((lastNode.type === JSONPathSyntaxTreeType.openingBracketToken || lastNode.type === JSONPathSyntaxTreeType.closingBracketToken) && lastButOneNode.type === JSONPathSyntaxTreeType.segment)
+        else if ((lastNode.type === SyntaxTreeType.openingBracketToken || lastNode.type === SyntaxTreeType.closingBracketToken) && lastButOneNode.type === SyntaxTreeType.segment)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if (lastNode.type === JSONPathSyntaxTreeType.questionMarkToken)
+        else if (lastNode.type === SyntaxTreeType.questionMarkToken)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if (lastNode.type === JSONPathSyntaxTreeType.starToken)
+        else if (lastNode.type === SyntaxTreeType.starToken)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if ((lastNode.type === JSONPathSyntaxTreeType.nameToken || lastNode.type === JSONPathSyntaxTreeType.stringToken) && lastButOneNode.type === JSONPathSyntaxTreeType.nameSelector)
+        else if ((lastNode.type === SyntaxTreeType.nameToken || lastNode.type === SyntaxTreeType.stringToken) && lastButOneNode.type === SyntaxTreeType.nameSelector)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if ((lastNode.type === JSONPathSyntaxTreeType.numberToken || lastNode.type === JSONPathSyntaxTreeType.colonToken) && lastButOneNode.type === JSONPathSyntaxTreeType.sliceSelector)
+        else if ((lastNode.type === SyntaxTreeType.numberToken || lastNode.type === SyntaxTreeType.colonToken) && lastButOneNode.type === SyntaxTreeType.sliceSelector)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if (lastNode.type === JSONPathSyntaxTreeType.numberToken && lastButOneNode.type === JSONPathSyntaxTreeType.indexSelector)
+        else if (lastNode.type === SyntaxTreeType.numberToken && lastButOneNode.type === SyntaxTreeType.indexSelector)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if (lastNode.type === JSONPathSyntaxTreeType.nameToken && lastButOneNode.type === JSONPathSyntaxTreeType.functionExpression)
+        else if (lastNode.type === SyntaxTreeType.nameToken && lastButOneNode.type === SyntaxTreeType.functionExpression)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if (lastNode.type === JSONPathSyntaxTreeType.doubleAmpersandToken && lastButOneNode.type === JSONPathSyntaxTreeType.andExpression)
+        else if (lastNode.type === SyntaxTreeType.doubleAmpersandToken && lastButOneNode.type === SyntaxTreeType.andExpression)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if (lastNode.type === JSONPathSyntaxTreeType.doubleBarToken && lastButOneNode.type === JSONPathSyntaxTreeType.orExpression)
+        else if (lastNode.type === SyntaxTreeType.doubleBarToken && lastButOneNode.type === SyntaxTreeType.orExpression)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if (lastNode.type === JSONPathSyntaxTreeType.exclamationMarkToken && lastButOneNode.type === JSONPathSyntaxTreeType.notExpression)
+        else if (lastNode.type === SyntaxTreeType.exclamationMarkToken && lastButOneNode.type === SyntaxTreeType.notExpression)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if ((lastNode.type === JSONPathSyntaxTreeType.openingParanthesisToken || lastNode.type === JSONPathSyntaxTreeType.closingParanthesisToken) && lastButOneNode.type === JSONPathSyntaxTreeType.paranthesisExpression)
+        else if ((lastNode.type === SyntaxTreeType.openingParanthesisToken || lastNode.type === SyntaxTreeType.closingParanthesisToken) && lastButOneNode.type === SyntaxTreeType.paranthesisExpression)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
         else if ((
-            lastNode.type === JSONPathSyntaxTreeType.lessThanToken ||
-            lastNode.type === JSONPathSyntaxTreeType.lessThanEqualsToken ||
-            lastNode.type === JSONPathSyntaxTreeType.greaterThanToken ||
-            lastNode.type === JSONPathSyntaxTreeType.greaterThanEqualsToken ||
-            lastNode.type === JSONPathSyntaxTreeType.doubleEqualsToken ||
-            lastNode.type === JSONPathSyntaxTreeType.exclamationMarkEqualsToken
-        ) && lastButOneNode.type === JSONPathSyntaxTreeType.comparisonExpression)
+            lastNode.type === SyntaxTreeType.lessThanToken ||
+            lastNode.type === SyntaxTreeType.lessThanEqualsToken ||
+            lastNode.type === SyntaxTreeType.greaterThanToken ||
+            lastNode.type === SyntaxTreeType.greaterThanEqualsToken ||
+            lastNode.type === SyntaxTreeType.doubleEqualsToken ||
+            lastNode.type === SyntaxTreeType.exclamationMarkEqualsToken
+        ) && lastButOneNode.type === SyntaxTreeType.comparisonExpression)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if (lastNode.type === JSONPathSyntaxTreeType.stringToken && lastButOneNode.type === JSONPathSyntaxTreeType.stringLiteral)
+        else if (lastNode.type === SyntaxTreeType.stringToken && lastButOneNode.type === SyntaxTreeType.stringLiteral)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if (lastNode.type === JSONPathSyntaxTreeType.numberToken && lastButOneNode.type === JSONPathSyntaxTreeType.numberLiteral)
+        else if (lastNode.type === SyntaxTreeType.numberToken && lastButOneNode.type === SyntaxTreeType.numberLiteral)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if ((lastNode.type === JSONPathSyntaxTreeType.trueToken || lastNode.type === JSONPathSyntaxTreeType.falseToken) && lastButOneNode.type === JSONPathSyntaxTreeType.booleanLiteral)
+        else if ((lastNode.type === SyntaxTreeType.trueToken || lastNode.type === SyntaxTreeType.falseToken) && lastButOneNode.type === SyntaxTreeType.booleanLiteral)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if (lastNode.type === JSONPathSyntaxTreeType.nullToken && lastButOneNode.type === JSONPathSyntaxTreeType.nullLiteral)
+        else if (lastNode.type === SyntaxTreeType.nullToken && lastButOneNode.type === SyntaxTreeType.nullLiteral)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if (lastNode.type === JSONPathSyntaxTreeType.dollarToken)
+        else if (lastNode.type === SyntaxTreeType.dollarToken)
             return this.createTooltip(lastNode, query, queryArgument, queryArgumentType);
-        else if (lastNode.type === JSONPathSyntaxTreeType.atToken)
+        else if (lastNode.type === SyntaxTreeType.atToken)
             return this.createTooltip(lastNode, query, queryArgument, queryArgumentType);
         else
             return null;
     }
 
-    private createTooltip(node: JSONPathSyntaxTree, query: JSONPath, queryArgument: JSONPathJSONValue | undefined, queryArgumentType: DataType): Tooltip | null {
+    private createTooltip(node: SyntaxTree, query: Query, queryArgument: JSONValue | undefined, queryArgumentType: DataType): Tooltip | null {
         const description = this.syntaxDescriptionProvider.provideDescription(node);
         if (description === null)
             return null;
@@ -102,10 +102,10 @@ export class TooltipService {
         return new Tooltip(text, node.textRangeWithoutSkipped);
     }
 
-    private findTypeNamesAndExample(node: JSONPathSyntaxTree, query: JSONPath, queryArgument: JSONPathJSONValue): { typeNames: Set<string>, example: JSONPathJSONValue | undefined } {
+    private findTypeNamesAndExample(node: SyntaxTree, query: Query, queryArgument: JSONValue): { typeNames: Set<string>, example: JSONValue | undefined } {
         const typeNames = new Set<string>();
         let example: string | number | undefined = undefined;
-        function processValue(value: JSONPathJSONValue) {
+        function processValue(value: JSONValue) {
             if (example === undefined && (typeof value === "string" || typeof value === "number"))
                 example = value;
             const typeName = getJSONTypeName(value);

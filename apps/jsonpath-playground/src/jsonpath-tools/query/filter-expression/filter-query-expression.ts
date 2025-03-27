@@ -1,20 +1,20 @@
-import { JSONPathFilterValue } from "../../types";
-import { JSONPathFilterExpressionContext, JSONPathQueryContext } from "../evaluation";
-import { JSONPathQuery } from "../query";
-import { JSONPathSyntaxTreeType } from "../syntax-tree-type";
-import { JSONPathFilterExpression } from "./filter-expression";
+import { FilterValue } from "../../types";
+import { FilterExpressionContext, QueryContext } from "../evaluation";
+import { SubQuery } from "../query";
+import { SyntaxTreeType } from "../syntax-tree-type";
+import { FilterExpression } from "./filter-expression";
 
 
-export class JSONPathFilterQueryExpression extends JSONPathFilterExpression {
+export class FilterQueryExpression extends FilterExpression {
     constructor(
-        readonly query: JSONPathQuery
+        readonly query: SubQuery
     ) {
         super([query]);
     }
 
-    get type() { return JSONPathSyntaxTreeType.filterQueryExpression; }
+    get type() { return SyntaxTreeType.filterQueryExpression; }
 
-    protected evaluateImplementation(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
+    protected evaluateImplementation(queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): FilterValue {
         return this.query.select(queryContext, filterExpressionContext);
     }
 }

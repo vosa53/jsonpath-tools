@@ -1,20 +1,20 @@
-import { JSONPathDiagnostics } from "@/jsonpath-tools/diagnostics";
-import { JSONPath } from "@/jsonpath-tools/query/json-path";
-import { JSONPathNormalizedPath, remove, replace, toJSONPointer, toNormalizedPath } from "@/jsonpath-tools/transformations";
-import { JSONPathJSONValue, JSONPathNothing } from "@/jsonpath-tools/types";
+import { Diagnostics } from "@/jsonpath-tools/diagnostics";
+import { Query } from "@/jsonpath-tools/query/json-path";
+import { NormalizedPath, remove, replace, toJSONPointer, toNormalizedPath } from "@/jsonpath-tools/transformations";
+import { JSONValue, Nothing } from "@/jsonpath-tools/types";
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { OperationCancelledError } from "./components/code-editors/codemirror/jsonpath-codemirror/cancellation-token";
 import { CustomFunction } from "./models/custom-function";
 import { Operation, OperationReplacementType, OperationType } from "./models/operation";
 import { PathType } from "./models/path-type";
-import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
+import { Parser } from "@/jsonpath-tools/syntax-analysis/parser";
 import { Settings } from "./models/settings";
 import { logPerformance } from "@/jsonpath-tools/utils";
-import { defaultJSONPathOptions, JSONPathOptions } from "@/jsonpath-tools/options";
+import { defaultQueryOptions, QueryOptions } from "@/jsonpath-tools/options";
 import { LanguageService } from "./components/code-editors/codemirror/jsonpath-codemirror/worker/language-service";
 import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";
 import { TextRange } from "@/jsonpath-tools/text-range";
-import { JSONPathSyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
+import { SyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
 import { jsonSchemaToType } from "@/jsonpath-tools/data-types/json-schema-data-type-converter";
 import { AnyDataType, DataType } from "@/jsonpath-tools/data-types/data-types";
 import { DataTypeRaw, DataTypeRawFormat } from "./models/data-type-raw";
@@ -39,7 +39,7 @@ export function usePageViewModel() {
     const [queryArgumentText, setQueryArgumentText] = useState<string>(examples[0].jsonText);
     const [queryArgumentTypeRaw, setQueryArgumentTypeRaw] = useState<DataTypeRaw>(testQueryArgumentTypeRaw);
     const [operation, setOperation] = useState<Operation>(testOperation);
-    const operationReplacementJSONValue = useMemo<JSONPathJSONValue | undefined>(() => {
+    const operationReplacementJSONValue = useMemo<JSONValue | undefined>(() => {
         try {
             return JSON.parse(operation.replacement.jsonValueText);
         }
@@ -56,8 +56,8 @@ export function usePageViewModel() {
         }
     }, [operation.replacement.jsonPatchText]);
     const [pathType, setPathType] = useState<PathType>(PathType.normalizedPath);
-    const [query, setQuery] = useState<JSONPath>(testQuery);
-    const [queryArgument, isQueryArgumentValid] = useMemo<[JSONPathJSONValue | undefined, boolean]>(() => {
+    const [query, setQuery] = useState<Query>(testQuery);
+    const [queryArgument, isQueryArgumentValid] = useMemo<[JSONValue | undefined, boolean]>(() => {
         try {
             return [logPerformance("Parse query argument", () => JSON.parse(queryArgumentText)), true];
         }
@@ -66,7 +66,7 @@ export function usePageViewModel() {
         }
     }, [queryArgumentText]);
     const [queryArgumentType, isQueryArgumentTypeValid] = useMemo<[DataType, boolean]>(() => {
-        let json: JSONPathJSONValue;
+        let json: JSONValue;
         const jsonText = queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema
             ? queryArgumentTypeRaw.jsonSchemaText
             : queryArgumentTypeRaw.jsonTypeDefinitionText;
@@ -86,21 +86,21 @@ export function usePageViewModel() {
             else return [jsonTypeDefinitionToType(json), true];
         }
     }, [queryArgumentTypeRaw]);
-    const options = useMemo<JSONPathOptions>(() => {
+    const options = useMemo<QueryOptions>(() => {
         return {
-            ...defaultJSONPathOptions,
+            ...defaultQueryOptions,
             functions: {
-                ...defaultJSONPathOptions.functions,
-                ...Object.fromEntries(customFunctions.map(f => [f.name, { description: f.description, parameters: f.parameters.map(p => ({ name: p.name, description: p.description, type: p.type, dataType: AnyDataType.create() })), returnType: f.returnType, returnDataType: AnyDataType.create(), handler: () => JSONPathNothing }]))
+                ...defaultQueryOptions.functions,
+                ...Object.fromEntries(customFunctions.map(f => [f.name, { description: f.description, parameters: f.parameters.map(p => ({ name: p.name, description: p.description, type: p.type, dataType: AnyDataType.create() })), returnType: f.returnType, returnDataType: AnyDataType.create(), handler: () => Nothing }]))
             }
         };
     }, [customFunctions]);
-    const [result, setResult] = useState<readonly JSONPathJSONValue[]>([]);
-    const [resultPaths, setResultPaths] = useState<readonly JSONPathNormalizedPath[]>([]);
+    const [result, setResult] = useState<readonly JSONValue[]>([]);
+    const [resultPaths, setResultPaths] = useState<readonly NormalizedPath[]>([]);
     const resultText = useMemo(() => {
         if (queryArgument === undefined) return "";
         const operationResult = logPerformance("Execute operation on result", () => {
-            return executeOperation(operation, queryArgument, result as JSONPathJSONValue[], resultPaths, operationReplacementJSONValue, operationReplacementJSONPatch);
+            return executeOperation(operation, queryArgument, result as JSONValue[], resultPaths, operationReplacementJSONValue, operationReplacementJSONPatch);
         });
         if (operationResult === undefined) return "";
         else return logPerformance("Stringify result", () => JSON.stringify(operationResult, undefined, 4));
@@ -114,9 +114,9 @@ export function usePageViewModel() {
         return logPerformance("Stringify result paths", () => JSON.stringify(resultPathsTransformed, undefined, 4));
     }, [resultPaths, pathType]);
     const [currentResultPathIndex, setCurrentResultPathIndex] = useState<number>(0);
-    const [diagnostics, setDiagnostics] = useState<readonly JSONPathDiagnostics[]>([]);
+    const [diagnostics, setDiagnostics] = useState<readonly Diagnostics[]>([]);
     const [highlightedRange, setHighlightedRange] = useState<TextRange | null>(null);
-    const getResultRef = useRef<() => Promise<{ nodes: readonly JSONPathJSONValue[], paths: readonly (string | number)[][] }>>(null);
+    const getResultRef = useRef<() => Promise<{ nodes: readonly JSONValue[], paths: readonly (string | number)[][] }>>(null);
     const resultTimeoutRef = useRef<number | null>(null);
 
     const onCustomFunctionsChanged = useCallback((customFunctions: readonly CustomFunction[]) => {
@@ -153,7 +153,7 @@ export function usePageViewModel() {
         setPathType(pathType);
     }, []);
 
-    const onQueryParsed = useCallback((query: JSONPath) => {
+    const onQueryParsed = useCallback((query: Query) => {
         setQuery(query);
     }, []);
 
@@ -161,19 +161,19 @@ export function usePageViewModel() {
         setCurrentResultPathIndex(currentResultPathIndex);
     }, []);
 
-    const onDiagnosticsPublished = useCallback((diagnostics: readonly JSONPathDiagnostics[]) => {
+    const onDiagnosticsPublished = useCallback((diagnostics: readonly Diagnostics[]) => {
         setDiagnostics(diagnostics);
     }, []);
 
-    const onGetResultAvailable = useCallback((getResult: () => Promise<{ nodes: readonly JSONPathJSONValue[], paths: readonly (string | number)[][] }>) => {
+    const onGetResultAvailable = useCallback((getResult: () => Promise<{ nodes: readonly JSONValue[], paths: readonly (string | number)[][] }>) => {
         getResultRef.current = getResult;
     }, []);
 
-    const onSelectedDiagnosticsChanged = useCallback((diagnostics: JSONPathDiagnostics | null) => {
+    const onSelectedDiagnosticsChanged = useCallback((diagnostics: Diagnostics | null) => {
         setHighlightedRange(diagnostics === null ? null : diagnostics.textRange);
     }, []);
 
-    const onSelectedNodeChanged = useCallback((tree: JSONPathSyntaxTree | null) => {
+    const onSelectedNodeChanged = useCallback((tree: SyntaxTree | null) => {
         setHighlightedRange(tree === null ? null : tree.textRangeWithoutSkipped);
     }, []);
 
@@ -259,22 +259,22 @@ const testOperation: Operation = {
     }
 };
 const testQueryText = `$..inventory[?@.features[?@ == "Bluetooth"] && match(@.make, "[tT].+")]`;
-const testQuery = new JSONPathParser().parse(testQueryText);
+const testQuery = new Parser().parse(testQueryText);
 
 function executeOperation(
     operation: Operation,
-    queryArgument: JSONPathJSONValue,
-    result: JSONPathJSONValue[],
-    resultPaths: readonly JSONPathNormalizedPath[],
-    replacementJSONValue: JSONPathJSONValue | undefined,
+    queryArgument: JSONValue,
+    result: JSONValue[],
+    resultPaths: readonly NormalizedPath[],
+    replacementJSONValue: JSONValue | undefined,
     replacementJSONPatch: JSONPatch | undefined
-): JSONPathJSONValue | undefined {
+): JSONValue | undefined {
     if (operation.type === OperationType.select)
         return result;
     else if (operation.type === OperationType.replace) {
         const replacer = operation.replacement.type === OperationReplacementType.jsonValue
-            ? (v: JSONPathJSONValue) => replacementJSONValue!
-            : (v: JSONPathJSONValue) => applyJSONPatch(v, replacementJSONPatch!);
+            ? (v: JSONValue) => replacementJSONValue!
+            : (v: JSONValue) => applyJSONPatch(v, replacementJSONPatch!);
         return replace(queryArgument, resultPaths, replacer);
     }
     else if (operation.type === OperationType.delete)

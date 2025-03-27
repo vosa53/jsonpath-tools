@@ -1,10 +1,10 @@
-import { defaultJSONPathOptions, JSONPathFunctionHandler } from "@/jsonpath-tools/options";
+import { defaultQueryOptions, FunctionHandler } from "@/jsonpath-tools/options";
 import { LanguageServiceBackend } from "./components/code-editors/codemirror/jsonpath-codemirror/worker/language-service-backend";
 import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";
-import { JSONPathLogicalFalse, JSONPathLogicalTrue, JSONPathNodeList, JSONPathNothing } from "@/jsonpath-tools/types";
-import { LocatedNode } from "@/jsonpath-tools/query/located-node";
+import { LogicalFalse, LogicalTrue, NodeList, Nothing } from "@/jsonpath-tools/types";
+import { Node } from "@/jsonpath-tools/query/located-node";
 
-const customFunctions = new Map<string, JSONPathFunctionHandler>();
+const customFunctions = new Map<string, FunctionHandler>();
 
 const backend = new LanguageServiceBackend(
     d => postMessage({ type: "languageServiceData", data: d } as CustomLanguageServiceWorkerMessage), 
@@ -23,9 +23,9 @@ addEventListener("message", e => {
     }
 });
 
-function resolveFunction(functionName: string): JSONPathFunctionHandler {
-    if (Object.hasOwn(defaultJSONPathOptions.functions, functionName)) 
-        return defaultJSONPathOptions.functions[functionName].handler;
+function resolveFunction(functionName: string): FunctionHandler {
+    if (Object.hasOwn(defaultQueryOptions.functions, functionName)) 
+        return defaultQueryOptions.functions[functionName].handler;
 
     const customFunctionHandler = customFunctions.get(functionName);
     if (customFunctionHandler !== undefined) 
@@ -34,20 +34,20 @@ function resolveFunction(functionName: string): JSONPathFunctionHandler {
     throw new Error(`Function '${functionName}' not found.`);
 }
 
-function compileCustomFunction(customFunction: CustomLanguageServiceFunction): JSONPathFunctionHandler {
+function compileCustomFunction(customFunction: CustomLanguageServiceFunction): FunctionHandler {
     try {
-        const compiledCustomFunction = new Function("jp", "context", ...customFunction.parameterNames, customFunction.code) as JSONPathFunctionHandler;
+        const compiledCustomFunction = new Function("jp", "context", ...customFunction.parameterNames, customFunction.code) as FunctionHandler;
         return createJSONPathFunctionHandler(compiledCustomFunction, customFunction.name);
     }
     catch (e) {
         return (context) => {
             context.reportWarning(`Compilation of custom function '${customFunction.name}' failed: ${e}`);
-            return JSONPathNothing;
+            return Nothing;
         };
     }
 }
 
-function createJSONPathFunctionHandler(customFunction: Function, functionName: string): JSONPathFunctionHandler {
+function createJSONPathFunctionHandler(customFunction: Function, functionName: string): FunctionHandler {
     return (context, ...args) => {
         try {
             const result = customFunction(JSONPATH_LIBRARY, context, ...args);
@@ -55,16 +55,16 @@ function createJSONPathFunctionHandler(customFunction: Function, functionName: s
         }
         catch(e) {
             context.reportWarning(`Error while executing custom function '${functionName}': ${e}`);
-            return JSONPathNothing;
+            return Nothing;
         }
     }
 }
 
 // TODO: Probably pass the whole library to custom functions (import *).
 const JSONPATH_LIBRARY = {
-    JSONPathNothing,
-    JSONPathLogicalFalse,
-    JSONPathLogicalTrue,
-    JSONPathNodeList,
-    LocatedNode
+    Nothing,
+    LogicalFalse,
+    LogicalTrue,
+    NodeList,
+    Node
 };

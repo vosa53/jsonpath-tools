@@ -1,4 +1,4 @@
-import { JSONPathDiagnosticsType } from '@/jsonpath-tools/diagnostics';
+import { DiagnosticsType } from '@/jsonpath-tools/diagnostics';
 import { ActionIcon, AppShell, Divider, Flex, Indicator, Stack, Tabs } from '@mantine/core';
 import { IconBraces, IconEqual, IconExclamationCircle, IconListTree, IconPlayerPlay, IconRouteSquare, IconSitemap } from '@tabler/icons-react';
 import { useMemo, useState } from "react";
@@ -18,7 +18,7 @@ export default function Home() {
     const [navbarOpened, setNavbarOpened] = useState(false);
     const viewModel = usePageViewModel();
     const errorCount = useMemo(() => {
-        return viewModel.diagnostics.filter(d => d.type === JSONPathDiagnosticsType.error).length;
+        return viewModel.diagnostics.filter(d => d.type === DiagnosticsType.error).length;
     }, [viewModel.diagnostics]);
 
     return (

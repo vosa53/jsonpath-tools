@@ -1,4 +1,4 @@
-export enum JSONPathSyntaxTreeType {
+export enum SyntaxTreeType {
     dollarToken = "DollarToken",
     atToken = "AtToken",
     starToken = "StarToken",

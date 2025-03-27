@@ -1,18 +1,18 @@
-import { JSONPathOptions } from "../options";
-import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
-import { JSONPath } from "../query/json-path";
-import { JSONPathQuery } from "../query/query";
-import { JSONPathFilterSelector } from "../query/selectors/filter-selector";
-import { JSONPathSyntaxTree } from "../query/syntax-tree";
-import { JSONPathSyntaxTreeType } from "../query/syntax-tree-type";
+import { QueryOptions } from "../options";
+import { FunctionExpression } from "../query/filter-expression/function-expression";
+import { Query } from "../query/json-path";
+import { SubQuery } from "../query/query";
+import { FilterSelector } from "../query/selectors/filter-selector";
+import { SyntaxTree } from "../query/syntax-tree";
+import { SyntaxTreeType } from "../query/syntax-tree-type";
 import { TextRange } from "../text-range";
 
 export class DocumentHighlightsService {
     constructor(
-        private readonly options: JSONPathOptions
+        private readonly options: QueryOptions
     ) { }
 
-    provideHighlights(query: JSONPath, position: number): DocumentHighlight[] {
+    provideHighlights(query: Query, position: number): DocumentHighlight[] {
         const documentHighlights: DocumentHighlight[] = [];
         const touchingNodes = query.getTouchingAtPosition(position);
         for (const node of touchingNodes)
@@ -21,21 +21,21 @@ export class DocumentHighlightsService {
         return documentHighlights.filter(h => h.range.length !== 0);
     }
 
-    private provideHighlightsForNode(query: JSONPath, node: JSONPathSyntaxTree, documentHighlights: DocumentHighlight[]) {
+    private provideHighlightsForNode(query: Query, node: SyntaxTree, documentHighlights: DocumentHighlight[]) {
         const lastNode = node;
         const lastButOneNode = node.parent!;
 
-        if (lastNode.type === JSONPathSyntaxTreeType.nameToken && lastButOneNode instanceof JSONPathFunctionExpression) {
+        if (lastNode.type === SyntaxTreeType.nameToken && lastButOneNode instanceof FunctionExpression) {
             if (Object.hasOwn(this.options.functions, lastButOneNode.name))
                 this.highlightFunctions(query, lastButOneNode.name, documentHighlights);
         }
-        if (lastNode.type === JSONPathSyntaxTreeType.dollarToken && lastButOneNode.type === JSONPathSyntaxTreeType.query) {
+        if (lastNode.type === SyntaxTreeType.dollarToken && lastButOneNode.type === SyntaxTreeType.query) {
             this.highlightRootIdentifier(query, documentHighlights);
         }
-        if (lastNode.type === JSONPathSyntaxTreeType.questionMarkToken && lastButOneNode.type === JSONPathSyntaxTreeType.filterSelector ||
-            lastNode.type === JSONPathSyntaxTreeType.atToken && lastButOneNode.type === JSONPathSyntaxTreeType.query) {
-                let current: JSONPathSyntaxTree | null = node;
-                while (current !== null && !(current instanceof JSONPathFilterSelector))
+        if (lastNode.type === SyntaxTreeType.questionMarkToken && lastButOneNode.type === SyntaxTreeType.filterSelector ||
+            lastNode.type === SyntaxTreeType.atToken && lastButOneNode.type === SyntaxTreeType.query) {
+                let current: SyntaxTree | null = node;
+                while (current !== null && !(current instanceof FilterSelector))
                     current = current.parent;
                 if (current !== null) {
                     documentHighlights.push(new DocumentHighlight(current.questionMarkToken.textRangeWithoutSkipped));
@@ -44,25 +44,25 @@ export class DocumentHighlightsService {
         }
     }
 
-    private highlightFunctions(tree: JSONPathSyntaxTree, functionName: string, documentHighlights: DocumentHighlight[]) {
+    private highlightFunctions(tree: SyntaxTree, functionName: string, documentHighlights: DocumentHighlight[]) {
         tree.forEach(n => {
-            if (n instanceof JSONPathFunctionExpression && n.name === functionName)
+            if (n instanceof FunctionExpression && n.name === functionName)
                 documentHighlights.push(new DocumentHighlight(n.nameToken.textRangeWithoutSkipped));
         })
     }
 
-    private highlightRootIdentifier(tree: JSONPathSyntaxTree, documentHighlights: DocumentHighlight[]) {
+    private highlightRootIdentifier(tree: SyntaxTree, documentHighlights: DocumentHighlight[]) {
         tree.forEach(n => {
-            if (n instanceof JSONPathQuery && n.identifierToken.type === JSONPathSyntaxTreeType.dollarToken)
+            if (n instanceof SubQuery && n.identifierToken.type === SyntaxTreeType.dollarToken)
                 documentHighlights.push(new DocumentHighlight(n.identifierToken.textRangeWithoutSkipped));
         })
     }
 
-    private highlightCurrentIdentifier(tree: JSONPathSyntaxTree, documentHighlights: DocumentHighlight[]) {
+    private highlightCurrentIdentifier(tree: SyntaxTree, documentHighlights: DocumentHighlight[]) {
         tree.forEach(n => {
-            if (n instanceof JSONPathQuery && n.identifierToken.type === JSONPathSyntaxTreeType.atToken)
+            if (n instanceof SubQuery && n.identifierToken.type === SyntaxTreeType.atToken)
                 documentHighlights.push(new DocumentHighlight(n.identifierToken.textRangeWithoutSkipped));
-            if (n.type === JSONPathSyntaxTreeType.filterSelector)
+            if (n.type === SyntaxTreeType.filterSelector)
                 return false;
         })
     }

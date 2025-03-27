@@ -1,22 +1,22 @@
-import { JSONPathFilterValue, JSONPathLogicalFalse } from "../../types";
-import { JSONPathFilterExpressionContext, JSONPathQueryContext } from "../evaluation";
-import { JSONPathSyntaxTreeType } from "../syntax-tree-type";
-import { JSONPathToken } from "../token";
-import { JSONPathFilterExpression } from "./filter-expression";
+import { FilterValue, LogicalFalse } from "../../types";
+import { FilterExpressionContext, QueryContext } from "../evaluation";
+import { SyntaxTreeType } from "../syntax-tree-type";
+import { SyntaxTreeToken } from "../token";
+import { FilterExpression } from "./filter-expression";
 
 
-export class JSONPathParanthesisExpression extends JSONPathFilterExpression {
+export class ParanthesisExpression extends FilterExpression {
     constructor(
-        readonly openingParanthesisToken: JSONPathToken,
-        readonly expression: JSONPathFilterExpression,
-        readonly closingParanthesisToken: JSONPathToken
+        readonly openingParanthesisToken: SyntaxTreeToken,
+        readonly expression: FilterExpression,
+        readonly closingParanthesisToken: SyntaxTreeToken
     ) {
         super([openingParanthesisToken, expression, closingParanthesisToken]);
     }
 
-    get type() { return JSONPathSyntaxTreeType.paranthesisExpression; }
+    get type() { return SyntaxTreeType.paranthesisExpression; }
 
-    protected evaluateImplementation(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
+    protected evaluateImplementation(queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): FilterValue {
         return this.expression.evaluate(queryContext, filterExpressionContext);
     }
 }

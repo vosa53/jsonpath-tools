@@ -1,17 +1,17 @@
 import { TextRange } from "../text-range";
-import type { JSONPathNode } from "./node";
-import { JSONPathSyntaxTreeType } from "./syntax-tree-type";
+import type { SyntaxTreeNode } from "./node";
+import { SyntaxTreeType } from "./syntax-tree-type";
 
-export abstract class JSONPathSyntaxTree {
+export abstract class SyntaxTree {
     constructor(
         readonly position: number,
         readonly length: number
     ) { }
 
     // TODO
-    parent: JSONPathNode | null = null;
+    parent: SyntaxTreeNode | null = null;
 
-    abstract readonly type: JSONPathSyntaxTreeType;
+    abstract readonly type: SyntaxTreeType;
     abstract readonly skippedTextBefore: string;
 
     get textRange(): TextRange {
@@ -22,18 +22,18 @@ export abstract class JSONPathSyntaxTree {
         return new TextRange(this.position + this.skippedTextBefore.length, this.length - this.skippedTextBefore.length);
     }
 
-    abstract forEach(action: (tree: JSONPathSyntaxTree) => void | boolean): void;
+    abstract forEach(action: (tree: SyntaxTree) => void | boolean): void;
 
-    getAtPosition(position: number): JSONPathSyntaxTree | null {
+    getAtPosition(position: number): SyntaxTree | null {
         if (position < this.position)
             return null;
         if (position >= this.position + this.length)
             return null;
 
-        let current: JSONPathSyntaxTree = this;
+        let current: SyntaxTree = this;
         // @ts-ignore
         while (current.children !== undefined) {
-            for (const child of (current as JSONPathNode).children) {
+            for (const child of (current as SyntaxTreeNode).children) {
                 if (child.position + child.length > position) {
                     current = child;
                     break;
@@ -43,23 +43,23 @@ export abstract class JSONPathSyntaxTree {
         return current;
     }
 
-    getTouchingAtPosition(position: number): JSONPathSyntaxTree[] {
-        const results: JSONPathSyntaxTree[] = [];
+    getTouchingAtPosition(position: number): SyntaxTree[] {
+        const results: SyntaxTree[] = [];
         this.getTouchingAtPositionRecursive(position, results);
         return results;
     }
 
-    getContainingAtPosition(position: number): JSONPathSyntaxTree | null {
+    getContainingAtPosition(position: number): SyntaxTree | null {
         if (position <= this.position)
             return null;
         if (position >= this.position + this.length)
             return null;
 
-        let current: JSONPathSyntaxTree = this;
+        let current: SyntaxTree = this;
         // @ts-ignore
         while (current.children !== undefined) {
             let changed = false;
-            for (const child of (current as JSONPathNode).children) {
+            for (const child of (current as SyntaxTreeNode).children) {
                 if (position > child.position && position < child.position + child.length) {
                     current = child;
                     changed = true;
@@ -72,14 +72,14 @@ export abstract class JSONPathSyntaxTree {
         return current;
     }
 
-    private getTouchingAtPositionRecursive(position: number, results: JSONPathSyntaxTree[]): void {
+    private getTouchingAtPositionRecursive(position: number, results: SyntaxTree[]): void {
         if (this.position > position || this.position + this.length < position)
             return;
 
         // @ts-ignore
         if (this.children !== undefined) {
             // @ts-ignore
-            for (const child of (this as JSONPathNode).children)
+            for (const child of (this as SyntaxTreeNode).children)
                 child.getTouchingAtPositionRecursive(position, results);
         }
         else

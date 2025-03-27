@@ -1,25 +1,25 @@
-import { JSONPathJSONValue } from "./types";
+import { JSONValue } from "./types";
 
-export type JSONPathNormalizedPath = readonly (string | number)[];
+export type NormalizedPath = readonly (string | number)[];
 
-export function toNormalizedPath(path: JSONPathNormalizedPath): string {
+export function toNormalizedPath(path: NormalizedPath): string {
     return "$" + path.map(ps => `[${JSON.stringify(ps)}]`).join(""); // TODO: Escaping.
 }
 
-export function toJSONPointer(path: JSONPathNormalizedPath): string {
+export function toJSONPointer(path: NormalizedPath): string {
     if (path.length === 0) return "/";
     return "/" + path.join("/"); // TODO: Escaping.
 }
 
-export function replace(value: JSONPathJSONValue, paths: readonly JSONPathNormalizedPath[], replacer: (value: JSONPathJSONValue) => JSONPathJSONValue | undefined): JSONPathJSONValue {
-    return replaceOrRemove(value, paths, replacer) as JSONPathJSONValue;
+export function replace(value: JSONValue, paths: readonly NormalizedPath[], replacer: (value: JSONValue) => JSONValue | undefined): JSONValue {
+    return replaceOrRemove(value, paths, replacer) as JSONValue;
 }
 
-export function remove(value: JSONPathJSONValue, paths: readonly JSONPathNormalizedPath[]): JSONPathJSONValue | undefined {
-    return replaceOrRemove(value, paths, () => undefined) as JSONPathJSONValue;
+export function remove(value: JSONValue, paths: readonly NormalizedPath[]): JSONValue | undefined {
+    return replaceOrRemove(value, paths, () => undefined) as JSONValue;
 }
 
-function replaceOrRemove(value: JSONPathJSONValue, paths: readonly JSONPathNormalizedPath[], replacer: (value: JSONPathJSONValue) => JSONPathJSONValue | undefined): JSONPathJSONValue | undefined {
+function replaceOrRemove(value: JSONValue, paths: readonly NormalizedPath[], replacer: (value: JSONValue) => JSONValue | undefined): JSONValue | undefined {
     if (paths.length === 0)
         return value;
     const sortedPaths = paths.toSorted(compareNormalizedPaths);
@@ -27,17 +27,17 @@ function replaceOrRemove(value: JSONPathJSONValue, paths: readonly JSONPathNorma
 }
 
 function replaceOrRemoveRecursive(
-    value: JSONPathJSONValue, 
-    paths: readonly JSONPathNormalizedPath[], 
-    replacer: (value: JSONPathJSONValue) => JSONPathJSONValue | undefined, 
+    value: JSONValue, 
+    paths: readonly NormalizedPath[], 
+    replacer: (value: JSONValue) => JSONValue | undefined, 
     level: number, 
     from: number, 
     to: number
-): JSONPathJSONValue | undefined {
+): JSONValue | undefined {
     const replaceCurrent = paths[from].length === level;
     while (from < to && paths[from].length === level) from++;
 
-    let newValue: JSONPathJSONValue | undefined = value;
+    let newValue: JSONValue | undefined = value;
     if (value !== null && typeof value === "object") {
         newValue = Array.isArray(value) ? [...value] : { ...value };
         let removedIndexCount = 0;
@@ -78,7 +78,7 @@ function replaceOrRemoveRecursive(
     return newValue;
 }
 
-function compareNormalizedPaths(pathA: JSONPathNormalizedPath, pathB: JSONPathNormalizedPath): number {
+function compareNormalizedPaths(pathA: NormalizedPath, pathB: NormalizedPath): number {
     const minLength = Math.min(pathA.length, pathB.length);
     for (let i = 0; i < minLength; i++) {
         if (typeof pathA[i] === "string" && typeof pathB[i] === "number") return -1;

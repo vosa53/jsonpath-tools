@@ -1,6 +1,6 @@
 import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-service";
 import { EditorService } from "@/jsonpath-tools/editor-services/editor-service";
-import { JSONPathFunction, JSONPathFunctionHandler } from "@/jsonpath-tools/options";
+import { Function, FunctionHandler } from "@/jsonpath-tools/options";
 import { logPerformance } from "@/jsonpath-tools/utils";
 import { deserializeDataType } from "./data-type-serializer";
 import { DisconnectLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
@@ -12,11 +12,11 @@ export class LanguageServiceBackendSession {
 
     constructor(
         private readonly rpcTopic: SimpleRPCTopic, 
-        private readonly resolveFunctionHandler: (functionName: string) => JSONPathFunctionHandler
+        private readonly resolveFunctionHandler: (functionName: string) => FunctionHandler
     ) { }
 
     updateOptions(message: UpdateOptionsLanguageServiceMessage) {
-        const functions: [string, JSONPathFunction][] = Object.entries(message.newOptions.functions).map(([name, f]) => [
+        const functions: [string, Function][] = Object.entries(message.newOptions.functions).map(([name, f]) => [
             name,
             {
                 description: f.description,

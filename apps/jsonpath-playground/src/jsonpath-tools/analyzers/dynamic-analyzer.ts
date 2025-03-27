@@ -1,19 +1,19 @@
-import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "../diagnostics";
-import { JSONPathOptions } from "../options";
-import { JSONPathQueryContext } from "../query/evaluation";
-import { JSONPath } from "../query/json-path";
-import { JSONPathSelector } from "../query/selectors/selector";
-import { JSONPathJSONValue, JSONPathNodeList } from "../types";
+import { Diagnostics, DiagnosticsType } from "../diagnostics";
+import { QueryOptions } from "../options";
+import { QueryContext } from "../query/evaluation";
+import { Query } from "../query/json-path";
+import { Selector } from "../query/selectors/selector";
+import { JSONValue, NodeList } from "../types";
 
 export class DynamicAnalyzer {
     constructor(
-        private readonly options: JSONPathOptions
+        private readonly options: QueryOptions
     ) { }
 
-    analyze(query: JSONPath, queryArgument: JSONPathJSONValue): DynamicAnalysisResult {
-        const selectorsThatProducedOutput = new Set<JSONPathSelector>();
+    analyze(query: Query, queryArgument: JSONValue): DynamicAnalysisResult {
+        const selectorsThatProducedOutput = new Set<Selector>();
         const diagnosticsJSON = new Set<string>();
-        const queryContext: JSONPathQueryContext = {
+        const queryContext: QueryContext = {
             rootNode: queryArgument, 
             options: this.options, 
             selectorInstrumentationCallback(s, i, oa, osi, ol) {
@@ -28,13 +28,13 @@ export class DynamicAnalyzer {
         };
         const queryResult = query.select(queryContext);
         
-        const diagnostics: JSONPathDiagnostics[] = Array.from(diagnosticsJSON).map(dJSON => JSON.parse(dJSON));
+        const diagnostics: Diagnostics[] = Array.from(diagnosticsJSON).map(dJSON => JSON.parse(dJSON));
         query.forEach(t => {
-            if (t instanceof JSONPathSelector && !selectorsThatProducedOutput.has(t))
+            if (t instanceof Selector && !selectorsThatProducedOutput.has(t))
                 diagnostics.push({
                     message: "This selector does not produce any output.",
                     textRange: t.textRangeWithoutSkipped,
-                    type: JSONPathDiagnosticsType.warning
+                    type: DiagnosticsType.warning
                 });
         });
 
@@ -43,6 +43,6 @@ export class DynamicAnalyzer {
 }
 
 export interface DynamicAnalysisResult {
-    readonly diagnostics: readonly JSONPathDiagnostics[];
-    readonly queryResult: JSONPathNodeList;
+    readonly diagnostics: readonly Diagnostics[];
+    readonly queryResult: NodeList;
 }

@@ -1,4 +1,4 @@
-import { JSONPathJSONValue } from "@/jsonpath-tools/types";
+import { JSONValue } from "@/jsonpath-tools/types";
 import { LanguageService } from "./language-service";
 import { LanguageServiceBackend } from "./language-service-backend";
 
@@ -19,7 +19,7 @@ export class LanguageServices {
     private static createLocalLanguageService(): LanguageService {
         // TODO: Queue.
         let backend: LanguageServiceBackend;
-        const sendToBackend = (data: JSONPathJSONValue) => backend!.receiveFromFrontend(data);
+        const sendToBackend = (data: JSONValue) => backend!.receiveFromFrontend(data);
         const languageService = new LanguageService(sendToBackend);
         backend = new LanguageServiceBackend(data => languageService.receiveFromBackend(data));
         return languageService;

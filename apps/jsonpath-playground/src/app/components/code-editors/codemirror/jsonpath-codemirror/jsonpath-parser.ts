@@ -1,24 +1,24 @@
-import { JSONPath } from "@/jsonpath-tools/query/json-path";
-import { JSONPathNode } from "@/jsonpath-tools/query/node";
-import { JSONPathSyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
-import { JSONPathSyntaxTreeType } from "@/jsonpath-tools/query/syntax-tree-type";
-import { JSONPathToken } from "@/jsonpath-tools/query/token";
-import { JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
+import { Query } from "@/jsonpath-tools/query/json-path";
+import { SyntaxTreeNode } from "@/jsonpath-tools/query/node";
+import { SyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
+import { SyntaxTreeType } from "@/jsonpath-tools/query/syntax-tree-type";
+import { SyntaxTreeToken } from "@/jsonpath-tools/query/token";
+import { Parser as JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
 import { continuedIndent, defineLanguageFacet, delimitedIndent, foldInside, foldNodeProp, indentNodeProp, languageDataProp } from "@codemirror/language";
 import { Input, NodeProp, NodeSet, NodeType, Parser, PartialParse, Tree, TreeFragment } from "@lezer/common";
 import { styleTags, tags as t } from "@lezer/highlight";
 
-export function getJSONPath(tree: Tree): JSONPath {
+export function getJSONPath(tree: Tree): Query {
     const jsonPath = treeToJSONPath.get(tree);
     if (jsonPath === undefined)
         throw new Error("The given Lezer tree does not have a corresponding JSONPath.");
     return jsonPath;
 }
 
-const treeToJSONPath = new WeakMap<Tree, JSONPath>();
+const treeToJSONPath = new WeakMap<Tree, Query>();
 
-function createNodeSet(types: JSONPathSyntaxTreeType[]): { nodeSet: NodeSet, treeTypeToNodeId: Map<JSONPathSyntaxTreeType, number> } {
-    const treeTypeToNodeId = new Map<JSONPathSyntaxTreeType, number>();
+function createNodeSet(types: SyntaxTreeType[]): { nodeSet: NodeSet, treeTypeToNodeId: Map<SyntaxTreeType, number> } {
+    const treeTypeToNodeId = new Map<SyntaxTreeType, number>();
     const nodeTypes: NodeType[] = [];
     let idCounter = 0;
     for (const type of types) {
@@ -32,56 +32,56 @@ function createNodeSet(types: JSONPathSyntaxTreeType[]): { nodeSet: NodeSet, tre
 }
 
 const { nodeSet, treeTypeToNodeId } = createNodeSet([
-    JSONPathSyntaxTreeType.root,
-    JSONPathSyntaxTreeType.query,
-    JSONPathSyntaxTreeType.segment,
-    JSONPathSyntaxTreeType.nameSelector,
-    JSONPathSyntaxTreeType.wildcardSelector,
-    JSONPathSyntaxTreeType.sliceSelector,
-    JSONPathSyntaxTreeType.indexSelector,
-    JSONPathSyntaxTreeType.filterSelector,
-    JSONPathSyntaxTreeType.missingSelector,
-    JSONPathSyntaxTreeType.orExpression,
-    JSONPathSyntaxTreeType.andExpression,
-    JSONPathSyntaxTreeType.notExpression,
-    JSONPathSyntaxTreeType.paranthesisExpression,
-    JSONPathSyntaxTreeType.comparisonExpression,
-    JSONPathSyntaxTreeType.filterQueryExpression,
-    JSONPathSyntaxTreeType.functionExpression,
-    JSONPathSyntaxTreeType.numberLiteral,
-    JSONPathSyntaxTreeType.stringLiteral,
-    JSONPathSyntaxTreeType.booleanLiteral,
-    JSONPathSyntaxTreeType.nullLiteral,
-    JSONPathSyntaxTreeType.missingExpression,
-    JSONPathSyntaxTreeType.dollarToken,
-    JSONPathSyntaxTreeType.atToken,
-    JSONPathSyntaxTreeType.starToken,
-    JSONPathSyntaxTreeType.questionMarkToken,
-    JSONPathSyntaxTreeType.dotToken,
-    JSONPathSyntaxTreeType.doubleDotToken,
-    JSONPathSyntaxTreeType.commaToken,
-    JSONPathSyntaxTreeType.colonToken,
-    JSONPathSyntaxTreeType.doubleAmpersandToken,
-    JSONPathSyntaxTreeType.doubleBarToken,
-    JSONPathSyntaxTreeType.exclamationMarkToken,
-    JSONPathSyntaxTreeType.doubleEqualsToken,
-    JSONPathSyntaxTreeType.exclamationMarkEqualsToken,
-    JSONPathSyntaxTreeType.lessThanEqualsToken,
-    JSONPathSyntaxTreeType.greaterThanEqualsToken,
-    JSONPathSyntaxTreeType.lessThanToken,
-    JSONPathSyntaxTreeType.greaterThanToken,
-    JSONPathSyntaxTreeType.trueToken,
-    JSONPathSyntaxTreeType.falseToken,
-    JSONPathSyntaxTreeType.nullToken,
-    JSONPathSyntaxTreeType.stringToken,
-    JSONPathSyntaxTreeType.numberToken,
-    JSONPathSyntaxTreeType.nameToken,
-    JSONPathSyntaxTreeType.openingParanthesisToken,
-    JSONPathSyntaxTreeType.closingParanthesisToken,
-    JSONPathSyntaxTreeType.openingBracketToken,
-    JSONPathSyntaxTreeType.closingBracketToken,
-    JSONPathSyntaxTreeType.endOfFileToken,
-    JSONPathSyntaxTreeType.missingToken
+    SyntaxTreeType.root,
+    SyntaxTreeType.query,
+    SyntaxTreeType.segment,
+    SyntaxTreeType.nameSelector,
+    SyntaxTreeType.wildcardSelector,
+    SyntaxTreeType.sliceSelector,
+    SyntaxTreeType.indexSelector,
+    SyntaxTreeType.filterSelector,
+    SyntaxTreeType.missingSelector,
+    SyntaxTreeType.orExpression,
+    SyntaxTreeType.andExpression,
+    SyntaxTreeType.notExpression,
+    SyntaxTreeType.paranthesisExpression,
+    SyntaxTreeType.comparisonExpression,
+    SyntaxTreeType.filterQueryExpression,
+    SyntaxTreeType.functionExpression,
+    SyntaxTreeType.numberLiteral,
+    SyntaxTreeType.stringLiteral,
+    SyntaxTreeType.booleanLiteral,
+    SyntaxTreeType.nullLiteral,
+    SyntaxTreeType.missingExpression,
+    SyntaxTreeType.dollarToken,
+    SyntaxTreeType.atToken,
+    SyntaxTreeType.starToken,
+    SyntaxTreeType.questionMarkToken,
+    SyntaxTreeType.dotToken,
+    SyntaxTreeType.doubleDotToken,
+    SyntaxTreeType.commaToken,
+    SyntaxTreeType.colonToken,
+    SyntaxTreeType.doubleAmpersandToken,
+    SyntaxTreeType.doubleBarToken,
+    SyntaxTreeType.exclamationMarkToken,
+    SyntaxTreeType.doubleEqualsToken,
+    SyntaxTreeType.exclamationMarkEqualsToken,
+    SyntaxTreeType.lessThanEqualsToken,
+    SyntaxTreeType.greaterThanEqualsToken,
+    SyntaxTreeType.lessThanToken,
+    SyntaxTreeType.greaterThanToken,
+    SyntaxTreeType.trueToken,
+    SyntaxTreeType.falseToken,
+    SyntaxTreeType.nullToken,
+    SyntaxTreeType.stringToken,
+    SyntaxTreeType.numberToken,
+    SyntaxTreeType.nameToken,
+    SyntaxTreeType.openingParanthesisToken,
+    SyntaxTreeType.closingParanthesisToken,
+    SyntaxTreeType.openingBracketToken,
+    SyntaxTreeType.closingBracketToken,
+    SyntaxTreeType.endOfFileToken,
+    SyntaxTreeType.missingToken
 ]);
 
 class CodeMirrorJSONPathParser extends Parser {
@@ -91,63 +91,63 @@ class CodeMirrorJSONPathParser extends Parser {
         super();
         this.nodeSet = nodeSet.extend(
             styleTags({
-                [JSONPathSyntaxTreeType.openingBracketToken]: t.squareBracket,
-                [JSONPathSyntaxTreeType.closingBracketToken]: t.squareBracket,
-                [JSONPathSyntaxTreeType.openingParanthesisToken]: t.paren,
-                [JSONPathSyntaxTreeType.closingParanthesisToken]: t.paren,
-                [JSONPathSyntaxTreeType.dollarToken]: t.variableName,
-                [JSONPathSyntaxTreeType.atToken]: t.variableName,
-                [JSONPathSyntaxTreeType.starToken]: t.controlOperator,
-                [JSONPathSyntaxTreeType.questionMarkToken]: t.controlOperator,
-                [JSONPathSyntaxTreeType.colonToken]: t.controlOperator,
-                [JSONPathSyntaxTreeType.numberToken]: t.number,
-                [JSONPathSyntaxTreeType.stringToken]: t.string,
-                [JSONPathSyntaxTreeType.greaterThanToken]: t.compareOperator,
-                [JSONPathSyntaxTreeType.greaterThanEqualsToken]: t.compareOperator,
-                [JSONPathSyntaxTreeType.lessThanToken]: t.compareOperator,
-                [JSONPathSyntaxTreeType.lessThanEqualsToken]: t.compareOperator,
-                [JSONPathSyntaxTreeType.doubleEqualsToken]: t.compareOperator,
-                [JSONPathSyntaxTreeType.exclamationMarkEqualsToken]: t.compareOperator,
-                [JSONPathSyntaxTreeType.exclamationMarkToken]: t.logicOperator,
-                [JSONPathSyntaxTreeType.doubleAmpersandToken]: t.logicOperator,
-                [JSONPathSyntaxTreeType.doubleBarToken]: t.logicOperator,
-                [JSONPathSyntaxTreeType.trueToken]: t.bool,
-                [JSONPathSyntaxTreeType.falseToken]: t.bool,
-                [JSONPathSyntaxTreeType.nullToken]: t.null,
-                [JSONPathSyntaxTreeType.nameToken]: t.propertyName,
-                [JSONPathSyntaxTreeType.functionExpression + "/" + JSONPathSyntaxTreeType.nameToken]: t.className
+                [SyntaxTreeType.openingBracketToken]: t.squareBracket,
+                [SyntaxTreeType.closingBracketToken]: t.squareBracket,
+                [SyntaxTreeType.openingParanthesisToken]: t.paren,
+                [SyntaxTreeType.closingParanthesisToken]: t.paren,
+                [SyntaxTreeType.dollarToken]: t.variableName,
+                [SyntaxTreeType.atToken]: t.variableName,
+                [SyntaxTreeType.starToken]: t.controlOperator,
+                [SyntaxTreeType.questionMarkToken]: t.controlOperator,
+                [SyntaxTreeType.colonToken]: t.controlOperator,
+                [SyntaxTreeType.numberToken]: t.number,
+                [SyntaxTreeType.stringToken]: t.string,
+                [SyntaxTreeType.greaterThanToken]: t.compareOperator,
+                [SyntaxTreeType.greaterThanEqualsToken]: t.compareOperator,
+                [SyntaxTreeType.lessThanToken]: t.compareOperator,
+                [SyntaxTreeType.lessThanEqualsToken]: t.compareOperator,
+                [SyntaxTreeType.doubleEqualsToken]: t.compareOperator,
+                [SyntaxTreeType.exclamationMarkEqualsToken]: t.compareOperator,
+                [SyntaxTreeType.exclamationMarkToken]: t.logicOperator,
+                [SyntaxTreeType.doubleAmpersandToken]: t.logicOperator,
+                [SyntaxTreeType.doubleBarToken]: t.logicOperator,
+                [SyntaxTreeType.trueToken]: t.bool,
+                [SyntaxTreeType.falseToken]: t.bool,
+                [SyntaxTreeType.nullToken]: t.null,
+                [SyntaxTreeType.nameToken]: t.propertyName,
+                [SyntaxTreeType.functionExpression + "/" + SyntaxTreeType.nameToken]: t.className
             }),
             NodeProp.closedBy.add(NodeType.match({
-                [JSONPathSyntaxTreeType.openingParanthesisToken]: [JSONPathSyntaxTreeType.closingParanthesisToken],
-                [JSONPathSyntaxTreeType.openingBracketToken]: [JSONPathSyntaxTreeType.closingBracketToken]
+                [SyntaxTreeType.openingParanthesisToken]: [SyntaxTreeType.closingParanthesisToken],
+                [SyntaxTreeType.openingBracketToken]: [SyntaxTreeType.closingBracketToken]
             })),
             NodeProp.openedBy.add(NodeType.match({
-                [JSONPathSyntaxTreeType.closingParanthesisToken]: [JSONPathSyntaxTreeType.openingParanthesisToken],
-                [JSONPathSyntaxTreeType.closingBracketToken]: [JSONPathSyntaxTreeType.openingBracketToken]
+                [SyntaxTreeType.closingParanthesisToken]: [SyntaxTreeType.openingParanthesisToken],
+                [SyntaxTreeType.closingBracketToken]: [SyntaxTreeType.openingBracketToken]
             })),
             foldNodeProp.add({
-                [JSONPathSyntaxTreeType.paranthesisExpression]: foldInside,
-                [JSONPathSyntaxTreeType.segment]: n => {
-                    if (n.lastChild!.name === JSONPathSyntaxTreeType.closingBracketToken)
-                        return { from: n.getChild(JSONPathSyntaxTreeType.openingBracketToken)!.to, to: n.lastChild!.from };
+                [SyntaxTreeType.paranthesisExpression]: foldInside,
+                [SyntaxTreeType.segment]: n => {
+                    if (n.lastChild!.name === SyntaxTreeType.closingBracketToken)
+                        return { from: n.getChild(SyntaxTreeType.openingBracketToken)!.to, to: n.lastChild!.from };
                     else
                         return null;
                 },
-                [JSONPathSyntaxTreeType.functionExpression]: n => ({ from: n.getChild(JSONPathSyntaxTreeType.openingParanthesisToken)!.to, to: n.lastChild!.from }),
-                [JSONPathSyntaxTreeType.stringToken]: (n, s) => {
+                [SyntaxTreeType.functionExpression]: n => ({ from: n.getChild(SyntaxTreeType.openingParanthesisToken)!.to, to: n.lastChild!.from }),
+                [SyntaxTreeType.stringToken]: (n, s) => {
                     const hasEndingQuote = s.doc.sliceString(n.to - 1, n.to) === "\""; // Could be escaped, but we probably don't care for this purpose.
                     return { from: n.from + 1, to: hasEndingQuote ? n.to - 1 : n.to };
                 }
             }),
             indentNodeProp.add({
-                [JSONPathSyntaxTreeType.query]: continuedIndent(),
-                [JSONPathSyntaxTreeType.segment]: delimitedIndent({ closing: "]", align: false }),
-                [JSONPathSyntaxTreeType.paranthesisExpression]: delimitedIndent({ closing: ")", align: false }),
-                [JSONPathSyntaxTreeType.functionExpression]: delimitedIndent({ closing: ")", align: false }),
-                [JSONPathSyntaxTreeType.stringToken]: c => 0,
+                [SyntaxTreeType.query]: continuedIndent(),
+                [SyntaxTreeType.segment]: delimitedIndent({ closing: "]", align: false }),
+                [SyntaxTreeType.paranthesisExpression]: delimitedIndent({ closing: ")", align: false }),
+                [SyntaxTreeType.functionExpression]: delimitedIndent({ closing: ")", align: false }),
+                [SyntaxTreeType.stringToken]: c => 0,
             }),
             languageDataProp.add(NodeType.match({
-                [JSONPathSyntaxTreeType.root]: jsonPathLanguageFacet
+                [SyntaxTreeType.root]: jsonPathLanguageFacet
             }))
         );
     }
@@ -165,7 +165,7 @@ class CodeMirrorJSONPathParser extends Parser {
         const tree = Tree.build({
             buffer: buffer,
             nodeSet: this.nodeSet,
-            topID: treeTypeToNodeId.get(JSONPathSyntaxTreeType.root)!,
+            topID: treeTypeToNodeId.get(SyntaxTreeType.root)!,
         });
         const treeBuildTime = performance.now() - start - parseTime;
         console.log("PARSE TIME:", parseTime, "ms", "TREE BUILD TIME", treeBuildTime, "ms");
@@ -173,16 +173,16 @@ class CodeMirrorJSONPathParser extends Parser {
         return new CodeMirrorJSONPathPartialParse(tree);
     }
 
-    private convertToTree(syntaxTree: JSONPathSyntaxTree, buffer: number[]) {
+    private convertToTree(syntaxTree: SyntaxTree, buffer: number[]) {
         const startBufferLength = buffer.length;
-        if (syntaxTree instanceof JSONPathNode) {
+        if (syntaxTree instanceof SyntaxTreeNode) {
             for (const child of syntaxTree.children)
                 this.convertToTree(child, buffer);
         }
         const nodeId = treeTypeToNodeId.get(syntaxTree.type);
         if (nodeId === undefined)
             throw new Error("Unknown node type: " + syntaxTree.type);
-        const position = syntaxTree instanceof JSONPathToken ? syntaxTree.position + syntaxTree.skippedTextBefore.length : syntaxTree.position;
+        const position = syntaxTree instanceof SyntaxTreeToken ? syntaxTree.position + syntaxTree.skippedTextBefore.length : syntaxTree.position;
         buffer.push(nodeId);
         buffer.push(position);
         buffer.push(syntaxTree.position + syntaxTree.length);

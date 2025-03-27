@@ -1,13 +1,13 @@
 import { DynamicAnalysisResult, DynamicAnalyzer } from "../analyzers/dynamic-analyzer";
 import { StaticAnalyzer } from "../analyzers/static-analyzer";
 import { AnyDataType, DataType } from "../data-types/data-types";
-import { JSONPathDiagnostics } from "../diagnostics";
-import { defaultJSONPathOptions, JSONPathFunctionHandler, JSONPathOptions } from "../options";
-import { JSONPath } from "../query/json-path";
+import { Diagnostics } from "../diagnostics";
+import { defaultQueryOptions, FunctionHandler, QueryOptions } from "../options";
+import { Query } from "../query/json-path";
 import { TypeChecker } from "../semantic-analysis/type-checker";
-import { JSONPathParser } from "../syntax-analysis/parser";
+import { Parser } from "../syntax-analysis/parser";
 import { TextChange } from "../text-change";
-import { JSONPathJSONValue, JSONPathNodeList } from "../types";
+import { JSONValue, NodeList } from "../types";
 import { logPerformance } from "../utils";
 import { CompletionItem, CompletionProvider } from "./completion-service";
 import { DocumentHighlight, DocumentHighlightsService } from "./document-highlights-service";
@@ -16,8 +16,8 @@ import { Signature, SignatureHelpService } from "./signature-help-service";
 import { Tooltip, TooltipService } from "./tooltip-service";
 
 export class EditorService {
-    private readonly parser: JSONPathParser;
-    private options: JSONPathOptions;
+    private readonly parser: Parser;
+    private options: QueryOptions;
     private typeChecker: TypeChecker;
     private completionProvider: CompletionProvider;
     private signatureProvider: SignatureHelpService;
@@ -26,14 +26,14 @@ export class EditorService {
     private staticAnalyzer: StaticAnalyzer;
     private dynamicAnalyzer: DynamicAnalyzer;
     private formatter: FormattingService;
-    private query: JSONPath;
-    private queryArgument: JSONPathJSONValue | undefined;
+    private query: Query;
+    private queryArgument: JSONValue | undefined;
     private queryArgumentType: DataType;
     private dynamicAnalysisResult: DynamicAnalysisResult | null;
 
     constructor() {
-        this.parser = new JSONPathParser();
-        this.options = defaultJSONPathOptions;
+        this.parser = new Parser();
+        this.options = defaultQueryOptions;
         this.typeChecker = new TypeChecker(this.options);
         this.completionProvider = new CompletionProvider(this.options);
         this.signatureProvider = new SignatureHelpService(this.options);
@@ -48,7 +48,7 @@ export class EditorService {
         this.dynamicAnalysisResult = null;
     }
 
-    updateOptions(newOptions: JSONPathOptions) {
+    updateOptions(newOptions: QueryOptions) {
         this.options = newOptions;
         this.typeChecker = new TypeChecker(this.options);
         this.completionProvider = new CompletionProvider(this.options);
@@ -65,7 +65,7 @@ export class EditorService {
         this.dynamicAnalysisResult = null;
     }
 
-    updateQueryArgument(newQueryArgument: JSONPathJSONValue | undefined) {
+    updateQueryArgument(newQueryArgument: JSONValue | undefined) {
         this.queryArgument = newQueryArgument;
         this.dynamicAnalysisResult = null;
     }
@@ -90,7 +90,7 @@ export class EditorService {
         return this.tooltipProvider.provideTooltip(this.query, this.queryArgument, this.queryArgumentType, position);
     }
 
-    getDiagnostics(): JSONPathDiagnostics[] {
+    getDiagnostics(): Diagnostics[] {
         const syntaxDiagnostics = this.query.syntaxDiagnostics;
         const typeCheckerDiagnostics = this.typeChecker.check(this.query);
         const analysisDiagnostics = this.queryArgument === undefined
@@ -106,7 +106,7 @@ export class EditorService {
         return this.formatter.getFormattingEdits(this.query);
     }
 
-    getResult(): JSONPathNodeList {
+    getResult(): NodeList {
         return this.getDynamicAnalysisResult().queryResult;
     }
 
@@ -115,7 +115,7 @@ export class EditorService {
             if (this.queryArgument !== undefined)
                 this.dynamicAnalysisResult = logPerformance("Execute query and analyze (on worker)", () => this.dynamicAnalyzer.analyze(this.query, this.queryArgument!));
             else
-                this.dynamicAnalysisResult = { diagnostics: [], queryResult: new JSONPathNodeList([]) };
+                this.dynamicAnalysisResult = { diagnostics: [], queryResult: new NodeList([]) };
         }
         return this.dynamicAnalysisResult;
     }

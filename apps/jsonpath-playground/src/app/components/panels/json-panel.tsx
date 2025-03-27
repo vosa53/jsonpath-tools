@@ -1,4 +1,4 @@
-import { JSONPathNormalizedPath, toNormalizedPath } from "@/jsonpath-tools/transformations";
+import { NormalizedPath, toNormalizedPath } from "@/jsonpath-tools/transformations";
 import { ActionIcon, Button, CopyButton, Divider, Group, Loader, Menu, Popover, Text, TextInput } from "@mantine/core";
 import { IconArrowDown, IconArrowUp, IconChevronDown, IconFileUpload, IconRouteSquare } from "@tabler/icons-react";
 import { memo, useRef, useState } from "react";
@@ -15,13 +15,13 @@ const JSONPanel = memo(({
     onCurrentPathIndexChanged
 }: {
     queryArgumentText: string,
-    paths: readonly JSONPathNormalizedPath[],
+    paths: readonly NormalizedPath[],
     currentPathIndex: number,
     onQueryArgumentTextChanged: (queryArgumentText: string) => void,
     onCurrentPathIndexChanged: (currentPathIndex: number) => void
 }) => {
     const [isParsingInProgress, setIsParsingInProgress] = useState(false);
-    const currentNormalizedPathGetter = useRef(() => [] as JSONPathNormalizedPath);
+    const currentNormalizedPathGetter = useRef(() => [] as NormalizedPath);
     const [currentNormalizedPath, setCurrentNormalizedPath] = useState("$");
 
     return (

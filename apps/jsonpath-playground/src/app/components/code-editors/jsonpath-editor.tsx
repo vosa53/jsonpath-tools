@@ -1,11 +1,11 @@
-import { defaultJSONPathOptions, JSONPathOptions } from "@/jsonpath-tools/options";
-import { JSONPath } from "@/jsonpath-tools/query/json-path";
-import { JSONPathJSONValue } from "@/jsonpath-tools/types";
+import { defaultQueryOptions, QueryOptions } from "@/jsonpath-tools/options";
+import { Query } from "@/jsonpath-tools/query/json-path";
+import { JSONValue } from "@/jsonpath-tools/types";
 import { syntaxTree } from "@codemirror/language";
 import { EditorView, keymap } from "@codemirror/view";
 import { Prec } from "@codemirror/state";
 import { useEffect, useRef } from "react";
-import { JSONPathDiagnostics } from "../../../jsonpath-tools/diagnostics";
+import { Diagnostics } from "../../../jsonpath-tools/diagnostics";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
 import { jsonPath } from "./codemirror/jsonpath-codemirror/jsonpath-language";
 import { getJSONPath } from "./codemirror/jsonpath-codemirror/jsonpath-parser";
@@ -17,7 +17,7 @@ import { AnyDataType, DataType } from "@/jsonpath-tools/data-types/data-types";
 
 export default function JSONPathEditor({
     value,
-    options = defaultJSONPathOptions,
+    options = defaultQueryOptions,
     queryArgument = undefined,
     queryArgumentType = AnyDataType.create(),
     highlightedRange = null,
@@ -30,16 +30,16 @@ export default function JSONPathEditor({
     onRun
 }: {
     value: string,
-    options: JSONPathOptions,
-    queryArgument: JSONPathJSONValue | undefined,
+    options: QueryOptions,
+    queryArgument: JSONValue | undefined,
     queryArgumentType: DataType,
     languageService: LanguageService,
     highlightedRange: TextRange | null,
     readonly?: boolean,
     onValueChanged: (value: string) => void,
-    onParsed?: (jsonPath: JSONPath) => void,
-    onDiagnosticsCreated?: (diagnostics: readonly JSONPathDiagnostics[]) => void,
-    onGetResultAvailable?: (getResult: () => Promise<{ nodes: readonly JSONPathJSONValue[], paths: readonly (string | number)[][] }>) => void,
+    onParsed?: (jsonPath: Query) => void,
+    onDiagnosticsCreated?: (diagnostics: readonly Diagnostics[]) => void,
+    onGetResultAvailable?: (getResult: () => Promise<{ nodes: readonly JSONValue[], paths: readonly (string | number)[][] }>) => void,
     onRun?: () => void
 }) {
     const editorViewRef = useRef<EditorView>(null);

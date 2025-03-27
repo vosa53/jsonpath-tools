@@ -1,78 +1,78 @@
-import { JSONPathAndExpression } from "@/jsonpath-tools/query/filter-expression/and-expression";
-import { JSONPathBooleanLiteral } from "@/jsonpath-tools/query/filter-expression/boolean-literal";
-import { JSONPathComparisonExpression, JSONPathComparisonOperator } from "@/jsonpath-tools/query/filter-expression/comparison-expression";
-import { JSONPathFilterExpression } from "@/jsonpath-tools/query/filter-expression/filter-expression";
-import { JSONPathFilterQueryExpression } from "@/jsonpath-tools/query/filter-expression/filter-query-expression";
-import { JSONPathNotExpression } from "@/jsonpath-tools/query/filter-expression/not-expression";
-import { JSONPathNullLiteral } from "@/jsonpath-tools/query/filter-expression/null-literal";
-import { JSONPathNumberLiteral } from "@/jsonpath-tools/query/filter-expression/number-literal";
-import { JSONPathOrExpression } from "@/jsonpath-tools/query/filter-expression/or-expression";
-import { JSONPathStringLiteral } from "@/jsonpath-tools/query/filter-expression/string-literal";
-import { JSONPathQuery } from "@/jsonpath-tools/query/query";
-import { JSONPathSegment } from "@/jsonpath-tools/query/segment";
-import { JSONPathFilterSelector } from "@/jsonpath-tools/query/selectors/filter-selector";
-import { JSONPathIndexSelector } from "@/jsonpath-tools/query/selectors/index-selector";
-import { JSONPathNameSelector } from "@/jsonpath-tools/query/selectors/name-selector";
-import { JSONPathWildcardSelector } from "@/jsonpath-tools/query/selectors/wildcard-selector";
-import { JSONPathSyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
-import { JSONPathSyntaxTreeType } from "@/jsonpath-tools/query/syntax-tree-type";
-import { JSONPathToken } from "@/jsonpath-tools/query/token";
+import { AndExpression } from "@/jsonpath-tools/query/filter-expression/and-expression";
+import { BooleanLiteralExpression } from "@/jsonpath-tools/query/filter-expression/boolean-literal";
+import { ComparisonExpression, JSONPathComparisonOperator } from "@/jsonpath-tools/query/filter-expression/comparison-expression";
+import { FilterExpression } from "@/jsonpath-tools/query/filter-expression/filter-expression";
+import { FilterQueryExpression } from "@/jsonpath-tools/query/filter-expression/filter-query-expression";
+import { NotExpression } from "@/jsonpath-tools/query/filter-expression/not-expression";
+import { NullLiteralExpression } from "@/jsonpath-tools/query/filter-expression/null-literal";
+import { NumberLiteralExpression } from "@/jsonpath-tools/query/filter-expression/number-literal";
+import { OrExpression } from "@/jsonpath-tools/query/filter-expression/or-expression";
+import { StringLiteralExpression } from "@/jsonpath-tools/query/filter-expression/string-literal";
+import { SubQuery } from "@/jsonpath-tools/query/query";
+import { Segment } from "@/jsonpath-tools/query/segment";
+import { FilterSelector } from "@/jsonpath-tools/query/selectors/filter-selector";
+import { IndexSelector } from "@/jsonpath-tools/query/selectors/index-selector";
+import { NameSelector } from "@/jsonpath-tools/query/selectors/name-selector";
+import { WildcardSelector } from "@/jsonpath-tools/query/selectors/wildcard-selector";
+import { SyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
+import { SyntaxTreeType } from "@/jsonpath-tools/query/syntax-tree-type";
+import { SyntaxTreeToken } from "@/jsonpath-tools/query/token";
 import { DataType, LiteralDataType, PrimitiveDataType, PrimitiveDataTypeType, AnyDataType, UnionDataType, intersectTypes, subtractTypes, NeverDataType, isSubtypeOf, isEquvivalentTypeWith } from "./data-types";
-import { JSONPathSliceSelector } from "../query/selectors/slice-selector";
-import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
-import { JSONPathOptions } from "../options";
-import { JSONPathParanthesisExpression } from "../query/filter-expression/paranthesis-expression";
-import { JSONPathMissingSelector } from "../query/selectors/missing-selector";
-import { JSONPathMissingExpression } from "../query/filter-expression/missing-expression";
+import { SliceSelector } from "../query/selectors/slice-selector";
+import { FunctionExpression } from "../query/filter-expression/function-expression";
+import { QueryOptions } from "../options";
+import { ParanthesisExpression } from "../query/filter-expression/paranthesis-expression";
+import { MissingSelector } from "../query/selectors/missing-selector";
+import { MissingExpression } from "../query/filter-expression/missing-expression";
 
 export class DataTypeAnalyzer {
-    private readonly typeCache = new Map<JSONPathSyntaxTree, DataType>();
+    private readonly typeCache = new Map<SyntaxTree, DataType>();
 
-    constructor(private readonly rootType: DataType, private readonly options: JSONPathOptions) {
+    constructor(private readonly rootType: DataType, private readonly options: QueryOptions) {
 
     }
 
-    getType(tree: JSONPathSyntaxTree): DataType {
+    getType(tree: SyntaxTree): DataType {
         const fromCache = this.typeCache.get(tree);
         if (fromCache !== undefined)
             return fromCache;
 
         let type: DataType;
-        if (tree instanceof JSONPathStringLiteral)
+        if (tree instanceof StringLiteralExpression)
             type = LiteralDataType.create(tree.value);
-        else if (tree instanceof JSONPathNumberLiteral)
+        else if (tree instanceof NumberLiteralExpression)
             type = LiteralDataType.create(tree.value);
-        else if (tree instanceof JSONPathBooleanLiteral)
+        else if (tree instanceof BooleanLiteralExpression)
             type = LiteralDataType.create(tree.value);
-        else if (tree instanceof JSONPathNullLiteral)
+        else if (tree instanceof NullLiteralExpression)
             type = PrimitiveDataType.create(PrimitiveDataTypeType.null);
-        else if (tree instanceof JSONPathParanthesisExpression)
+        else if (tree instanceof ParanthesisExpression)
             type = this.getType(tree.expression);
-        else if (tree.type === JSONPathSyntaxTreeType.atToken)
-            type = this.getCurrentIdentifierType(tree as JSONPathToken);
-        else if (tree.type === JSONPathSyntaxTreeType.dollarToken)
-            type = this.getRootIdentifierType(tree as JSONPathToken);
-        else if (tree instanceof JSONPathFilterSelector)
+        else if (tree.type === SyntaxTreeType.atToken)
+            type = this.getCurrentIdentifierType(tree as SyntaxTreeToken);
+        else if (tree.type === SyntaxTreeType.dollarToken)
+            type = this.getRootIdentifierType(tree as SyntaxTreeToken);
+        else if (tree instanceof FilterSelector)
             type = this.getFilterSelectorType(tree);
-        else if (tree instanceof JSONPathWildcardSelector)
+        else if (tree instanceof WildcardSelector)
             type = this.getWildcardSelectorType(tree);
-        else if (tree instanceof JSONPathNameSelector)
+        else if (tree instanceof NameSelector)
             type = this.getNameSelectorType(tree);
-        else if (tree instanceof JSONPathIndexSelector)
+        else if (tree instanceof IndexSelector)
             type = this.getIndexSelectorType(tree);
-        else if (tree instanceof JSONPathSliceSelector)
+        else if (tree instanceof SliceSelector)
             type = this.getSliceSelectorType(tree);
-        else if (tree instanceof JSONPathMissingSelector)
+        else if (tree instanceof MissingSelector)
             type = NeverDataType.create();
-        else if (tree instanceof JSONPathSegment)
+        else if (tree instanceof Segment)
             type = this.getSegmentType(tree);
-        else if (tree instanceof JSONPathQuery)
+        else if (tree instanceof SubQuery)
             type = this.getQueryType(tree);
-        else if (tree instanceof JSONPathFilterQueryExpression)
+        else if (tree instanceof FilterQueryExpression)
             type = this.getFilterQueryType(tree);
-        else if (tree instanceof JSONPathFunctionExpression)
+        else if (tree instanceof FunctionExpression)
             type = this.getFunctionType(tree);
-        else if (tree instanceof JSONPathMissingExpression)
+        else if (tree instanceof MissingExpression)
             type = NeverDataType.create();
         else
             type = AnyDataType.create();
@@ -81,74 +81,74 @@ export class DataTypeAnalyzer {
         return type;
     }
     
-    private getSegmentType(segment: JSONPathSegment): DataType {
+    private getSegmentType(segment: Segment): DataType {
         const selectorTypes = segment.selectors.map(selector => this.getType(selector.selector));
         return UnionDataType.create(selectorTypes);
     }
     
-    private getFilterSelectorType(filterSelector: JSONPathFilterSelector): DataType {
+    private getFilterSelectorType(filterSelector: FilterSelector): DataType {
         const previousSegmentType = this.getIncomingTypeToSegment(filterSelector);
         const childrenType = previousSegmentType.getChildrenType();
         const narrowedType = this.narrowTypeByExpression(childrenType, filterSelector.expression, true);
         return narrowedType;
     }
 
-    private getWildcardSelectorType(wildcardSelector: JSONPathWildcardSelector): DataType {
+    private getWildcardSelectorType(wildcardSelector: WildcardSelector): DataType {
         const previousSegmentType = this.getIncomingTypeToSegment(wildcardSelector);
         return previousSegmentType.getChildrenType();
     }
 
-    private getNameSelectorType(nameSelector: JSONPathNameSelector): DataType {
+    private getNameSelectorType(nameSelector: NameSelector): DataType {
         const previousSegmentType = this.getIncomingTypeToSegment(nameSelector);
         return previousSegmentType.getTypeAtPathSegment(nameSelector.name);
     }
 
-    private getIndexSelectorType(indexSelector: JSONPathIndexSelector): DataType {
+    private getIndexSelectorType(indexSelector: IndexSelector): DataType {
         const previousSegmentType = this.getIncomingTypeToSegment(indexSelector);
         return previousSegmentType.getTypeAtPathSegment(indexSelector.index);
     }
 
-    private getSliceSelectorType(indexSelector: JSONPathSliceSelector): DataType {
+    private getSliceSelectorType(indexSelector: SliceSelector): DataType {
         const previousSegmentType = this.getIncomingTypeToSegment(indexSelector);
         // It's not worth dealing with special cases for now, just consider wider type (corresponds to ::).
         return previousSegmentType.getChildrenType();
     }
 
-    private getCurrentIdentifierType(currentIdentifier: JSONPathToken): DataType {
+    private getCurrentIdentifierType(currentIdentifier: SyntaxTreeToken): DataType {
         const previousSegmentType = this.getIncomingTypeToSegment(currentIdentifier);
         return previousSegmentType.getChildrenType();
     }
 
-    private getRootIdentifierType(rootIdentifier: JSONPathToken): DataType {
+    private getRootIdentifierType(rootIdentifier: SyntaxTreeToken): DataType {
         return this.rootType;
     }
 
-    private getQueryType(query: JSONPathQuery): DataType {
+    private getQueryType(query: SubQuery): DataType {
         return query.segments.length === 0 
             ? this.getType(query.identifierToken) 
             : this.getSegmentType(query.segments[query.segments.length - 1]);
     }
 
-    private getFilterQueryType(filterQuery: JSONPathFilterQueryExpression): DataType {
+    private getFilterQueryType(filterQuery: FilterQueryExpression): DataType {
         let type = this.getQueryType(filterQuery.query);
-        if (filterQuery.parent instanceof JSONPathComparisonExpression)
+        if (filterQuery.parent instanceof ComparisonExpression)
             type = UnionDataType.create([type, PrimitiveDataType.create(PrimitiveDataTypeType.nothing)]);
         return type;
     }
 
-    private getFunctionType(functionExpression: JSONPathFunctionExpression): DataType {
+    private getFunctionType(functionExpression: FunctionExpression): DataType {
         const functionDefinition = this.options.functions[functionExpression.name];
         if (functionDefinition === undefined)
             return NeverDataType.create();
         return functionDefinition.returnDataType;
     }
 
-    getIncomingTypeToSegment(tree: JSONPathSyntaxTree): DataType {
-        let segment: JSONPathSyntaxTree | null = tree;
-        while (segment !== null && !(segment instanceof JSONPathSegment)) segment = segment.parent;
+    getIncomingTypeToSegment(tree: SyntaxTree): DataType {
+        let segment: SyntaxTree | null = tree;
+        while (segment !== null && !(segment instanceof Segment)) segment = segment.parent;
         if (segment === null)
             return NeverDataType.create();
-        const query = segment.parent as JSONPathQuery;
+        const query = segment.parent as SubQuery;
         const segmentIndex = query.segments.indexOf(segment);
         const previousSegment = segmentIndex === 0 ? query.identifierToken : query.segments[segmentIndex - 1];
         const previousSegmentType = this.getType(previousSegment);
@@ -158,22 +158,22 @@ export class DataTypeAnalyzer {
             return previousSegmentType;
     }
 
-    private narrowTypeByExpression(type: DataType, expression: JSONPathFilterExpression, isTrue: boolean): DataType {
-        if (expression instanceof JSONPathComparisonExpression)
+    private narrowTypeByExpression(type: DataType, expression: FilterExpression, isTrue: boolean): DataType {
+        if (expression instanceof ComparisonExpression)
             return this.narrowTypeByComparison(type, expression, isTrue);
-        else if (expression instanceof JSONPathFilterQueryExpression)
+        else if (expression instanceof FilterQueryExpression)
             return this.narrowTypeByFilterQuery(type, expression, isTrue);
-        else if (expression instanceof JSONPathAndExpression)
+        else if (expression instanceof AndExpression)
             return this.narrowTypeByAnd(type, expression, isTrue);
-        else if (expression instanceof JSONPathOrExpression)
+        else if (expression instanceof OrExpression)
             return this.narrowTypeByOr(type, expression, isTrue);
-        else if (expression instanceof JSONPathNotExpression)
+        else if (expression instanceof NotExpression)
             return this.narrowTypeByNot(type, expression, isTrue);
         else
             return type;
     }
 
-    private narrowTypeByComparison(type: DataType, comparisonExpression: JSONPathComparisonExpression, isTrue: boolean): DataType {
+    private narrowTypeByComparison(type: DataType, comparisonExpression: ComparisonExpression, isTrue: boolean): DataType {
         if (comparisonExpression.operator !== JSONPathComparisonOperator.equals && comparisonExpression.operator !== JSONPathComparisonOperator.notEquals)
             return type;
 
@@ -186,8 +186,8 @@ export class DataTypeAnalyzer {
         return narrowedType;
     }
 
-    private narrowTypeByEquals(type: DataType, sideToNarrow: JSONPathFilterExpression, otherSide: JSONPathFilterExpression, isTrue: boolean): DataType {
-        if (!(sideToNarrow instanceof JSONPathFilterQueryExpression) || !sideToNarrow.query.isRelative)
+    private narrowTypeByEquals(type: DataType, sideToNarrow: FilterExpression, otherSide: FilterExpression, isTrue: boolean): DataType {
+        if (!(sideToNarrow instanceof FilterQueryExpression) || !sideToNarrow.query.isRelative)
             return type;
         const path = sideToNarrow.query.toNormalizedPath();
         if (path === null)
@@ -201,7 +201,7 @@ export class DataTypeAnalyzer {
         return narrowedType;
     }
 
-    private narrowTypeByFilterQuery(type: DataType, filterQueryExpression: JSONPathFilterQueryExpression, isTrue: boolean): DataType {
+    private narrowTypeByFilterQuery(type: DataType, filterQueryExpression: FilterQueryExpression, isTrue: boolean): DataType {
         if (!filterQueryExpression.query.isRelative)
             return type;
         const path = filterQueryExpression.query.toNormalizedPath();
@@ -213,7 +213,7 @@ export class DataTypeAnalyzer {
             return type.changeTypeAtPath(path, t => intersectTypes(t, PrimitiveDataType.create(PrimitiveDataTypeType.nothing)));
     }
 
-    private narrowTypeByAnd(type: DataType, andExpression: JSONPathAndExpression, isTrue: boolean): DataType {
+    private narrowTypeByAnd(type: DataType, andExpression: AndExpression, isTrue: boolean): DataType {
         if (isTrue) {
             let narrowedType = type;
             for (const childExpression of andExpression.expressions)
@@ -228,7 +228,7 @@ export class DataTypeAnalyzer {
         }
     }
 
-    private narrowTypeByOr(type: DataType, orExpression: JSONPathOrExpression, isTrue: boolean): DataType {
+    private narrowTypeByOr(type: DataType, orExpression: OrExpression, isTrue: boolean): DataType {
         if (isTrue) {
             let narrowedType = NeverDataType.create();
             for (const childExpression of orExpression.expressions)
@@ -243,7 +243,7 @@ export class DataTypeAnalyzer {
         }
     }
 
-    private narrowTypeByNot(type: DataType, expression: JSONPathNotExpression, isTrue: boolean): DataType {
+    private narrowTypeByNot(type: DataType, expression: NotExpression, isTrue: boolean): DataType {
         return this.narrowTypeByExpression(type, expression.expression, !isTrue);
     }
 }

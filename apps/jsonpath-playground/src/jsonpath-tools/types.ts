@@ -1,38 +1,38 @@
-import { LocatedNode } from "./query/located-node";
+import { Node } from "./query/located-node";
 
-export type JSONPathJSONValue = string | number | boolean | null | JSONPathJSONValue[] | { [key: string]: JSONPathJSONValue };
-export const JSONPathNothing: unique symbol = Symbol("Nothing");
+export type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
+export const Nothing: unique symbol = Symbol("Nothing");
 
-export const JSONPathLogicalTrue: unique symbol = Symbol("LogicalTrue");
-export const JSONPathLogicalFalse: unique symbol = Symbol("LogicalFalse");
+export const LogicalTrue: unique symbol = Symbol("LogicalTrue");
+export const LogicalFalse: unique symbol = Symbol("LogicalFalse");
 
-export class JSONPathNodeList {
+export class NodeList {
     constructor(
-        readonly nodes: readonly LocatedNode[]
+        readonly nodes: readonly Node[]
     ) { }
 
-    static readonly empty = new JSONPathNodeList([]);
+    static readonly empty = new NodeList([]);
 }
 
-export type JSONPathValueType = JSONPathJSONValue | typeof JSONPathNothing;
-export type JSONPathLogicalType = typeof JSONPathLogicalTrue | typeof JSONPathLogicalFalse;
-export type JSONPathNodesType = JSONPathNodeList;
+export type ValueType = JSONValue | typeof Nothing;
+export type LogicalType = typeof LogicalTrue | typeof LogicalFalse;
+export type NodesType = NodeList;
 
-export type JSONPathFilterValue = JSONPathValueType | JSONPathLogicalType | JSONPathNodesType;
+export type FilterValue = ValueType | LogicalType | NodesType;
 
-export function isValueType(value: JSONPathFilterValue): value is JSONPathValueType {
+export function isValueType(value: FilterValue): value is ValueType {
     return !isLogicalType(value) && !isNodesType(value);
 }
 
-export function isLogicalType(value: JSONPathFilterValue): value is JSONPathLogicalType {
-    return value === JSONPathLogicalTrue || value === JSONPathLogicalFalse;
+export function isLogicalType(value: FilterValue): value is LogicalType {
+    return value === LogicalTrue || value === LogicalFalse;
 }
 
-export function isNodesType(value: JSONPathFilterValue): value is JSONPathNodesType {
-    return value instanceof JSONPathNodeList;
+export function isNodesType(value: FilterValue): value is NodesType {
+    return value instanceof NodeList;
 }
 
-export function deepEquals(left: JSONPathJSONValue, right: JSONPathJSONValue): boolean {
+export function deepEquals(left: JSONValue, right: JSONValue): boolean {
     if (typeof left === "number" && typeof right === "number")
         return left === right;
     if (typeof left === "string" && typeof right === "string")
@@ -48,7 +48,7 @@ export function deepEquals(left: JSONPathJSONValue, right: JSONPathJSONValue): b
     return false;
 }
 
-function deepEqualsArrays(left: JSONPathJSONValue[], right: JSONPathJSONValue[]): boolean {
+function deepEqualsArrays(left: JSONValue[], right: JSONValue[]): boolean {
     if (left.length !== right.length)
         return false;
     for (let i = 0; i < left.length; i++) {
@@ -58,7 +58,7 @@ function deepEqualsArrays(left: JSONPathJSONValue[], right: JSONPathJSONValue[])
     return true;
 }
 
-function deepEqualsObjects(left: { [key: string]: JSONPathJSONValue; }, right: { [key: string]: JSONPathJSONValue; }): boolean {
+function deepEqualsObjects(left: { [key: string]: JSONValue; }, right: { [key: string]: JSONValue; }): boolean {
     const leftKeys = Object.keys(left);
     const rightKeys = Object.keys(right);
     if (leftKeys.length !== rightKeys.length)

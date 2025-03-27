@@ -1,4 +1,4 @@
-import { defaultJSONPathOptions, JSONPathType } from "@/jsonpath-tools/options";
+import { defaultQueryOptions, Type } from "@/jsonpath-tools/options";
 import { ActionIcon, Button, Collapse, Flex, Group, Input, Select, Stack, TextInput } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -70,9 +70,9 @@ export default function CustomFunctionEditor({
                     label="Type"
                     allowDeselect={false}
                     data={[
-                        { label: "ValueType", value: JSONPathType.valueType },
-                        { label: "NodesType", value: JSONPathType.nodesType },
-                        { label: "LogicalType", value: JSONPathType.logicalType }
+                        { label: "ValueType", value: Type.valueType },
+                        { label: "NodesType", value: Type.nodesType },
+                        { label: "LogicalType", value: Type.logicalType }
                     ]}
                     key={form.key(`parameters.${i}.type`)}
                     {...form.getInputProps(`parameters.${i}.type`)}
@@ -109,9 +109,9 @@ export default function CustomFunctionEditor({
                     label="Return Type"
                     allowDeselect={false}
                     data={[
-                        { label: "ValueType", value: JSONPathType.valueType },
-                        { label: "NodesType", value: JSONPathType.nodesType },
-                        { label: "LogicalType", value: JSONPathType.logicalType }
+                        { label: "ValueType", value: Type.valueType },
+                        { label: "NodesType", value: Type.nodesType },
+                        { label: "LogicalType", value: Type.logicalType }
                     ]}
                     key={form.key("returnType")}
                     {...form.getInputProps("returnType")}
@@ -139,7 +139,7 @@ export default function CustomFunctionEditor({
                         <Button
                             variant="subtle"
                             leftSection={<IconPlus size={14} />}
-                            onClick={() => form.insertListItem("parameters", { name: "", description: "", type: JSONPathType.valueType })}>
+                            onClick={() => form.insertListItem("parameters", { name: "", description: "", type: Type.valueType })}>
                             Add Parameter
                         </Button>
                     </Stack>
@@ -195,7 +195,7 @@ function count<T>(array: T[], predicate: (item: T) => boolean): number {
 }
 
 const reservedFunctionNames: ReadonlySet<string> = new Set([
-    ...Object.keys(defaultJSONPathOptions.functions)
+    ...Object.keys(defaultQueryOptions.functions)
 ]);
 const reservedParameterNames: ReadonlySet<string> = new Set([
     "context",

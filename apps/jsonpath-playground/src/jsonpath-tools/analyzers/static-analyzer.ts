@@ -1,24 +1,24 @@
 import { DataType, isSubtypeOf, NeverDataType } from "../data-types/data-types";
-import { JSONPathOptions } from "../options";
-import { JSONPath } from "../query/json-path";
-import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "../diagnostics";
-import { JSONPathSelector } from "../query/selectors/selector";
+import { QueryOptions } from "../options";
+import { Query } from "../query/json-path";
+import { Diagnostics, DiagnosticsType } from "../diagnostics";
+import { Selector } from "../query/selectors/selector";
 import { DataTypeAnalyzer } from "../data-types/data-type-analyzer";
 
 export class StaticAnalyzer {
     constructor(
-        private readonly options: JSONPathOptions
+        private readonly options: QueryOptions
     ) { }
 
-    analyze(query: JSONPath, queryArgumentType: DataType): JSONPathDiagnostics[] {
+    analyze(query: Query, queryArgumentType: DataType): Diagnostics[] {
         const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType, this.options);
-        const diagnostics: JSONPathDiagnostics[] = [];
+        const diagnostics: Diagnostics[] = [];
         query.forEach(t => {
-            if (t instanceof JSONPathSelector && isSubtypeOf(typeAnalyzer.getType(t), NeverDataType.create()))
+            if (t instanceof Selector && isSubtypeOf(typeAnalyzer.getType(t), NeverDataType.create()))
                 diagnostics.push({
                     message: "This selector can not produce any output.",
                     textRange: t.textRangeWithoutSkipped,
-                    type: JSONPathDiagnosticsType.warning
+                    type: DiagnosticsType.warning
                 });
         });
         return diagnostics;

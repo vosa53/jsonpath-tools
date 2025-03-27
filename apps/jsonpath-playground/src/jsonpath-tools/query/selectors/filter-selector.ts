@@ -1,38 +1,38 @@
-import { JSONPathLogicalTrue } from "../../types";
-import { JSONPathFilterExpressionContext, JSONPathQueryContext, PushOnlyArray } from "../evaluation";
-import { JSONPathFilterExpression } from "../filter-expression/filter-expression";
+import { LogicalTrue } from "../../types";
+import { FilterExpressionContext, QueryContext, PushOnlyArray } from "../evaluation";
+import { FilterExpression } from "../filter-expression/filter-expression";
 import { evaluateAsLogicalType } from "../helpers";
-import { LocatedNode } from "../located-node";
-import { JSONPathSyntaxTreeType } from "../syntax-tree-type";
-import { JSONPathToken } from "../token";
-import { JSONPathSelector } from "./selector";
+import { Node } from "../located-node";
+import { SyntaxTreeType } from "../syntax-tree-type";
+import { SyntaxTreeToken } from "../token";
+import { Selector } from "./selector";
 
 
-export class JSONPathFilterSelector extends JSONPathSelector {
+export class FilterSelector extends Selector {
     constructor(
-        readonly questionMarkToken: JSONPathToken,
-        readonly expression: JSONPathFilterExpression
+        readonly questionMarkToken: SyntaxTreeToken,
+        readonly expression: FilterExpression
     ) {
         super([questionMarkToken, expression]);
     }
 
-    get type() { return JSONPathSyntaxTreeType.filterSelector; }
+    get type() { return SyntaxTreeType.filterSelector; }
 
-    select(input: LocatedNode, output: PushOnlyArray<LocatedNode>, queryContext: JSONPathQueryContext): void {
+    select(input: Node, output: PushOnlyArray<Node>, queryContext: QueryContext): void {
         if (Array.isArray(input.value)) {
             for (let i = 0; i < input.value.length; i++) {
-                const filterExpressionContext: JSONPathFilterExpressionContext = { currentNode: input.value[i] };
+                const filterExpressionContext: FilterExpressionContext = { currentNode: input.value[i] };
                 const filterResult = evaluateAsLogicalType(this.expression, queryContext, filterExpressionContext);
-                if (filterResult === JSONPathLogicalTrue)
-                    output.push(new LocatedNode(input.value[i], i, input));
+                if (filterResult === LogicalTrue)
+                    output.push(new Node(input.value[i], i, input));
             }
         }
         else if (typeof input.value === "object" && input.value !== null) {
             for (const entry of Object.entries(input.value)) {
-                const filterExpressionContext: JSONPathFilterExpressionContext = { currentNode: entry[1] };
+                const filterExpressionContext: FilterExpressionContext = { currentNode: entry[1] };
                 const filterResult = evaluateAsLogicalType(this.expression, queryContext, filterExpressionContext);
-                if (filterResult === JSONPathLogicalTrue)
-                    output.push(new LocatedNode(entry[1], entry[0], input));
+                if (filterResult === LogicalTrue)
+                    output.push(new Node(entry[1], entry[0], input));
             }
         }
     }

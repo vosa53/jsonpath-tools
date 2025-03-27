@@ -1,30 +1,30 @@
-import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "@/jsonpath-tools/diagnostics";
-import { JSONPathFunctionContext } from "@/jsonpath-tools/options";
-import { JSONPathFilterValue, JSONPathNothing } from "../../types";
-import { JSONPathFilterExpressionContext, JSONPathQueryContext } from "../evaluation";
+import { Diagnostics, DiagnosticsType } from "@/jsonpath-tools/diagnostics";
+import { FunctionContext } from "@/jsonpath-tools/options";
+import { FilterValue, Nothing } from "../../types";
+import { FilterExpressionContext, QueryContext } from "../evaluation";
 import { evaluateAs } from "../helpers";
-import { JSONPathSyntaxTreeType } from "../syntax-tree-type";
-import { JSONPathToken } from "../token";
-import { JSONPathFilterExpression } from "./filter-expression";
+import { SyntaxTreeType } from "../syntax-tree-type";
+import { SyntaxTreeToken } from "../token";
+import { FilterExpression } from "./filter-expression";
 
 
-export class JSONPathFunctionExpression extends JSONPathFilterExpression {
+export class FunctionExpression extends FilterExpression {
     constructor(
-        readonly nameToken: JSONPathToken,
-        readonly openingParanthesisToken: JSONPathToken,
-        readonly args: readonly { arg: JSONPathFilterExpression; commaToken: JSONPathToken | null; }[],
-        readonly closingParanthesisToken: JSONPathToken,
+        readonly nameToken: SyntaxTreeToken,
+        readonly openingParanthesisToken: SyntaxTreeToken,
+        readonly args: readonly { arg: FilterExpression; commaToken: SyntaxTreeToken | null; }[],
+        readonly closingParanthesisToken: SyntaxTreeToken,
 
         readonly name: string
     ) {
         super([nameToken, openingParanthesisToken, ...args.flatMap(a => [a.arg, a.commaToken]), closingParanthesisToken]);
     }
 
-    get type() { return JSONPathSyntaxTreeType.functionExpression; }
+    get type() { return SyntaxTreeType.functionExpression; }
 
-    protected evaluateImplementation(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
+    protected evaluateImplementation(queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): FilterValue {
         const functionDefinition = queryContext.options.functions[this.name];
-        if (functionDefinition === undefined) return JSONPathNothing;
+        if (functionDefinition === undefined) return Nothing;
         
         const argValues = [];
         for (let i = 0; i < Math.min(this.args.length, functionDefinition.parameters.length); i++) {
@@ -33,7 +33,7 @@ export class JSONPathFunctionExpression extends JSONPathFilterExpression {
             argValues.push(argValue);
         }
 
-        if (this.args.length < functionDefinition.parameters.length) return JSONPathNothing;
+        if (this.args.length < functionDefinition.parameters.length) return Nothing;
         
         const functionContext = queryContext.reportDiagnosticsCallback === undefined 
             ? nullFunctionContext 
@@ -43,15 +43,15 @@ export class JSONPathFunctionExpression extends JSONPathFilterExpression {
     }
 }
 
-class QueryContextFunctionContext implements JSONPathFunctionContext {
+class QueryContextFunctionContext implements FunctionContext {
     constructor(
-        private readonly reportDiagnosticsCallback: (diagnostics: JSONPathDiagnostics) => void,
-        private readonly functionExpression: JSONPathFunctionExpression
+        private readonly reportDiagnosticsCallback: (diagnostics: Diagnostics) => void,
+        private readonly functionExpression: FunctionExpression
     ) { }
 
     reportParameterWarning(parameterIndex: number, message: string): void {
-        const warning: JSONPathDiagnostics = { 
-            type: JSONPathDiagnosticsType.warning, 
+        const warning: Diagnostics = { 
+            type: DiagnosticsType.warning, 
             message, 
             textRange: this.functionExpression.args[parameterIndex].arg.textRangeWithoutSkipped 
         };
@@ -59,8 +59,8 @@ class QueryContextFunctionContext implements JSONPathFunctionContext {
     }
 
     reportWarning(message: string): void {
-        const warning: JSONPathDiagnostics = { 
-            type: JSONPathDiagnosticsType.warning, 
+        const warning: Diagnostics = { 
+            type: DiagnosticsType.warning, 
             message, 
             textRange: this.functionExpression.nameToken.textRangeWithoutSkipped 
         };
@@ -68,7 +68,7 @@ class QueryContextFunctionContext implements JSONPathFunctionContext {
     }
 }
 
-const nullFunctionContext: JSONPathFunctionContext = {
+const nullFunctionContext: FunctionContext = {
     reportParameterWarning(parameterIndex, message) { },
     reportWarning(message) { }
 };

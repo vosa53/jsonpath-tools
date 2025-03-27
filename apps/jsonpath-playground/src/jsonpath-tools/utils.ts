@@ -1,16 +1,16 @@
-import { JSONPathNode } from "./query/node";
-import { JSONPathSyntaxTree } from "./query/syntax-tree";
-import { JSONPathToken } from "./query/token";
+import { SyntaxTreeNode } from "./query/node";
+import { SyntaxTree } from "./query/syntax-tree";
+import { SyntaxTreeToken } from "./query/token";
 
-export function createSyntaxTree(syntaxTree: JSONPathSyntaxTree, colored = false, indentationLevel = 0): string {
+export function createSyntaxTree(syntaxTree: SyntaxTree, colored = false, indentationLevel = 0): string {
     let text = ' '.repeat(indentationLevel * 4);
-    if (syntaxTree instanceof JSONPathToken) {
+    if (syntaxTree instanceof SyntaxTreeToken) {
         if (colored) text += "\x1b[90m";
         text += "token: ";
         if (colored) text += "\x1b[0m";
         text += syntaxTree.text + "\n";
     }
-    else if (syntaxTree instanceof JSONPathNode) {
+    else if (syntaxTree instanceof SyntaxTreeNode) {
         if (colored) text += "\x1b[33m";
         text += syntaxTree.constructor.name.replace(/^JSONPath/, "");
         if (colored) text += "\x1b[0m";

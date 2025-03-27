@@ -1,14 +1,14 @@
-import { JSONPathFilterValue } from "../../types";
-import { JSONPathFilterExpressionContext, JSONPathQueryContext } from "../evaluation";
-import { JSONPathNode } from "../node";
+import { FilterValue } from "../../types";
+import { FilterExpressionContext, QueryContext } from "../evaluation";
+import { SyntaxTreeNode } from "../node";
 
 
-export abstract class JSONPathFilterExpression extends JSONPathNode {
-    evaluate(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
+export abstract class FilterExpression extends SyntaxTreeNode {
+    evaluate(queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): FilterValue {
         const output = this.evaluateImplementation(queryContext, filterExpressionContext);
         queryContext.filterExpressionInstrumentationCallback?.(this, output);
         return output;
     }
 
-    protected abstract evaluateImplementation(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue;
+    protected abstract evaluateImplementation(queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): FilterValue;
 }

@@ -1,22 +1,22 @@
-import { JSONPathFilterValue } from "../../types";
-import { JSONPathFilterExpressionContext, JSONPathQueryContext } from "../evaluation";
-import { JSONPathSyntaxTreeType } from "../syntax-tree-type";
-import { JSONPathToken } from "../token";
-import { JSONPathFilterExpression } from "./filter-expression";
+import { FilterValue } from "../../types";
+import { FilterExpressionContext, QueryContext } from "../evaluation";
+import { SyntaxTreeType } from "../syntax-tree-type";
+import { SyntaxTreeToken } from "../token";
+import { FilterExpression } from "./filter-expression";
 
 
-export class JSONPathNumberLiteral extends JSONPathFilterExpression {
+export class NumberLiteralExpression extends FilterExpression {
     constructor(
-        readonly valueToken: JSONPathToken,
+        readonly valueToken: SyntaxTreeToken,
 
         readonly value: number
     ) {
         super([valueToken]);
     }
 
-    get type() { return JSONPathSyntaxTreeType.numberLiteral; }
+    get type() { return SyntaxTreeType.numberLiteral; }
 
-    protected evaluateImplementation(queryContext: JSONPathQueryContext, filterExpressionContext: JSONPathFilterExpressionContext): JSONPathFilterValue {
+    protected evaluateImplementation(queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): FilterValue {
         return this.value;
     }
 }

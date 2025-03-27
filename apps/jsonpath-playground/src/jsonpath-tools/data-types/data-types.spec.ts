@@ -3,14 +3,14 @@ import { AnyDataType, ArrayDataType, intersectTypes, LiteralDataType, NeverDataT
 import { DataTypeAnalyzer } from "./data-type-analyzer";
 import { jsonSchemaToType } from "./json-schema-data-type-converter";
 import { jsonSchemaForTest } from "./json-schema-data-type-converter.spec";
-import { JSONPathParser } from "../syntax-analysis/parser";
-import { defaultJSONPathOptions } from "../options";
+import { Parser } from "../syntax-analysis/parser";
+import { defaultQueryOptions } from "../options";
 
 describe("Types", () => {
     it("types test", () => {
         const rootType = jsonSchemaToType(JSON.parse(jsonSchemaForTest));
-        const typeAnalyzer = new DataTypeAnalyzer(rootType, defaultJSONPathOptions);
-        const parser = new JSONPathParser();
+        const typeAnalyzer = new DataTypeAnalyzer(rootType, defaultQueryOptions);
+        const parser = new Parser();
         const path = parser.parse("$[?@.role=='admin']");
 
         const queryType = typeAnalyzer.getType(path.query);

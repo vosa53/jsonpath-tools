@@ -1,17 +1,17 @@
-import { JSONPathJSONValue } from "@/jsonpath-tools/types";
+import { JSONValue } from "@/jsonpath-tools/types";
 import { SimpleRPC } from "./simple-rpc";
 import { LanguageServiceBackendSession } from "./language-service-backend-session";
 import { UpdateOptionsLanguageServiceMessage, UpdateQueryLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessage, GetResultLanguageServiceMessage, DisconnectLanguageServiceMessage, GetSignatureLanguageServiceMessage, GetTooltipLanguageServiceMessage, ResolveCompletionLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage as UpdateQueryArgumentTypeLanguageServiceMessage } from "./language-service-messages";
-import { defaultJSONPathOptions, JSONPathFunctionHandler } from "@/jsonpath-tools/options";
+import { defaultQueryOptions, FunctionHandler } from "@/jsonpath-tools/options";
 
 export class LanguageServiceBackend {
     private readonly rpc: SimpleRPC<LanguageServiceBackendSession>;
 
-    constructor(sendToFrontend: (data: JSONPathJSONValue) => void, resolveFunctionHandler?: (functionName: string) => JSONPathFunctionHandler) {
+    constructor(sendToFrontend: (data: JSONValue) => void, resolveFunctionHandler?: (functionName: string) => FunctionHandler) {
         resolveFunctionHandler ??= fn => {
-            const exists = Object.hasOwn(defaultJSONPathOptions.functions, fn);
+            const exists = Object.hasOwn(defaultQueryOptions.functions, fn);
             if (!exists) throw new Error(`Function '${fn}' not found.`);
-            else return defaultJSONPathOptions.functions[fn].handler;
+            else return defaultQueryOptions.functions[fn].handler;
         };
         this.rpc = new SimpleRPC<LanguageServiceBackendSession>(
             i => sendToFrontend(i), 
@@ -33,7 +33,7 @@ export class LanguageServiceBackend {
         this.rpc.addHandlerAction("disconnect", (h, message: DisconnectLanguageServiceMessage) => h.disconnect(message));
     }
 
-    receiveFromFrontend(data: JSONPathJSONValue) {
+    receiveFromFrontend(data: JSONValue) {
         this.rpc.receive(data);
     }
 }

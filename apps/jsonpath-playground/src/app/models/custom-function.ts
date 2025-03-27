@@ -1,15 +1,15 @@
-import { JSONPathType } from "@/jsonpath-tools/options";
+import { Type } from "@/jsonpath-tools/options";
 
 export interface CustomFunction {
     name: string;
     description: string;
     parameters: readonly CustomFunctionParameter[];
-    returnType: JSONPathType;
+    returnType: Type;
     code: string;
 }
 
 export interface CustomFunctionParameter {
     name: string;
     description: string;
-    type: JSONPathType;
+    type: Type;
 }

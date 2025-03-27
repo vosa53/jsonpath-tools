@@ -1,36 +1,36 @@
-import { JSONPathAndExpression } from "../query/filter-expression/and-expression";
-import { JSONPathComparisonExpression } from "../query/filter-expression/comparison-expression";
-import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
-import { JSONPathNotExpression } from "../query/filter-expression/not-expression";
-import { JSONPathOrExpression } from "../query/filter-expression/or-expression";
-import { JSONPathParanthesisExpression } from "../query/filter-expression/paranthesis-expression";
-import { JSONPath } from "../query/json-path";
-import { JSONPathNode } from "../query/node";
-import { JSONPathQuery } from "../query/query";
-import { JSONPathSegment } from "../query/segment";
-import { JSONPathFilterSelector } from "../query/selectors/filter-selector";
-import { JSONPathSliceSelector } from "../query/selectors/slice-selector";
-import { JSONPathSyntaxTree } from "../query/syntax-tree";
+import { AndExpression } from "../query/filter-expression/and-expression";
+import { ComparisonExpression } from "../query/filter-expression/comparison-expression";
+import { FunctionExpression } from "../query/filter-expression/function-expression";
+import { NotExpression } from "../query/filter-expression/not-expression";
+import { OrExpression } from "../query/filter-expression/or-expression";
+import { ParanthesisExpression } from "../query/filter-expression/paranthesis-expression";
+import { Query } from "../query/json-path";
+import { SyntaxTreeNode } from "../query/node";
+import { SubQuery } from "../query/query";
+import { Segment } from "../query/segment";
+import { FilterSelector } from "../query/selectors/filter-selector";
+import { SliceSelector } from "../query/selectors/slice-selector";
+import { SyntaxTree } from "../query/syntax-tree";
 import { TextChange } from "../text-change";
 import { TextRange } from "../text-range";
 
 export class FormattingService {
-    getFormattingEdits(query: JSONPath): TextChange[] {
+    getFormattingEdits(query: Query): TextChange[] {
         const context = new FormatterContext();
         this.formatTree(query, 0, context);
         return context.edits;
     }
 
-    private addPolicies(tree: JSONPathSyntaxTree, context: FormatterContext) {
-        if (tree instanceof JSONPath) {
+    private addPolicies(tree: SyntaxTree, context: FormatterContext) {
+        if (tree instanceof Query) {
             context.addPolicy(tree.query, WhitespacePolicy.disallowed, false);
             context.addPolicy(tree.endOfFileToken, WhitespacePolicy.disallowed, false);
         }
-        if (tree instanceof JSONPathQuery) {
+        if (tree instanceof SubQuery) {
             for (const segment of tree.segments)
                 context.addPolicy(segment, WhitespacePolicy.shouldNotBe, true);
         }
-        if (tree instanceof JSONPathSegment) {
+        if (tree instanceof Segment) {
             if (tree.dotToken !== null && tree.openingBracketToken !== null)
                 context.addPolicy(tree.openingBracketToken, WhitespacePolicy.shouldNotBe, false);
             if (tree.openingBracketToken !== null)
@@ -38,9 +38,9 @@ export class FormattingService {
             if (tree.closingBracketToken !== null)
                 context.addPolicy(tree.closingBracketToken, WhitespacePolicy.shouldNotBe, false);
         }
-        if (tree instanceof JSONPathFilterSelector)
+        if (tree instanceof FilterSelector)
             context.addPolicy(tree.expression, WhitespacePolicy.shouldNotBe, true);
-        if (tree instanceof JSONPathSliceSelector) {
+        if (tree instanceof SliceSelector) {
             if (tree.startToken !== null)
                 context.addPolicy(tree.firstColonToken, WhitespacePolicy.shouldNotBe, true);
             if (tree.endToken !== null)
@@ -50,21 +50,21 @@ export class FormattingService {
             if (tree.stepToken !== null)
                 context.addPolicy(tree.stepToken, WhitespacePolicy.shouldNotBe, true);
         }
-        if (tree instanceof JSONPathComparisonExpression) {
+        if (tree instanceof ComparisonExpression) {
             context.addPolicy(tree.operatorToken, WhitespacePolicy.shouldBe, true);
             context.addPolicy(tree.right, WhitespacePolicy.shouldBe, true);
         }
-        if (tree instanceof JSONPathAndExpression)
+        if (tree instanceof AndExpression)
             this.addDelimitedPolicies(tree.expressions, e => e.expression, e => e.andToken, true, context);
-        if (tree instanceof JSONPathOrExpression)
+        if (tree instanceof OrExpression)
             this.addDelimitedPolicies(tree.expressions, e => e.expression, e => e.orToken, true, context);
-        if (tree instanceof JSONPathNotExpression)
+        if (tree instanceof NotExpression)
             context.addPolicy(tree.expression, WhitespacePolicy.shouldNotBe, true);
-        if (tree instanceof JSONPathParanthesisExpression) {
+        if (tree instanceof ParanthesisExpression) {
             context.addPolicy(tree.expression, WhitespacePolicy.shouldNotBe, true);
             context.addPolicy(tree.closingParanthesisToken, WhitespacePolicy.shouldNotBe, false);
         }
-        if (tree instanceof JSONPathFunctionExpression) {
+        if (tree instanceof FunctionExpression) {
             context.addPolicy(tree.openingParanthesisToken, WhitespacePolicy.shouldNotBe, false);
             this.addDelimitedPolicies(tree.args, e => e.arg, e => e.commaToken, false, context);
             context.addPolicy(tree.closingParanthesisToken, WhitespacePolicy.shouldNotBe, false);
@@ -73,8 +73,8 @@ export class FormattingService {
 
     private addDelimitedPolicies<TElement>(
         list: readonly TElement[],
-        getElement: (element: TElement) => JSONPathSyntaxTree,
-        getDelimiter: (element: TElement) => JSONPathSyntaxTree | null,
+        getElement: (element: TElement) => SyntaxTree,
+        getDelimiter: (element: TElement) => SyntaxTree | null,
         allowWhitespaceBeforeDelimiter: boolean,
         context: FormatterContext
     ) {
@@ -88,8 +88,8 @@ export class FormattingService {
     }
 
 
-    private formatTree(tree: JSONPathSyntaxTree, baseIndent: number, context: FormatterContext) {
-        if (tree instanceof JSONPathNode) {
+    private formatTree(tree: SyntaxTree, baseIndent: number, context: FormatterContext) {
+        if (tree instanceof SyntaxTreeNode) {
             this.addPolicies(tree, context);
             for (let i = 0; i < tree.children.length; i++) {
                 const child = tree.children[i];
@@ -103,7 +103,7 @@ export class FormattingService {
         }
     }
 
-    private addEdit(tree: JSONPathSyntaxTree, baseIndent: number, whitespacePolicy: WhitespacePolicy, context: FormatterContext) {
+    private addEdit(tree: SyntaxTree, baseIndent: number, whitespacePolicy: WhitespacePolicy, context: FormatterContext) {
         const lines = this.getSkippedTextLines(tree);
         if (whitespacePolicy === WhitespacePolicy.disallowed) {
             this.adjustSpaces(tree.skippedTextBefore, tree.position, 0, tree.skippedTextBefore.length, "", 0, context);
@@ -131,7 +131,7 @@ export class FormattingService {
         }
     }
 
-    private getSkippedTextLines(tree: JSONPathSyntaxTree): SkippedTextLine[] {
+    private getSkippedTextLines(tree: SyntaxTree): SkippedTextLine[] {
         const lines: SkippedTextLine[] = [];
         let lineStart = 0;
         for (let i = 0; i < tree.skippedTextBefore.length; i++) {
@@ -162,22 +162,22 @@ export class FormattingService {
 
 class FormatterContext {
     private _edits: TextChange[] = [];
-    whitespacePolicies = new Map<JSONPathSyntaxTree, WhitespacePolicy>();
-    indentPolicies = new Map<JSONPathSyntaxTree, boolean>();
+    whitespacePolicies = new Map<SyntaxTree, WhitespacePolicy>();
+    indentPolicies = new Map<SyntaxTree, boolean>();
 
     addEdit(edit: TextChange) {
         this._edits.push(edit);
     }
 
-    getWhitespacePolicy(tree: JSONPathSyntaxTree): WhitespacePolicy {
+    getWhitespacePolicy(tree: SyntaxTree): WhitespacePolicy {
         return this.whitespacePolicies.get(tree) ?? WhitespacePolicy.disallowed;
     }
 
-    getIndentPolicy(tree: JSONPathSyntaxTree): boolean {
+    getIndentPolicy(tree: SyntaxTree): boolean {
         return this.indentPolicies.get(tree) ?? false;
     }
 
-    addPolicy(tree: JSONPathSyntaxTree, whitespacePolicy: WhitespacePolicy, indentPolicy: boolean) {
+    addPolicy(tree: SyntaxTree, whitespacePolicy: WhitespacePolicy, indentPolicy: boolean) {
         this.whitespacePolicies.set(tree, whitespacePolicy);
         this.indentPolicies.set(tree, indentPolicy);
     }

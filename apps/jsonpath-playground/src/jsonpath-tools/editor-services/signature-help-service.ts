@@ -1,25 +1,25 @@
-import { JSONPathOptions } from "../options";
-import { JSONPathFunctionExpression } from "../query/filter-expression/function-expression";
-import { JSONPath } from "../query/json-path";
-import { JSONPathSyntaxTree } from "../query/syntax-tree";
+import { QueryOptions } from "../options";
+import { FunctionExpression } from "../query/filter-expression/function-expression";
+import { Query } from "../query/json-path";
+import { SyntaxTree } from "../query/syntax-tree";
 import { TextRange } from "../text-range";
 
 export class SignatureHelpService {
     constructor(
-        private readonly options: JSONPathOptions
+        private readonly options: QueryOptions
     ) { }
 
-    provideSignature(query: JSONPath, position: number): Signature | null {
+    provideSignature(query: Query, position: number): Signature | null {
         const node = query.getContainingAtPosition(position);
         if (node === null)
             return null;
 
-        let current: JSONPathSyntaxTree | null = node;
+        let current: SyntaxTree | null = node;
         while (current !== null && !this.isCorrectFunction(current, position))
             current = current.parent;
         if (current === null) 
             return null;
-        const functionExpression = current as JSONPathFunctionExpression;
+        const functionExpression = current as FunctionExpression;
         const functionDefinition = this.options.functions[functionExpression.name];
         if (functionDefinition === undefined)
             return null;
@@ -39,13 +39,13 @@ export class SignatureHelpService {
         return new Signature(text, parameters, parameterIndex, "");
     }
 
-    private isCorrectFunction(node: JSONPathSyntaxTree, position: number): boolean {
-        return node instanceof JSONPathFunctionExpression && 
+    private isCorrectFunction(node: SyntaxTree, position: number): boolean {
+        return node instanceof FunctionExpression && 
             node.openingParanthesisToken.position < position && 
             node.closingParanthesisToken.position >= position;
     }
 
-    private getParameterIndex(node: JSONPathFunctionExpression, position: number): number {
+    private getParameterIndex(node: FunctionExpression, position: number): number {
         let index = 0;
         while (index < node.args.length && node.args[index].commaToken !== null && node.args[index].commaToken!.position < position)
             index++;

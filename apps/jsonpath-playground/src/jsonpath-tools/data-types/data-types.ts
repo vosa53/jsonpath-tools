@@ -1,5 +1,5 @@
-import { JSONPathJSONValue, JSONPathNothing } from "@/jsonpath-tools/types";
-import { JSONPathNormalizedPath } from "../transformations";
+import { JSONValue, Nothing } from "@/jsonpath-tools/types";
+import { NormalizedPath } from "../transformations";
 
 const INDENTATION_SPACE_COUNT = 4;
 
@@ -10,8 +10,8 @@ export class DataTypeAnnotation {
         readonly deprecated: boolean,
         readonly readOnly: boolean,
         readonly writeOnly: boolean,
-        readonly defaultValue: JSONPathJSONValue | undefined,
-        readonly exampleValues: readonly JSONPathJSONValue[]
+        readonly defaultValue: JSONValue | undefined,
+        readonly exampleValues: readonly JSONValue[]
     ) { }
 
     static readonly EMPTY_SET: ReadonlySet<DataTypeAnnotation> = new Set<DataTypeAnnotation>();
@@ -60,7 +60,7 @@ export abstract class DataType {
         return knownLitarals;
     }
 
-    getTypeAtPath(path: JSONPathNormalizedPath): DataType {
+    getTypeAtPath(path: NormalizedPath): DataType {
         let current = this as DataType;
         for (const pathSegment of path) {
             current = current.getTypeAtPathSegment(pathSegment);
@@ -68,8 +68,8 @@ export abstract class DataType {
         return current;
     }
 
-    abstract changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: DataType) => DataType): DataType;
-    abstract setPathExistence(path: JSONPathNormalizedPath): DataType;
+    abstract changeTypeAtPath(path: NormalizedPath, operation: (currentType: DataType) => DataType): DataType;
+    abstract setPathExistence(path: NormalizedPath): DataType;
     abstract toStringInternal(simplified: boolean, multiline: boolean, level: number): string;
     
     toString(simplified = false, multiline = false): string {
@@ -150,11 +150,11 @@ export class LiteralDataType extends DataType {
         return JSON.stringify(this.value);
     }
 
-    changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: DataType) => DataType): DataType {
+    changeTypeAtPath(path: NormalizedPath, operation: (currentType: DataType) => DataType): DataType {
         return path.length === 0 ? operation(this) : this;
     }
 
-    setPathExistence(path: JSONPathNormalizedPath): DataType {
+    setPathExistence(path: NormalizedPath): DataType {
         return path.length === 0 ? this : NeverDataType.create();
     }
 }
@@ -204,11 +204,11 @@ export class PrimitiveDataType extends DataType {
         return this.type;
     }
 
-    changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: DataType) => DataType): DataType {
+    changeTypeAtPath(path: NormalizedPath, operation: (currentType: DataType) => DataType): DataType {
         return path.length === 0 ? operation(this) : this;
     }
 
-    setPathExistence(path: JSONPathNormalizedPath): DataType {
+    setPathExistence(path: NormalizedPath): DataType {
         return path.length === 0 ? this : NeverDataType.create();
     }
 }
@@ -281,7 +281,7 @@ export class ObjectDataType extends DataType {
         return text;
     }
 
-    changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: DataType) => DataType): DataType {
+    changeTypeAtPath(path: NormalizedPath, operation: (currentType: DataType) => DataType): DataType {
         if (path.length === 0)
             return operation(this)
         if (typeof path[0] === "number" || !this.propertyTypes.has(path[0]))
@@ -292,7 +292,7 @@ export class ObjectDataType extends DataType {
         return ObjectDataType.create(newPropertyTypes, this.restPropertyType, this.requiredProperties);
     }
 
-    setPathExistence(path: JSONPathNormalizedPath): DataType {
+    setPathExistence(path: NormalizedPath): DataType {
         if (path.length === 0)
             return this;
         if (typeof path[0] === "number")
@@ -390,7 +390,7 @@ export class ArrayDataType extends DataType {
         return text;
     }
 
-    changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: DataType) => DataType): DataType {
+    changeTypeAtPath(path: NormalizedPath, operation: (currentType: DataType) => DataType): DataType {
         if (path.length === 0)
             return operation(this);
         if (typeof path[0] === "string" || path[0] >= this.prefixElementTypes.length)
@@ -401,7 +401,7 @@ export class ArrayDataType extends DataType {
         return ArrayDataType.create(newPrefixElementTypes, this.restElementType, this.requiredElementCount);
     }
 
-    setPathExistence(path: JSONPathNormalizedPath): DataType {
+    setPathExistence(path: NormalizedPath): DataType {
         if (path.length === 0)
             return this;
         if (typeof path[0] === "string")
@@ -493,12 +493,12 @@ export class UnionDataType extends DataType {
         return `${typeStrings.join(multiline ? " |\n" + this.createIndentationString(level + 1) : " | ")}`;
     }
 
-    changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: DataType) => DataType): DataType {
+    changeTypeAtPath(path: NormalizedPath, operation: (currentType: DataType) => DataType): DataType {
         const newTypes = this.types.map(t => t.changeTypeAtPath(path, operation));
         return UnionDataType.create(newTypes);
     }
 
-    setPathExistence(path: JSONPathNormalizedPath): DataType {
+    setPathExistence(path: NormalizedPath): DataType {
         const newTypes = this.types.map(t => t.setPathExistence(path));
         return UnionDataType.create(newTypes);
     }
@@ -548,11 +548,11 @@ export class NeverDataType extends DataType {
         return "never";
     }
 
-    changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: DataType) => DataType): DataType {
+    changeTypeAtPath(path: NormalizedPath, operation: (currentType: DataType) => DataType): DataType {
         return path.length === 0 ? operation(this) : this;
     }
 
-    setPathExistence(path: JSONPathNormalizedPath): DataType {
+    setPathExistence(path: NormalizedPath): DataType {
         return this;
     }
 }
@@ -601,11 +601,11 @@ export class AnyDataType extends DataType {
         return "any";
     }
 
-    changeTypeAtPath(path: JSONPathNormalizedPath, operation: (currentType: DataType) => DataType): DataType {
+    changeTypeAtPath(path: NormalizedPath, operation: (currentType: DataType) => DataType): DataType {
         return path.length === 0 ? operation(this) : this;
     }
 
-    setPathExistence(path: JSONPathNormalizedPath): DataType {
+    setPathExistence(path: NormalizedPath): DataType {
         return this;
     }
 }

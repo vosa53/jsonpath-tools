@@ -1,12 +1,12 @@
 import { TextRange } from "../text-range";
-import { JSONPathSyntaxTree } from "./syntax-tree";
+import { SyntaxTree } from "./syntax-tree";
 
 
-export abstract class JSONPathNode extends JSONPathSyntaxTree {
-    readonly children: JSONPathSyntaxTree[];
+export abstract class SyntaxTreeNode extends SyntaxTree {
+    readonly children: SyntaxTree[];
 
     constructor(
-        children: (JSONPathSyntaxTree | null)[]
+        children: (SyntaxTree | null)[]
     ) {
         const notNullChildren = children.filter(c => c !== null);
         if (notNullChildren.length === 0)
@@ -22,7 +22,7 @@ export abstract class JSONPathNode extends JSONPathSyntaxTree {
         return this.children[0].skippedTextBefore;
     }
 
-    forEach(action: (tree: JSONPathSyntaxTree) => void | boolean): void {
+    forEach(action: (tree: SyntaxTree) => void | boolean): void {
         const shouldContinue = action(this);
         if (shouldContinue !== false) {
             for (const child of this.children)

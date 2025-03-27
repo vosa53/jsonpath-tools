@@ -1,11 +1,11 @@
-import { JSONPathDiagnostics, JSONPathDiagnosticsType } from "@/jsonpath-tools/diagnostics";
+import { Diagnostics, DiagnosticsType } from "@/jsonpath-tools/diagnostics";
 import { LintSource } from "@codemirror/lint";
 import { ViewUpdate } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";
 import { languageServiceSessionStateField, updateOptionsEffect, updateQueryArgumentEffect } from "./jsonpath-state";
 
 
-export function jsonPathLintSource(options: { onDiagnosticsCreated?: (diagnostics: readonly JSONPathDiagnostics[]) => void } = {}): LintSource {
+export function jsonPathLintSource(options: { onDiagnosticsCreated?: (diagnostics: readonly Diagnostics[]) => void } = {}): LintSource {
     return async view => {
         const languageServiceSession = view.state.field(languageServiceSessionStateField);
         try {
@@ -15,7 +15,7 @@ export function jsonPathLintSource(options: { onDiagnosticsCreated?: (diagnostic
             return diagnostics.map(d => ({
                 from: d.textRange.position,
                 to: d.textRange.position + d.textRange.length,
-                severity: d.type === JSONPathDiagnosticsType.error ? "error" : "warning",
+                severity: d.type === DiagnosticsType.error ? "error" : "warning",
                 message: d.message
             }));
         }

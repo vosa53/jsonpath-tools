@@ -1,24 +1,24 @@
-import { JSONPathDiagnostics } from "../diagnostics";
-import { JSONPathOptions } from "../options";
-import { JSONPathFilterValue, JSONPathJSONValue } from "../types";
-import { JSONPathFilterExpression } from "./filter-expression/filter-expression";
-import { LocatedNode } from "./located-node";
-import { JSONPathQuery } from "./query";
-import { JSONPathSegment } from "./segment";
-import { JSONPathSelector } from "./selectors/selector";
+import { Diagnostics } from "../diagnostics";
+import { QueryOptions } from "../options";
+import { FilterValue, JSONValue } from "../types";
+import { FilterExpression } from "./filter-expression/filter-expression";
+import { Node } from "./located-node";
+import { SubQuery } from "./query";
+import { Segment } from "./segment";
+import { Selector } from "./selectors/selector";
 
-export interface JSONPathQueryContext {
-    readonly rootNode: JSONPathJSONValue;
-    readonly options: JSONPathOptions;
-    readonly queryInstrumentationCallback?: (query: JSONPathQuery, input: LocatedNode, outputArray: IndexOnlyArray<LocatedNode>, outputStartIndex: number, outputLength: number) => void;
-    readonly segmentInstrumentationCallback?: (segment: JSONPathSegment, input: LocatedNode, outputArray: IndexOnlyArray<LocatedNode>, outputStartIndex: number, outputLength: number) => void;
-    readonly selectorInstrumentationCallback?: (selector: JSONPathSelector, input: LocatedNode, outputArray: IndexOnlyArray<LocatedNode>, outputStartIndex: number, outputLength: number) => void;
-    readonly filterExpressionInstrumentationCallback?: (filterExpression: JSONPathFilterExpression, output: JSONPathFilterValue) => void;
-    readonly reportDiagnosticsCallback?: (diagnostics: JSONPathDiagnostics) => void;
+export interface QueryContext {
+    readonly rootNode: JSONValue;
+    readonly options: QueryOptions;
+    readonly queryInstrumentationCallback?: (query: SubQuery, input: Node, outputArray: IndexOnlyArray<Node>, outputStartIndex: number, outputLength: number) => void;
+    readonly segmentInstrumentationCallback?: (segment: Segment, input: Node, outputArray: IndexOnlyArray<Node>, outputStartIndex: number, outputLength: number) => void;
+    readonly selectorInstrumentationCallback?: (selector: Selector, input: Node, outputArray: IndexOnlyArray<Node>, outputStartIndex: number, outputLength: number) => void;
+    readonly filterExpressionInstrumentationCallback?: (filterExpression: FilterExpression, output: FilterValue) => void;
+    readonly reportDiagnosticsCallback?: (diagnostics: Diagnostics) => void;
 }
 
-export interface JSONPathFilterExpressionContext {
-    readonly currentNode: JSONPathJSONValue;
+export interface FilterExpressionContext {
+    readonly currentNode: JSONValue;
 }
 
 export interface PushOnlyArray<T> {

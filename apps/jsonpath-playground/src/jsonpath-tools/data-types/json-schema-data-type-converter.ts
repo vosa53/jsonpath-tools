@@ -1,4 +1,4 @@
-import { JSONPathJSONValue } from "@/jsonpath-tools/types";
+import { JSONValue } from "@/jsonpath-tools/types";
 import { AnyDataType, ArrayDataType, intersectTypes, LiteralDataType, NeverDataType, ObjectDataType, PrimitiveDataType, PrimitiveDataTypeType, subtractTypes, DataType, DataTypeAnnotation, UnionDataType } from "./data-types";
 import { get } from "jsonpointer";
 import { normalize, parse, resolve, serialize } from "uri-js";
@@ -203,7 +203,7 @@ class JSONSchemaDataTypeConverterContext {
         return this.jsonSchemaToType(referencedSchema);
     }
 
-    private createConstantType(value: JSONPathJSONValue): DataType {
+    private createConstantType(value: JSONValue): DataType {
         if (typeof value === "string" || typeof value === "number" || typeof value === "boolean")
             return LiteralDataType.create(value);
         else if (value === null)
@@ -214,13 +214,13 @@ class JSONSchemaDataTypeConverterContext {
             return this.createObjectConstantType(value);
     }
 
-    private createObjectConstantType(value: { [key: string]: JSONPathJSONValue }): DataType {
+    private createObjectConstantType(value: { [key: string]: JSONValue }): DataType {
         const propertyTypes = new Map(Object.entries(value).map(([pn, pv]) => [pn, this.createConstantType(pv)]));
         const requiredProperties = new Set(Object.keys(value));
         return ObjectDataType.create(propertyTypes, NeverDataType.create(), requiredProperties);
     }
 
-    private createArrayConstantType(value: JSONPathJSONValue[]): DataType {
+    private createArrayConstantType(value: JSONValue[]): DataType {
         const prefixElementTypes = value.map(v => this.createConstantType(v));
         return ArrayDataType.create(prefixElementTypes, NeverDataType.create(), prefixElementTypes.length);
     }
@@ -350,8 +350,8 @@ export type JSONSchema = boolean | ObjectJSONSchema;
 
 export interface ObjectJSONSchema {
     readonly type?: JSONSchemaType | readonly JSONSchemaType[];
-    readonly enum?: JSONPathJSONValue[];
-    readonly const?: JSONPathJSONValue;
+    readonly enum?: JSONValue[];
+    readonly const?: JSONValue;
     readonly anyOf?: readonly JSONSchema[];
     readonly allOf?: readonly JSONSchema[];
     readonly oneOf?: readonly JSONSchema[];
@@ -367,8 +367,8 @@ export interface ObjectJSONSchema {
     readonly deprecated?: boolean;
     readonly readOnly?: boolean;
     readonly writeOnly?: boolean;
-    readonly default?: JSONPathJSONValue;
-    readonly examples?: readonly JSONPathJSONValue[];
+    readonly default?: JSONValue;
+    readonly examples?: readonly JSONValue[];
     readonly $comment?: string;
     readonly $schema?: string;
     readonly $defs?: JSONSchemaDictionary;

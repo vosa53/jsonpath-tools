@@ -1,7 +1,7 @@
-import { JSONPathJSONValue } from "@/jsonpath-tools/types";
+import { JSONValue } from "@/jsonpath-tools/types";
 import { applyPatch, JsonPatchError, validate } from "fast-json-patch";
 
-export function applyJSONPatch(data: JSONPathJSONValue, patch: JSONPatch): JSONPathJSONValue {
+export function applyJSONPatch(data: JSONValue, patch: JSONPatch): JSONValue {
     try {
         return applyPatch(data, patch, true).newDocument;
     }
@@ -13,7 +13,7 @@ export function applyJSONPatch(data: JSONPathJSONValue, patch: JSONPatch): JSONP
     }
 }
 
-export function validateJSONPatch(patch: JSONPathJSONValue): string | null {
+export function validateJSONPatch(patch: JSONValue): string | null {
     // @ts-ignore
     const error = validate(patch);
     return error === undefined ? null : error.message;
@@ -21,10 +21,10 @@ export function validateJSONPatch(patch: JSONPathJSONValue): string | null {
 
 export type JSONPatch =
     (
-        { op: "add", path: string, value: JSONPathJSONValue } |
+        { op: "add", path: string, value: JSONValue } |
         { op: "remove", path: string } |
-        { op: "replace", path: string, value: JSONPathJSONValue } |
+        { op: "replace", path: string, value: JSONValue } |
         { op: "move", path: string, from: string } |
         { op: "copy", path: string, from: string } |
-        { op: "test", path: string, value: JSONPathJSONValue }
+        { op: "test", path: string, value: JSONValue }
     )[]

@@ -1,11 +1,11 @@
-import { JSONPathDiagnostics } from "@/jsonpath-tools/diagnostics";
+import { Diagnostics } from "@/jsonpath-tools/diagnostics";
 import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-service";
 import { DocumentHighlight } from "@/jsonpath-tools/editor-services/document-highlights-service";
 import { Signature } from "@/jsonpath-tools/editor-services/signature-help-service";
 import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-service";
-import { JSONPathFunction, JSONPathFunctionParameter, JSONPathOptions, JSONPathType } from "@/jsonpath-tools/options";
+import { Function, FunctionParameter, QueryOptions, Type } from "@/jsonpath-tools/options";
 import { TextChange } from "@/jsonpath-tools/text-change";
-import { JSONPathJSONValue } from "@/jsonpath-tools/types";
+import { JSONValue } from "@/jsonpath-tools/types";
 
 export enum LanguageServiceMessageType {
     updateOptions = "updateOptions",
@@ -26,7 +26,7 @@ export interface UpdateQueryLanguageServiceMessage {
 }
 
 export interface UpdateQueryArgumentLanguageServiceMessage {
-    readonly newQueryArgument: JSONPathJSONValue | undefined;
+    readonly newQueryArgument: JSONValue | undefined;
 }
 
 export interface UpdateQueryArgumentTypeLanguageServiceMessage {
@@ -78,7 +78,7 @@ export interface GetDiagnosticsLanguageServiceMessage {
 }
 
 export interface GetDiagnosticsLanguageServiceMessageResponse {
-    readonly diagnostics: readonly JSONPathDiagnostics[];
+    readonly diagnostics: readonly Diagnostics[];
 }
 
 export interface GetFormattingEditsLanguageServiceMessage {
@@ -94,7 +94,7 @@ export interface GetResultLanguageServiceMessage {
 }
 
 export interface GetResultLanguageServiceMessageResponse {
-    readonly nodes: readonly JSONPathJSONValue[];
+    readonly nodes: readonly JSONValue[];
     readonly paths: readonly (string | number)[][];
 }
 
@@ -104,15 +104,15 @@ export interface DisconnectLanguageServiceMessage {
 
 export type SerializableCompletionItem = Omit<CompletionItem, "resolveDescription">;
 
-export type SerializableJSONPathOptions = Omit<JSONPathOptions, "functions"> & {
+export type SerializableJSONPathOptions = Omit<QueryOptions, "functions"> & {
     readonly functions: { [name: string]: SerializableJSONPathFunction };
 }
 
-export type SerializableJSONPathFunction = Omit<JSONPathFunction, "parameters" | "returnDataType" | "handler"> & {
+export type SerializableJSONPathFunction = Omit<Function, "parameters" | "returnDataType" | "handler"> & {
     readonly parameters: readonly SerializableJSONPathFunctionParameter[];
     readonly returnDataType: any;
 }
 
-export type SerializableJSONPathFunctionParameter = Omit<JSONPathFunctionParameter, "dataType"> & {
+export type SerializableJSONPathFunctionParameter = Omit<FunctionParameter, "dataType"> & {
     readonly dataType: any;
 }
