@@ -1,7 +1,7 @@
 import { CompletionItemTextType, CompletionItemType } from "@/jsonpath-tools/editor-services/completion-service";
 import { Completion, CompletionContext, CompletionSource, insertCompletionText, pickedCompletion, snippet } from "@codemirror/autocomplete";
 import { OperationCancelledError } from "./cancellation-token";
-import { languageServiceSessionStateField } from "./jsonpath-state";
+import { languageServiceSessionStateField } from "./state";
 import { MarkdownRenderer } from "./markdown-renderer";
 
 

@@ -2,7 +2,7 @@ import { Diagnostics, DiagnosticsType } from "@/jsonpath-tools/diagnostics";
 import { LintSource } from "@codemirror/lint";
 import { ViewUpdate } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";
-import { languageServiceSessionStateField, updateOptionsEffect, updateQueryArgumentEffect } from "./jsonpath-state";
+import { languageServiceSessionStateField, updateOptionsEffect, updateQueryArgumentEffect } from "./state";
 
 
 export function jsonPathLintSource(options: { onDiagnosticsCreated?: (diagnostics: readonly Diagnostics[]) => void } = {}): LintSource {

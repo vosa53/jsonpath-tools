@@ -1,14 +1,14 @@
 import { Diagnostics } from "@/jsonpath-tools/diagnostics";
 import { Language, LanguageSupport } from "@codemirror/language";
 import { linter } from "@codemirror/lint";
-import { jsonPathCompletionSource } from "./jsonpath-completion-source";
-import { jsonPathDocumentHighlights } from "./jsonpath-document-highlights";
-import { jsonPathFormatKeyMap } from "./jsonpath-format";
-import { jsonPathLintSource, jsonPathLintSourceNeedsRefresh } from "./jsonpath-lint-source";
-import { jsonPathLanguageFacet, jsonPathParser } from "./jsonpath-parser";
-import { jsonPathSignatureHelp } from "./jsonpath-signature-help";
-import { jsonPathConfigFacet, jsonPathState } from "./jsonpath-state";
-import { jsonPathTooltip } from "./jsonpath-tooltip";
+import { jsonPathCompletionSource } from "./completion-source";
+import { jsonPathDocumentHighlights } from "./document-highlights";
+import { jsonPathFormatKeyMap } from "./format";
+import { jsonPathLintSource, jsonPathLintSourceNeedsRefresh } from "./lint-source";
+import { jsonPathLanguageFacet, jsonPathParser } from "./parser";
+import { jsonPathSignatureHelp } from "./signature-help";
+import { jsonPathConfigFacet, jsonPathState } from "./state";
+import { jsonPathTooltip } from "./tooltip";
 import { LanguageService } from "./worker/language-service";
 import { LanguageServices } from "./worker/language-services";
 

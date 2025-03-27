@@ -2,7 +2,7 @@ import { Extension } from "@codemirror/state";
 import { Decoration, hoverTooltip } from "@codemirror/view";
 import { EditorView } from "codemirror";
 import { OperationCancelledError } from "./cancellation-token";
-import { languageServiceSessionStateField } from "./jsonpath-state";
+import { languageServiceSessionStateField } from "./state";
 import { MarkdownRenderer } from "./markdown-renderer";
 
 export function jsonPathTooltip(): Extension {

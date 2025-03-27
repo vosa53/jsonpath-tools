@@ -1,6 +1,6 @@
 import { Command, EditorView, keymap } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";
-import { languageServiceSessionStateField } from "./jsonpath-state";
+import { languageServiceSessionStateField } from "./state";
 
 export const jsonPathFormat: Command = view => {
     formatAsync(view);

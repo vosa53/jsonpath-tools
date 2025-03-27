@@ -2,7 +2,7 @@ import { Signature } from "@/jsonpath-tools/editor-services/signature-help-servi
 import { EditorState, Extension, StateEffect, StateField, Transaction } from "@codemirror/state";
 import { EditorView, showTooltip, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";
-import { languageServiceSessionStateField } from "./jsonpath-state";
+import { languageServiceSessionStateField } from "./state";
 import { MarkdownRenderer } from "./markdown-renderer";
 
 export function jsonPathSignatureHelp(): Extension {
