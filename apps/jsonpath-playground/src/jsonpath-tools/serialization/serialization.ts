@@ -1,4 +1,4 @@
-import { NormalizedPath } from "./normalized-path";
+import { NormalizedPath } from "../normalized-path";
 
 export function serializeString(value: string): string {
     // JSON strings are equivivalent with JSONPath strings.

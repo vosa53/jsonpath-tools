@@ -1,5 +1,6 @@
-import { QueryContext, PushOnlyArray } from "./evaluation";
-import { Node } from "../node";
+import { QueryContext } from "./evaluation";
+import { PushOnlyArray } from "../helpers/array";
+import { Node } from "../values/node";
 import { SyntaxTreeNode } from "./syntax-tree-node";
 import { Selector } from "./selectors/selector";
 import { SyntaxTreeType } from "./syntax-tree-type";

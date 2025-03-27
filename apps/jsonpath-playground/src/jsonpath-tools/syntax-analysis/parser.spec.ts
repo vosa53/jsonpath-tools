@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createSyntaxTree } from '../utils';
+import { createSyntaxTree } from '../helpers/utils';
 import { Parser } from './parser';
 
 describe("parser", () => {

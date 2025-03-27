@@ -1,4 +1,4 @@
-import { FilterValue } from "../../types";
+import { FilterValue } from "../../values/types";
 import { FilterExpressionContext, QueryContext } from "../evaluation";
 import { SubQuery } from "../sub-query";
 import { SyntaxTreeType } from "../syntax-tree-type";

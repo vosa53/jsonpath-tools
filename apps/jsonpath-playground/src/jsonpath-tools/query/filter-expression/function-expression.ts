@@ -1,8 +1,8 @@
 import { Diagnostics, DiagnosticsType } from "@/jsonpath-tools/diagnostics";
 import { FunctionContext } from "@/jsonpath-tools/function";
-import { FilterValue, Nothing } from "../../types";
+import { FilterValue, Nothing } from "../../values/types";
 import { FilterExpressionContext, QueryContext } from "../evaluation";
-import { evaluateAs } from "../helpers";
+import { evaluateAs } from "../evaluation";
 import { SyntaxTreeType } from "../syntax-tree-type";
 import { SyntaxTreeToken } from "../syntax-tree-token";
 import { FilterExpression } from "./filter-expression";

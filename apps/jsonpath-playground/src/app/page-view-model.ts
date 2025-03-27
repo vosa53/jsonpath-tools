@@ -1,9 +1,9 @@
 import { Diagnostics } from "@/jsonpath-tools/diagnostics";
 import { Query } from "@/jsonpath-tools/query/query";
 import { removeAtPaths, replaceAtPaths } from "@/jsonpath-tools/transformations";
-import { serializedNormalizedPath } from "@/jsonpath-tools/serialization";
+import { serializedNormalizedPath } from "@/jsonpath-tools/serialization/serialization";
 import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
-import { Nothing } from "@/jsonpath-tools/types";
+import { Nothing } from "@/jsonpath-tools/values/types";
 import { JSONValue } from "@/jsonpath-tools/json/json-types";
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { OperationCancelledError } from "./components/code-editors/codemirror/jsonpath-codemirror/cancellation-token";
@@ -12,7 +12,7 @@ import { Operation, OperationReplacementType, OperationType } from "./models/ope
 import { PathType } from "./models/path-type";
 import { Parser } from "@/jsonpath-tools/syntax-analysis/parser";
 import { Settings } from "./models/settings";
-import { logPerformance } from "@/jsonpath-tools/utils";
+import { logPerformance } from "@/jsonpath-tools/helpers/utils";
 import { defaultQueryOptions, QueryOptions } from "@/jsonpath-tools/options";
 import { LanguageService } from "./components/code-editors/codemirror/jsonpath-codemirror/worker/language-service";
 import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";

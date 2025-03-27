@@ -4,7 +4,7 @@ import { QueryContext } from "../query/evaluation";
 import { Query } from "../query/query";
 import { Selector } from "../query/selectors/selector";
 import { JSONValue } from "../json/json-types";
-import { NodeList } from "../node-list";
+import { NodeList } from "../values/node-list";
 
 export class DynamicAnalyzer {
     constructor(

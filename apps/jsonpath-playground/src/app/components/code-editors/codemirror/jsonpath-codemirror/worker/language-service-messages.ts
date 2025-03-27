@@ -6,7 +6,7 @@ import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-service";
 import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
 import { QueryOptions } from "@/jsonpath-tools/options";
 import { Function, FunctionParameter } from "@/jsonpath-tools/function";
-import { Type } from "@/jsonpath-tools/types";
+import { Type } from "@/jsonpath-tools/values/types";
 import { TextChange } from "@/jsonpath-tools/text/text-change";
 import { JSONValue } from "@/jsonpath-tools/json/json-types";
 

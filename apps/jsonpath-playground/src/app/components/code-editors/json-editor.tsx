@@ -7,7 +7,7 @@ import { EditorView } from "codemirror";
 import { FocusEventHandler, useEffect, useRef } from "react";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
 import { getNodeAtPath, getPathAtTreeCursor, pathsHighlighter, setCurrentHighlightedPathEffect, setHighlightedPathsEffect } from "./codemirror/paths-highlighter";
-import { EMPTY_ARRAY, logPerformance } from "@/jsonpath-tools/utils";
+import { EMPTY_ARRAY, logPerformance } from "@/jsonpath-tools/helpers/utils";
 import { ensureParsed } from "./codemirror/ensure-parsed";
 
 export default function JSONEditor({

@@ -5,15 +5,15 @@ import { QueryOptions } from "../options";
 import { QueryContext } from "../query/evaluation";
 import { ComparisonExpression } from "../query/filter-expression/comparison-expression";
 import { FilterExpression } from "../query/filter-expression/filter-expression";
-import { convertToValueType } from "../query/helpers";
+import { convertToValueType } from "../query/evaluation";
 import { Query } from "../query/query";
-import { Node } from "../node";
+import { Node } from "../values/node";
 import { Segment } from "../query/segment";
 import { Selector } from "../query/selectors/selector";
 import { SyntaxTree } from "../query/syntax-tree";
 import { SyntaxTreeType } from "../query/syntax-tree-type";
-import { serializeLiteral, serializeString } from "../serialization";
-import { Characters } from "../syntax-analysis/parser";
+import { serializeLiteral, serializeString } from "../serialization/serialization";
+import { CharacterCategorizer } from "../syntax-analysis/character-categorizer";
 import { TextRange } from "../text/text-range";
 import { JSONValue } from "../json/json-types";
 import { AnalysisDescriptionService } from "./analysis-description-service";
@@ -273,10 +273,10 @@ export class CompletionProvider {
     private isValidName(text: string): boolean {
         if (text.length === 0)
             return false;
-        if (!Characters.isNameFirst(text[0]))
+        if (!CharacterCategorizer.isNameFirst(text[0]))
             return false;
         for (let i = 1; i < text.length; i++) {
-            if (!Characters.isName(text[i]))
+            if (!CharacterCategorizer.isName(text[i]))
                 return false;
         }
         return true;

@@ -5,12 +5,12 @@ import { Diagnostics, DiagnosticsType } from "./diagnostics";
 import { EditorService } from "./editor-services/editor-service";
 import { JSONValue } from "./json/json-types";
 import { JSONPath } from "./jsonpath";
-import { Node } from "./node";
-import { NodeList } from "./node-list";
+import { Node } from "./values/node";
+import { NodeList } from "./values/node-list";
 import { NormalizedPath, NormalizedPathSegment } from "./normalized-path";
 import { defaultQueryOptions, QueryOptions } from "./options";
 import { Function, FunctionContext, FunctionHandler, FunctionParameter } from "./function";
-import { Type } from "./types";
+import { Type } from "./values/types";
 import { AndExpression } from "./query/filter-expression/and-expression";
 import { BooleanLiteralExpression } from "./query/filter-expression/boolean-literal-expression";
 import { ComparisonExpression } from "./query/filter-expression/comparison-expression";
@@ -41,7 +41,7 @@ import { SyntaxTreeType } from "./query/syntax-tree-type";
 import { TextChange } from "./text/text-change";
 import { TextRange } from "./text/text-range";
 import { removeAtPaths, replaceAtPaths } from "./transformations";
-import { LogicalFalse, LogicalTrue, Nothing, ValueType, LogicalType, NodesType, isValueType, isNodesType, isLogicalType, FilterValue } from "./types";
+import { LogicalFalse, LogicalTrue, Nothing, ValueType, LogicalType, NodesType, isValueType, isNodesType, isLogicalType, FilterValue } from "./values/types";
 
 export type {
     JSONValue,

@@ -1,5 +1,5 @@
 import { NormalizedPath, NormalizedPathSegment } from "@/jsonpath-tools/normalized-path";
-import { logPerformance } from "@/jsonpath-tools/utils";
+import { logPerformance } from "@/jsonpath-tools/helpers/utils";
 import { syntaxTree } from "@codemirror/language";
 import { EditorState, Extension, Range, StateEffect, StateField, Text } from "@codemirror/state";
 import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";

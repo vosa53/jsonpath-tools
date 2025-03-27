@@ -1,7 +1,7 @@
-import { FilterValue, LogicalFalse, LogicalTrue, Nothing, ValueType } from "../../types";
+import { FilterValue, LogicalFalse, LogicalTrue, Nothing, ValueType } from "../../values/types";
 import { jsonDeepEquals } from "@/jsonpath-tools/json/deep-equals";
 import { FilterExpressionContext, QueryContext } from "../evaluation";
-import { evaluateAsValueType } from "../helpers";
+import { evaluateAsValueType } from "../evaluation";
 import { SyntaxTreeType } from "../syntax-tree-type";
 import { SyntaxTreeToken } from "../syntax-tree-token";
 import { FilterExpression } from "./filter-expression";

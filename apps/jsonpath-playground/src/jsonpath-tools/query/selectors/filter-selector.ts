@@ -1,8 +1,9 @@
-import { LogicalTrue } from "../../types";
-import { FilterExpressionContext, QueryContext, PushOnlyArray } from "../evaluation";
+import { LogicalTrue } from "../../values/types";
+import { FilterExpressionContext, QueryContext } from "../evaluation";
+import { PushOnlyArray } from "@/jsonpath-tools/helpers/array";
 import { FilterExpression } from "../filter-expression/filter-expression";
-import { evaluateAsLogicalType } from "../helpers";
-import { Node } from "../../node";
+import { evaluateAsLogicalType } from "../evaluation";
+import { Node } from "../../values/node";
 import { SyntaxTreeType } from "../syntax-tree-type";
 import { SyntaxTreeToken } from "../syntax-tree-token";
 import { Selector } from "./selector";

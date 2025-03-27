@@ -1,5 +1,5 @@
 import { DataType } from "./data-types/data-types";
-import { Type, FilterValue } from "./types";
+import { Type, FilterValue } from "./values/types";
 
 export interface Function {
     readonly description: string;

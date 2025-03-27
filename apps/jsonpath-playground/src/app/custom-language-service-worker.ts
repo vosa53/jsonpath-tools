@@ -2,9 +2,9 @@ import { defaultQueryOptions } from "@/jsonpath-tools/options";
 import { FunctionHandler } from "@/jsonpath-tools/function";
 import { LanguageServiceBackend } from "./components/code-editors/codemirror/jsonpath-codemirror/worker/language-service-backend";
 import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";
-import { LogicalFalse, LogicalTrue, Nothing } from "@/jsonpath-tools/types";
-import { NodeList } from "@/jsonpath-tools/node-list";
-import { Node } from "@/jsonpath-tools/node";
+import { LogicalFalse, LogicalTrue, Nothing } from "@/jsonpath-tools/values/types";
+import { NodeList } from "@/jsonpath-tools/values/node-list";
+import { Node } from "@/jsonpath-tools/values/node";
 
 const customFunctions = new Map<string, FunctionHandler>();
 

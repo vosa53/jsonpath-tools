@@ -1,7 +1,7 @@
 import { AnyDataType, ArrayDataType, ObjectDataType, PrimitiveDataType, PrimitiveDataTypeType, UnionDataType } from "./data-types/data-types";
 import { Function, FunctionContext } from "./function";
 import { IRegexp } from "./iregexp";
-import { isNodesType, isValueType, FilterValue, LogicalFalse, LogicalTrue, Nothing, Type } from "./types";
+import { isNodesType, isValueType, FilterValue, LogicalFalse, LogicalTrue, Nothing, Type } from "./values/types";
 
 export interface QueryOptions {
     readonly functions: { [name: string]: Function };

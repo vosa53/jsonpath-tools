@@ -1,5 +1,5 @@
-import { NormalizedPath, NormalizedPathSegment } from "./normalized-path";
-import { JSONValue } from "./json/json-types";
+import { NormalizedPath, NormalizedPathSegment } from "../normalized-path";
+import { JSONValue } from "../json/json-types";
 
 export class Node {
     constructor(

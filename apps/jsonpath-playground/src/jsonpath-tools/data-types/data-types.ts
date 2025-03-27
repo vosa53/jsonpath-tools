@@ -1,4 +1,4 @@
-import { Nothing } from "@/jsonpath-tools/types";
+import { Nothing } from "@/jsonpath-tools/values/types";
 import { JSONValue } from "../json/json-types";
 import { NormalizedPath, NormalizedPathSegment } from "../normalized-path";
 import { isSubtypeOf } from "./operations";

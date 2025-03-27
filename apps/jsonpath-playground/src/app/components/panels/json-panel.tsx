@@ -1,4 +1,4 @@
-import { serializedNormalizedPath } from "@/jsonpath-tools/serialization";
+import { serializedNormalizedPath } from "@/jsonpath-tools/serialization/serialization";
 import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
 import { ActionIcon, Button, CopyButton, Divider, Group, Loader, Menu, Popover, Text, TextInput } from "@mantine/core";
 import { IconArrowDown, IconArrowUp, IconChevronDown, IconFileUpload, IconRouteSquare } from "@tabler/icons-react";

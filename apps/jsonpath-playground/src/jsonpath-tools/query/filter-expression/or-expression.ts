@@ -1,6 +1,6 @@
-import { FilterValue, LogicalFalse, LogicalTrue } from "../../types";
+import { FilterValue, LogicalFalse, LogicalTrue } from "../../values/types";
 import { FilterExpressionContext, QueryContext } from "../evaluation";
-import { evaluateAsLogicalType } from "../helpers";
+import { evaluateAsLogicalType } from "../evaluation";
 import { SyntaxTreeType } from "../syntax-tree-type";
 import { SyntaxTreeToken } from "../syntax-tree-token";
 import { FilterExpression } from "./filter-expression";

@@ -1,4 +1,4 @@
-import { logPerformance } from "@/jsonpath-tools/utils";
+import { logPerformance } from "@/jsonpath-tools/helpers/utils";
 
 export class SimpleRPC<THandler> {
     private readonly messageTypeToHandlerActions = new Map<string, (handler: THandler, data: any) => any>();

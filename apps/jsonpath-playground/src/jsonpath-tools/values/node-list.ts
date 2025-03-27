@@ -1,5 +1,5 @@
 import { Node } from "./node";
-import { NormalizedPath } from "./normalized-path";
+import { NormalizedPath } from "../normalized-path";
 
 export class NodeList {
     constructor(

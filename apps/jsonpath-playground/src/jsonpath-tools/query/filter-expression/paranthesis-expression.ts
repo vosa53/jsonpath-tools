@@ -1,4 +1,4 @@
-import { FilterValue, LogicalFalse } from "../../types";
+import { FilterValue, LogicalFalse } from "../../values/types";
 import { FilterExpressionContext, QueryContext } from "../evaluation";
 import { SyntaxTreeType } from "../syntax-tree-type";
 import { SyntaxTreeToken } from "../syntax-tree-token";

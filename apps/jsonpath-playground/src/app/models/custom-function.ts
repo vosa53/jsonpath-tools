@@ -1,4 +1,4 @@
-import { Type } from "@/jsonpath-tools/types";
+import { Type } from "@/jsonpath-tools/values/types";
 
 export interface CustomFunction {
     name: string;

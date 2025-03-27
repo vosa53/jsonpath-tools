@@ -1,7 +1,7 @@
 import { NormalizedPath, NormalizedPathSegment } from "../normalized-path";
-import { NodeList } from "../node-list";
+import { NodeList } from "../values/node-list";
 import { FilterExpressionContext, QueryContext } from "./evaluation";
-import { Node } from "../node";
+import { Node } from "../values/node";
 import { SyntaxTreeNode } from "./syntax-tree-node";
 import { Segment } from "./segment";
 import { IndexSelector } from "./selectors/index-selector";
