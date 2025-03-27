@@ -12,7 +12,7 @@ import PathsPanel from "./components/panels/paths-panel";
 import ResultPanel from "./components/panels/result-panel";
 import TypePanel from "./components/panels/type-panel";
 import { usePageViewModel } from "./page-view-model";
-import classes from "./styles/page.module.css";
+import classes from "./page.module.css";
 
 export default function Home() {
     const [navbarOpened, setNavbarOpened] = useState(false);

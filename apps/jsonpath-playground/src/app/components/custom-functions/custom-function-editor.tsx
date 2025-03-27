@@ -4,12 +4,12 @@ import { ActionIcon, Button, Collapse, Flex, Group, Input, Select, Stack, TextIn
 import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { IconChevronDown, IconChevronUp, IconDeviceFloppy, IconHelp, IconPlus, IconTrash } from "@tabler/icons-react";
-import { CustomFunction } from "../models/custom-function";
-import JavaScriptEditor from "./code-editors/javascript-editor";
-import MarkdownEditor from "./code-editors/markdown-editor";
-import { EditorFormAdapter } from "./editor-form-adapter";
+import { CustomFunction } from "../../models/custom-function";
+import JavaScriptEditor from "../code-editors/javascript-editor";
+import MarkdownEditor from "../code-editors/markdown-editor";
+import { EditorFormAdapter } from "../editor-form-adapter";
 import documentationMarkdown from "./custom-function-editor-documentation.md?raw";
-import { MarkdownView } from "./markdown-view";
+import { MarkdownView } from "../markdown-view";
 
 export default function CustomFunctionEditor({
     customFunction,

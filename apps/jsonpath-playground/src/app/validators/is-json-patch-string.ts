@@ -1,4 +1,4 @@
-import { validateJSONPatch } from "../json-patch/json-patch";
+import { validateJSONPatch } from "../services/json-patch";
 import { isJSONString } from "./is-json-string";
 
 export function isJSONPatchString(value: string): string | null {

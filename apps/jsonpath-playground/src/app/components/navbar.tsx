@@ -3,7 +3,7 @@ import { IconHelp, IconMathFunction, IconSettings } from "@tabler/icons-react";
 import { memo } from "react";
 import { CustomFunction } from "../models/custom-function";
 import { Settings } from "../models/settings";
-import CustomFunctionsView from "./custom-functions-view";
+import CustomFunctionsView from "./custom-functions/custom-functions-view";
 import SettingsEditor from "./settings-editor";
 import { MarkdownView } from "./markdown-view";
 import jsonPathGuide from "./jsonpath-guide.md?raw";

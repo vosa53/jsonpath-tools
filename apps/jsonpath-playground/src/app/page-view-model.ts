@@ -15,15 +15,15 @@ import { Settings } from "./models/settings";
 import { logPerformance } from "@/jsonpath-tools/helpers/utils";
 import { defaultQueryOptions, QueryOptions } from "@/jsonpath-tools/options";
 import { LanguageService } from "./components/code-editors/codemirror/jsonpath-codemirror/language-service/language-service";
-import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";
+import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./services/language-service/custom-language-service-worker-mesages";
 import { TextRange } from "@/jsonpath-tools/text/text-range";
 import { SyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
 import { jsonSchemaToType } from "@/jsonpath-tools/data-types/json-schema-data-type-converter";
 import { AnyDataType, DataType } from "@/jsonpath-tools/data-types/data-types";
 import { DataTypeRaw, DataTypeRawFormat } from "./models/data-type-raw";
 import { jsonTypeDefinitionToType } from "@/jsonpath-tools/data-types/json-type-definition-data-type-converter";
-import { isValidJSONSchema, isValidJSONTypeDefinition } from "./json-schemas/json-schemas";
-import { JSONPatch, applyJSONPatch } from "./json-patch/json-patch";
+import { isValidJSONSchema, isValidJSONTypeDefinition } from "./services/json-schema";
+import { JSONPatch, applyJSONPatch } from "./services/json-patch";
 import { examples } from "./models/examples";
 
 interface State {
@@ -291,7 +291,7 @@ function toJSONPointer(path: NormalizedPath): string {
     return "/" + path.join("/"); // TODO: Escaping.
 }
 
-const worker = new Worker(new URL("./custom-language-service-worker.ts", import.meta.url), { type: "module" });
+const worker = new Worker(new URL("./services/language-service/custom-language-service-worker.ts", import.meta.url), { type: "module" });
 const languageService = new LanguageService(data => worker.postMessage({ type: "languageServiceData", data } as CustomLanguageServiceWorkerMessage));
 worker.addEventListener("message", e => {
     const message = e.data as CustomLanguageServiceWorkerMessage;

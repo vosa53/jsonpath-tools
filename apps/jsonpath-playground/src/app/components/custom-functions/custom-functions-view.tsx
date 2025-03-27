@@ -3,7 +3,7 @@ import { Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
-import { CustomFunction } from "../models/custom-function";
+import { CustomFunction } from "../../models/custom-function";
 import CustomFunctionEditor from "./custom-function-editor";
 import CustomFunctionView from "./custom-function-view";
 

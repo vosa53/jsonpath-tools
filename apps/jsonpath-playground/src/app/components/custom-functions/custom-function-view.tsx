@@ -1,7 +1,7 @@
 import { ActionIcon, Box, Flex, Title } from "@mantine/core";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
-import { CustomFunction } from "../models/custom-function";
-import { MarkdownView } from "./markdown-view";
+import { CustomFunction } from "../../models/custom-function";
+import { MarkdownView } from "../markdown-view";
 
 export default function CustomFunctionView({
     customFunction,
