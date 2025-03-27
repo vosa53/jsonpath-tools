@@ -1,8 +1,28 @@
 {
-  "name": "@jsonpath-tools/jsonpath",
-  "version": "0.1.0",
-  "main": "src/index.ts",
-  "author": "Jan Jörka",
-  "license": "MIT",
-  "description": ""
+    "name": "@jsonpath-tools/jsonpath",
+    "version": "0.1.0",
+    "author": "Jan Jörka",
+    "license": "MIT",
+    "description": "",
+    "type": "module",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview",
+        "prepublishOnly": "npm run build"
+    },
+    "dependencies": {
+        "jsonpointer": "^5.0.1",
+        "uri-js": "^4.4.1"
+    },
+    "devDependencies": {
+        "typescript": "~5.7.2",
+        "vite": "^6.2.0",
+        "vite-plugin-dts": "^4.5.3"
+    }
 }

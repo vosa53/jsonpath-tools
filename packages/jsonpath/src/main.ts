@@ -1,0 +1,3 @@
+import { pes } from "../";
+
+pes();
