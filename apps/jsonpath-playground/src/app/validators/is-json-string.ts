@@ -1,4 +1,4 @@
-import { JSONValue } from "@/jsonpath-tools/types";
+import { JSONValue } from "@/jsonpath-tools/json/json-types";
 
 export function isJSONString(value: string, dataValidator?: (value: JSONValue) => string | null): string | null {
     try {

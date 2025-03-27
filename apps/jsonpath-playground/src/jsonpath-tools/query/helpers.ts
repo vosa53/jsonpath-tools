@@ -1,5 +1,6 @@
 import { Type } from "../options";
-import { isLogicalType, isNodesType, isValueType, FilterValue, LogicalFalse, LogicalTrue, LogicalType, NodeList, NodesType, Nothing, ValueType } from "../types";
+import { isLogicalType, isNodesType, isValueType, FilterValue, LogicalFalse, LogicalTrue, LogicalType, NodesType, Nothing, ValueType } from "../types";
+import { NodeList } from "../node-list";
 import { FilterExpressionContext, QueryContext } from "./evaluation";
 import { FilterExpression } from "./filter-expression/filter-expression";
 

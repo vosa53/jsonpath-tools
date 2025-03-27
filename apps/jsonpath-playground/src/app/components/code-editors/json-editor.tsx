@@ -1,4 +1,4 @@
-import { NormalizedPath } from "@/jsonpath-tools/transformations";
+import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
 import { json, jsonParseLinter } from "@codemirror/lang-json";
 import { syntaxTree } from "@codemirror/language";
 import { linter } from "@codemirror/lint";

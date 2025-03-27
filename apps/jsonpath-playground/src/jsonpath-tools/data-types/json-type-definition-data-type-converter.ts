@@ -1,4 +1,4 @@
-import { JSONValue } from "../types";
+import { JSONValue } from "../json/json-types";
 import { AnyDataType, LiteralDataType, NeverDataType, ObjectDataType, PrimitiveDataType, PrimitiveDataTypeType, DataType, DataTypeAnnotation, UnionDataType, ArrayDataType } from "./data-types";
 
 export function jsonTypeDefinitionToType(jsonTypeDefinition: JSONTypeDefinition): DataType {

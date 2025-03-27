@@ -1,6 +1,6 @@
 import { DataTypeAnalyzer } from "../data-types/data-type-analyzer";
 import { DataType, DataTypeAnnotation } from "../data-types/data-types";
-import { getJSONTypeName } from "../data-types/json-types";
+import { getJSONTypeName } from "../json/json-types";
 import { QueryOptions } from "../options";
 import { QueryContext } from "../query/evaluation";
 import { ComparisonExpression } from "../query/filter-expression/comparison-expression";
@@ -14,10 +14,11 @@ import { SyntaxTree } from "../query/syntax-tree";
 import { SyntaxTreeType } from "../query/syntax-tree-type";
 import { serializeLiteral, serializeString } from "../serialization";
 import { Characters } from "../syntax-analysis/parser";
-import { TextRange } from "../text-range";
-import { JSONValue } from "../types";
+import { TextRange } from "../text/text-range";
+import { JSONValue } from "../json/json-types";
 import { AnalysisDescriptionService } from "./analysis-description-service";
 import { SyntaxDescriptionService } from "./syntax-description-service";
+import { NormalizedPathSegment } from "../normalized-path";
 
 export class CompletionProvider {
     private readonly syntaxDescriptionProvider: SyntaxDescriptionService;
@@ -175,7 +176,7 @@ export class CompletionProvider {
         }
     }
 
-    private createSelectorCompletionItem(selector: Selector, segment: Segment, pathSegment: string | number, typeText: string, resolveDescription: () => string): CompletionItem {
+    private createSelectorCompletionItem(selector: Selector, segment: Segment, pathSegment: NormalizedPathSegment, typeText: string, resolveDescription: () => string): CompletionItem {
         const isValidName = typeof pathSegment === "string" && this.isValidName(pathSegment);
         const useBracketNotation = !isValidName || segment.usesBracketNotation;
         const willUseBracketNotation = useBracketNotation && !segment.usesBracketNotation;
@@ -193,7 +194,7 @@ export class CompletionProvider {
         return new CompletionItem(CompletionItemType.name, text, range, label, typeText, resolveDescription);
     }
 
-    private createSelectorCompletionItemDescription(pathSegment: string | number, type: string, annotations: DataTypeAnnotation[]): string {
+    private createSelectorCompletionItemDescription(pathSegment: NormalizedPathSegment, type: string, annotations: DataTypeAnnotation[]): string {
         const syntaxDescription = typeof pathSegment === "string"
             ? this.syntaxDescriptionProvider.provideDescriptionForNameSelector(pathSegment)
             : this.syntaxDescriptionProvider.provideDescriptionForIndexSelector(pathSegment);

@@ -1,17 +1,18 @@
-import { JSONValue } from "./types";
+import { NormalizedPath, NormalizedPathSegment } from "./normalized-path";
+import { JSONValue } from "./json/json-types";
 
 export class Node {
     constructor(
         readonly value: JSONValue,
-        readonly pathSegment: string | number,
+        readonly pathSegment: NormalizedPathSegment,
         readonly parent: Node | null
     ) { }
 
-    buildPath(): (string | number)[] {
+    buildPath(): NormalizedPath {
         return this.buildPathRecursive();
     }
 
-    private buildPathRecursive(depth = 0): (string | number)[] {
+    private buildPathRecursive(depth = 0): NormalizedPathSegment[] {
         if (this.parent === null) {
             return new Array(depth);
         }

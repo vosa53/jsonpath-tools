@@ -3,9 +3,10 @@ import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-serv
 import { DocumentHighlight } from "@/jsonpath-tools/editor-services/document-highlights-service";
 import { Signature } from "@/jsonpath-tools/editor-services/signature-help-service";
 import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-service";
+import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
 import { Function, FunctionParameter, QueryOptions, Type } from "@/jsonpath-tools/options";
-import { TextChange } from "@/jsonpath-tools/text-change";
-import { JSONValue } from "@/jsonpath-tools/types";
+import { TextChange } from "@/jsonpath-tools/text/text-change";
+import { JSONValue } from "@/jsonpath-tools/json/json-types";
 
 export enum LanguageServiceMessageType {
     updateOptions = "updateOptions",
@@ -95,7 +96,7 @@ export interface GetResultLanguageServiceMessage {
 
 export interface GetResultLanguageServiceMessageResponse {
     readonly nodes: readonly JSONValue[];
-    readonly paths: readonly (string | number)[][];
+    readonly paths: readonly NormalizedPath[];
 }
 
 export interface DisconnectLanguageServiceMessage {

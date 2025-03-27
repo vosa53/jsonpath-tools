@@ -1,5 +1,5 @@
-import { NormalizedPath } from "../transformations";
-import { NodeList } from "../types";
+import { NormalizedPath, NormalizedPathSegment } from "../normalized-path";
+import { NodeList } from "../node-list";
 import { FilterExpressionContext, QueryContext } from "./evaluation";
 import { Node } from "../node";
 import { SyntaxTreeNode } from "./syntax-tree-node";
@@ -56,7 +56,7 @@ export class SubQuery extends SyntaxTreeNode {
     }
 
     toNormalizedPath(): NormalizedPath | null {
-        const segments: (string | number)[] = [];
+        const segments: NormalizedPathSegment[] = [];
         for (const segment of this.segments) {
             if (segment.isDescendant || segment.selectors.length !== 1)
                 return null;

@@ -19,7 +19,7 @@ import { IndexSelector } from "../query/selectors/index-selector";
 import { SliceSelector } from "../query/selectors/slice-selector";
 import { SyntaxTree } from "../query/syntax-tree";
 import { SyntaxTreeToken } from "../query/syntax-tree-token";
-import { TextRange } from "../text-range";
+import { TextRange } from "../text/text-range";
 
 export class TypeChecker {
     constructor (private readonly options: QueryOptions) {

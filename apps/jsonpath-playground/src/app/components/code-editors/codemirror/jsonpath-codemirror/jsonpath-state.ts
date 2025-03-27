@@ -1,10 +1,11 @@
 import { QueryOptions } from "@/jsonpath-tools/options";
-import { JSONValue } from "@/jsonpath-tools/types";
+import { JSONValue } from "@/jsonpath-tools/json/json-types";
 import { EditorState, Extension, Facet, StateEffect, StateField } from "@codemirror/state";
 import { EditorView, PluginValue, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { LanguageService } from "./worker/language-service";
 import { LanguageServiceSession } from "./worker/language-service-session";
 import { DataType } from "@/jsonpath-tools/data-types/data-types";
+import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
 
 export function jsonPathState(): Extension {
     return [
@@ -65,7 +66,7 @@ const jsonPathPlugin = ViewPlugin.fromClass(JSONPathPlugin, {
     }
 });
 
-export function getResult(state: EditorState): Promise<{ nodes: readonly JSONValue[], paths: readonly (string | number)[][] }> {
+export function getResult(state: EditorState): Promise<{ nodes: readonly JSONValue[], paths: readonly NormalizedPath[] }> {
     const languageServiceSession = state.field(languageServiceSessionStateField);
     return languageServiceSession.getResult();
 }

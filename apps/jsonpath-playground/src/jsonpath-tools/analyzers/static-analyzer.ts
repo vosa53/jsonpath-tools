@@ -1,4 +1,5 @@
-import { DataType, isSubtypeOf, NeverDataType } from "../data-types/data-types";
+import { DataType, NeverDataType } from "../data-types/data-types";
+import { isSubtypeOf } from "../data-types/operations";
 import { QueryOptions } from "../options";
 import { Query } from "../query/query";
 import { Diagnostics, DiagnosticsType } from "../diagnostics";

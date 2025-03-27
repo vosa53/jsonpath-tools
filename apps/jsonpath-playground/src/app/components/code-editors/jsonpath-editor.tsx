@@ -1,6 +1,6 @@
 import { defaultQueryOptions, QueryOptions } from "@/jsonpath-tools/options";
 import { Query } from "@/jsonpath-tools/query/query";
-import { JSONValue } from "@/jsonpath-tools/types";
+import { JSONValue } from "@/jsonpath-tools/json/json-types";
 import { syntaxTree } from "@codemirror/language";
 import { EditorView, keymap } from "@codemirror/view";
 import { Prec } from "@codemirror/state";
@@ -11,9 +11,10 @@ import { jsonPath } from "./codemirror/jsonpath-codemirror/jsonpath-language";
 import { getJSONPath } from "./codemirror/jsonpath-codemirror/jsonpath-parser";
 import { getResult, updateOptionsEffect, updateQueryArgumentEffect, updateQueryArgumentTypeEffect } from "./codemirror/jsonpath-codemirror/jsonpath-state";
 import { LanguageService } from "./codemirror/jsonpath-codemirror/worker/language-service";
-import { TextRange } from "@/jsonpath-tools/text-range";
+import { TextRange } from "@/jsonpath-tools/text/text-range";
 import { rangeHighlighter, setHighlightedRangeEffect } from "./codemirror/range-highlighter";
 import { AnyDataType, DataType } from "@/jsonpath-tools/data-types/data-types";
+import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
 
 export default function JSONPathEditor({
     value,
@@ -39,7 +40,7 @@ export default function JSONPathEditor({
     onValueChanged: (value: string) => void,
     onParsed?: (jsonPath: Query) => void,
     onDiagnosticsCreated?: (diagnostics: readonly Diagnostics[]) => void,
-    onGetResultAvailable?: (getResult: () => Promise<{ nodes: readonly JSONValue[], paths: readonly (string | number)[][] }>) => void,
+    onGetResultAvailable?: (getResult: () => Promise<{ nodes: readonly JSONValue[], paths: readonly NormalizedPath[] }>) => void,
     onRun?: () => void
 }) {
     const editorViewRef = useRef<EditorView>(null);

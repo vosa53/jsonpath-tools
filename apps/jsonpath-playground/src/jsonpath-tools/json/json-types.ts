@@ -1,4 +1,4 @@
-import { JSONValue } from "@/jsonpath-tools/types";
+export type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue; };
 
 export function getJSONTypeName(value: JSONValue): string {
     const javaScriptType = typeof value;
@@ -7,9 +7,12 @@ export function getJSONTypeName(value: JSONValue): string {
             return "null";
         else if (Array.isArray(value))
             return "array";
+
         else
             return "object";
     }
+
     else
         return javaScriptType;
 }
+

@@ -1,15 +1,16 @@
 import { Diagnostics } from "@/jsonpath-tools/diagnostics";
 import { QueryOptions } from "@/jsonpath-tools/options";
-import { JSONValue } from "@/jsonpath-tools/types";
+import { JSONValue } from "@/jsonpath-tools/json/json-types";
 import { CancellationToken } from "../cancellation-token";
 import { GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, SerializableCompletionItem, SerializableJSONPathFunction, SerializableJSONPathOptions, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage as UpdateQueryArgumentTypeLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
 import { SimpleRPCTopic } from "./simple-rpc";
 import { Signature } from "@/jsonpath-tools/editor-services/signature-help-service";
 import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-service";
 import { DocumentHighlight } from "@/jsonpath-tools/editor-services/document-highlights-service";
-import { TextChange } from "@/jsonpath-tools/text-change";
+import { TextChange } from "@/jsonpath-tools/text/text-change";
 import { DataType } from "@/jsonpath-tools/data-types/data-types";
 import { serializeDataType } from "./data-type-serializer";
+import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
 
 
 export class LanguageServiceSession {
@@ -111,7 +112,7 @@ export class LanguageServiceSession {
         return response.formattingEdits;
     }
 
-    async getResult(): Promise<{ nodes: readonly JSONValue[], paths: readonly (string | number)[][] }> {
+    async getResult(): Promise<{ nodes: readonly JSONValue[], paths: readonly NormalizedPath[] }> {
         const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse>("getResult", {
         }), this.cancellationToken);
         return response;

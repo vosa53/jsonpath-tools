@@ -1,5 +1,5 @@
 import { Diagnostics } from "../diagnostics";
-import { NodeList } from "../types";
+import { NodeList } from "../node-list";
 import { QueryContext } from "./evaluation";
 import { SyntaxTreeNode } from "./syntax-tree-node";
 import { SubQuery } from "./sub-query";

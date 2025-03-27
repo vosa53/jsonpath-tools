@@ -1,4 +1,4 @@
-import { JSONValue } from "@/jsonpath-tools/types";
+import { JSONValue } from "@/jsonpath-tools/json/json-types";
 import { applyPatch, JsonPatchError, validate } from "fast-json-patch";
 
 export function applyJSONPatch(data: JSONValue, patch: JSONPatch): JSONValue {

@@ -1,4 +1,5 @@
-import { NormalizedPath, toNormalizedPath } from "@/jsonpath-tools/transformations";
+import { serializedNormalizedPath } from "@/jsonpath-tools/serialization";
+import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
 import { ActionIcon, Button, CopyButton, Divider, Group, Loader, Menu, Popover, Text, TextInput } from "@mantine/core";
 import { IconArrowDown, IconArrowUp, IconChevronDown, IconFileUpload, IconRouteSquare } from "@tabler/icons-react";
 import { memo, useRef, useState } from "react";
@@ -46,7 +47,7 @@ const JSONPanel = memo(({
                             <Text>Parsing...</Text>
                         </>
                     )}
-                    <Popover width={400} position="bottom" withArrow shadow="md" onChange={() => setCurrentNormalizedPath(toNormalizedPath(currentNormalizedPathGetter.current()))}>
+                    <Popover width={400} position="bottom" withArrow shadow="md" onChange={() => setCurrentNormalizedPath(serializedNormalizedPath(currentNormalizedPathGetter.current()))}>
                         <Popover.Target>
                             <ActionIcon variant="default" aria-label="Settings" ml="auto">
                                 <IconRouteSquare style={{ width: '70%', height: '70%' }} stroke={1.5} />

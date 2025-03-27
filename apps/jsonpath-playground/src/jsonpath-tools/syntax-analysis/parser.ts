@@ -24,7 +24,7 @@ import { SliceSelector } from "../query/selectors/slice-selector";
 import { WildcardSelector } from "../query/selectors/wildcard-selector";
 import { SyntaxTreeType } from "../query/syntax-tree-type";
 import { SyntaxTreeToken } from "../query/syntax-tree-token";
-import { TextRange } from "../text-range";
+import { TextRange } from "../text/text-range";
 
 export class Parser {
     parse(input: string): Query {

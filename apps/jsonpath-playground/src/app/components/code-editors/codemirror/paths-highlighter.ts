@@ -1,4 +1,4 @@
-import { NormalizedPath } from "@/jsonpath-tools/transformations";
+import { NormalizedPath, NormalizedPathSegment } from "@/jsonpath-tools/normalized-path";
 import { logPerformance } from "@/jsonpath-tools/utils";
 import { syntaxTree } from "@codemirror/language";
 import { EditorState, Extension, Range, StateEffect, StateField, Text } from "@codemirror/state";
@@ -16,7 +16,7 @@ export const setCurrentHighlightedPathEffect = StateEffect.define<NormalizedPath
 export const setHighlightedPathsEffect = StateEffect.define<readonly NormalizedPath[]>();
 
 export function getPathAtTreeCursor(cursor: TreeCursor, state: EditorState): NormalizedPath {
-    const path: (string | number)[] = [];
+    const path: NormalizedPathSegment[] = [];
 
     while (!valueNodeNames.has(cursor.name) && cursor.parent());
 
@@ -120,7 +120,7 @@ const pathsHighlighterPlugin = ViewPlugin.fromClass(class {
             const tree = syntaxTree(view.state);
             const decorations: Range<Decoration>[] = [];
             for (const visibleRange of view.visibleRanges) {
-                const path: (string | number)[] = [];
+                const path: NormalizedPathSegment[] = [];
 
                 tree.iterate({
                     from: visibleRange.from,

@@ -11,8 +11,8 @@ import { Segment } from "../query/segment";
 import { FilterSelector } from "../query/selectors/filter-selector";
 import { SliceSelector } from "../query/selectors/slice-selector";
 import { SyntaxTree } from "../query/syntax-tree";
-import { TextChange } from "../text-change";
-import { TextRange } from "../text-range";
+import { TextChange } from "../text/text-change";
+import { TextRange } from "../text/text-range";
 
 export class FormattingService {
     getFormattingEdits(query: Query): TextChange[] {

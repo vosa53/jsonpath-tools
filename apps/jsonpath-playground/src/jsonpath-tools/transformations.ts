@@ -1,32 +1,22 @@
-import { JSONValue } from "./types";
+import { NormalizedPath } from "./normalized-path";
+import { JSONValue } from "./json/json-types";
 
-export type NormalizedPath = readonly (string | number)[];
-
-export function toNormalizedPath(path: NormalizedPath): string {
-    return "$" + path.map(ps => `[${JSON.stringify(ps)}]`).join(""); // TODO: Escaping.
+export function replaceAtPaths(value: JSONValue, paths: readonly NormalizedPath[], replacer: (value: JSONValue) => JSONValue | undefined): JSONValue {
+    return replaceOrRemoveAtPaths(value, paths, replacer) as JSONValue;
 }
 
-export function toJSONPointer(path: NormalizedPath): string {
-    if (path.length === 0) return "/";
-    return "/" + path.join("/"); // TODO: Escaping.
+export function removeAtPaths(value: JSONValue, paths: readonly NormalizedPath[]): JSONValue | undefined {
+    return replaceOrRemoveAtPaths(value, paths, () => undefined) as JSONValue;
 }
 
-export function replace(value: JSONValue, paths: readonly NormalizedPath[], replacer: (value: JSONValue) => JSONValue | undefined): JSONValue {
-    return replaceOrRemove(value, paths, replacer) as JSONValue;
-}
-
-export function remove(value: JSONValue, paths: readonly NormalizedPath[]): JSONValue | undefined {
-    return replaceOrRemove(value, paths, () => undefined) as JSONValue;
-}
-
-function replaceOrRemove(value: JSONValue, paths: readonly NormalizedPath[], replacer: (value: JSONValue) => JSONValue | undefined): JSONValue | undefined {
+function replaceOrRemoveAtPaths(value: JSONValue, paths: readonly NormalizedPath[], replacer: (value: JSONValue) => JSONValue | undefined): JSONValue | undefined {
     if (paths.length === 0)
         return value;
     const sortedPaths = paths.toSorted(compareNormalizedPaths);
-    return replaceOrRemoveRecursive(value, sortedPaths, replacer, 0, 0, sortedPaths.length);
+    return replaceOrRemoveAtPathsRecursive(value, sortedPaths, replacer, 0, 0, sortedPaths.length);
 }
 
-function replaceOrRemoveRecursive(
+function replaceOrRemoveAtPathsRecursive(
     value: JSONValue, 
     paths: readonly NormalizedPath[], 
     replacer: (value: JSONValue) => JSONValue | undefined, 
@@ -48,7 +38,7 @@ function replaceOrRemoveRecursive(
                 from++;
             if (Array.isArray(newValue)) {
                 if (typeof propertyName === "number") {
-                    const result = replaceOrRemoveRecursive(newValue[propertyName], paths, replacer, level + 1, oldFrom, from);
+                    const result = replaceOrRemoveAtPathsRecursive(newValue[propertyName], paths, replacer, level + 1, oldFrom, from);
                     if (result === undefined)
                         removedIndexCount++;
                     else
@@ -57,7 +47,7 @@ function replaceOrRemoveRecursive(
             }
             else {
                 if (typeof propertyName === "string") {
-                    const result = replaceOrRemoveRecursive(newValue[propertyName], paths, replacer, level + 1, oldFrom, from);
+                    const result = replaceOrRemoveAtPathsRecursive(newValue[propertyName], paths, replacer, level + 1, oldFrom, from);
                     if (result === undefined)
                         delete newValue[propertyName];
                     else

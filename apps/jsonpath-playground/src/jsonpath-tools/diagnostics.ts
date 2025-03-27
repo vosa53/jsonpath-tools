@@ -1,4 +1,4 @@
-import { TextRange } from "./text-range";
+import { TextRange } from "./text/text-range";
 
 export interface Diagnostics {
     readonly type: DiagnosticsType;

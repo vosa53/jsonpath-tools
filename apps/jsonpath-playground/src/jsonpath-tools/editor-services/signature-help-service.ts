@@ -2,7 +2,7 @@ import { QueryOptions } from "../options";
 import { FunctionExpression } from "../query/filter-expression/function-expression";
 import { Query } from "../query/query";
 import { SyntaxTree } from "../query/syntax-tree";
-import { TextRange } from "../text-range";
+import { TextRange } from "../text/text-range";
 
 export class SignatureHelpService {
     constructor(

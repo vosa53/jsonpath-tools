@@ -1,4 +1,4 @@
-import { TextRange } from "../text-range";
+import { TextRange } from "../text/text-range";
 import { SyntaxTree } from "./syntax-tree";
 import { SyntaxTreeType } from "./syntax-tree-type";
 

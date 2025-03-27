@@ -1,7 +1,8 @@
 import { defaultQueryOptions, FunctionHandler } from "@/jsonpath-tools/options";
 import { LanguageServiceBackend } from "./components/code-editors/codemirror/jsonpath-codemirror/worker/language-service-backend";
 import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";
-import { LogicalFalse, LogicalTrue, NodeList, Nothing } from "@/jsonpath-tools/types";
+import { LogicalFalse, LogicalTrue, Nothing } from "@/jsonpath-tools/types";
+import { NodeList } from "@/jsonpath-tools/node-list";
 import { Node } from "@/jsonpath-tools/node";
 
 const customFunctions = new Map<string, FunctionHandler>();

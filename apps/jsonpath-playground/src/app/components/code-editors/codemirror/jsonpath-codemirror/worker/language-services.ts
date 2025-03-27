@@ -1,4 +1,4 @@
-import { JSONValue } from "@/jsonpath-tools/types";
+import { JSONValue } from "@/jsonpath-tools/json/json-types";
 import { LanguageService } from "./language-service";
 import { LanguageServiceBackend } from "./language-service-backend";
 

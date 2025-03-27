@@ -1,7 +1,7 @@
-import { JSONValue, Nothing } from "@/jsonpath-tools/types";
-import { NormalizedPath } from "../transformations";
-
-const INDENTATION_SPACE_COUNT = 4;
+import { Nothing } from "@/jsonpath-tools/types";
+import { JSONValue } from "../json/json-types";
+import { NormalizedPath, NormalizedPathSegment } from "../normalized-path";
+import { isSubtypeOf } from "./operations";
 
 export class DataTypeAnnotation {
     constructor(
@@ -44,12 +44,12 @@ export abstract class DataType {
     
     abstract getChildrenType(): DataType;
     abstract getDescendantType(): DataType;
-    abstract getTypeAtPathSegment(segment: string | number): DataType;
-    abstract collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void;
+    abstract getTypeAtPathSegment(segment: NormalizedPathSegment): DataType;
+    abstract collectKnownPathSegmentsToSet(pathSegments: Set<NormalizedPathSegment>): void;
     abstract collectKnownLiteralsToSet(literals: Set<string | number | boolean | null>): void;
 
-    collectKnownPathSegments(): Set<string | number> {
-        const knownPathSegments = new Set<string | number>();
+    collectKnownPathSegments(): Set<NormalizedPathSegment> {
+        const knownPathSegments = new Set<NormalizedPathSegment>();
         this.collectKnownPathSegmentsToSet(knownPathSegments);
         return knownPathSegments;
     }
@@ -134,7 +134,7 @@ export class LiteralDataType extends DataType {
         return NeverDataType.create();
     }
 
-    collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
+    collectKnownPathSegmentsToSet(pathSegments: Set<NormalizedPathSegment>): void {
         return;
     }
 
@@ -142,7 +142,7 @@ export class LiteralDataType extends DataType {
         literals.add(this.value);
     }
 
-    getTypeAtPathSegment(segment: string | number): DataType {
+    getTypeAtPathSegment(segment: NormalizedPathSegment): DataType {
         return NeverDataType.create();
     }
 
@@ -183,7 +183,7 @@ export class PrimitiveDataType extends DataType {
         return NeverDataType.create();
     }
 
-    collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
+    collectKnownPathSegmentsToSet(pathSegments: Set<NormalizedPathSegment>): void {
         return;
     }
 
@@ -196,7 +196,7 @@ export class PrimitiveDataType extends DataType {
         }
     }
 
-    getTypeAtPathSegment(segment: string | number): DataType {
+    getTypeAtPathSegment(segment: NormalizedPathSegment): DataType {
         return NeverDataType.create();
     }
 
@@ -244,7 +244,7 @@ export class ObjectDataType extends DataType {
         return UnionDataType.create([childrenType, childrenType.getDescendantType()]);
     }
 
-    collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
+    collectKnownPathSegmentsToSet(pathSegments: Set<NormalizedPathSegment>): void {
         for (const propertyName of this.propertyTypes.keys())
             pathSegments.add(propertyName);
     }
@@ -253,7 +253,7 @@ export class ObjectDataType extends DataType {
         return;
     }
 
-    getTypeAtPathSegment(segment: string | number): DataType {
+    getTypeAtPathSegment(segment: NormalizedPathSegment): DataType {
         if (typeof segment === "number")
             return NeverDataType.create();
 
@@ -333,7 +333,7 @@ export class ArrayDataType extends DataType {
         return UnionDataType.create([childrenType, childrenType.getDescendantType()]);
     }
 
-    collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
+    collectKnownPathSegmentsToSet(pathSegments: Set<NormalizedPathSegment>): void {
         for (let i = 0; i < this.prefixElementTypes.length; i++)
             pathSegments.add(i);
     }
@@ -342,7 +342,7 @@ export class ArrayDataType extends DataType {
         return;
     }
 
-    getTypeAtPathSegment(segment: string | number): DataType {
+    getTypeAtPathSegment(segment: NormalizedPathSegment): DataType {
         if (typeof segment === "string")
             return NeverDataType.create();
 
@@ -472,7 +472,7 @@ export class UnionDataType extends DataType {
         return UnionDataType.create(descendantTypes);
     }
 
-    collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
+    collectKnownPathSegmentsToSet(pathSegments: Set<NormalizedPathSegment>): void {
         for (const type of this.types)
             type.collectKnownPathSegmentsToSet(pathSegments);
     }
@@ -482,7 +482,7 @@ export class UnionDataType extends DataType {
             type.collectKnownLiteralsToSet(literals);
     }
 
-    getTypeAtPathSegment(segment: string | number): DataType {
+    getTypeAtPathSegment(segment: NormalizedPathSegment): DataType {
         const types = this.types.map(type => type.getTypeAtPathSegment(segment));
         return UnionDataType.create(types);
     }
@@ -532,7 +532,7 @@ export class NeverDataType extends DataType {
         return NeverDataType.create();
     }
 
-    collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
+    collectKnownPathSegmentsToSet(pathSegments: Set<NormalizedPathSegment>): void {
         return;
     }
 
@@ -540,7 +540,7 @@ export class NeverDataType extends DataType {
         return;
     }
 
-    getTypeAtPathSegment(segment: string | number): DataType {
+    getTypeAtPathSegment(segment: NormalizedPathSegment): DataType {
         return NeverDataType.create();
     }
 
@@ -585,7 +585,7 @@ export class AnyDataType extends DataType {
         return AnyDataType.create();
     }
 
-    collectKnownPathSegmentsToSet(pathSegments: Set<string | number>): void {
+    collectKnownPathSegmentsToSet(pathSegments: Set<NormalizedPathSegment>): void {
         return;
     }
 
@@ -593,7 +593,7 @@ export class AnyDataType extends DataType {
         return;
     }
 
-    getTypeAtPathSegment(segment: string | number): DataType {
+    getTypeAtPathSegment(segment: NormalizedPathSegment): DataType {
         return AnyDataType.create();
     }
 
@@ -608,110 +608,4 @@ export class AnyDataType extends DataType {
     setPathExistence(path: NormalizedPath): DataType {
         return this;
     }
-}
-
-export function intersectTypes(typeA: DataType, typeB: DataType): DataType {
-    if (typeA instanceof UnionDataType)
-        return UnionDataType.create(typeA.types.map(type => intersectTypes(type, typeB)), typeA.annotations);
-    if (typeB instanceof UnionDataType)
-        return UnionDataType.create(typeB.types.map(type => intersectTypes(typeA, type)), typeB.annotations);
-
-    if (isSubtypeOf(typeA, typeB))
-        return typeA.addAnnotations(typeB.annotations);
-    if (isSubtypeOf(typeB, typeA))
-        return typeB.addAnnotations(typeA.annotations);
-
-    if (typeA instanceof ObjectDataType && typeB instanceof ObjectDataType) {
-        const propertyNames = new Set([...typeA.propertyTypes.keys(), ...typeB.propertyTypes.keys()]);
-        const intersectedPropertyTypes = new Map<string, DataType>();
-        for (const propertyName of propertyNames) {
-            const propertyTypeA = typeA.getTypeAtPathSegment(propertyName);
-            const propertyTypeB = typeB.getTypeAtPathSegment(propertyName);
-            const intersectedPropertyType = intersectTypes(propertyTypeA, propertyTypeB);
-            intersectedPropertyTypes.set(propertyName, intersectedPropertyType);
-        }
-        const intersectedRestPropertyType = intersectTypes(typeA.restPropertyType, typeB.restPropertyType);
-        const intersectedRequiredProperties = typeA.requiredProperties.union(typeB.requiredProperties);
-        const intersectedAnnotations = typeA.annotations.union(typeB.annotations);
-        return ObjectDataType.create(intersectedPropertyTypes, intersectedRestPropertyType, intersectedRequiredProperties, intersectedAnnotations);
-    }
-    if (typeA instanceof ArrayDataType && typeB instanceof ArrayDataType) {
-        const prefixElementTypes: DataType[] = [];
-        for (let i = 0; i < Math.max(typeA.prefixElementTypes.length, typeB.prefixElementTypes.length); i++) {
-            const intersectedPrefixElementType = intersectTypes(typeA.prefixElementTypes[i], typeB.prefixElementTypes[i]);
-            prefixElementTypes.push(intersectedPrefixElementType);
-        }
-        const restElementType = intersectTypes(typeA.restElementType, typeB.restElementType);
-        const intersectedRequiredElementCount = Math.max(typeA.requiredElementCount, typeB.requiredElementCount);
-        const intersectedAnnotations = typeA.annotations.union(typeB.annotations);
-        return ArrayDataType.create(prefixElementTypes, restElementType, intersectedRequiredElementCount, intersectedAnnotations);
-    }
-    return NeverDataType.create();
-}
-
-export function subtractTypes(typeA: DataType, typeB: DataType): DataType {
-    if (typeA instanceof UnionDataType) {
-        const newTypes = typeA.types.map(type => subtractTypes(type, typeB))
-        return UnionDataType.create(newTypes, typeA.annotations);
-    }
-    if (typeB instanceof UnionDataType) {
-        const newTypes = typeB.types.map(type => subtractTypes(typeA, type))
-        return UnionDataType.create(newTypes, typeB.annotations);
-    }
-    if (isSubtypeOf(typeA, typeB))
-        return NeverDataType.create();
-
-    return typeA;
-}
-
-export function isSubtypeOf(typeA: DataType, typeB: DataType): boolean {
-    if (typeA === typeB)
-        return true;
-    if (typeB instanceof AnyDataType)
-        return true;
-    if (typeB instanceof UnionDataType)
-        return typeB.types.some(type => isSubtypeOf(typeA, type));
-
-    if (typeA instanceof LiteralDataType)
-        return typeB instanceof LiteralDataType && typeA.value === typeB.value || typeB instanceof PrimitiveDataType && typeA.type === typeB.type;
-    if (typeA instanceof PrimitiveDataType)
-        return typeB instanceof PrimitiveDataType && typeA.type === typeB.type;
-    if (typeA instanceof ObjectDataType) {
-        if (typeB instanceof ObjectDataType) {
-            const propertyNames = new Set([...typeA.propertyTypes.keys(), ...typeB.propertyTypes.keys()]);
-            for (const propertyName of propertyNames) {
-                if (!isSubtypeOf(typeA.getTypeAtPathSegment(propertyName), typeB.getTypeAtPathSegment(propertyName)))
-                    return false;
-            }
-            if (!isSubtypeOf(typeA.restPropertyType, typeB.restPropertyType))
-                return false;
-            if (!typeA.requiredProperties.isSupersetOf(typeB.requiredProperties))
-                return false;
-            return true;
-        }
-        else
-            return false;
-    }
-    if (typeA instanceof ArrayDataType) {
-        if (typeB instanceof ArrayDataType) {
-            for (let i = 0; i < Math.max(typeA.prefixElementTypes.length, typeB.prefixElementTypes.length); i++) {
-                if (!isSubtypeOf(typeA.getTypeAtPathSegment(i), typeB.getTypeAtPathSegment(i)))
-                    return false;
-            }
-            if (!isSubtypeOf(typeA.restElementType, typeB.restElementType))
-                return false;
-            if (!(typeA.requiredElementCount >= typeB.requiredElementCount))
-                return false;
-            return true;
-        }
-    }
-    if (typeA instanceof NeverDataType)
-        return true;
-    if (typeA instanceof UnionDataType)
-        return typeA.types.every(type => isSubtypeOf(type, typeB));
-    return false;
-}
-
-export function isEquvivalentTypeWith(typeA: DataType, typeB: DataType): boolean {
-    return isSubtypeOf(typeA, typeB) && isSubtypeOf(typeB, typeA);
 }

@@ -1,5 +1,6 @@
-import { JSONValue } from "@/jsonpath-tools/types";
-import { AnyDataType, ArrayDataType, intersectTypes, LiteralDataType, NeverDataType, ObjectDataType, PrimitiveDataType, PrimitiveDataTypeType, subtractTypes, DataType, DataTypeAnnotation, UnionDataType } from "./data-types";
+import { JSONValue } from "../json/json-types";
+import { AnyDataType, ArrayDataType, LiteralDataType, NeverDataType, ObjectDataType, PrimitiveDataType, PrimitiveDataTypeType, DataType, DataTypeAnnotation, UnionDataType } from "./data-types";
+import { intersectTypes, subtractTypes } from "./operations";
 import { get } from "jsonpointer";
 import { normalize, parse, resolve, serialize } from "uri-js";
 

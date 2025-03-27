@@ -5,7 +5,7 @@ import { SubQuery } from "../query/sub-query";
 import { FilterSelector } from "../query/selectors/filter-selector";
 import { SyntaxTree } from "../query/syntax-tree";
 import { SyntaxTreeType } from "../query/syntax-tree-type";
-import { TextRange } from "../text-range";
+import { TextRange } from "../text/text-range";
 
 export class DocumentHighlightsService {
     constructor(

@@ -17,7 +17,8 @@ import { WildcardSelector } from "@/jsonpath-tools/query/selectors/wildcard-sele
 import { SyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
 import { SyntaxTreeType } from "@/jsonpath-tools/query/syntax-tree-type";
 import { SyntaxTreeToken } from "@/jsonpath-tools/query/syntax-tree-token";
-import { DataType, LiteralDataType, PrimitiveDataType, PrimitiveDataTypeType, AnyDataType, UnionDataType, intersectTypes, subtractTypes, NeverDataType, isSubtypeOf, isEquvivalentTypeWith } from "./data-types";
+import { DataType, LiteralDataType, PrimitiveDataType, PrimitiveDataTypeType, AnyDataType, UnionDataType, NeverDataType } from "./data-types";
+import { intersectTypes, subtractTypes, isSubtypeOf, isEquvivalentTypeWith } from "./operations";
 import { SliceSelector } from "../query/selectors/slice-selector";
 import { FunctionExpression } from "../query/filter-expression/function-expression";
 import { QueryOptions } from "../options";

@@ -1,4 +1,5 @@
-import { deepEquals, FilterValue, LogicalFalse, LogicalTrue, Nothing, ValueType } from "../../types";
+import { FilterValue, LogicalFalse, LogicalTrue, Nothing, ValueType } from "../../types";
+import { jsonDeepEquals } from "@/jsonpath-tools/json/deep-equals";
 import { FilterExpressionContext, QueryContext } from "../evaluation";
 import { evaluateAsValueType } from "../helpers";
 import { SyntaxTreeType } from "../syntax-tree-type";
@@ -44,7 +45,7 @@ export class ComparisonExpression extends FilterExpression {
         if (left === Nothing || right === Nothing)
             return left === Nothing && right === Nothing;
 
-        return deepEquals(left, right);
+        return jsonDeepEquals(left, right);
     }
 
     private isLower(left: ValueType, right: ValueType): boolean {

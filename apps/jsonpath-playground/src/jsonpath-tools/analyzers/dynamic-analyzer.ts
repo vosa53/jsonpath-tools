@@ -3,7 +3,8 @@ import { QueryOptions } from "../options";
 import { QueryContext } from "../query/evaluation";
 import { Query } from "../query/query";
 import { Selector } from "../query/selectors/selector";
-import { JSONValue, NodeList } from "../types";
+import { JSONValue } from "../json/json-types";
+import { NodeList } from "../node-list";
 
 export class DynamicAnalyzer {
     constructor(

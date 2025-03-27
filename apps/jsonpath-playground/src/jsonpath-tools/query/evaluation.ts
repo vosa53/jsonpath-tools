@@ -1,6 +1,7 @@
 import { Diagnostics } from "../diagnostics";
 import { QueryOptions } from "../options";
-import { FilterValue, JSONValue } from "../types";
+import { FilterValue } from "../types";
+import { JSONValue } from "../json/json-types";
 import { FilterExpression } from "./filter-expression/filter-expression";
 import { Node } from "../node";
 import { SubQuery } from "./sub-query";

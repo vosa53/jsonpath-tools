@@ -4,7 +4,7 @@ import cts from "./jsonpath-compliance-test-suite/cts.json";
 import { Parser } from './syntax-analysis/parser';
 import { TypeChecker } from './semantic-analysis/type-checker';
 import { defaultQueryOptions } from './options';
-import { deepEquals } from './types';
+import { jsonDeepEquals } from "./json/deep-equals";
 
 describe("JSONPath Compliance Test Suite", () => {
     for (const test of cts.tests) {
@@ -25,7 +25,7 @@ describe("JSONPath Compliance Test Suite", () => {
                     const result = path.select({ rootNode: test.document, options: defaultQueryOptions }).nodes.map(n => n.value);
                     if (test.results !== undefined) {
                         // @ts-ignore
-                        expect(test.results.some(r => deepEquals(r, result))).toBeTruthy();
+                        expect(test.results.some(r => jsonDeepEquals(r, result))).toBeTruthy();
                     }
                     if (test.result !== undefined)
                         expect(result).toEqual(test.result);

@@ -1,7 +1,10 @@
 import { Diagnostics } from "@/jsonpath-tools/diagnostics";
 import { Query } from "@/jsonpath-tools/query/query";
-import { NormalizedPath, remove, replace, toJSONPointer, toNormalizedPath } from "@/jsonpath-tools/transformations";
-import { JSONValue, Nothing } from "@/jsonpath-tools/types";
+import { removeAtPaths, replaceAtPaths } from "@/jsonpath-tools/transformations";
+import { serializedNormalizedPath } from "@/jsonpath-tools/serialization";
+import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
+import { Nothing } from "@/jsonpath-tools/types";
+import { JSONValue } from "@/jsonpath-tools/json/json-types";
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { OperationCancelledError } from "./components/code-editors/codemirror/jsonpath-codemirror/cancellation-token";
 import { CustomFunction } from "./models/custom-function";
@@ -13,7 +16,7 @@ import { logPerformance } from "@/jsonpath-tools/utils";
 import { defaultQueryOptions, QueryOptions } from "@/jsonpath-tools/options";
 import { LanguageService } from "./components/code-editors/codemirror/jsonpath-codemirror/worker/language-service";
 import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";
-import { TextRange } from "@/jsonpath-tools/text-range";
+import { TextRange } from "@/jsonpath-tools/text/text-range";
 import { SyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
 import { jsonSchemaToType } from "@/jsonpath-tools/data-types/json-schema-data-type-converter";
 import { AnyDataType, DataType } from "@/jsonpath-tools/data-types/data-types";
@@ -108,7 +111,7 @@ export function usePageViewModel() {
     const resultPathsText = useMemo(() => {
         const resultPathsTransformed = logPerformance("Transform result paths", () => {
             return pathType === PathType.normalizedPath
-                ? resultPaths.map(p => toNormalizedPath(p))
+                ? resultPaths.map(p => serializedNormalizedPath(p))
                 : resultPaths.map(p => toJSONPointer(p));
         });
         return logPerformance("Stringify result paths", () => JSON.stringify(resultPathsTransformed, undefined, 4));
@@ -116,7 +119,7 @@ export function usePageViewModel() {
     const [currentResultPathIndex, setCurrentResultPathIndex] = useState<number>(0);
     const [diagnostics, setDiagnostics] = useState<readonly Diagnostics[]>([]);
     const [highlightedRange, setHighlightedRange] = useState<TextRange | null>(null);
-    const getResultRef = useRef<() => Promise<{ nodes: readonly JSONValue[], paths: readonly (string | number)[][] }>>(null);
+    const getResultRef = useRef<() => Promise<{ nodes: readonly JSONValue[], paths: readonly NormalizedPath[] }>>(null);
     const resultTimeoutRef = useRef<number | null>(null);
 
     const onCustomFunctionsChanged = useCallback((customFunctions: readonly CustomFunction[]) => {
@@ -165,7 +168,7 @@ export function usePageViewModel() {
         setDiagnostics(diagnostics);
     }, []);
 
-    const onGetResultAvailable = useCallback((getResult: () => Promise<{ nodes: readonly JSONValue[], paths: readonly (string | number)[][] }>) => {
+    const onGetResultAvailable = useCallback((getResult: () => Promise<{ nodes: readonly JSONValue[], paths: readonly NormalizedPath[] }>) => {
         getResultRef.current = getResult;
     }, []);
 
@@ -275,12 +278,17 @@ function executeOperation(
         const replacer = operation.replacement.type === OperationReplacementType.jsonValue
             ? (v: JSONValue) => replacementJSONValue!
             : (v: JSONValue) => applyJSONPatch(v, replacementJSONPatch!);
-        return replace(queryArgument, resultPaths, replacer);
+        return replaceAtPaths(queryArgument, resultPaths, replacer);
     }
     else if (operation.type === OperationType.delete)
-        return remove(queryArgument, resultPaths);
+        return removeAtPaths(queryArgument, resultPaths);
     else
         throw new Error(`Unknown operation type: ${operation.type}.`);
+}
+
+function toJSONPointer(path: NormalizedPath): string {
+    if (path.length === 0) return "/";
+    return "/" + path.join("/"); // TODO: Escaping.
 }
 
 const worker = new Worker(new URL("./custom-language-service-worker.ts", import.meta.url), { type: "module" });
