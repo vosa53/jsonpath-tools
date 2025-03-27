@@ -8,14 +8,14 @@ import { continuedIndent, defineLanguageFacet, delimitedIndent, foldInside, fold
 import { Input, NodeProp, NodeSet, NodeType, Parser, PartialParse, Tree, TreeFragment } from "@lezer/common";
 import { styleTags, tags as t } from "@lezer/highlight";
 
-export function getJSONPath(tree: Tree): Query {
-    const jsonPath = treeToJSONPath.get(tree);
+export function getQuery(tree: Tree): Query {
+    const jsonPath = treeToQuery.get(tree);
     if (jsonPath === undefined)
-        throw new Error("The given Lezer tree does not have a corresponding JSONPath.");
+        throw new Error("The given Lezer tree does not have a corresponding JSONPath query.");
     return jsonPath;
 }
 
-const treeToJSONPath = new WeakMap<Tree, Query>();
+const treeToQuery = new WeakMap<Tree, Query>();
 
 function createNodeSet(types: SyntaxTreeType[]): { nodeSet: NodeSet, treeTypeToNodeId: Map<SyntaxTreeType, number> } {
     const treeTypeToNodeId = new Map<SyntaxTreeType, number>();
@@ -147,7 +147,7 @@ class CodeMirrorJSONPathParser extends Parser {
                 [SyntaxTreeType.stringToken]: c => 0,
             }),
             languageDataProp.add(NodeType.match({
-                [SyntaxTreeType.root]: jsonPathLanguageFacet
+                [SyntaxTreeType.root]: languageFacet
             }))
         );
     }
@@ -169,7 +169,7 @@ class CodeMirrorJSONPathParser extends Parser {
         });
         const treeBuildTime = performance.now() - start - parseTime;
         console.log("PARSE TIME:", parseTime, "ms", "TREE BUILD TIME", treeBuildTime, "ms");
-        treeToJSONPath.set(tree, result);
+        treeToQuery.set(tree, result);
         return new CodeMirrorJSONPathPartialParse(tree);
     }
 
@@ -206,5 +206,5 @@ class CodeMirrorJSONPathPartialParse implements PartialParse {
     stopAt(pos: number): void { }
 }
 
-export const jsonPathLanguageFacet = defineLanguageFacet();
-export const jsonPathParser = new CodeMirrorJSONPathParser();
+export const languageFacet = defineLanguageFacet();
+export const parser = new CodeMirrorJSONPathParser();

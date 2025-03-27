@@ -1,43 +1,43 @@
 import { Diagnostics } from "@/jsonpath-tools/diagnostics";
 import { Language, LanguageSupport } from "@codemirror/language";
 import { linter } from "@codemirror/lint";
-import { jsonPathCompletionSource } from "./completion-source";
-import { jsonPathDocumentHighlights } from "./document-highlights";
+import { completionSource } from "./completion-source";
+import { documentHighlights } from "./document-highlights";
 import { jsonPathFormatKeyMap } from "./format";
-import { jsonPathLintSource, jsonPathLintSourceNeedsRefresh } from "./lint-source";
-import { jsonPathLanguageFacet, jsonPathParser } from "./parser";
-import { jsonPathSignatureHelp } from "./signature-help";
-import { jsonPathConfigFacet, jsonPathState } from "./state";
-import { jsonPathTooltip } from "./tooltip";
-import { LanguageService } from "./worker/language-service";
-import { LanguageServices } from "./worker/language-services";
+import { lintSource, lintSourceNeedsRefresh } from "./lint-source";
+import { languageFacet, parser } from "./parser";
+import { signatureHelp } from "./signature-help";
+import { jsonPathConfigFacet, state } from "./state";
+import { tooltip } from "./tooltip";
+import { LanguageService } from "./language-service/language-service";
+import { LanguageServices } from "./language-service/language-services";
 
 
-export const jsonPathLanguage = new Language(jsonPathLanguageFacet, jsonPathParser);
+export const jsonpathLanguage = new Language(languageFacet, parser);
 
-export function jsonPath(options: {
+export function jsonpath(options: {
     languageService?: LanguageService,
     onDiagnosticsCreated?: (diagnostics: readonly Diagnostics[]) => void
 }): LanguageSupport {
-    return new LanguageSupport(jsonPathLanguage, [
+    return new LanguageSupport(jsonpathLanguage, [
         jsonPathConfigFacet.of({
             languageService: options.languageService ?? LanguageServices.workerLanguageService
         }),
-        jsonPathState(),
+        state(),
         linter(
-            jsonPathLintSource({
+            lintSource({
                 onDiagnosticsCreated: options.onDiagnosticsCreated
             }),
             {
-                needsRefresh: jsonPathLintSourceNeedsRefresh
+                needsRefresh: lintSourceNeedsRefresh
             }
         ),
-        jsonPathLanguageFacet.of({
-            autocomplete: jsonPathCompletionSource()
+        languageFacet.of({
+            autocomplete: completionSource()
         }),
-        jsonPathTooltip(),
-        jsonPathSignatureHelp(),
-        jsonPathDocumentHighlights(),
+        tooltip(),
+        signatureHelp(),
+        documentHighlights(),
         jsonPathFormatKeyMap
     ]);
 }

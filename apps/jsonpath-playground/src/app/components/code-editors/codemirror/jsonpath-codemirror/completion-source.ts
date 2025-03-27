@@ -5,7 +5,7 @@ import { languageServiceSessionStateField } from "./state";
 import { MarkdownRenderer } from "./markdown-renderer";
 
 
-export function jsonPathCompletionSource(): CompletionSource {
+export function completionSource(): CompletionSource {
     return async (context: CompletionContext) => {
         // TODO: Add all word and number characters.
         if (context.explicit || context.matchBefore(/\w|\.|\[|\(|,\s|"|'|\?/)) {

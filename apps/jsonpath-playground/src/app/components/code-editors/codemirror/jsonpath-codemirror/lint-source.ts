@@ -5,7 +5,7 @@ import { OperationCancelledError } from "./cancellation-token";
 import { languageServiceSessionStateField, updateOptionsEffect, updateQueryArgumentEffect } from "./state";
 
 
-export function jsonPathLintSource(options: { onDiagnosticsCreated?: (diagnostics: readonly Diagnostics[]) => void } = {}): LintSource {
+export function lintSource(options: { onDiagnosticsCreated?: (diagnostics: readonly Diagnostics[]) => void } = {}): LintSource {
     return async view => {
         const languageServiceSession = view.state.field(languageServiceSessionStateField);
         try {
@@ -26,7 +26,7 @@ export function jsonPathLintSource(options: { onDiagnosticsCreated?: (diagnostic
     }
 }
 
-export const jsonPathLintSourceNeedsRefresh = (update: ViewUpdate): boolean => {
+export const lintSourceNeedsRefresh = (update: ViewUpdate): boolean => {
     for (const transaction of update.transactions) {
         if (transaction.effects.some(e => e.is(updateOptionsEffect) || e.is(updateQueryArgumentEffect))) 
             return true;

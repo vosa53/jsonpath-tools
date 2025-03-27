@@ -4,7 +4,7 @@ import { parser as javaScriptParser } from "@lezer/javascript";
 import markdownit from "markdown-it";
 import { highlight, markdownItLinksTargetBlank } from "../components/code-editors/codemirror/jsonpath-codemirror/markdown-renderer";
 import { highlightStyle } from "../components/code-editors/codemirror/highlight-style";
-import { jsonPathParser } from "../components/code-editors/codemirror/jsonpath-codemirror/parser";
+import { parser } from "../components/code-editors/codemirror/jsonpath-codemirror/parser";
 
 const md = markdownit({
     linkify: true,
@@ -20,7 +20,7 @@ const md = markdownit({
 
 const parserMap = new Map<string, Parser>([
     ["json", jsonParser],
-    ["jsonpath", jsonPathParser],
+    ["jsonpath", parser],
     ["javascript", javaScriptParser],
     ["typescript", javaScriptParser.configure({ dialect: "ts" })]
 ]);

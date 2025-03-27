@@ -5,7 +5,7 @@ import { OperationCancelledError } from "./cancellation-token";
 import { languageServiceSessionStateField } from "./state";
 import { MarkdownRenderer } from "./markdown-renderer";
 
-export function jsonPathSignatureHelp(): Extension {
+export function signatureHelp(): Extension {
     return [
         signatureHelpPlugin,
         signatureHelpBaseTheme

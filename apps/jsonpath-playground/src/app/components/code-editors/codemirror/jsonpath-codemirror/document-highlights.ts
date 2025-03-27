@@ -4,7 +4,7 @@ import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate } from "@
 import { OperationCancelledError } from "./cancellation-token";
 import { languageServiceSessionStateField } from "./state";
 
-export function jsonPathDocumentHighlights(): Extension {
+export function documentHighlights(): Extension {
     return [
         documentsHighlightsPlugin,
         documentHighlightsBaseTheme

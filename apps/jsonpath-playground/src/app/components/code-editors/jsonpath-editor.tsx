@@ -7,10 +7,10 @@ import { Prec } from "@codemirror/state";
 import { useEffect, useRef } from "react";
 import { Diagnostics } from "../../../jsonpath-tools/diagnostics";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
-import { jsonPath } from "./codemirror/jsonpath-codemirror/language";
-import { getJSONPath } from "./codemirror/jsonpath-codemirror/parser";
+import { jsonpath } from "./codemirror/jsonpath-codemirror/language";
+import { getQuery } from "./codemirror/jsonpath-codemirror/parser";
 import { getResult, updateOptionsEffect, updateQueryArgumentEffect, updateQueryArgumentTypeEffect } from "./codemirror/jsonpath-codemirror/state";
-import { LanguageService } from "./codemirror/jsonpath-codemirror/worker/language-service";
+import { LanguageService } from "./codemirror/jsonpath-codemirror/language-service/language-service";
 import { TextRange } from "@/jsonpath-tools/text/text-range";
 import { rangeHighlighter, setHighlightedRangeEffect } from "./codemirror/range-highlighter";
 import { AnyDataType, DataType } from "@/jsonpath-tools/data-types/data-types";
@@ -70,7 +70,7 @@ export default function JSONPathEditor({
 
     const onEditorExtensionsRequested = () => {
         return [
-            jsonPath({
+            jsonpath({
                 languageService,
                 onDiagnosticsCreated
             }),
@@ -81,7 +81,7 @@ export default function JSONPathEditor({
             }),
             EditorView.updateListener.of(u => {
                 if (u.docChanged) {
-                    const jsonPath = getJSONPath(syntaxTree(u.view.state));
+                    const jsonPath = getQuery(syntaxTree(u.view.state));
                     onParsed?.(jsonPath);
                 }
             }),

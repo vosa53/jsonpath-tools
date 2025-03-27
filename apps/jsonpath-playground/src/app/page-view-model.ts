@@ -14,7 +14,7 @@ import { Parser } from "@/jsonpath-tools/syntax-analysis/parser";
 import { Settings } from "./models/settings";
 import { logPerformance } from "@/jsonpath-tools/helpers/utils";
 import { defaultQueryOptions, QueryOptions } from "@/jsonpath-tools/options";
-import { LanguageService } from "./components/code-editors/codemirror/jsonpath-codemirror/worker/language-service";
+import { LanguageService } from "./components/code-editors/codemirror/jsonpath-codemirror/language-service/language-service";
 import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";
 import { TextRange } from "@/jsonpath-tools/text/text-range";
 import { SyntaxTree } from "@/jsonpath-tools/query/syntax-tree";

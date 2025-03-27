@@ -2,12 +2,12 @@ import { QueryOptions } from "@/jsonpath-tools/options";
 import { JSONValue } from "@/jsonpath-tools/json/json-types";
 import { EditorState, Extension, Facet, StateEffect, StateField } from "@codemirror/state";
 import { EditorView, PluginValue, ViewPlugin, ViewUpdate } from "@codemirror/view";
-import { LanguageService } from "./worker/language-service";
-import { LanguageServiceSession } from "./worker/language-service-session";
+import { LanguageService } from "./language-service/language-service";
+import { LanguageServiceSession } from "./language-service/language-service-session";
 import { DataType } from "@/jsonpath-tools/data-types/data-types";
 import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
 
-export function jsonPathState(): Extension {
+export function state(): Extension {
     return [
         jsonPathPlugin
     ];
