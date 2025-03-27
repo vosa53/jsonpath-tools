@@ -1,4 +1,4 @@
-import { IRegexpParser } from "./iregexp-parser";
+import { IRegexpParser } from "./syntax-analysis/iregexp-parser";
 
 export class IRegexp {
     private static readonly iRegexpParser = new IRegexpParser();

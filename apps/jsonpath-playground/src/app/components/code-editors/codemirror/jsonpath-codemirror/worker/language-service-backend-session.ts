@@ -1,6 +1,6 @@
 import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-service";
 import { EditorService } from "@/jsonpath-tools/editor-services/editor-service";
-import { Function, FunctionHandler } from "@/jsonpath-tools/options";
+import { Function, FunctionHandler } from "@/jsonpath-tools/function";
 import { logPerformance } from "@/jsonpath-tools/utils";
 import { deserializeDataType } from "./data-type-serializer";
 import { DisconnectLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";

@@ -2,7 +2,8 @@ import { JSONValue } from "@/jsonpath-tools/json/json-types";
 import { SimpleRPC } from "./simple-rpc";
 import { LanguageServiceBackendSession } from "./language-service-backend-session";
 import { UpdateOptionsLanguageServiceMessage, UpdateQueryLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessage, GetResultLanguageServiceMessage, DisconnectLanguageServiceMessage, GetSignatureLanguageServiceMessage, GetTooltipLanguageServiceMessage, ResolveCompletionLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage as UpdateQueryArgumentTypeLanguageServiceMessage } from "./language-service-messages";
-import { defaultQueryOptions, FunctionHandler } from "@/jsonpath-tools/options";
+import { defaultQueryOptions } from "@/jsonpath-tools/options";
+import { FunctionHandler } from "@/jsonpath-tools/function";
 
 export class LanguageServiceBackend {
     private readonly rpc: SimpleRPC<LanguageServiceBackendSession>;

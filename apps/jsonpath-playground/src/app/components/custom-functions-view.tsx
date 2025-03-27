@@ -1,4 +1,4 @@
-import { Type } from "@/jsonpath-tools/options";
+import { Type } from "@/jsonpath-tools/types";
 import { Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";

@@ -1,4 +1,5 @@
-import { Function, QueryOptions } from "../options";
+import { QueryOptions } from "../options";
+import { Function } from "../function";
 import { BooleanLiteralExpression } from "../query/filter-expression/boolean-literal-expression";
 import { ComparisonExpression, JSONPathComparisonOperator } from "../query/filter-expression/comparison-expression";
 import { FunctionExpression } from "../query/filter-expression/function-expression";

@@ -1,37 +1,10 @@
-import { AnyDataType, ArrayDataType, DataType, ObjectDataType, PrimitiveDataType, PrimitiveDataTypeType, UnionDataType } from "./data-types/data-types";
-import { IRegexp } from "./syntax-analysis/iregexp";
-import { isNodesType, isValueType, FilterValue, LogicalFalse, LogicalTrue, Nothing } from "./types";
+import { AnyDataType, ArrayDataType, ObjectDataType, PrimitiveDataType, PrimitiveDataTypeType, UnionDataType } from "./data-types/data-types";
+import { Function, FunctionContext } from "./function";
+import { IRegexp } from "./iregexp";
+import { isNodesType, isValueType, FilterValue, LogicalFalse, LogicalTrue, Nothing, Type } from "./types";
 
 export interface QueryOptions {
     readonly functions: { [name: string]: Function };
-}
-
-export interface Function {
-    readonly description: string;
-    readonly parameters: readonly FunctionParameter[];
-    readonly returnType: Type;
-    readonly returnDataType: DataType;
-    readonly handler: FunctionHandler;
-}
-
-export interface FunctionParameter {
-    readonly name: string;
-    readonly description: string;
-    readonly type: Type;
-    readonly dataType: DataType;
-}
-
-export type FunctionHandler = (context: FunctionContext, ...args: FilterValue[]) => FilterValue;
-
-export enum Type {
-    valueType = "ValueType",
-    logicalType = "LogicalType",
-    nodesType = "NodesType"
-}
-
-export interface FunctionContext {
-    reportWarning(message: string): void;
-    reportParameterWarning(parameterIndex: number, message: string): void;
 }
 
 export const defaultQueryOptions: QueryOptions = {

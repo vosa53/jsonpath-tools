@@ -1,5 +1,5 @@
 import { Diagnostics, DiagnosticsType } from "@/jsonpath-tools/diagnostics";
-import { FunctionContext } from "@/jsonpath-tools/options";
+import { FunctionContext } from "@/jsonpath-tools/function";
 import { FilterValue, Nothing } from "../../types";
 import { FilterExpressionContext, QueryContext } from "../evaluation";
 import { evaluateAs } from "../helpers";

@@ -4,7 +4,9 @@ import { DocumentHighlight } from "@/jsonpath-tools/editor-services/document-hig
 import { Signature } from "@/jsonpath-tools/editor-services/signature-help-service";
 import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-service";
 import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
-import { Function, FunctionParameter, QueryOptions, Type } from "@/jsonpath-tools/options";
+import { QueryOptions } from "@/jsonpath-tools/options";
+import { Function, FunctionParameter } from "@/jsonpath-tools/function";
+import { Type } from "@/jsonpath-tools/types";
 import { TextChange } from "@/jsonpath-tools/text/text-change";
 import { JSONValue } from "@/jsonpath-tools/json/json-types";
 

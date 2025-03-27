@@ -1,5 +1,6 @@
 import { Diagnostics, DiagnosticsType } from "../diagnostics";
-import { QueryOptions, Type } from "../options";
+import { QueryOptions } from "../options";
+import { Type } from "../types";
 import { AndExpression } from "../query/filter-expression/and-expression";
 import { BooleanLiteralExpression } from "../query/filter-expression/boolean-literal-expression";
 import { ComparisonExpression } from "../query/filter-expression/comparison-expression";

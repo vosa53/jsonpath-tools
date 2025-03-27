@@ -22,4 +22,9 @@ export function isLogicalType(value: FilterValue): value is LogicalType {
 
 export function isNodesType(value: FilterValue): value is NodesType {
     return value instanceof NodeList;
+}export enum Type {
+    valueType = "ValueType",
+    logicalType = "LogicalType",
+    nodesType = "NodesType"
 }
+
