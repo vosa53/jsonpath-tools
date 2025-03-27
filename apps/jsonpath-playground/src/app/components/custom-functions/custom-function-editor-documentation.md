@@ -7,11 +7,11 @@ Parameters can be used directly by their names, and the result value should be r
 
 ### JSONPath values representation
 
-`ValueType` values can be represented with their equivalent JavaScript constructs (e.g. JSON object corresponds to JavaScript object). Special value `JSONPathNothing` is represented with a symbol `jp.JSONPathNothing`. 
+`ValueType` values can be represented with their equivalent JavaScript constructs (e.g. JSON object corresponds to JavaScript object). Special value `Nothing` is represented with a symbol `jp.Nothing`. 
 
-`LogicalType` values are represented by symbols `jp.JSONPathLogicalTrue` and `jp.JSONPathLogicalFalse`. 
+`LogicalType` values are represented by symbols `jp.LogicalTrue` and `jp.LogicalFalse`. 
 
-`NodesType` values correspond to the class `jp.JSONPathNodeList`.
+`NodesType` values correspond to the class `jp.NodeList`.
 
 ### Error reporting
 
@@ -19,36 +19,39 @@ The function always needs to return some valid JSONPath value and shouldn't thro
 
 ### Full API reference
 
-The following symbols and classes are available to the function via the `jp` parameter, e.g.: `jp.JSONPathNodeList`. The function current context value is available via the `context` parameter.
+The following symbols and classes are available to the function via the `jp` parameter, e.g.: `jp.NodeList`. The function current context value is available via the `context` parameter.
 
 ```typescript
-interface JSONPathFunctionContext {
+interface FunctionContext {
     reportWarning(message: string): void;
     reportParameterWarning(parameterIndex: number, message: string): void;
 }
 
-type JSONPathJSONValue = string | number | boolean | null | JSONPathJSONValue[] | { [key: string]: JSONPathJSONValue };
-const JSONPathNothing: unique symbol;
+type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
+const Nothing: unique symbol;
 
-const JSONPathLogicalTrue: unique symbol;
-const JSONPathLogicalFalse: unique symbol;
+const LogicalTrue: unique symbol;
+const LogicalFalse: unique symbol;
 
-class JSONPathNodeList {
+class NodeList {
     constructor(
-        readonly nodes: readonly LocatedNode[]
+        readonly nodes: readonly Node[]
     );
 }
 
-class LocatedNode {
+class Node {
     constructor(
-        readonly value: JSONPathJSONValue,
-        readonly pathSegment: string | number,
-        readonly parent: LocatedNode | null
+        readonly value: JSONValue,
+        readonly pathSegment: NormalizedPathSegment,
+        readonly parent: Node | null
     );
-    buildPath(): (string | number)[];
+    buildPath(): NormalizedPath;
 }
 
-type JSONPathValueType = JSONPathJSONValue | typeof JSONPathNothing;
-type JSONPathLogicalType = typeof JSONPathLogicalTrue | typeof JSONPathLogicalFalse;
-type JSONPathNodesType = JSONPathNodeList;
+type NormalizedPath = readonly NormalizedPathSegment[];
+type NormalizedPathSegment = string | number;
+
+type ValueType = JSONValue | typeof JSONPathNothing;
+type LogicalType = typeof JSONPathLogicalTrue | typeof JSONPathLogicalFalse;
+type NodesType = NodeList;
 ```
