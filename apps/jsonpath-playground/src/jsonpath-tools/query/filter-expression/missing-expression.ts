@@ -1,7 +1,7 @@
 import { FilterValue, Nothing } from "../../types";
 import { FilterExpressionContext, QueryContext } from "../evaluation";
 import { SyntaxTreeType } from "../syntax-tree-type";
-import { SyntaxTreeToken } from "../token";
+import { SyntaxTreeToken } from "../syntax-tree-token";
 import { FilterExpression } from "./filter-expression";
 
 

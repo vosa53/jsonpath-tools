@@ -1,10 +1,10 @@
 import { Function, QueryOptions } from "../options";
-import { BooleanLiteralExpression } from "../query/filter-expression/boolean-literal";
+import { BooleanLiteralExpression } from "../query/filter-expression/boolean-literal-expression";
 import { ComparisonExpression, JSONPathComparisonOperator } from "../query/filter-expression/comparison-expression";
 import { FunctionExpression } from "../query/filter-expression/function-expression";
-import { NumberLiteralExpression } from "../query/filter-expression/number-literal";
-import { StringLiteralExpression } from "../query/filter-expression/string-literal";
-import { SubQuery } from "../query/query";
+import { NumberLiteralExpression } from "../query/filter-expression/number-literal-expression";
+import { StringLiteralExpression } from "../query/filter-expression/string-literal-expression";
+import { SubQuery } from "../query/sub-query";
 import { Segment } from "../query/segment";
 import { IndexSelector } from "../query/selectors/index-selector";
 import { NameSelector } from "../query/selectors/name-selector";

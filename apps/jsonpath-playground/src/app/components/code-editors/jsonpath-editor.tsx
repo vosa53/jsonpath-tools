@@ -1,5 +1,5 @@
 import { defaultQueryOptions, QueryOptions } from "@/jsonpath-tools/options";
-import { Query } from "@/jsonpath-tools/query/json-path";
+import { Query } from "@/jsonpath-tools/query/query";
 import { JSONValue } from "@/jsonpath-tools/types";
 import { syntaxTree } from "@codemirror/language";
 import { EditorView, keymap } from "@codemirror/view";

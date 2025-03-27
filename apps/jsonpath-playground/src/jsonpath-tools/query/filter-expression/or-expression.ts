@@ -2,7 +2,7 @@ import { FilterValue, LogicalFalse, LogicalTrue } from "../../types";
 import { FilterExpressionContext, QueryContext } from "../evaluation";
 import { evaluateAsLogicalType } from "../helpers";
 import { SyntaxTreeType } from "../syntax-tree-type";
-import { SyntaxTreeToken } from "../token";
+import { SyntaxTreeToken } from "../syntax-tree-token";
 import { FilterExpression } from "./filter-expression";
 
 

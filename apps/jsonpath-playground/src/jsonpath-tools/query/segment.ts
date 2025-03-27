@@ -1,9 +1,9 @@
 import { QueryContext, PushOnlyArray } from "./evaluation";
-import { Node } from "./located-node";
-import { SyntaxTreeNode } from "./node";
+import { Node } from "../node";
+import { SyntaxTreeNode } from "./syntax-tree-node";
 import { Selector } from "./selectors/selector";
 import { SyntaxTreeType } from "./syntax-tree-type";
-import { SyntaxTreeToken } from "./token";
+import { SyntaxTreeToken } from "./syntax-tree-token";
 
 
 export class Segment extends SyntaxTreeNode {

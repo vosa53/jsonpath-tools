@@ -2,7 +2,7 @@ import { getJSONTypeName } from "../data-types/json-types";
 import { DataTypeAnalyzer } from "../data-types/data-type-analyzer";
 import { DataType, DataTypeAnnotation } from "../data-types/data-types";
 import { QueryOptions } from "../options";
-import { Query } from "../query/json-path";
+import { Query } from "../query/query";
 import { SyntaxTree } from "../query/syntax-tree";
 import { SyntaxTreeType } from "../query/syntax-tree-type";
 import { TextRange } from "../text-range";

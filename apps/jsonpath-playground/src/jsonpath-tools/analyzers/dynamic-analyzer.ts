@@ -1,7 +1,7 @@
 import { Diagnostics, DiagnosticsType } from "../diagnostics";
 import { QueryOptions } from "../options";
 import { QueryContext } from "../query/evaluation";
-import { Query } from "../query/json-path";
+import { Query } from "../query/query";
 import { Selector } from "../query/selectors/selector";
 import { JSONValue, NodeList } from "../types";
 

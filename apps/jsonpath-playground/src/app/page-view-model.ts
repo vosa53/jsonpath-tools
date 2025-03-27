@@ -1,5 +1,5 @@
 import { Diagnostics } from "@/jsonpath-tools/diagnostics";
-import { Query } from "@/jsonpath-tools/query/json-path";
+import { Query } from "@/jsonpath-tools/query/query";
 import { NormalizedPath, remove, replace, toJSONPointer, toNormalizedPath } from "@/jsonpath-tools/transformations";
 import { JSONValue, Nothing } from "@/jsonpath-tools/types";
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";

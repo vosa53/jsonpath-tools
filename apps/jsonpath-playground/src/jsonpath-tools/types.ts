@@ -1,4 +1,4 @@
-import { Node } from "./query/located-node";
+import { Node } from "./node";
 
 export type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
 export const Nothing: unique symbol = Symbol("Nothing");

@@ -1,6 +1,6 @@
-import { SyntaxTreeNode } from "./query/node";
+import { SyntaxTreeNode } from "./query/syntax-tree-node";
 import { SyntaxTree } from "./query/syntax-tree";
-import { SyntaxTreeToken } from "./query/token";
+import { SyntaxTreeToken } from "./query/syntax-tree-token";
 
 export function createSyntaxTree(syntaxTree: SyntaxTree, colored = false, indentationLevel = 0): string {
     let text = ' '.repeat(indentationLevel * 4);

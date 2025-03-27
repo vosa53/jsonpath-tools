@@ -1,6 +1,6 @@
 import { FilterValue } from "../../types";
 import { FilterExpressionContext, QueryContext } from "../evaluation";
-import { SubQuery } from "../query";
+import { SubQuery } from "../sub-query";
 import { SyntaxTreeType } from "../syntax-tree-type";
 import { FilterExpression } from "./filter-expression";
 

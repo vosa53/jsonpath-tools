@@ -1,7 +1,7 @@
 import { QueryOptions } from "../options";
 import { FunctionExpression } from "../query/filter-expression/function-expression";
-import { Query } from "../query/json-path";
-import { SubQuery } from "../query/query";
+import { Query } from "../query/query";
+import { SubQuery } from "../query/sub-query";
 import { FilterSelector } from "../query/selectors/filter-selector";
 import { SyntaxTree } from "../query/syntax-tree";
 import { SyntaxTreeType } from "../query/syntax-tree-type";

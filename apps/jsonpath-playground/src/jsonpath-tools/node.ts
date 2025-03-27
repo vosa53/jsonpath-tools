@@ -1,4 +1,4 @@
-import { JSONValue } from "../types";
+import { JSONValue } from "./types";
 
 export class Node {
     constructor(

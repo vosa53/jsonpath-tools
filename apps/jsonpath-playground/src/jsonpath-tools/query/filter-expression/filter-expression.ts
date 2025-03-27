@@ -1,6 +1,6 @@
 import { FilterValue } from "../../types";
 import { FilterExpressionContext, QueryContext } from "../evaluation";
-import { SyntaxTreeNode } from "../node";
+import { SyntaxTreeNode } from "../syntax-tree-node";
 
 
 export abstract class FilterExpression extends SyntaxTreeNode {

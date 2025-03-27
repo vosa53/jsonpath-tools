@@ -3,7 +3,7 @@ import { StaticAnalyzer } from "../analyzers/static-analyzer";
 import { AnyDataType, DataType } from "../data-types/data-types";
 import { Diagnostics } from "../diagnostics";
 import { defaultQueryOptions, FunctionHandler, QueryOptions } from "../options";
-import { Query } from "../query/json-path";
+import { Query } from "../query/query";
 import { TypeChecker } from "../semantic-analysis/type-checker";
 import { Parser } from "../syntax-analysis/parser";
 import { TextChange } from "../text-change";

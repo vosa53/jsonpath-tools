@@ -2,9 +2,9 @@ import { LogicalTrue } from "../../types";
 import { FilterExpressionContext, QueryContext, PushOnlyArray } from "../evaluation";
 import { FilterExpression } from "../filter-expression/filter-expression";
 import { evaluateAsLogicalType } from "../helpers";
-import { Node } from "../located-node";
+import { Node } from "../../node";
 import { SyntaxTreeType } from "../syntax-tree-type";
-import { SyntaxTreeToken } from "../token";
+import { SyntaxTreeToken } from "../syntax-tree-token";
 import { Selector } from "./selector";
 
 

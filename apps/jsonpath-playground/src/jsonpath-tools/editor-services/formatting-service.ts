@@ -4,9 +4,9 @@ import { FunctionExpression } from "../query/filter-expression/function-expressi
 import { NotExpression } from "../query/filter-expression/not-expression";
 import { OrExpression } from "../query/filter-expression/or-expression";
 import { ParanthesisExpression } from "../query/filter-expression/paranthesis-expression";
-import { Query } from "../query/json-path";
-import { SyntaxTreeNode } from "../query/node";
-import { SubQuery } from "../query/query";
+import { Query } from "../query/query";
+import { SyntaxTreeNode } from "../query/syntax-tree-node";
+import { SubQuery } from "../query/sub-query";
 import { Segment } from "../query/segment";
 import { FilterSelector } from "../query/selectors/filter-selector";
 import { SliceSelector } from "../query/selectors/slice-selector";

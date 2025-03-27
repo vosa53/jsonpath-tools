@@ -1,5 +1,5 @@
 import { TextRange } from "../text-range";
-import type { SyntaxTreeNode } from "./node";
+import type { SyntaxTreeNode } from "./syntax-tree-node";
 import { SyntaxTreeType } from "./syntax-tree-type";
 
 export abstract class SyntaxTree {

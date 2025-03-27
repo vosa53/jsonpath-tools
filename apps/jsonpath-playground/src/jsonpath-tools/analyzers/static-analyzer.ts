@@ -1,6 +1,6 @@
 import { DataType, isSubtypeOf, NeverDataType } from "../data-types/data-types";
 import { QueryOptions } from "../options";
-import { Query } from "../query/json-path";
+import { Query } from "../query/query";
 import { Diagnostics, DiagnosticsType } from "../diagnostics";
 import { Selector } from "../query/selectors/selector";
 import { DataTypeAnalyzer } from "../data-types/data-type-analyzer";

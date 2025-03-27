@@ -1,6 +1,6 @@
 import { QueryContext, PushOnlyArray } from "../evaluation";
-import { Node } from "../located-node";
-import { SyntaxTreeNode } from "../node";
+import { Node } from "../../node";
+import { SyntaxTreeNode } from "../syntax-tree-node";
 
 
 export abstract class Selector extends SyntaxTreeNode {

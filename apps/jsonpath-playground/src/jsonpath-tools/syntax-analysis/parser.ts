@@ -1,19 +1,19 @@
 import { Diagnostics, DiagnosticsType } from "../diagnostics";
 import { AndExpression } from "../query/filter-expression/and-expression";
-import { BooleanLiteralExpression } from "../query/filter-expression/boolean-literal";
+import { BooleanLiteralExpression } from "../query/filter-expression/boolean-literal-expression";
 import { ComparisonExpression, JSONPathComparisonOperator } from "../query/filter-expression/comparison-expression";
 import { FilterExpression } from "../query/filter-expression/filter-expression";
 import { FilterQueryExpression } from "../query/filter-expression/filter-query-expression";
 import { FunctionExpression } from "../query/filter-expression/function-expression";
 import { MissingExpression } from "../query/filter-expression/missing-expression";
 import { NotExpression } from "../query/filter-expression/not-expression";
-import { NullLiteralExpression } from "../query/filter-expression/null-literal";
-import { NumberLiteralExpression } from "../query/filter-expression/number-literal";
+import { NullLiteralExpression } from "../query/filter-expression/null-literal-expression";
+import { NumberLiteralExpression } from "../query/filter-expression/number-literal-expression";
 import { OrExpression } from "../query/filter-expression/or-expression";
 import { ParanthesisExpression } from "../query/filter-expression/paranthesis-expression";
-import { StringLiteralExpression } from "../query/filter-expression/string-literal";
-import { Query } from "../query/json-path";
-import { SubQuery } from "../query/query";
+import { StringLiteralExpression } from "../query/filter-expression/string-literal-expression";
+import { Query } from "../query/query";
+import { SubQuery } from "../query/sub-query";
 import { Segment } from "../query/segment";
 import { FilterSelector } from "../query/selectors/filter-selector";
 import { IndexSelector } from "../query/selectors/index-selector";
@@ -23,7 +23,7 @@ import { Selector } from "../query/selectors/selector";
 import { SliceSelector } from "../query/selectors/slice-selector";
 import { WildcardSelector } from "../query/selectors/wildcard-selector";
 import { SyntaxTreeType } from "../query/syntax-tree-type";
-import { SyntaxTreeToken } from "../query/token";
+import { SyntaxTreeToken } from "../query/syntax-tree-token";
 import { TextRange } from "../text-range";
 
 export class Parser {

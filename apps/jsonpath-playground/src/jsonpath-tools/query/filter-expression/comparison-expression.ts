@@ -2,7 +2,7 @@ import { deepEquals, FilterValue, LogicalFalse, LogicalTrue, Nothing, ValueType 
 import { FilterExpressionContext, QueryContext } from "../evaluation";
 import { evaluateAsValueType } from "../helpers";
 import { SyntaxTreeType } from "../syntax-tree-type";
-import { SyntaxTreeToken } from "../token";
+import { SyntaxTreeToken } from "../syntax-tree-token";
 import { FilterExpression } from "./filter-expression";
 
 export class ComparisonExpression extends FilterExpression {

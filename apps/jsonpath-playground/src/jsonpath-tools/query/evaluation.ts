@@ -2,8 +2,8 @@ import { Diagnostics } from "../diagnostics";
 import { QueryOptions } from "../options";
 import { FilterValue, JSONValue } from "../types";
 import { FilterExpression } from "./filter-expression/filter-expression";
-import { Node } from "./located-node";
-import { SubQuery } from "./query";
+import { Node } from "../node";
+import { SubQuery } from "./sub-query";
 import { Segment } from "./segment";
 import { Selector } from "./selectors/selector";
 
