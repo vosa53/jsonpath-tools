@@ -1,12 +1,12 @@
 import { NormalizedPath } from "./normalized-path";
 import { JSONValue } from "./json/json-types";
 
-export function replaceAtPaths(value: JSONValue, paths: readonly NormalizedPath[], replacer: (value: JSONValue) => JSONValue | undefined): JSONValue {
-    return replaceOrRemoveAtPaths(value, paths, replacer) as JSONValue;
+export function replaceAtPaths(value: JSONValue, paths: readonly NormalizedPath[], replacer: (value: JSONValue) => JSONValue | undefined): JSONValue | undefined {
+    return replaceOrRemoveAtPaths(value, paths, replacer);
 }
 
 export function removeAtPaths(value: JSONValue, paths: readonly NormalizedPath[]): JSONValue | undefined {
-    return replaceOrRemoveAtPaths(value, paths, () => undefined) as JSONValue;
+    return replaceOrRemoveAtPaths(value, paths, () => undefined);
 }
 
 function replaceOrRemoveAtPaths(value: JSONValue, paths: readonly NormalizedPath[], replacer: (value: JSONValue) => JSONValue | undefined): JSONValue | undefined {
