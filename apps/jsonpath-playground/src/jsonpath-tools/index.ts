@@ -1,3 +1,7 @@
+/**
+ * @module @jsonpath-tools/jsonpath
+ */
+
 import { DataType, DataTypeAnnotation } from "./data-types/data-types";
 import { jsonSchemaToType } from "./data-types/json-schema-data-type-converter";
 import { jsonTypeDefinitionToType } from "./data-types/json-type-definition-data-type-converter";

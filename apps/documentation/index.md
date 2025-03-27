@@ -8,13 +8,13 @@ hero:
   actions:
     - theme: brand
       text: Evaluator Quickstart
-      link: /evaluator/get-started
+      link: /documentation/evaluator/get-started
     - theme: brand
       text: Editor Quickstart
-      link: /editor/get-started
+      link: /documentation/editor/get-started
     - theme: alt
       text: Documentation
-      link: /introduction/overview
+      link: /documentation/introduction/overview
     - theme: alt
       text: API Reference
       link: /api

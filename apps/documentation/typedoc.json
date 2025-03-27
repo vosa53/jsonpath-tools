@@ -1,6 +1,7 @@
 {
     "entryPoints": [
-        "../jsonpath-playground/src/jsonpath-tools/data-types/data-types.ts"
+        "../jsonpath-playground/src/jsonpath-tools/index.ts",
+        "../jsonpath-playground/src/app/components/code-editors/codemirror/jsonpath-codemirror/index.ts"
     ],
     "plugin": [
         "typedoc-plugin-markdown",
