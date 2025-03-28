@@ -28,8 +28,8 @@ export enum SyntaxTreeType {
     closingBracketToken = "ClosingBracketToken",
     endOfFileToken = "EndOfFileToken",
     missingToken = "MissingToken",
-    root = "Root",
     query = "Query",
+    subQuery = "SubQuery",
     segment = "Segment",
     nameSelector = "NameSelector",
     wildcardSelector = "WildcardSelector",
@@ -44,9 +44,9 @@ export enum SyntaxTreeType {
     comparisonExpression = "ComparisonExpression",
     filterQueryExpression = "FilterQueryExpression",
     functionExpression = "FunctionExpression",
-    numberLiteral = "NumberLiteral",
-    stringLiteral = "StringLiteral",
-    booleanLiteral = "BooleanLiteral",
-    nullLiteral = "NullLiteral",
+    numberLiteralExpression = "NumberLiteralExpression",
+    stringLiteralExpression = "StringLiteralExpression",
+    booleanLiteralExpression = "BooleanLiteralExpression",
+    nullLiteralExpression = "NullLiteralExpression",
     missingExpression = "MissingExpression"
 }

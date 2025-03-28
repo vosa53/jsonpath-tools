@@ -17,7 +17,7 @@ export class Query extends SyntaxTreeNode {
         super([query, endOfFileToken]);
     }
 
-    get type() { return SyntaxTreeType.root; }
+    get type() { return SyntaxTreeType.query; }
 
     select(queryContext: QueryContext): NodeList {
         return this.query.select(queryContext, null);

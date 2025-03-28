@@ -14,7 +14,7 @@ export class BooleanLiteralExpression extends FilterExpression {
         super([valueToken]);
     }
 
-    get type() { return SyntaxTreeType.booleanLiteral; }
+    get type() { return SyntaxTreeType.booleanLiteralExpression; }
 
     protected evaluateImplementation(queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): FilterValue {
         return this.value;

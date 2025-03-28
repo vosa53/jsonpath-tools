@@ -29,11 +29,11 @@ export class DocumentHighlightsService {
             if (Object.hasOwn(this.options.functions, lastButOneNode.name))
                 this.highlightFunctions(query, lastButOneNode.name, documentHighlights);
         }
-        if (lastNode.type === SyntaxTreeType.dollarToken && lastButOneNode.type === SyntaxTreeType.query) {
+        if (lastNode.type === SyntaxTreeType.dollarToken && lastButOneNode.type === SyntaxTreeType.subQuery) {
             this.highlightRootIdentifier(query, documentHighlights);
         }
         if (lastNode.type === SyntaxTreeType.questionMarkToken && lastButOneNode.type === SyntaxTreeType.filterSelector ||
-            lastNode.type === SyntaxTreeType.atToken && lastButOneNode.type === SyntaxTreeType.query) {
+            lastNode.type === SyntaxTreeType.atToken && lastButOneNode.type === SyntaxTreeType.subQuery) {
                 let current: SyntaxTree | null = node;
                 while (current !== null && !(current instanceof FilterSelector))
                     current = current.parent;

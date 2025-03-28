@@ -87,7 +87,7 @@ function getLabel(tree: SyntaxTree): string {
 }
 
 const classNameMap = new Map<SyntaxTreeType, string>([
-    [SyntaxTreeType.query, classes.query],
+    [SyntaxTreeType.subQuery, classes.query],
     [SyntaxTreeType.segment, classes.segment],
     [SyntaxTreeType.nameSelector, classes.selector],
     [SyntaxTreeType.indexSelector, classes.selector],
@@ -100,10 +100,10 @@ const classNameMap = new Map<SyntaxTreeType, string>([
     [SyntaxTreeType.orExpression, classes.logicalOperator],
     [SyntaxTreeType.notExpression, classes.logicalOperator],
     [SyntaxTreeType.comparisonExpression, classes.comparisonOperator],
-    [SyntaxTreeType.stringLiteral, classes.literal],
-    [SyntaxTreeType.numberLiteral, classes.literal],
-    [SyntaxTreeType.nullLiteral, classes.literal],
-    [SyntaxTreeType.booleanLiteral, classes.literal],
+    [SyntaxTreeType.stringLiteralExpression, classes.literal],
+    [SyntaxTreeType.numberLiteralExpression, classes.literal],
+    [SyntaxTreeType.nullLiteralExpression, classes.literal],
+    [SyntaxTreeType.booleanLiteralExpression, classes.literal],
     [SyntaxTreeType.filterQueryExpression, classes.filterQueryExpression],
     [SyntaxTreeType.paranthesisExpression, classes.paranthesisExpression],
     [SyntaxTreeType.missingExpression, classes.missing]

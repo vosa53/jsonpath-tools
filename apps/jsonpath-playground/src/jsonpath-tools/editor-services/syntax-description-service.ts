@@ -15,7 +15,7 @@ import { SyntaxTreeType } from "../query/syntax-tree-type";
 
 export class SyntaxDescriptionService {
     private readonly descriptionProviders = new Map<SyntaxTreeType, (node: SyntaxTree) => SyntaxDescription>([
-        [SyntaxTreeType.query, n => {
+        [SyntaxTreeType.subQuery, n => {
             const query = n as SubQuery;
             return this.provideDescriptionForQuery(query.isRelative);
         }],
@@ -56,19 +56,19 @@ export class SyntaxDescriptionService {
             const functionExpression = n as FunctionExpression;
             return this.provideDescriptionForFunctionExpression(functionExpression.name, this.options.functions[functionExpression.name]);
         }],
-        [SyntaxTreeType.stringLiteral, n => {
+        [SyntaxTreeType.stringLiteralExpression, n => {
             const stringLiteral = n as StringLiteralExpression;
             return this.provideDescriptionForStringLiteralExpression(stringLiteral.value);
         }],
-        [SyntaxTreeType.numberLiteral, n => {
+        [SyntaxTreeType.numberLiteralExpression, n => {
             const numberLiteral = n as NumberLiteralExpression;
             return this.provideDescriptionForNumberLiteralExpression(numberLiteral.value);
         }],
-        [SyntaxTreeType.booleanLiteral, n => {
+        [SyntaxTreeType.booleanLiteralExpression, n => {
             const booleanLiteral = n as BooleanLiteralExpression;
             return this.provideDescriptionForBooleanLiteralExpression(booleanLiteral.value);
         }],
-        [SyntaxTreeType.nullLiteral, n => this.provideDescriptionForNullLiteralExpression()],
+        [SyntaxTreeType.nullLiteralExpression, n => this.provideDescriptionForNullLiteralExpression()],
         [SyntaxTreeType.missingExpression, n => new SyntaxDescription("Missing Expression", "Represents a mising expression (syntax error).")],
 
         [SyntaxTreeType.dollarToken, n => this.provideDescriptionForDollarToken()],

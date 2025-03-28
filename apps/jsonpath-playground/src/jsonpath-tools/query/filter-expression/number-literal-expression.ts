@@ -14,7 +14,7 @@ export class NumberLiteralExpression extends FilterExpression {
         super([valueToken]);
     }
 
-    get type() { return SyntaxTreeType.numberLiteral; }
+    get type() { return SyntaxTreeType.numberLiteralExpression; }
 
     protected evaluateImplementation(queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): FilterValue {
         return this.value;

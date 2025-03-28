@@ -12,7 +12,7 @@ export class NullLiteralExpression extends FilterExpression {
         super([valueToken]);
     }
 
-    get type() { return SyntaxTreeType.nullLiteral; }
+    get type() { return SyntaxTreeType.nullLiteralExpression; }
 
     protected evaluateImplementation(queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): FilterValue {
         return null;

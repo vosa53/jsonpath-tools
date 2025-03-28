@@ -32,8 +32,8 @@ function createNodeSet(types: SyntaxTreeType[]): { nodeSet: NodeSet, treeTypeToN
 }
 
 const { nodeSet, treeTypeToNodeId } = createNodeSet([
-    SyntaxTreeType.root,
     SyntaxTreeType.query,
+    SyntaxTreeType.subQuery,
     SyntaxTreeType.segment,
     SyntaxTreeType.nameSelector,
     SyntaxTreeType.wildcardSelector,
@@ -48,10 +48,10 @@ const { nodeSet, treeTypeToNodeId } = createNodeSet([
     SyntaxTreeType.comparisonExpression,
     SyntaxTreeType.filterQueryExpression,
     SyntaxTreeType.functionExpression,
-    SyntaxTreeType.numberLiteral,
-    SyntaxTreeType.stringLiteral,
-    SyntaxTreeType.booleanLiteral,
-    SyntaxTreeType.nullLiteral,
+    SyntaxTreeType.numberLiteralExpression,
+    SyntaxTreeType.stringLiteralExpression,
+    SyntaxTreeType.booleanLiteralExpression,
+    SyntaxTreeType.nullLiteralExpression,
     SyntaxTreeType.missingExpression,
     SyntaxTreeType.dollarToken,
     SyntaxTreeType.atToken,
@@ -140,14 +140,14 @@ class CodeMirrorJSONPathParser extends Parser {
                 }
             }),
             indentNodeProp.add({
-                [SyntaxTreeType.query]: continuedIndent(),
+                [SyntaxTreeType.subQuery]: continuedIndent(),
                 [SyntaxTreeType.segment]: delimitedIndent({ closing: "]", align: false }),
                 [SyntaxTreeType.paranthesisExpression]: delimitedIndent({ closing: ")", align: false }),
                 [SyntaxTreeType.functionExpression]: delimitedIndent({ closing: ")", align: false }),
                 [SyntaxTreeType.stringToken]: c => 0,
             }),
             languageDataProp.add(NodeType.match({
-                [SyntaxTreeType.root]: languageFacet
+                [SyntaxTreeType.query]: languageFacet
             }))
         );
     }
@@ -165,7 +165,7 @@ class CodeMirrorJSONPathParser extends Parser {
         const tree = Tree.build({
             buffer: buffer,
             nodeSet: this.nodeSet,
-            topID: treeTypeToNodeId.get(SyntaxTreeType.root)!,
+            topID: treeTypeToNodeId.get(SyntaxTreeType.query)!,
         });
         const treeBuildTime = performance.now() - start - parseTime;
         console.log("PARSE TIME:", parseTime, "ms", "TREE BUILD TIME", treeBuildTime, "ms");

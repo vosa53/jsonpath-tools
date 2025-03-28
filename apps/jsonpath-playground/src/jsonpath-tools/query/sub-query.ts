@@ -20,7 +20,7 @@ export class SubQuery extends SyntaxTreeNode {
         super([identifierToken, ...segments]);
     }
 
-    get type() { return SyntaxTreeType.query; }
+    get type() { return SyntaxTreeType.subQuery; }
 
     get isSingular() {
         return this.segments.every(s => {

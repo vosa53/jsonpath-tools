@@ -61,10 +61,10 @@ export class CompletionProvider {
         }
         if (
             lastButOneNode.type === SyntaxTreeType.missingExpression ||
-            lastButOneNode.type === SyntaxTreeType.stringLiteral ||
-            lastButOneNode.type === SyntaxTreeType.numberLiteral ||
-            lastButOneNode.type === SyntaxTreeType.booleanLiteral ||
-            lastButOneNode.type === SyntaxTreeType.nullLiteral
+            lastButOneNode.type === SyntaxTreeType.stringLiteralExpression ||
+            lastButOneNode.type === SyntaxTreeType.numberLiteralExpression ||
+            lastButOneNode.type === SyntaxTreeType.booleanLiteralExpression ||
+            lastButOneNode.type === SyntaxTreeType.nullLiteralExpression
         ) {
             const range = lastButOneNode.textRangeWithoutSkipped;
             if (lastButOneNode.parent instanceof ComparisonExpression) {
@@ -77,8 +77,8 @@ export class CompletionProvider {
         if (lastButOneNode.type === SyntaxTreeType.missingExpression ||
             lastNode.type === SyntaxTreeType.nameToken && (
                 lastButOneNode.type === SyntaxTreeType.functionExpression ||
-                lastButOneNode.type === SyntaxTreeType.booleanLiteral ||
-                lastButOneNode.type === SyntaxTreeType.nullLiteral
+                lastButOneNode.type === SyntaxTreeType.booleanLiteralExpression ||
+                lastButOneNode.type === SyntaxTreeType.nullLiteralExpression
             )) {
             const range = lastButOneNode.textRangeWithoutSkipped;
             this.completeFunctions(completions, lastNode.textRangeWithoutSkipped);

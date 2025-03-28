@@ -61,13 +61,13 @@ export class TooltipService {
             lastNode.type === SyntaxTreeType.exclamationMarkEqualsToken
         ) && lastButOneNode.type === SyntaxTreeType.comparisonExpression)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if (lastNode.type === SyntaxTreeType.stringToken && lastButOneNode.type === SyntaxTreeType.stringLiteral)
+        else if (lastNode.type === SyntaxTreeType.stringToken && lastButOneNode.type === SyntaxTreeType.stringLiteralExpression)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if (lastNode.type === SyntaxTreeType.numberToken && lastButOneNode.type === SyntaxTreeType.numberLiteral)
+        else if (lastNode.type === SyntaxTreeType.numberToken && lastButOneNode.type === SyntaxTreeType.numberLiteralExpression)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if ((lastNode.type === SyntaxTreeType.trueToken || lastNode.type === SyntaxTreeType.falseToken) && lastButOneNode.type === SyntaxTreeType.booleanLiteral)
+        else if ((lastNode.type === SyntaxTreeType.trueToken || lastNode.type === SyntaxTreeType.falseToken) && lastButOneNode.type === SyntaxTreeType.booleanLiteralExpression)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
-        else if (lastNode.type === SyntaxTreeType.nullToken && lastButOneNode.type === SyntaxTreeType.nullLiteral)
+        else if (lastNode.type === SyntaxTreeType.nullToken && lastButOneNode.type === SyntaxTreeType.nullLiteralExpression)
             return this.createTooltip(lastButOneNode, query, queryArgument, queryArgumentType);
         else if (lastNode.type === SyntaxTreeType.dollarToken)
             return this.createTooltip(lastNode, query, queryArgument, queryArgumentType);
