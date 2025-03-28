@@ -1,26 +1,21 @@
 import { describe, expect, it } from 'vitest';
 
 import cts from "./jsonpath-compliance-test-suite/cts.json";
-import { Parser } from './syntax-analysis/parser';
-import { TypeChecker } from './semantic-analysis/type-checker';
 import { defaultQueryOptions } from './options';
 import { jsonDeepEquals } from "./json/deep-equals";
 import { JSONValue } from './json/json-types';
 import { serializedNormalizedPath } from './serialization/serialization';
+import { JSONPath } from './jsonpath';
 
 describe("JSONPath Compliance Test Suite", () => {
     for (const test of cts.tests) {
         it(test.name, () => {
-            const parser = new Parser();
-            const typeChecker = new TypeChecker(defaultQueryOptions);
             const queryText = test.selector;
-            const query = parser.parse(queryText);
-            const errorCount = query.syntaxDiagnostics.length + typeChecker.check(query).length;
 
             if (test.invalid_selector === true)
-                expect(errorCount).toBeGreaterThan(0);
+                expect(() => JSONPath.parse(queryText)).toThrow();
             else {
-                expect(errorCount).toBe(0);
+                const query = JSONPath.parse(queryText);
                 if (test.document !== undefined) {
                     const result = query.select({ argument: test.document as JSONValue, options: defaultQueryOptions });
                     const resultValues = result.nodes.map(n => n.value);
