@@ -22,3 +22,8 @@ export interface FunctionContext {
     reportWarning(message: string): void;
     reportParameterWarning(parameterIndex: number, message: string): void;
 }
+
+export const nullFunctionContext: FunctionContext = {
+    reportParameterWarning(parameterIndex, message) { },
+    reportWarning(message) { }
+};

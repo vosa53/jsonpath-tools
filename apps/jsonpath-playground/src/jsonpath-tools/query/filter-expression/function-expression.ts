@@ -1,5 +1,5 @@
 import { Diagnostics, DiagnosticsType } from "@/jsonpath-tools/diagnostics";
-import { FunctionContext } from "@/jsonpath-tools/functions/function";
+import { FunctionContext, nullFunctionContext } from "@/jsonpath-tools/functions/function";
 import { FilterValue, Nothing } from "../../values/types";
 import { FilterExpressionContext, QueryContext } from "../evaluation";
 import { evaluateAs } from "../evaluation";
@@ -67,8 +67,3 @@ class QueryContextFunctionContext implements FunctionContext {
         this.reportDiagnosticsCallback(warning);
     }
 }
-
-const nullFunctionContext: FunctionContext = {
-    reportParameterWarning(parameterIndex, message) { },
-    reportWarning(message) { }
-};
