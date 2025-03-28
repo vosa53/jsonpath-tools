@@ -5,6 +5,8 @@ import { Parser } from './syntax-analysis/parser';
 import { TypeChecker } from './semantic-analysis/type-checker';
 import { defaultQueryOptions } from './options';
 import { jsonDeepEquals } from "./json/deep-equals";
+import { JSONValue } from './json/json-types';
+import { serializedNormalizedPath } from './serialization/serialization';
 
 describe("JSONPath Compliance Test Suite", () => {
     for (const test of cts.tests) {
@@ -13,23 +15,24 @@ describe("JSONPath Compliance Test Suite", () => {
             const typeChecker = new TypeChecker(defaultQueryOptions);
             const queryText = test.selector;
             const query = parser.parse(queryText);
-            const errorsCount = query.syntaxDiagnostics.length + typeChecker.check(query).length;
+            const errorCount = query.syntaxDiagnostics.length + typeChecker.check(query).length;
 
             if (test.invalid_selector === true)
-                expect(errorsCount).toBeGreaterThan(0);
+                expect(errorCount).toBeGreaterThan(0);
             else {
-                expect(errorsCount).toBe(0);
+                expect(errorCount).toBe(0);
                 if (test.document !== undefined) {
-                    // @ts-ignore
-                    const result = query.select({ argument: test.document, options: defaultQueryOptions });
+                    const result = query.select({ argument: test.document as JSONValue, options: defaultQueryOptions });
                     const resultValues = result.nodes.map(n => n.value);
-                    const resultPaths = result.nodes.map(n => n.buildPath());
-                    if (test.results !== undefined) {
-                        // @ts-ignore
-                        expect(test.results.some(r => jsonDeepEquals(r, resultValues))).toBeTruthy();
-                    }
+                    const resultPaths = result.nodes.map(n => serializedNormalizedPath(n.buildPath()));
                     if (test.result !== undefined)
                         expect(resultValues).toEqual(test.result);
+                    if (test.results !== undefined)
+                        expect(test.results.some(r => jsonDeepEquals(r as JSONValue, resultValues))).toBeTruthy();
+                    if (test.result_paths !== undefined)
+                        expect(resultPaths).toEqual(test.result_paths);
+                    if (test.results_paths !== undefined)
+                        expect(test.results_paths.some(r => jsonDeepEquals(r as JSONValue, resultPaths))).toBeTruthy();
                 }
             }
         });
