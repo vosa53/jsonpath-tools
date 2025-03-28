@@ -10,7 +10,7 @@ export class JSONPath {
     static select(queryText: string, queryArgument: JSONValue, queryOptions: QueryOptions = defaultQueryOptions): NodeList {
         const query = this.parse(queryText);
         return query.select({
-            rootNode: queryArgument,
+            argument: queryArgument,
             options: queryOptions
         });
     }

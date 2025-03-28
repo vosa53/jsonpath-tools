@@ -11,7 +11,7 @@ import { IndexOnlyArray } from "../helpers/array";
 import { NodeList } from "../values/node-list";
 
 export interface QueryContext {
-    readonly rootNode: JSONValue;
+    readonly argument: JSONValue;
     readonly options: QueryOptions;
     readonly queryInstrumentationCallback?: (query: SubQuery, input: Node, outputArray: IndexOnlyArray<Node>, outputStartIndex: number, outputLength: number) => void;
     readonly segmentInstrumentationCallback?: (segment: Segment, input: Node, outputArray: IndexOnlyArray<Node>, outputStartIndex: number, outputLength: number) => void;
@@ -21,7 +21,7 @@ export interface QueryContext {
 }
 
 export interface FilterExpressionContext {
-    readonly currentNode: JSONValue;
+    readonly current: JSONValue;
 }
 
 export function evaluateAsLogicalType(expression: FilterExpression, queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): LogicalType {

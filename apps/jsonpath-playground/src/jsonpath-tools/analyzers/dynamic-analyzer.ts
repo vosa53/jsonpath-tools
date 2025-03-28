@@ -15,7 +15,7 @@ export class DynamicAnalyzer {
         const selectorsThatProducedOutput = new Set<Selector>();
         const diagnosticsJSON = new Set<string>();
         const queryContext: QueryContext = {
-            rootNode: queryArgument, 
+            argument: queryArgument, 
             options: this.options, 
             selectorInstrumentationCallback(s, i, oa, osi, ol) {
                 if (ol !== 0)

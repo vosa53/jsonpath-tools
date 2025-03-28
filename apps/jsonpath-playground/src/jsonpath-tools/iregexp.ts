@@ -5,7 +5,7 @@ export class IRegexp {
 
     static convertToECMAScriptRegExp(iRegexp: string, fullMatch: boolean): RegExp {
         const parseResult = this.iRegexpParser.parse(iRegexp);
-        if (!parseResult.isSuccess) throw new Error("Invalid IRegexp.");
+        if (!parseResult.isSuccess) throw new Error("Invalid I-Regexp.");
         
         let iRegexpCharacters = iRegexp.split("");
         for (const dotIndex of parseResult.dotIndices)
@@ -17,7 +17,7 @@ export class IRegexp {
             return new RegExp(transformedIRegexp, "u");
         }
         catch {
-            throw new Error("Invalid IRegexp.");
+            throw new Error("Invalid I-Regexp.");
         }
     }
 }

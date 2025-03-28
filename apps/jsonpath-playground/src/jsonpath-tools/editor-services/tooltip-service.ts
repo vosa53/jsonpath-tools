@@ -113,7 +113,7 @@ export class TooltipService {
         }
 
         query.select({
-            rootNode: queryArgument,
+            argument: queryArgument,
             options: this.options,
             queryInstrumentationCallback: (query, input, outputArray, outputStartIndex, outputLength) => {
                 if (query.identifierToken !== node) return;

@@ -241,7 +241,7 @@ export class CompletionProvider {
     private getAllNodesOutputtedFromSegment(queryArgument: JSONValue, jsonPath: Query, segment: Segment): Node[] {
         const values: Node[] = [];
         const queryContext: QueryContext = {
-            rootNode: queryArgument,
+            argument: queryArgument,
             options: this.options,
             segmentInstrumentationCallback(s, i) {
                 if (s === segment)
@@ -255,7 +255,7 @@ export class CompletionProvider {
     private getAllLiteralsOutputtedFromExpression(queryArgument: JSONValue, jsonPath: Query, expression: FilterExpression): Set<string | number | boolean | null> {
         const literals = new Set<string | number | boolean | null>();
         const queryContext: QueryContext = {
-            rootNode: queryArgument,
+            argument: queryArgument,
             options: this.options,
             filterExpressionInstrumentationCallback(fe, o) {
                 if (fe === expression) {

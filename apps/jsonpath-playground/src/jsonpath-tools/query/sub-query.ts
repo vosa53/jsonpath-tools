@@ -40,7 +40,7 @@ export class SubQuery extends SyntaxTreeNode {
     select(queryContext: QueryContext, filterExpressionContext: FilterExpressionContext | null): NodeList {
         if (this.isRelative && filterExpressionContext === null)
             return NodeList.empty;
-        const inputValue = this.isRelative ? filterExpressionContext!.currentNode : queryContext.rootNode;
+        const inputValue = this.isRelative ? filterExpressionContext!.current : queryContext.argument;
         const input = new Node(inputValue, "", null);
         let inputs = [input];
         let outputs: Node[] = [];

@@ -22,7 +22,7 @@ export class FilterSelector extends Selector {
     select(input: Node, output: PushOnlyArray<Node>, queryContext: QueryContext): void {
         if (Array.isArray(input.value)) {
             for (let i = 0; i < input.value.length; i++) {
-                const filterExpressionContext: FilterExpressionContext = { currentNode: input.value[i] };
+                const filterExpressionContext: FilterExpressionContext = { current: input.value[i] };
                 const filterResult = evaluateAsLogicalType(this.expression, queryContext, filterExpressionContext);
                 if (filterResult === LogicalTrue)
                     output.push(new Node(input.value[i], i, input));
@@ -30,7 +30,7 @@ export class FilterSelector extends Selector {
         }
         else if (typeof input.value === "object" && input.value !== null) {
             for (const entry of Object.entries(input.value)) {
-                const filterExpressionContext: FilterExpressionContext = { currentNode: entry[1] };
+                const filterExpressionContext: FilterExpressionContext = { current: entry[1] };
                 const filterResult = evaluateAsLogicalType(this.expression, queryContext, filterExpressionContext);
                 if (filterResult === LogicalTrue)
                     output.push(new Node(entry[1], entry[0], input));
