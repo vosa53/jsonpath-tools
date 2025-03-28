@@ -13,7 +13,7 @@ import { Node } from "./values/node";
 import { NodeList } from "./values/node-list";
 import { NormalizedPath, NormalizedPathSegment } from "./normalized-path";
 import { defaultQueryOptions, QueryOptions } from "./options";
-import { Function, FunctionContext, FunctionHandler, FunctionParameter } from "./function";
+import { Function, FunctionContext, FunctionHandler, FunctionParameter } from "./functions/function";
 import { Type } from "./values/types";
 import { AndExpression } from "./query/filter-expression/and-expression";
 import { BooleanLiteralExpression } from "./query/filter-expression/boolean-literal-expression";
