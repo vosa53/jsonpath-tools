@@ -102,7 +102,7 @@ export class LanguageServiceBackendSession {
         const result = this.editorService.getResult();
         return {
             nodes: result.nodes.map(n => n.value),
-            paths: result.nodes.map(n => n.buildPath())
+            paths: result.nodes.map(n => n.createNormalizedPath())
         };
     }
 
