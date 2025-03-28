@@ -1,9 +1,9 @@
-import { countFunction } from "./functions/count";
+import { countFunction } from "./functions/functions";
 import { Function } from "./functions/function";
-import { lengthFunction } from "./functions/length";
-import { matchFunction } from "./functions/match";
-import { searchFunction } from "./functions/search";
-import { valueFunction } from "./functions/value";
+import { lengthFunction } from "./functions/functions";
+import { matchFunction } from "./functions/functions";
+import { searchFunction } from "./functions/functions";
+import { valueFunction } from "./functions/functions";
 
 export interface QueryOptions {
     readonly functions: { [name: string]: Function };
