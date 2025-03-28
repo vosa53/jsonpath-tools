@@ -101,8 +101,8 @@ export class LanguageServiceBackendSession {
     getResult(message: GetResultLanguageServiceMessage): GetResultLanguageServiceMessageResponse {
         const result = this.editorService.getResult();
         return {
-            nodes: result.nodes.map(n => n.value),
-            paths: result.nodes.map(n => n.createNormalizedPath())
+            nodes: result.createValues(),
+            paths: result.createNormalizedPaths()
         };
     }
 
