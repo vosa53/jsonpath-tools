@@ -11,7 +11,7 @@ const unicodeCategories = new Map<string, Set<string>>([
 export class IRegexpParser {
     parse(iregexp: string): { isSuccess: boolean, dotIndices: number[] } {
         const context = new ParserContext(iregexp);
-        const isSuccess = this.parseIRegexp(context);
+        const isSuccess = this.parseIRegexp(context) && context.current === null;
         return { isSuccess, dotIndices: context.dotIndices };
     }
 
@@ -25,7 +25,7 @@ export class IRegexpParser {
     }
 
     parseBranch(context: ParserContext): boolean {
-        while (context.current !== "|" && context.current !== null) {
+        while (context.current !== "|" && context.current !== ")" && context.current !== null) {
             if (!this.parsePiece(context)) return false;
         }
         return true;
@@ -76,7 +76,7 @@ export class IRegexpParser {
         if (context.current === ".") {
             return this.parseDot(context);
         }
-        if (context.current === "(") {
+        else if (context.current === "(") {
             return this.parseSubIRegexp(context);
         }
         else if (context.current === "[") {
