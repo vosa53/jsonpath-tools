@@ -5,6 +5,7 @@ import { Query } from "./query/query";
 import { TypeChecker } from "./semantic-analysis/type-checker";
 import { Parser } from "./syntax-analysis/parser";
 import { removeAtPaths, replaceAtPaths } from "./transformations";
+import { Diagnostics } from "./diagnostics";
 
 export class JSONPath {
     static select(queryText: string, queryArgument: JSONValue, queryOptions: QueryOptions = defaultQueryOptions): NodeList {
@@ -35,10 +36,17 @@ export class JSONPath {
         const typeChecker = new TypeChecker(queryOptions);
         const query = parser.parse(queryText);
         if (query.syntaxDiagnostics.length !== 0)
-            throw new Error("");
+            throw new JSONPathError(query.syntaxDiagnostics);
         const typeCheckerDiagnostics = typeChecker.check(query);
         if (typeCheckerDiagnostics.length !== 0)
-            throw new Error("");
+            throw new JSONPathError(typeCheckerDiagnostics);
         return query;
+    }
+}
+
+export class JSONPathError extends Error {
+    constructor(readonly diagnostics: readonly Diagnostics[]) {
+        const message = diagnostics.map(d => d.toString()).join("\n");
+        super(message);
     }
 }

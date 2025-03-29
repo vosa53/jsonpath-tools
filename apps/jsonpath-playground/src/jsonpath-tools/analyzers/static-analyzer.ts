@@ -16,11 +16,7 @@ export class StaticAnalyzer {
         const diagnostics: Diagnostics[] = [];
         query.forEach(t => {
             if (t instanceof Selector && isSubtypeOf(typeAnalyzer.getType(t), NeverDataType.create()))
-                diagnostics.push({
-                    message: "This selector can not produce any output.",
-                    textRange: t.textRangeWithoutSkipped,
-                    type: DiagnosticsType.warning
-                });
+                diagnostics.push(new Diagnostics(DiagnosticsType.warning, "This selector can not produce any output.", t.textRangeWithoutSkipped));
         });
         return diagnostics;
     }

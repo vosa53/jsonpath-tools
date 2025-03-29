@@ -29,14 +29,13 @@ export class DynamicAnalyzer {
         };
         const queryResult = query.select(queryContext);
         
-        const diagnostics: Diagnostics[] = Array.from(diagnosticsJSON).map(dJSON => JSON.parse(dJSON));
+        const diagnostics = diagnosticsJSON.values().map(dJSON => {
+            const diagnosticsObject = JSON.parse(dJSON) as Diagnostics;
+            return new Diagnostics(diagnosticsObject.type, diagnosticsObject.message, diagnosticsObject.textRange);
+        }).toArray();
         query.forEach(t => {
             if (t instanceof Selector && !selectorsThatProducedOutput.has(t))
-                diagnostics.push({
-                    message: "This selector does not produce any output.",
-                    textRange: t.textRangeWithoutSkipped,
-                    type: DiagnosticsType.warning
-                });
+                diagnostics.push(new Diagnostics(DiagnosticsType.warning, "This selector does not produce any output.", t.textRangeWithoutSkipped));
         });
 
         return { diagnostics, queryResult };

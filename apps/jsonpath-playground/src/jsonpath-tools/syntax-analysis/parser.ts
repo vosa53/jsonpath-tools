@@ -590,7 +590,7 @@ class ParserContext {
 
     addError(message: string, textRange?: TextRange) {
         textRange ??= new TextRange(this._currentIndex, this.currentIndex < this.input.length ? 1 : 0);
-        const diagnostics: Diagnostics = { type: DiagnosticsType.error, message, textRange };
+        const diagnostics = new Diagnostics(DiagnosticsType.error, message, textRange);
         this._diagnostics.push(diagnostics);
     }
 

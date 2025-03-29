@@ -50,20 +50,12 @@ class QueryContextFunctionContext implements FunctionContext {
     ) { }
 
     reportParameterWarning(parameterIndex: number, message: string): void {
-        const warning: Diagnostics = { 
-            type: DiagnosticsType.warning, 
-            message, 
-            textRange: this.functionExpression.args[parameterIndex].arg.textRangeWithoutSkipped 
-        };
+        const warning = new Diagnostics(DiagnosticsType.warning, message, this.functionExpression.args[parameterIndex].arg.textRangeWithoutSkipped);
         this.reportDiagnosticsCallback(warning);
     }
 
     reportWarning(message: string): void {
-        const warning: Diagnostics = { 
-            type: DiagnosticsType.warning, 
-            message, 
-            textRange: this.functionExpression.nameToken.textRangeWithoutSkipped 
-        };
+        const warning = new Diagnostics(DiagnosticsType.warning, message, this.functionExpression.nameToken.textRangeWithoutSkipped);
         this.reportDiagnosticsCallback(warning);
     }
 }

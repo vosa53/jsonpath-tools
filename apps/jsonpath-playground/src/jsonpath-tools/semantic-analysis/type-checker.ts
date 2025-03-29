@@ -112,7 +112,7 @@ class TypeCheckerContext {
     private _diagnostics: Diagnostics[] = [];
 
     addError(message: string, textRange: TextRange) {
-        const diagnostics: Diagnostics = { type: DiagnosticsType.error, message, textRange };
+        const diagnostics = new Diagnostics(DiagnosticsType.error, message, textRange);
         this._diagnostics.push(diagnostics);
     }
 
