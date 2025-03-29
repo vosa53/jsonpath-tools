@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createSyntaxTree } from '../helpers/utils';
+import { stringifySyntaxTree } from '../helpers/utils';
 import { Parser } from './parser';
 import { SyntaxTree } from '../query/syntax-tree';
 import { SyntaxTreeToken } from '../query/syntax-tree-token';
@@ -136,17 +136,4 @@ function parse(queryText: string): string {
     const parser = new Parser();
     const result = parser.parse(queryText);
     return "\n" + stringifySyntaxTree(result);
-}
-
-function stringifySyntaxTree(syntaxTree: SyntaxTree, indentationLevel = 0): string {
-    let text = " ".repeat(indentationLevel * 4);
-    text += syntaxTree.type;
-    if (syntaxTree instanceof SyntaxTreeToken)
-        text += " " + JSON.stringify(syntaxTree.text) + "\n";
-    else if (syntaxTree instanceof SyntaxTreeNode) {
-        text += "\n";
-        for (const child of syntaxTree.children)
-            text += stringifySyntaxTree(child, indentationLevel + 1);
-    }
-    return text;
 }
