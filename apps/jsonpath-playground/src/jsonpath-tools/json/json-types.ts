@@ -1,18 +1,26 @@
 export type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue; };
 
-export function getJSONTypeName(value: JSONValue): string {
+export function getJSONType(value: JSONValue): JSONType {
     const javaScriptType = typeof value;
     if (javaScriptType == "object") {
         if (value === null)
-            return "null";
+            return JSONType.null;
         else if (Array.isArray(value))
-            return "array";
+            return JSONType.array;
 
         else
-            return "object";
+            return JSONType.object;
     }
 
     else
-        return javaScriptType;
+        return javaScriptType as JSONType;
 }
 
+export enum JSONType {
+    string = "string",
+    number = "number",
+    boolean = "boolean",
+    null = "null",
+    object = "object",
+    array = "array"
+}

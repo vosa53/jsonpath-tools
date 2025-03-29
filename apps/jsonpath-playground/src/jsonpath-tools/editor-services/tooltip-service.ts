@@ -1,4 +1,4 @@
-import { getJSONTypeName } from "../json/json-types";
+import { getJSONType } from "../json/json-types";
 import { DataTypeAnalyzer } from "../data-types/data-type-analyzer";
 import { DataType, DataTypeAnnotation } from "../data-types/data-types";
 import { QueryOptions } from "../options";
@@ -108,7 +108,7 @@ export class TooltipService {
         function processValue(value: JSONValue) {
             if (example === undefined && (typeof value === "string" || typeof value === "number"))
                 example = value;
-            const typeName = getJSONTypeName(value);
+            const typeName = getJSONType(value);
             typeNames.add(typeName);
         }
 

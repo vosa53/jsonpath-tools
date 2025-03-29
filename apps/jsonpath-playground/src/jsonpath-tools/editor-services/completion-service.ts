@@ -1,6 +1,6 @@
 import { DataTypeAnalyzer } from "../data-types/data-type-analyzer";
 import { DataType, DataTypeAnnotation } from "../data-types/data-types";
-import { getJSONTypeName } from "../json/json-types";
+import { getJSONType } from "../json/json-types";
 import { QueryOptions } from "../options";
 import { QueryContext } from "../query/evaluation";
 import { ComparisonExpression } from "../query/filter-expression/comparison-expression";
@@ -225,7 +225,7 @@ export class CompletionProvider {
             const value = node.value;
             if (typeof value === "object" && value !== null && !Array.isArray(value)) {
                 for (const [propertyName, propertyValue] of Object.entries(value)) {
-                    const type = getJSONTypeName(propertyValue);
+                    const type = getJSONType(propertyValue);
                     let types = keysAndTypes.get(propertyName);
                     if (types === undefined) {
                         types = new Set();
