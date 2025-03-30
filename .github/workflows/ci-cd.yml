@@ -32,6 +32,8 @@ jobs:
         uses: actions/configure-pages@v4
       - name: Install dependencies
         run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
       - name: Build JSONPath Playground
         run: npm run build --workspace @jsonpath-tools/jsonpath-playground
       - name: Run tests
