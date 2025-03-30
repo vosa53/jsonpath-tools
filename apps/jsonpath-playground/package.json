@@ -10,7 +10,8 @@
     "build-data-type-grammar": "lezer-generator --typeScript src\\app\\components\\code-editors\\codemirror\\jsonpath-codemirror\\data-type\\data-type.grammar -o src\\app\\components\\code-editors\\codemirror\\jsonpath-codemirror\\data-type\\data-type-parser.ts",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.3",
