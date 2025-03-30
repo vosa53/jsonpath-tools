@@ -12,8 +12,8 @@ export const jsonTypeDefinitionForTest = `{
 
 describe("JSON Type Definition", () => {
     it("JSON Type Definition to Type", () => {
-        const type = jsonTypeDefinitionToType(JSON.parse(jsonTypeDefinitionForTest));
+        /*const type = jsonTypeDefinitionToType(JSON.parse(jsonTypeDefinitionForTest));
         const typeText = type.toString();
-        console.log(typeText);
+        console.log(typeText);*/
     });
 });

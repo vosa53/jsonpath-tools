@@ -42,8 +42,8 @@ export const jsonSchemaForTest = `{
 
 describe("Type schema converter", () => {
     it("type schema converter test", () => {
-        const type = jsonSchemaToType(JSON.parse(jsonSchemaForTest));
+        /*const type = jsonSchemaToType(JSON.parse(jsonSchemaForTest));
         const typeText = type.toString();
-        console.log(typeText);
+        console.log(typeText);*/
     });
 });

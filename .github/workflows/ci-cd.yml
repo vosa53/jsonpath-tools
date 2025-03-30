@@ -1,4 +1,4 @@
-name: Deploy Documentation to GitHub Pages
+name: Build, test and deploy
 
 on:
   push:
@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  build-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -32,23 +32,38 @@ jobs:
         uses: actions/configure-pages@v4
       - name: Install dependencies
         run: npm ci
-      - name: Build with VitePress
+      - name: Run tests
+        run: npm run test --workspaces --if-present
+      - name: Build JSONPath playground
+        run: npm run build --workspace @jsonpath-tools/jsonpath-playground
+      - name: Build documentation
         run: |
           npm run typedoc --workspace @jsonpath-tools/documentation
           npm run build --workspace @jsonpath-tools/documentation
-      - name: Upload artifact
+      - name: Upload JSONPath playground artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jsonpath-playground-build
+          path: apps/jsonpath-playground/dist/
+      - name: Upload documentation artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: apps/documentation/.vitepress/dist
 
   deploy:
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    needs: build
+    needs: build-test
     runs-on: ubuntu-latest
     name: Deploy
     steps:
+      - name: Download JSONPath playground artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: jsonpath-playground-build
+          path: apps/jsonpath-playground/dist/
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
