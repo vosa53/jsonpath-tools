@@ -1,7 +1,7 @@
 import { test, expect, Page, Locator } from "@playwright/test";
 
 test("Inserts input data, writes a query with autocomplete and checks output", async ({ page }) => {
-    await page.goto("https://localhost:3000/");
+    await page.goto("/");
 
     const dataEditorLocator = await page.locator(`.cm-content:has-text('Superior Auto Sales')`);
     await dataEditorLocator.click();
