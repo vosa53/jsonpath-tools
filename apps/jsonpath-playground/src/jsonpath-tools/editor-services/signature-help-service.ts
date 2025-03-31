@@ -36,7 +36,7 @@ export class SignatureHelpService {
         text += "): ";
         text += functionDefinition.returnType;
         const parameterIndex = this.getParameterIndex(functionExpression, position);
-        return new Signature(text, parameters, parameterIndex, "");
+        return new Signature(text, parameters, parameterIndex, functionDefinition.description);
     }
 
     private isCorrectFunction(node: SyntaxTree, position: number): boolean {

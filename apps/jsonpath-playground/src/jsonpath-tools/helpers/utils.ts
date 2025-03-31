@@ -1,5 +1,5 @@
-import { SyntaxTreeNode } from "../query/syntax-tree-node";
 import { SyntaxTree } from "../query/syntax-tree";
+import { SyntaxTreeNode } from "../query/syntax-tree-node";
 import { SyntaxTreeToken } from "../query/syntax-tree-token";
 
 export function stringifySyntaxTree(syntaxTree: SyntaxTree, colored = false, indentationLevel = 0): string {
