@@ -19,8 +19,9 @@ import { JSONValue } from "../json/json-types";
 import { AnalysisDescriptionService } from "./analysis-description-service";
 import { SyntaxDescriptionService } from "./syntax-description-service";
 import { NormalizedPathSegment } from "../normalized-path";
+import { FilterValue } from "../values/types";
 
-export class CompletionProvider {
+export class CompletionService {
     private readonly syntaxDescriptionProvider: SyntaxDescriptionService;
     private readonly analysisDescriptionProvider: AnalysisDescriptionService;
 
@@ -149,7 +150,7 @@ export class CompletionProvider {
 
         const literals = queryArgument !== undefined
             ? this.getAllLiteralsOutputtedFromExpression(queryArgument, query, reference)
-            : typeAnalyzer.getType(reference).collectKnownLiterals();
+            : this.getAllLiteralsFromExpressionType(typeAnalyzer.getType(reference));
         for (const literal of literals) {
             const literalType = typeof literal;
             completions.push(new CompletionItem(
@@ -257,17 +258,35 @@ export class CompletionProvider {
         const queryContext: QueryContext = {
             argument: queryArgument,
             options: this.options,
-            filterExpressionInstrumentationCallback(fe, o) {
+            filterExpressionInstrumentationCallback: (fe, o) => {
                 if (fe === expression) {
                     const value = convertToValueType(o);
-                    const type = typeof value;
-                    if (type === "string" || type === "number" || type === "boolean" || value === null)
-                        literals.add(value as string | number | boolean | null);
+                    if (this.isLiteral(value))
+                        literals.add(value);
                 }
             }
         };
         jsonPath.select(queryContext);
         return literals;
+    }
+
+    private getAllLiteralsFromExpressionType(type: DataType): Set<string | number | boolean | null> {
+        const literals = type.collectKnownLiterals();
+        const annotations = type.collectAnnotations();
+        for (const annotation of annotations) {
+            if (annotation.defaultValue !== undefined && this.isLiteral(annotation.defaultValue))
+                literals.add(annotation.defaultValue);
+            for (const example of annotation.exampleValues) {
+                if (this.isLiteral(example))
+                    literals.add(example);
+            }
+        }
+        return literals;
+    }
+
+    private isLiteral(value: FilterValue): value is string | number | boolean | null {
+        const type = typeof value;
+        return type === "string" || type === "number" || type === "boolean" || value === null;
     }
 
     private isValidName(text: string): boolean {

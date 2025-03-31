@@ -11,7 +11,7 @@ import { TextChange } from "../text/text-change";
 import { JSONValue } from "../json/json-types";
 import { NodeList } from "../values/node-list";
 import { logPerformance } from "../helpers/utils";
-import { CompletionItem, CompletionProvider } from "./completion-service";
+import { CompletionItem, CompletionService } from "./completion-service";
 import { DocumentHighlight, DocumentHighlightsService } from "./document-highlights-service";
 import { FormattingService } from "./formatting-service";
 import { Signature, SignatureHelpService } from "./signature-help-service";
@@ -21,7 +21,7 @@ export class EditorService {
     private readonly parser: Parser;
     private options: QueryOptions;
     private typeChecker: TypeChecker;
-    private completionProvider: CompletionProvider;
+    private completionProvider: CompletionService;
     private signatureProvider: SignatureHelpService;
     private documentHighlightsProvider: DocumentHighlightsService;
     private tooltipProvider: TooltipService;
@@ -37,7 +37,7 @@ export class EditorService {
         this.parser = new Parser();
         this.options = defaultQueryOptions;
         this.typeChecker = new TypeChecker(this.options);
-        this.completionProvider = new CompletionProvider(this.options);
+        this.completionProvider = new CompletionService(this.options);
         this.signatureProvider = new SignatureHelpService(this.options);
         this.documentHighlightsProvider = new DocumentHighlightsService(this.options);
         this.tooltipProvider = new TooltipService(this.options);
@@ -53,7 +53,7 @@ export class EditorService {
     updateOptions(newOptions: QueryOptions) {
         this.options = newOptions;
         this.typeChecker = new TypeChecker(this.options);
-        this.completionProvider = new CompletionProvider(this.options);
+        this.completionProvider = new CompletionService(this.options);
         this.signatureProvider = new SignatureHelpService(this.options);
         this.documentHighlightsProvider = new DocumentHighlightsService(this.options);
         this.tooltipProvider = new TooltipService(this.options);
