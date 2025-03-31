@@ -16,6 +16,7 @@ function replaceOrRemoveAtPaths(value: JSONValue, paths: readonly NormalizedPath
     return replaceOrRemoveAtPathsRecursive(value, sortedPaths, replacer, 0, 0, sortedPaths.length);
 }
 
+// TODO: Add a mutable variant.
 function replaceOrRemoveAtPathsRecursive(
     value: JSONValue, 
     paths: readonly NormalizedPath[], 
@@ -37,7 +38,7 @@ function replaceOrRemoveAtPathsRecursive(
             while (from < to && paths[from][level] === propertyName)
                 from++;
             if (Array.isArray(newValue)) {
-                if (typeof propertyName === "number") {
+                if (typeof propertyName === "number" && propertyName < newValue.length) {
                     const result = replaceOrRemoveAtPathsRecursive(newValue[propertyName], paths, replacer, level + 1, oldFrom, from);
                     if (result === undefined)
                         removedIndexCount++;
@@ -46,7 +47,7 @@ function replaceOrRemoveAtPathsRecursive(
                 }
             }
             else {
-                if (typeof propertyName === "string") {
+                if (typeof propertyName === "string" && Object.hasOwn(newValue, propertyName)) {
                     const result = replaceOrRemoveAtPathsRecursive(newValue[propertyName], paths, replacer, level + 1, oldFrom, from);
                     if (result === undefined)
                         delete newValue[propertyName];
