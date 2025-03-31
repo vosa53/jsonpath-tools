@@ -3,6 +3,7 @@ import viteConfig from "./vite.config";
 
 export default mergeConfig(viteConfig, defineConfig({
     test: {
-        exclude: ["e2e-tests"]
+        exclude: ["e2e-tests"],
+        environment: "jsdom"
     }
 }));

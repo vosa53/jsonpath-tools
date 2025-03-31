@@ -3,7 +3,7 @@ import { applyPatch, JsonPatchError, validate } from "fast-json-patch";
 
 export function applyJSONPatch(data: JSONValue, patch: JSONPatch): JSONValue {
     try {
-        return applyPatch(data, patch, true).newDocument;
+        return applyPatch(data, patch, true, false).newDocument;
     }
     catch (e) {
         if (e instanceof JsonPatchError)
