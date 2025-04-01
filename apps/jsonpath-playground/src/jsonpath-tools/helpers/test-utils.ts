@@ -13,7 +13,7 @@ export const fooFunction: Function = {
     ],
     returnType: Type.logicalType,
     returnDataType: AnyDataType.create(),
-    handler: (context: FunctionContext, text: FilterValue, pattern: FilterValue) => {
+    handler: (context: FunctionContext, abc: FilterValue, def: FilterValue) => {
         return LogicalTrue;
     }
 };
@@ -25,8 +25,8 @@ export const barFunction: Function = {
     ],
     returnType: Type.valueType,
     returnDataType: AnyDataType.create(),
-    handler: (context: FunctionContext, text: FilterValue, pattern: FilterValue) => {
-        return LogicalTrue;
+    handler: (context: FunctionContext, abc: FilterValue) => {
+        return 123;
     }
 };
 
