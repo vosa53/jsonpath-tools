@@ -16,6 +16,7 @@ concurrency:
 
 jobs:
   build-test:
+    name: Build and test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -55,13 +56,13 @@ jobs:
           path: apps/documentation/.vitepress/dist
 
   deploy:
+    name: Deploy
     if: github.ref == 'refs/heads/main'
+    needs: build-test
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    needs: build-test
-    runs-on: ubuntu-latest
-    name: Deploy
     steps:
       - name: Download JSONPath Playground artifact
         uses: actions/download-artifact@v4
