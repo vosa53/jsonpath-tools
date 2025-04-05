@@ -1,5 +1,10 @@
 import { TextChange } from "./text-change";
 
+/**
+ * Returns a new text with applied changes.
+ * @param text The text to which the changes are to be applied.
+ * @param changes Changes to apply. Ranges of the changes can not overlap and must be contained in the input text.
+ */
 export function applyTextChanges(text: string, changes: readonly TextChange[]): string {
     const sortedChanges = changes.toSorted((a, b) => a.range.position - b.range.position);
     let newText = "";
