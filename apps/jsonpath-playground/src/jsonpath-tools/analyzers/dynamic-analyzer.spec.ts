@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Diagnostics, DiagnosticsType } from "../diagnostics";
+import { Diagnostics, DiagnosticsSeverity } from "../diagnostics";
 import { testQueryOptions } from "../helpers/test-utils";
 import { Parser } from "../syntax-analysis/parser";
 import { TextRange } from "../text/text-range";
@@ -16,31 +16,31 @@ describe("Dynamic analyzer", () => {
 
     it("analyze - Unknown property reports a warning", () => {
         expect(analyze(`$.itms`)).toEqual([
-            new Diagnostics(DiagnosticsType.warning, expect.any(String), new TextRange(2, 4))
+            new Diagnostics(DiagnosticsSeverity.warning, expect.any(String), new TextRange(2, 4))
         ]);
     });
 
     it("analyze - Unknown index reports a warning", () => {
         expect(analyze(`$.items[3]`)).toEqual([
-            new Diagnostics(DiagnosticsType.warning, expect.any(String), new TextRange(8, 1))
+            new Diagnostics(DiagnosticsSeverity.warning, expect.any(String), new TextRange(8, 1))
         ]);
     });
 
     it("analyze - Slice selector that does not select anything reports a warning", () => {
         expect(analyze(`$.items[2:1]`)).toEqual([
-            new Diagnostics(DiagnosticsType.warning, expect.any(String), new TextRange(8, 3))
+            new Diagnostics(DiagnosticsSeverity.warning, expect.any(String), new TextRange(8, 3))
         ]);
     });
 
     it("analyze - Wildcard selector that does not select anything reports a warning", () => {
         expect(analyze(`$.empty.*`)).toEqual([
-            new Diagnostics(DiagnosticsType.warning, expect.any(String), new TextRange(8, 1))
+            new Diagnostics(DiagnosticsSeverity.warning, expect.any(String), new TextRange(8, 1))
         ]);
     });
 
     it("analyze - Filter that is always LogicalFalse reports a warning", () => {
         expect(analyze(`$.items[?@ == "ddd"]`)).toEqual([
-            new Diagnostics(DiagnosticsType.warning, expect.any(String), new TextRange(8, 11))
+            new Diagnostics(DiagnosticsSeverity.warning, expect.any(String), new TextRange(8, 11))
         ]);
     });
 
@@ -60,7 +60,7 @@ describe("Dynamic analyzer", () => {
             }
         };
         expect(analyze(`$.items[?test()]`, queryOptions)).toEqual([
-            new Diagnostics(DiagnosticsType.warning, "Some warning from a function.", new TextRange(9, 4))
+            new Diagnostics(DiagnosticsSeverity.warning, "Some warning from a function.", new TextRange(9, 4))
         ]);
     });
 
@@ -82,7 +82,7 @@ describe("Dynamic analyzer", () => {
             }
         };
         expect(analyze(`$.items[?test("abc")]`, queryOptions)).toEqual([
-            new Diagnostics(DiagnosticsType.warning, "Some parameter warning from a function.", new TextRange(14, 5))
+            new Diagnostics(DiagnosticsSeverity.warning, "Some parameter warning from a function.", new TextRange(14, 5))
         ]);
     });
 });

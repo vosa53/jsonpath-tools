@@ -1,4 +1,4 @@
-import { Diagnostics, DiagnosticsType } from "../diagnostics";
+import { Diagnostics, DiagnosticsSeverity } from "../diagnostics";
 import { AndExpression } from "../query/filter-expression/and-expression";
 import { BooleanLiteralExpression } from "../query/filter-expression/boolean-literal-expression";
 import { ComparisonExpression, JSONPathComparisonOperator } from "../query/filter-expression/comparison-expression";
@@ -590,7 +590,7 @@ class ParserContext {
 
     addError(message: string, textRange?: TextRange) {
         textRange ??= new TextRange(this._currentIndex, this.currentIndex < this.input.length ? 1 : 0);
-        const diagnostics = new Diagnostics(DiagnosticsType.error, message, textRange);
+        const diagnostics = new Diagnostics(DiagnosticsSeverity.error, message, textRange);
         this._diagnostics.push(diagnostics);
     }
 

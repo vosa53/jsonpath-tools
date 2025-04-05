@@ -1,4 +1,4 @@
-import { Diagnostics, DiagnosticsType } from "@/jsonpath-tools/diagnostics";
+import { Diagnostics, DiagnosticsSeverity } from "@/jsonpath-tools/diagnostics";
 import { LintSource } from "@codemirror/lint";
 import { ViewUpdate } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";
@@ -15,7 +15,7 @@ export function lintSource(options: { onDiagnosticsCreated?: (diagnostics: reado
             return diagnostics.map(d => ({
                 from: d.textRange.position,
                 to: d.textRange.position + d.textRange.length,
-                severity: d.type === DiagnosticsType.error ? "error" : "warning",
+                severity: d.severity === DiagnosticsSeverity.error ? "error" : "warning",
                 message: d.message
             }));
         }

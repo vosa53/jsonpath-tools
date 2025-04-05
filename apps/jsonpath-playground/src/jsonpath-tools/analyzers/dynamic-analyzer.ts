@@ -1,4 +1,4 @@
-import { Diagnostics, DiagnosticsType } from "../diagnostics";
+import { Diagnostics, DiagnosticsSeverity } from "../diagnostics";
 import { QueryOptions } from "../options";
 import { QueryContext } from "../query/evaluation";
 import { Query } from "../query/query";
@@ -31,11 +31,11 @@ export class DynamicAnalyzer {
         
         const diagnostics = diagnosticsJSON.values().map(dJSON => {
             const diagnosticsObject = JSON.parse(dJSON) as Diagnostics;
-            return new Diagnostics(diagnosticsObject.type, diagnosticsObject.message, diagnosticsObject.textRange);
+            return new Diagnostics(diagnosticsObject.severity, diagnosticsObject.message, diagnosticsObject.textRange);
         }).toArray();
         query.forEach(t => {
             if (t instanceof Selector && !selectorsThatProducedOutput.has(t))
-                diagnostics.push(new Diagnostics(DiagnosticsType.warning, "This selector does not produce any output.", t.textRangeWithoutSkipped));
+                diagnostics.push(new Diagnostics(DiagnosticsSeverity.warning, "This selector does not produce any output.", t.textRangeWithoutSkipped));
         });
 
         return { diagnostics, queryResult };

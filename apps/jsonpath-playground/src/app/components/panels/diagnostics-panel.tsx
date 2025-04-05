@@ -1,4 +1,4 @@
-import { Diagnostics, DiagnosticsType } from "@/jsonpath-tools/diagnostics";
+import { Diagnostics, DiagnosticsSeverity } from "@/jsonpath-tools/diagnostics";
 import { Checkbox, DefaultMantineColor, Group, Table, ThemeIcon } from "@mantine/core";
 import { IconAlertTriangle, IconAlertTriangleFilled, IconExclamationCircle, IconExclamationCircleFilled } from "@tabler/icons-react";
 import { memo, ReactNode, useMemo, useState } from "react";
@@ -14,11 +14,11 @@ const DiagnosticsPanel = memo(({
     const [filters, setFilters] = useState<DiagnosticsFilters>({ showErrors: true, showWarnings: true });
     const {filteredDiagnostics, errorCount, warningCount} = useMemo(() => {
         const filteredDiagnostics = diagnostics.filter(d => 
-            d.type === DiagnosticsType.error && filters.showErrors || 
-            d.type === DiagnosticsType.warning && filters.showWarnings
+            d.severity === DiagnosticsSeverity.error && filters.showErrors || 
+            d.severity === DiagnosticsSeverity.warning && filters.showWarnings
         );
-        const errorCount = diagnostics.filter(d => d.type === DiagnosticsType.error).length;
-        const warningCount = diagnostics.filter(d => d.type === DiagnosticsType.warning).length;
+        const errorCount = diagnostics.filter(d => d.severity === DiagnosticsSeverity.error).length;
+        const warningCount = diagnostics.filter(d => d.severity === DiagnosticsSeverity.warning).length;
         return { filteredDiagnostics, errorCount, warningCount };
     }, [diagnostics, filters]);
 
@@ -58,7 +58,7 @@ function DiagnosticsView({
         <Table>
             <Table.Thead>
                 <Table.Tr>
-                    <Table.Th>Type</Table.Th>
+                    <Table.Th>Severity</Table.Th>
                     <Table.Th>Message</Table.Th>
                     <Table.Th>Line</Table.Th>
                     <Table.Th>Column</Table.Th>
@@ -67,7 +67,7 @@ function DiagnosticsView({
             <Table.Tbody>{diagnostics.map((d, i) => (
                 <Table.Tr key={i} onMouseEnter={() => onSelectedDiagnosticsChanged(d)} onMouseLeave={() => onSelectedDiagnosticsChanged(null)}>
                     <Table.Td>
-                        <DiagnosticsIcon diagnosticsType={d.type} />
+                        <DiagnosticsIcon diagnosticsSeverity={d.severity} />
                     </Table.Td>
                     <Table.Td>{d.message}</Table.Td>
                     <Table.Td>{d.textRange.position}</Table.Td>
@@ -78,15 +78,15 @@ function DiagnosticsView({
     );
 }
 
-function DiagnosticsIcon({ diagnosticsType }: { diagnosticsType: DiagnosticsType }) {
+function DiagnosticsIcon({ diagnosticsSeverity }: { diagnosticsSeverity: DiagnosticsSeverity }) {
     const ICON_SIZE = 20;
     let iconColor: DefaultMantineColor;
     let icon: ReactNode;
-    if (diagnosticsType === DiagnosticsType.error) {
+    if (diagnosticsSeverity === DiagnosticsSeverity.error) {
         iconColor = "red.7";
         icon = <IconExclamationCircleFilled size={ICON_SIZE} />;
     }
-    else if (diagnosticsType === DiagnosticsType.warning) {
+    else if (diagnosticsSeverity === DiagnosticsSeverity.warning) {
         iconColor = "yellow.4";
         icon = <IconAlertTriangleFilled size={ICON_SIZE} />;
     }

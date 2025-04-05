@@ -1,4 +1,4 @@
-import { Diagnostics, DiagnosticsType } from "@/jsonpath-tools/diagnostics";
+import { Diagnostics, DiagnosticsSeverity } from "@/jsonpath-tools/diagnostics";
 import { FunctionContext, nullFunctionContext } from "@/jsonpath-tools/functions/function";
 import { FilterValue, Nothing } from "../../values/types";
 import { FilterExpressionContext, QueryContext } from "../evaluation";
@@ -50,12 +50,12 @@ class QueryContextFunctionContext implements FunctionContext {
     ) { }
 
     reportParameterWarning(parameterIndex: number, message: string): void {
-        const warning = new Diagnostics(DiagnosticsType.warning, message, this.functionExpression.args[parameterIndex].arg.textRangeWithoutSkipped);
+        const warning = new Diagnostics(DiagnosticsSeverity.warning, message, this.functionExpression.args[parameterIndex].arg.textRangeWithoutSkipped);
         this.reportDiagnosticsCallback(warning);
     }
 
     reportWarning(message: string): void {
-        const warning = new Diagnostics(DiagnosticsType.warning, message, this.functionExpression.nameToken.textRangeWithoutSkipped);
+        const warning = new Diagnostics(DiagnosticsSeverity.warning, message, this.functionExpression.nameToken.textRangeWithoutSkipped);
         this.reportDiagnosticsCallback(warning);
     }
 }

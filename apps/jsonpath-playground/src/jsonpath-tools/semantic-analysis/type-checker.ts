@@ -1,4 +1,4 @@
-import { Diagnostics, DiagnosticsType } from "../diagnostics";
+import { Diagnostics, DiagnosticsSeverity } from "../diagnostics";
 import { QueryOptions } from "../options";
 import { Type } from "../values/types";
 import { AndExpression } from "../query/filter-expression/and-expression";
@@ -112,7 +112,7 @@ class TypeCheckerContext {
     private _diagnostics: Diagnostics[] = [];
 
     addError(message: string, textRange: TextRange) {
-        const diagnostics = new Diagnostics(DiagnosticsType.error, message, textRange);
+        const diagnostics = new Diagnostics(DiagnosticsSeverity.error, message, textRange);
         this._diagnostics.push(diagnostics);
     }
 

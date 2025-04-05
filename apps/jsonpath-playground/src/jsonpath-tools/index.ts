@@ -5,7 +5,7 @@
 import { DataType, DataTypeAnnotation } from "./data-types/data-types";
 import { jsonSchemaToType } from "./data-types/json-schema-data-type-converter";
 import { jsonTypeDefinitionToType } from "./data-types/json-type-definition-data-type-converter";
-import { Diagnostics, DiagnosticsType } from "./diagnostics";
+import { Diagnostics, DiagnosticsSeverity } from "./diagnostics";
 import { EditorService } from "./editor-services/editor-service";
 import { JSONValue } from "./json/json-types";
 import { JSONPath } from "./jsonpath";
@@ -74,7 +74,7 @@ export {
 
     Type,
 
-    DiagnosticsType,
+    DiagnosticsSeverity as DiagnosticsType,
 
     TextRange,
     TextChange,

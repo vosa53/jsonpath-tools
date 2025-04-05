@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ArrayDataType, LiteralDataType, NeverDataType, ObjectDataType } from "../data-types/data-types";
-import { Diagnostics, DiagnosticsType } from "../diagnostics";
+import { Diagnostics, DiagnosticsSeverity } from "../diagnostics";
 import { testQueryOptions } from "../helpers/test-utils";
 import { Parser } from "../syntax-analysis/parser";
 import { TextRange } from "../text/text-range";
@@ -13,13 +13,13 @@ describe("Static analyzer", () => {
 
     it("analyze - Unknown property reports a warning", () => {
         expect(analyze(`$.itms`)).toEqual([
-            new Diagnostics(DiagnosticsType.warning, expect.any(String), new TextRange(2, 4))
+            new Diagnostics(DiagnosticsSeverity.warning, expect.any(String), new TextRange(2, 4))
         ]);
     });
 
     it("analyze - Unknown index reports a warning", () => {
         expect(analyze(`$.items[3]`)).toEqual([
-            new Diagnostics(DiagnosticsType.warning, expect.any(String), new TextRange(8, 1))
+            new Diagnostics(DiagnosticsSeverity.warning, expect.any(String), new TextRange(8, 1))
         ]);
     });
 
@@ -32,13 +32,13 @@ describe("Static analyzer", () => {
 
     it("analyze - Wildcard selector that does not select anything reports a warning", () => {
         expect(analyze(`$.empty.*`)).toEqual([
-            new Diagnostics(DiagnosticsType.warning, expect.any(String), new TextRange(8, 1))
+            new Diagnostics(DiagnosticsSeverity.warning, expect.any(String), new TextRange(8, 1))
         ]);
     });
 
     it("analyze - Filter that is always LogicalFalse reports a warning", () => {
         expect(analyze(`$.items[?@ == "ddd"]`)).toEqual([
-            new Diagnostics(DiagnosticsType.warning, expect.any(String), new TextRange(8, 11))
+            new Diagnostics(DiagnosticsSeverity.warning, expect.any(String), new TextRange(8, 11))
         ]);
     });
 });
