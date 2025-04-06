@@ -25,7 +25,7 @@ import { TextRange } from "../text/text-range";
 /**
  * JSONPath query checker.
  */
-export class TypeChecker {
+export class Checker {
     constructor (private readonly options: QueryOptions) {
 
     }
@@ -36,12 +36,12 @@ export class TypeChecker {
      * @returns Query diagnostics.
      */
     check(query: Query): readonly Diagnostics[] {
-        const context = new TypeCheckerContext();
+        const context = new CheckerContext();
         this.checkRecursive(query, null, context);
         return context.diagnostics;
     }
 
-    private checkRecursive(tree: SyntaxTreeNode, parent: SyntaxTree | null, context: TypeCheckerContext) {
+    private checkRecursive(tree: SyntaxTreeNode, parent: SyntaxTree | null, context: CheckerContext) {
         if (tree instanceof FunctionExpression) {
             const functionDefinition = this.options.functions[tree.name];
             if (functionDefinition === undefined)
@@ -74,7 +74,7 @@ export class TypeChecker {
         }
     }
 
-    private checkType(expression: FilterExpression, targetType: Type, context: TypeCheckerContext) {
+    private checkType(expression: FilterExpression, targetType: Type, context: CheckerContext) {
         const expressionType = this.getType(targetType, expression, context);
         if (expressionType === null) return;
         const isAssignable = this.isAssignableTo(expressionType, targetType);
@@ -82,7 +82,7 @@ export class TypeChecker {
             context.addError(`Type '${expressionType}' can not be used in the context where is expected '${targetType}'.`, expression.textRangeWithoutSkipped);
     }
 
-    private getType(targetType: Type | null, expression: FilterExpression, context: TypeCheckerContext): Type | null {
+    private getType(targetType: Type | null, expression: FilterExpression, context: CheckerContext): Type | null {
         if (expression instanceof FunctionExpression) {
             const functionDefinition = this.options.functions[expression.name];
             if (functionDefinition === undefined) return null;
@@ -110,14 +110,14 @@ export class TypeChecker {
             typeFrom === Type.nodesType && typeTo === Type.logicalType; // Implicit conversion.
     }
 
-    private checkIntegerRange(number: number, numberToken: SyntaxTreeToken, context: TypeCheckerContext) {
+    private checkIntegerRange(number: number, numberToken: SyntaxTreeToken, context: CheckerContext) {
         if (!Number.isSafeInteger(number))
             context.addError("Integer has to be within interval [-(2^53)+1, (2^53)-1].", numberToken.textRangeWithoutSkipped);
     }
 }
 
-class TypeCheckerContext {
-    private _diagnostics: Diagnostics[] = [];
+class CheckerContext {
+    private readonly _diagnostics: Diagnostics[] = [];
 
     addError(message: string, textRange: TextRange) {
         const diagnostics = new Diagnostics(DiagnosticsSeverity.error, message, textRange);

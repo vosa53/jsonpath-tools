@@ -5,7 +5,7 @@ import { Diagnostics } from "../diagnostics";
 import { defaultQueryOptions, QueryOptions } from "../options";
 import { FunctionHandler } from "../functions/function";
 import { Query } from "../query/query";
-import { TypeChecker } from "../semantic-analysis/type-checker";
+import { Checker } from "../semantic-analysis/checker";
 import { Parser } from "../syntax-analysis/parser";
 import { TextChange } from "../text/text-change";
 import { JSONValue } from "../json/json-types";
@@ -20,7 +20,7 @@ import { Tooltip, TooltipService } from "./tooltip-service";
 export class EditorService {
     private readonly parser: Parser;
     private options: QueryOptions;
-    private typeChecker: TypeChecker;
+    private typeChecker: Checker;
     private completionProvider: CompletionService;
     private signatureProvider: SignatureHelpService;
     private documentHighlightsProvider: DocumentHighlightsService;
@@ -36,7 +36,7 @@ export class EditorService {
     constructor() {
         this.parser = new Parser();
         this.options = defaultQueryOptions;
-        this.typeChecker = new TypeChecker(this.options);
+        this.typeChecker = new Checker(this.options);
         this.completionProvider = new CompletionService(this.options);
         this.signatureProvider = new SignatureHelpService(this.options);
         this.documentHighlightsProvider = new DocumentHighlightsService(this.options);
@@ -52,7 +52,7 @@ export class EditorService {
 
     updateOptions(newOptions: QueryOptions) {
         this.options = newOptions;
-        this.typeChecker = new TypeChecker(this.options);
+        this.typeChecker = new Checker(this.options);
         this.completionProvider = new CompletionService(this.options);
         this.signatureProvider = new SignatureHelpService(this.options);
         this.documentHighlightsProvider = new DocumentHighlightsService(this.options);

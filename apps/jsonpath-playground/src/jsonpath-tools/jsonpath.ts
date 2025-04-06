@@ -2,7 +2,7 @@ import { JSONValue } from "./json/json-types";
 import { NodeList } from "./values/node-list";
 import { defaultQueryOptions, QueryOptions } from "./options";
 import { Query } from "./query/query";
-import { TypeChecker } from "./semantic-analysis/type-checker";
+import { Checker } from "./semantic-analysis/checker";
 import { Parser } from "./syntax-analysis/parser";
 import { removeAtPaths, replaceAtPaths } from "./transformations";
 import { Diagnostics } from "./diagnostics";
@@ -68,7 +68,7 @@ export class JSONPath {
      */
     static parse(queryText: string, queryOptions: QueryOptions = defaultQueryOptions): Query {
         const parser = new Parser();
-        const typeChecker = new TypeChecker(queryOptions);
+        const typeChecker = new Checker(queryOptions);
         const query = parser.parse(queryText);
         if (query.syntaxDiagnostics.length !== 0)
             throw new JSONPathError(query.syntaxDiagnostics);
