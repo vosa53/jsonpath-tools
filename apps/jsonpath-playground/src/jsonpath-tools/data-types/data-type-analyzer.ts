@@ -26,13 +26,28 @@ import { ParanthesisExpression } from "../query/filter-expression/paranthesis-ex
 import { MissingSelector } from "../query/selectors/missing-selector";
 import { MissingExpression } from "../query/filter-expression/missing-expression";
 
+/**
+ * Resolves data types for a query syntax tree parts.
+ */
 export class DataTypeAnalyzer {
     private readonly typeCache = new Map<SyntaxTree, DataType>();
 
-    constructor(private readonly rootType: DataType, private readonly options: QueryOptions) {
+    constructor(
+        /**
+         * Query argument type.
+         */
+        private readonly queryArgumentType: DataType,
+        
+        /**
+         * Query options.
+         */
+        private readonly options: QueryOptions
+    ) { }
 
-    }
-
+    /**
+     * Resolves data type for the given tree.
+     * @param tree Tree.
+     */
     getType(tree: SyntaxTree): DataType {
         const fromCache = this.typeCache.get(tree);
         if (fromCache !== undefined)
@@ -121,7 +136,7 @@ export class DataTypeAnalyzer {
     }
 
     private getRootIdentifierType(rootIdentifier: SyntaxTreeToken): DataType {
-        return this.rootType;
+        return this.queryArgumentType;
     }
 
     private getQueryType(query: SubQuery): DataType {

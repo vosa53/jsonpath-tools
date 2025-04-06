@@ -1,22 +1,54 @@
-import { Nothing } from "@/jsonpath-tools/values/types";
 import { JSONValue } from "../json/json-types";
 import { NormalizedPath, NormalizedPathSegment } from "../normalized-path";
 import { isSubtypeOf } from "./operations";
 
+/**
+ * Annotation of a data type (description, example values, ...).
+ */
 export class DataTypeAnnotation {
     constructor(
+        /**
+         * Title.
+         */
         readonly title: string,
+
+        /**
+         * Description.
+         */
         readonly description: string,
+
+        /**
+         * Whether it is deprecated.
+         */
         readonly deprecated: boolean,
+
+        /**
+         * Whether it is read-only.
+         */
         readonly readOnly: boolean,
+
+        /**
+         * Whether it is write-only.
+         */
         readonly writeOnly: boolean,
+
+        /**
+         * Default value or `undefined` if no default value is defined.
+         */
         readonly defaultValue: JSONValue | undefined,
+
+        /**
+         * Example of values.
+         */
         readonly exampleValues: readonly JSONValue[]
     ) { }
 
     static readonly EMPTY_SET: ReadonlySet<DataTypeAnnotation> = new Set<DataTypeAnnotation>();
 }
 
+/**
+ * Data type. Refines JSONPath type.
+ */
 export abstract class DataType {
     constructor(
         readonly annotations: ReadonlySet<DataTypeAnnotation>

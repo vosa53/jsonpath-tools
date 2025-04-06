@@ -1,6 +1,10 @@
 import { JSONValue } from "../json/json-types";
 import { AnyDataType, LiteralDataType, NeverDataType, ObjectDataType, PrimitiveDataType, PrimitiveDataTypeType, DataType, DataTypeAnnotation, UnionDataType, ArrayDataType } from "./data-types";
 
+/**
+ * Converts the given JSON Type Definition ([RFC 8927](https://datatracker.ietf.org/doc/html/rfc8927)) to a data type.
+ * @param jsonTypeDefinition JSON Type Defintion.
+ */
 export function jsonTypeDefinitionToType(jsonTypeDefinition: JSONTypeDefinition): DataType {
     const context = new JSONTypeDefinitionDataTypeConverterContext(jsonTypeDefinition);
     return context.jsonTypeDefinitionToType(jsonTypeDefinition);

@@ -2,42 +2,42 @@ import { JSONValue } from "./json-types";
 
 /**
  * Checks whether the two given JSON values are deeply equal.
- * @param first First JSON value.
- * @param second Second JSON value.
+ * @param valueA JSON value A.
+ * @param valueB JSON value B.
  */
-export function jsonDeepEquals(first: JSONValue, second: JSONValue): boolean {
-    if (typeof first === "number" && typeof second === "number")
-        return first === second;
-    if (typeof first === "string" && typeof second === "string")
-        return first === second;
-    if (typeof first === "boolean" && typeof second === "boolean")
-        return first === second;
-    if (first === null && second === null)
+export function jsonDeepEquals(valueA: JSONValue, valueB: JSONValue): boolean {
+    if (typeof valueA === "number" && typeof valueB === "number")
+        return valueA === valueB;
+    if (typeof valueA === "string" && typeof valueB === "string")
+        return valueA === valueB;
+    if (typeof valueA === "boolean" && typeof valueB === "boolean")
+        return valueA === valueB;
+    if (valueA === null && valueB === null)
         return true;
-    if (Array.isArray(first) && Array.isArray(second))
-        return jsonDeepEqualsArrays(first, second);
-    if (typeof first === "object" && first !== null && !Array.isArray(first) && typeof second === "object" && second !== null && !Array.isArray(second))
-        return jsonDeepEqualsObjects(first, second);
+    if (Array.isArray(valueA) && Array.isArray(valueB))
+        return jsonDeepEqualsArrays(valueA, valueB);
+    if (typeof valueA === "object" && valueA !== null && !Array.isArray(valueA) && typeof valueB === "object" && valueB !== null && !Array.isArray(valueB))
+        return jsonDeepEqualsObjects(valueA, valueB);
     return false;
 }
 
-function jsonDeepEqualsArrays(first: JSONValue[], second: JSONValue[]): boolean {
-    if (first.length !== second.length)
+function jsonDeepEqualsArrays(valueA: JSONValue[], valueB: JSONValue[]): boolean {
+    if (valueA.length !== valueB.length)
         return false;
-    for (let i = 0; i < first.length; i++) {
-        if (!jsonDeepEquals(first[i], second[i]))
+    for (let i = 0; i < valueA.length; i++) {
+        if (!jsonDeepEquals(valueA[i], valueB[i]))
             return false;
     }
     return true;
 }
 
-function jsonDeepEqualsObjects(first: { [key: string]: JSONValue; }, second: { [key: string]: JSONValue; }): boolean {
-    const leftKeys = Object.keys(first);
-    const rightKeys = Object.keys(second);
+function jsonDeepEqualsObjects(valueA: { [key: string]: JSONValue; }, valueB: { [key: string]: JSONValue; }): boolean {
+    const leftKeys = Object.keys(valueA);
+    const rightKeys = Object.keys(valueB);
     if (leftKeys.length !== rightKeys.length)
         return false;
     for (const key of leftKeys) {
-        if (!second.hasOwnProperty(key) || !jsonDeepEquals(first[key], second[key]))
+        if (!valueB.hasOwnProperty(key) || !jsonDeepEquals(valueA[key], valueB[key]))
             return false;
     }
     return true;

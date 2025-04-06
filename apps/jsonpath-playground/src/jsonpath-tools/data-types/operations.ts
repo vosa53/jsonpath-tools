@@ -1,6 +1,10 @@
 import { DataType, UnionDataType, ObjectDataType, ArrayDataType, NeverDataType, AnyDataType, LiteralDataType, PrimitiveDataType } from "./data-types";
 
-
+/**
+ * Creates a new data type that will contain values from intersection of values of types {@link typeA} and {@link typeB}.
+ * @param typeA Type A.
+ * @param typeB Type B.
+ */
 export function intersectTypes(typeA: DataType, typeB: DataType): DataType {
     if (typeA instanceof UnionDataType)
         return UnionDataType.create(typeA.types.map(type => intersectTypes(type, typeB)), typeA.annotations);
@@ -40,6 +44,13 @@ export function intersectTypes(typeA: DataType, typeB: DataType): DataType {
     return NeverDataType.create();
 }
 
+/**
+ * Approximately creates a new data type that will contain values that are in the type {@link typeA} and are not in the type {@link typeB}.
+ * 
+ * *This function is only an approximation and the result type can be a superset of a correct type.*
+ * @param typeA Type A.
+ * @param typeB Type B.
+ */
 export function subtractTypes(typeA: DataType, typeB: DataType): DataType {
     if (typeA instanceof UnionDataType) {
         const newTypes = typeA.types.map(type => subtractTypes(type, typeB));
@@ -55,6 +66,13 @@ export function subtractTypes(typeA: DataType, typeB: DataType): DataType {
     return typeA;
 }
 
+/**
+ * Approximately checks if the type {@link typeA} is a subtype of the type {@link typeB} (all values from {@link typeA} are also in {@link typeB}).
+ * 
+ * *This function is only an approximation, when it returns `true` the result is correct, but when it returns `false` the result is unknown.*
+ * @param typeA Type A.
+ * @param typeB Type B.
+ */
 export function isSubtypeOf(typeA: DataType, typeB: DataType): boolean {
     if (typeA === typeB)
         return true;
@@ -104,6 +122,13 @@ export function isSubtypeOf(typeA: DataType, typeB: DataType): boolean {
     return false;
 }
 
+/**
+ * Approximately checks if the type {@link typeA} is a same type as the type {@link typeB} (all values from {@link typeA} are also in {@link typeB} and vice-versa).
+ * 
+ * *This function is only an approximation, when it returns `true` the result is correct, but when it returns `false` the result is unknown.*
+ * @param typeA Type A.
+ * @param typeB Type B.
+ */
 export function isEquvivalentTypeWith(typeA: DataType, typeB: DataType): boolean {
     return isSubtypeOf(typeA, typeB) && isSubtypeOf(typeB, typeA);
 }

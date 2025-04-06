@@ -4,6 +4,11 @@ import { intersectTypes, subtractTypes } from "./operations";
 import { get } from "jsonpointer";
 import { normalize, parse, resolve, serialize } from "uri-js";
 
+/**
+ * Converts the given JSON Schema to a data type.
+ * @param jsonSchema JSON schema with its URI (optional).
+ * @param additionalJSONSchemas Additional JSON Schemas that can be referenced from the {@link jsonSchema} (via `$ref`).
+ */
 export function jsonSchemaToType(jsonSchema: JsonSchemaWithURI, additionalJSONSchemas: JsonSchemaWithURI[] = []): DataType {
     const context = new JSONSchemaDataTypeConverterContext(jsonSchema, additionalJSONSchemas);
     return context.jsonSchemaToType(jsonSchema.schema);
