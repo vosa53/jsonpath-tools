@@ -14,7 +14,7 @@ import TypePanel from "./components/panels/type-panel";
 import { usePageViewModel } from "./page-view-model";
 import classes from "./page.module.css";
 
-export default function Home() {
+export default function Page() {
     const [navbarOpened, setNavbarOpened] = useState(false);
     const viewModel = usePageViewModel();
     const errorCount = useMemo(() => {
