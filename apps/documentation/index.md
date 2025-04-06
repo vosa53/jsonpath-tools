@@ -43,6 +43,6 @@ features:
   - title: JSON Schema Support
     details: Supports JSON Schema/JSON Type Definition. Actually can work (autocomplete etc.) even without concrete data based only on schema.
   - title: And Many More...
-    details: Fully compliant with the JSONPath standard RFC 9535.
+    details: Document symbols highlighting, folding, automatic indentation, ...
 ---
 
