@@ -2,9 +2,11 @@ import { Diagnostics, DiagnosticsSeverity } from "@/jsonpath-tools/diagnostics";
 import { LintSource } from "@codemirror/lint";
 import { ViewUpdate } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";
-import { languageServiceSessionStateField, updateOptionsEffect, updateQueryArgumentEffect } from "./state";
+import { languageServiceSessionStateField, updateOptionsEffect, updateQueryArgumentEffect } from "./core";
 
-
+/**
+ * CodeMirror lint source for JSONPath.
+ */
 export function lintSource(options: { onDiagnosticsCreated?: (diagnostics: readonly Diagnostics[]) => void } = {}): LintSource {
     return async view => {
         const languageServiceSession = view.state.field(languageServiceSessionStateField);
@@ -26,6 +28,9 @@ export function lintSource(options: { onDiagnosticsCreated?: (diagnostics: reado
     }
 }
 
+/**
+ * CodeMirror lint source `needsRefresh` for {@link lintSource}.
+ */
 export const lintSourceNeedsRefresh = (update: ViewUpdate): boolean => {
     for (const transaction of update.transactions) {
         if (transaction.effects.some(e => e.is(updateOptionsEffect) || e.is(updateQueryArgumentEffect))) 

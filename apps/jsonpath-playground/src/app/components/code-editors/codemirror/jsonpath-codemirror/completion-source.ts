@@ -1,10 +1,12 @@
 import { CompletionItemTextType, CompletionItemType } from "@/jsonpath-tools/editor-services/completion-service";
 import { Completion, CompletionContext, CompletionSource, insertCompletionText, pickedCompletion, snippet } from "@codemirror/autocomplete";
 import { OperationCancelledError } from "./cancellation-token";
-import { languageServiceSessionStateField } from "./state";
+import { languageServiceSessionStateField } from "./core";
 import { MarkdownRenderer } from "./markdown-renderer";
 
-
+/**
+ * CodeMirror completion source for JSONPath.
+ */
 export function completionSource(): CompletionSource {
     return async (context: CompletionContext) => {
         // TODO: Add all word and number characters.

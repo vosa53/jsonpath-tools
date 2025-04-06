@@ -2,18 +2,31 @@ import { JSONValue } from "@/jsonpath-tools/json/json-types";
 import { LanguageService } from "./language-service";
 import { LanguageServiceBackend } from "./language-service-backend";
 
-export class LanguageServices {
-    private static _localLanguageService: LanguageService | undefined;
-    private static _workerLanguageService: LanguageService | undefined;
+/**
+ * Default language services.
+ */
+export class DefaultLanguageServices {
+    private static _local: LanguageService | undefined;
+    private static _worker: LanguageService | undefined;
 
-    static get localLanguageService(): LanguageService {
-        this._localLanguageService ??= this.createLocalLanguageService();
-        return this._localLanguageService;
+    /**
+     * A language service working directly on the UI thread. 
+     * 
+     * **Not recommended, because can cause UI freezes.** The recommended is {@link worker}.
+     */
+    static get local(): LanguageService {
+        this._local ??= this.createLocalLanguageService();
+        return this._local;
     }
 
-    static get workerLanguageService(): LanguageService {
-        this._workerLanguageService ??= this.createWorkerLanguageService();
-        return this._workerLanguageService;
+    /**
+     * A language service working in a web worker.
+     * 
+     * Recommended over {@link local}.
+     */
+    static get worker(): LanguageService {
+        this._worker ??= this.createWorkerLanguageService();
+        return this._worker;
     }
 
     private static createLocalLanguageService(): LanguageService {
@@ -34,4 +47,3 @@ export class LanguageServices {
 
     private constructor() { }
 }
-

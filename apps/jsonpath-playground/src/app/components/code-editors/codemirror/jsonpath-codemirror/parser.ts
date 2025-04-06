@@ -8,7 +8,12 @@ import { continuedIndent, defineLanguageFacet, delimitedIndent, foldInside, fold
 import { Input, NodeProp, NodeSet, NodeType, Parser, PartialParse, Tree, TreeFragment } from "@lezer/common";
 import { styleTags, tags as t } from "@lezer/highlight";
 
-export function getQuery(tree: Tree): Query {
+/**
+ * Returns a JSONPath query associated with the given Lezer tree.
+ * @param tree Lezer tree. 
+ * @throws When the given Lezer tree does not have any associated JSONPath query.
+ */
+export function getQueryForTree(tree: Tree): Query {
     const jsonPath = treeToQuery.get(tree);
     if (jsonPath === undefined)
         throw new Error("The given Lezer tree does not have a corresponding JSONPath query.");
@@ -206,5 +211,12 @@ class CodeMirrorJSONPathPartialParse implements PartialParse {
     stopAt(pos: number): void { }
 }
 
+/**
+ * CodeMirror JSONPath language facet.
+ */
 export const languageFacet = defineLanguageFacet();
+
+/**
+ * CodeMirror JSONPath language parser.
+ */
 export const parser = new CodeMirrorJSONPathParser();

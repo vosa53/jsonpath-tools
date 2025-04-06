@@ -12,7 +12,9 @@ import { DataType } from "@/jsonpath-tools/data-types/data-types";
 import { serializeDataType } from "./data-type-serializer";
 import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
 
-
+/**
+ * Language service session related to one editor instance.
+ */
 export class LanguageServiceSession {
     private cancellationToken = new CancellationToken();
     private taskQueue: Promise<any> = Promise.resolve();

@@ -2,8 +2,11 @@ import { DocumentHighlight } from "@/jsonpath-tools/editor-services/document-hig
 import { EditorState, Extension, StateEffect, StateField } from "@codemirror/state";
 import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";
-import { languageServiceSessionStateField } from "./state";
+import { languageServiceSessionStateField } from "./core";
 
+/**
+ * CodeMirror extension adding JSONPath document highlights.
+ */
 export function documentHighlights(): Extension {
     return [
         documentsHighlightsPlugin,

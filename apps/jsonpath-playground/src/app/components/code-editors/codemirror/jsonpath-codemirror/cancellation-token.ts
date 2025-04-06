@@ -1,5 +1,5 @@
 /**
- * Token to signal that operation should be cancelled.
+ * Token to signal that an operation should be cancelled.
  */
 export class CancellationToken {
     private _isCancelled = false;

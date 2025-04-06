@@ -2,9 +2,12 @@ import { Extension } from "@codemirror/state";
 import { Decoration, hoverTooltip } from "@codemirror/view";
 import { EditorView } from "codemirror";
 import { OperationCancelledError } from "./cancellation-token";
-import { languageServiceSessionStateField } from "./state";
+import { languageServiceSessionStateField } from "./core";
 import { MarkdownRenderer } from "./markdown-renderer";
 
+/**
+ * CodeMirror extension adding JSONPath hover tooltips.
+ */
 export function tooltip(): Extension {
     return [
         jsonPathHoverTooltip,

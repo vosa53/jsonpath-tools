@@ -7,9 +7,9 @@ import { Prec } from "@codemirror/state";
 import { useEffect, useRef } from "react";
 import { Diagnostics } from "../../../jsonpath-tools/diagnostics";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
-import { jsonpath } from "./codemirror/jsonpath-codemirror/language";
-import { getQuery } from "./codemirror/jsonpath-codemirror/parser";
-import { getResult, updateOptionsEffect, updateQueryArgumentEffect, updateQueryArgumentTypeEffect } from "./codemirror/jsonpath-codemirror/state";
+import { jsonpath } from "./codemirror/jsonpath-codemirror/jsonpath";
+import { getQueryForTree } from "./codemirror/jsonpath-codemirror/parser";
+import { getResult, updateOptionsEffect, updateQueryArgumentEffect, updateQueryArgumentTypeEffect } from "./codemirror/jsonpath-codemirror/core";
 import { LanguageService } from "./codemirror/jsonpath-codemirror/language-service/language-service";
 import { TextRange } from "@/jsonpath-tools/text/text-range";
 import { textRangeHighlighter, setHighlightedRangeEffect } from "./codemirror/text-range-highlighter";
@@ -84,7 +84,7 @@ export default function JSONPathEditor({
             }),
             EditorView.updateListener.of(u => {
                 if (u.docChanged) {
-                    const jsonPath = getQuery(syntaxTree(u.view.state));
+                    const jsonPath = getQueryForTree(syntaxTree(u.view.state));
                     onParsed?.(jsonPath);
                 }
             }),

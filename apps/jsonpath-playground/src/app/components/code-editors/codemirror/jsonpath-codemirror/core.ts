@@ -7,7 +7,7 @@ import { LanguageServiceSession } from "./language-service/language-service-sess
 import { DataType } from "@/jsonpath-tools/data-types/data-types";
 import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
 
-export function state(): Extension {
+export function core(): Extension {
     return [
         jsonPathPlugin
     ];

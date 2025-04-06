@@ -35,6 +35,9 @@ interface State {
     pathType: PathType;
 }
 
+/**
+ * ViewModel of the application main page.
+ */
 export function usePageViewModel() {
     const [customFunctions, setCustomFunctions] = useState<readonly CustomFunction[]>([]);
     const [settings, setSettings] = useState<Settings>(testSettings);

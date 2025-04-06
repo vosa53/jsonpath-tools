@@ -2,9 +2,12 @@ import { Signature } from "@/jsonpath-tools/editor-services/signature-help-servi
 import { EditorState, Extension, StateEffect, StateField, Transaction } from "@codemirror/state";
 import { EditorView, showTooltip, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";
-import { languageServiceSessionStateField } from "./state";
+import { languageServiceSessionStateField } from "./core";
 import { MarkdownRenderer } from "./markdown-renderer";
 
+/**
+ * CodeMirror extension adding JSONPath signature help.
+ */
 export function signatureHelp(): Extension {
     return [
         signatureHelpPlugin,

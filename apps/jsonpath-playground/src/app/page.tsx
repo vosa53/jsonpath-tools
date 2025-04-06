@@ -14,6 +14,9 @@ import TypePanel from "./components/panels/type-panel";
 import { usePageViewModel } from "./page-view-model";
 import classes from "./page.module.css";
 
+/**
+ * Main page of the application.
+ */
 export default function Page() {
     const [navbarOpened, setNavbarOpened] = useState(false);
     const viewModel = usePageViewModel();

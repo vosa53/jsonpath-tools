@@ -4,6 +4,9 @@ import "./styles/globals.css";
 import { applicationTheme, applicationCSSVariablesResolver } from "./theme";
 import Page from "./page";
 
+/**
+ * Root component of the application.
+ */
 export default function Root() {
     return (
         <MantineProvider

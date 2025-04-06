@@ -7,6 +7,9 @@ import { Parser } from "@lezer/common";
 import { applicationHighlightStyle } from "../application-highlight-style";
 import MarkdownIt from "markdown-it";
 
+/**
+ * Renders Markdown code to HTML code.
+ */
 export class MarkdownRenderer {
     private static readonly md = markdownit({
         linkify: true,
@@ -15,14 +18,21 @@ export class MarkdownRenderer {
             if (parser === undefined)
                 return code;
             else
-                return highlight(code, parser, applicationHighlightStyle);
+                return highlightCodeToHTML(code, parser, applicationHighlightStyle);
         }
     })
         .use(markdownItLinksTargetBlank);
 
+    /**
+     * Renders Markdown code to HTML code.
+     * @param markdown Markdown code.
+     * @returns Rendered HTML code.
+     */
     static renderToHTML(markdown: string): string {
         return this.md.render(markdown);
     }
+
+    private constructor() { }
 }
 
 const parserMap = new Map<string, Parser>([
@@ -30,7 +40,13 @@ const parserMap = new Map<string, Parser>([
     ["jsonpath-data-type", jsonPathDataTypeParser]
 ]);
 
-export function highlight(code: string, parser: Parser, highlighter: Highlighter): string {
+/**
+ * Highlights the given code using the provided Lezer parser and highlighter and returns result as HTML code.
+ * @param code Code.
+ * @param parser Parser.
+ * @param highlighter Highlighter.
+ */
+export function highlightCodeToHTML(code: string, parser: Parser, highlighter: Highlighter): string {
     const highlightedContainer = document.createElement("pre");
     const tree = parser.parse(code);
 
@@ -57,8 +73,12 @@ export function highlight(code: string, parser: Parser, highlighter: Highlighter
     return highlightedContainer.innerHTML;
 }
 
-// Adapted from: https://github.com/markdown-it/markdown-it/blob/master/docs/architecture.md#renderer
+/**
+ * markdown-it plugin that adds `target="_blank"` to all links.
+ */
 export function markdownItLinksTargetBlank(md: MarkdownIt) {
+    // Adapted from: https://github.com/markdown-it/markdown-it/blob/master/docs/architecture.md#renderer
+
     const defaultLinkOpen = md.renderer.rules.link_open ?? ((tokens, idx, options, env, self) => self.renderToken(tokens, idx, options));
 
     md.renderer.rules.link_open = (tokens, idx, options, env, self) => {

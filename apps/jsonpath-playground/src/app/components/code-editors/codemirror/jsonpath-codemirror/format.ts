@@ -1,14 +1,20 @@
 import { Command, EditorView, keymap } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";
-import { languageServiceSessionStateField } from "./state";
+import { languageServiceSessionStateField } from "./core";
 
-export const jsonPathFormat: Command = view => {
+/**
+ * CodeMirror command to format a JSONPath query.
+ */
+export const format: Command = view => {
     formatAsync(view);
     return true;
 };
 
-export const jsonPathFormatKeyMap = keymap.of([
-    { key: "Alt-Shift-f", run: jsonPathFormat }
+/**
+ * Default CodeMirror keymap for JSONPath formatting using `Alt+Shift+F`.
+ */
+export const formatKeymap = keymap.of([
+    { key: "Alt-Shift-f", run: format }
 ]);
 
 async function formatAsync(view: EditorView) {
