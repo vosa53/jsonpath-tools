@@ -1,6 +1,6 @@
 # JSONPath Tools
 
-[JSONPath Playground](https://vosa53.github.io/jsonpath-tools/documentation/introduction/image.png) | [Documentation](https://vosa53.github.io/jsonpath-tools/)
+[JSONPath Playground](https://jsonpath-playground.pages.dev) | [Documentation](https://vosa53.github.io/jsonpath-tools/)
 
 JSONPath Tools is a set of libraries and applications for JSONPath query language ([RFC 9535](https://datatracker.ietf.org/doc/rfc9535/)). It provides tools to evaluate JSONPath queries, analyze and test them. It also contains an advanced code editor component to edit JSONPath queries.
 
