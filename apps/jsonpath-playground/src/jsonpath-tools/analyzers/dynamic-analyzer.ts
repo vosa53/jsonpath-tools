@@ -6,11 +6,22 @@ import { Selector } from "../query/selectors/selector";
 import { JSONValue } from "../json/json-types";
 import { NodeList } from "../values/node-list";
 
+/**
+ * Analyzes a query for mistakes by executing it on concrete data.
+ */
 export class DynamicAnalyzer {
     constructor(
+        /**
+         * Query options.
+         */
         private readonly options: QueryOptions
     ) { }
 
+    /**
+     * Analyzes a query and returns diagnostics with the query result.
+     * @param query Query.
+     * @param queryArgument Query argument.
+     */
     analyze(query: Query, queryArgument: JSONValue): DynamicAnalysisResult {
         const selectorsThatProducedOutput = new Set<Selector>();
         const diagnosticsJSON = new Set<string>();
@@ -42,7 +53,17 @@ export class DynamicAnalyzer {
     }
 }
 
+/**
+ * Result of dynamic analysis.
+ */
 export interface DynamicAnalysisResult {
+    /**
+     * Diagnostics.
+     */
     readonly diagnostics: readonly Diagnostics[];
+
+    /**
+     * Result of the query.
+     */
     readonly queryResult: NodeList;
 }

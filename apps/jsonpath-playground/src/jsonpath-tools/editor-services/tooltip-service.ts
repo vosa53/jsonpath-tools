@@ -10,17 +10,30 @@ import { JSONValue } from "../json/json-types";
 import { AnalysisDescriptionService } from "./analysis-description-service";
 import { SyntaxDescriptionService } from "./syntax-description-service";
 
+/**
+ * Provides tooltips with information about query parts.
+ */
 export class TooltipService {
     private readonly syntaxDescriptionProvider: SyntaxDescriptionService;
     private readonly analysisDescriptionProvider: AnalysisDescriptionService;
 
     constructor(
+        /**
+         * Query options.
+         */
         private readonly options: QueryOptions
     ) {
         this.syntaxDescriptionProvider = new SyntaxDescriptionService(options);
         this.analysisDescriptionProvider = new AnalysisDescriptionService();
     }
 
+    /**
+     * Provides a tooltip at the given position in the query text.
+     * @param query Query.
+     * @param queryArgument Query argument.
+     * @param queryArgumentType Query argument type.
+     * @param position Position in the query text (character index).
+     */
     provideTooltip(query: Query, queryArgument: JSONValue | undefined, queryArgumentType: DataType, position: number): Tooltip | null {
         const node = query.getAtPosition(position);
         if (node === null)
@@ -132,9 +145,19 @@ export class TooltipService {
     }
 }
 
+/**
+ * Tooltip.
+ */
 export class Tooltip {
     constructor(
+        /**
+         * Text of the tooltip. In Markdown format.
+         */
         readonly text: string,
+
+        /**
+         * Range in the text of the query to which the tooltip relates.
+         */
         readonly range: TextRange
     ) { }
 }

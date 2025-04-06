@@ -4,11 +4,22 @@ import { Query } from "../query/query";
 import { SyntaxTree } from "../query/syntax-tree";
 import { TextRange } from "../text/text-range";
 
+/**
+ * Provides a signature for a called function.
+ */
 export class SignatureHelpService {
     constructor(
+        /**
+         * Query options.
+         */
         private readonly options: QueryOptions
     ) { }
 
+    /**
+     * Provides a signature at the given caret position in the query text.
+     * @param query Query.
+     * @param position Caret position in the query text (starts with 0).
+     */
     provideSignature(query: Query, position: number): Signature | null {
         const node = query.getContainingAtPosition(position);
         if (node === null)

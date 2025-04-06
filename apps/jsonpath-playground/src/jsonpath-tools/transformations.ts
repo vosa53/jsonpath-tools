@@ -1,10 +1,21 @@
 import { NormalizedPath } from "./normalized-path";
 import { JSONValue } from "./json/json-types";
 
+/**
+ * Replaces JSON values at the given normalized paths.
+ * @param value JSON value.
+ * @param paths Normalized paths.
+ * @param replacer JSON value that should be used as a replacement or a function to create that value based on the replaced value.
+ */
 export function replaceAtPaths(value: JSONValue, paths: readonly NormalizedPath[], replacer: (value: JSONValue) => JSONValue | undefined): JSONValue | undefined {
     return replaceOrRemoveAtPaths(value, paths, replacer);
 }
 
+/**
+ * Removes JSON values at the given normalized paths.
+ * @param value JSON value.
+ * @param paths Normalized paths.
+ */
 export function removeAtPaths(value: JSONValue, paths: readonly NormalizedPath[]): JSONValue | undefined {
     return replaceOrRemoveAtPaths(value, paths, () => undefined);
 }

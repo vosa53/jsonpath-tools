@@ -3,7 +3,6 @@ import { StaticAnalyzer } from "../analyzers/static-analyzer";
 import { AnyDataType, DataType } from "../data-types/data-types";
 import { Diagnostics } from "../diagnostics";
 import { defaultQueryOptions, QueryOptions } from "../options";
-import { FunctionHandler } from "../functions/function";
 import { Query } from "../query/query";
 import { Checker } from "../semantic-analysis/checker";
 import { Parser } from "../syntax-analysis/parser";
@@ -17,6 +16,9 @@ import { FormattingService } from "./formatting-service";
 import { Signature, SignatureHelpService } from "./signature-help-service";
 import { Tooltip, TooltipService } from "./tooltip-service";
 
+/**
+ * Provides services for JSONPath editors.
+ */
 export class EditorService {
     private readonly parser: Parser;
     private options: QueryOptions;
@@ -50,6 +52,10 @@ export class EditorService {
         this.dynamicAnalysisResult = null;
     }
 
+    /**
+     * Updates query options.
+     * @param newOptions New query options.
+     */
     updateOptions(newOptions: QueryOptions) {
         this.options = newOptions;
         this.typeChecker = new Checker(this.options);
@@ -62,16 +68,28 @@ export class EditorService {
         this.dynamicAnalysisResult = null;
     }
 
+    /**
+     * Updates edited query text.
+     * @param newQuery New text of the edited query.
+     */
     updateQuery(newQuery: string) {
         this.query = this.parser.parse(newQuery);
         this.dynamicAnalysisResult = null;
     }
 
+    /**
+     * Updates query argument.
+     * @param newQueryArgument New query argument. 
+     */
     updateQueryArgument(newQueryArgument: JSONValue | undefined) {
         this.queryArgument = newQueryArgument;
         this.dynamicAnalysisResult = null;
     }
 
+    /**
+     * Updates query argument type.
+     * @param newQueryArgumentType New query argument type.
+     */
     updateQueryArgumentType(newQueryArgumentType: DataType) {
         this.queryArgumentType = newQueryArgumentType;
     }

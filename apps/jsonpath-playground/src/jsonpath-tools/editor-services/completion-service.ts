@@ -21,17 +21,30 @@ import { SyntaxDescriptionService } from "./syntax-description-service";
 import { NormalizedPathSegment } from "../normalized-path";
 import { FilterValue } from "../values/types";
 
+/**
+ * Provides completion items.
+ */
 export class CompletionService {
     private readonly syntaxDescriptionProvider: SyntaxDescriptionService;
     private readonly analysisDescriptionProvider: AnalysisDescriptionService;
 
     constructor(
+        /**
+         * Query options.
+         */
         private readonly options: QueryOptions
     ) {
         this.syntaxDescriptionProvider = new SyntaxDescriptionService(options);
         this.analysisDescriptionProvider = new AnalysisDescriptionService();
     }
 
+    /**
+     * Provides completion items at the given caret position in the query text.
+     * @param query Query.
+     * @param queryArgument Query argument.
+     * @param queryArgumentType Query argument type.
+     * @param position Caret position in the query text (starts with 0).
+     */
     provideCompletions(query: Query, queryArgument: JSONValue | undefined, queryArgumentType: DataType, position: number): CompletionItem[] {
         const completions: CompletionItem[] = [];
         const touchingNodes = query.getTouchingAtPosition(position);

@@ -14,7 +14,14 @@ import { SyntaxTree } from "../query/syntax-tree";
 import { TextChange } from "../text/text-change";
 import { TextRange } from "../text/text-range";
 
+/**
+ * Formats query text to be more readable and consistent.
+ */
 export class FormattingService {
+    /**
+     * Returns text changes that can be used to format the given query text.
+     * @param query Query.
+     */
     getFormattingEdits(query: Query): TextChange[] {
         const context = new FormatterContext();
         this.formatTree(query, 0, context);

@@ -7,11 +7,22 @@ import { SyntaxTree } from "../query/syntax-tree";
 import { SyntaxTreeType } from "../query/syntax-tree-type";
 import { TextRange } from "../text/text-range";
 
+/**
+ * Provides highlights of related symbols.
+ */
 export class DocumentHighlightsService {
     constructor(
+        /**
+         * Query options.
+         */
         private readonly options: QueryOptions
     ) { }
 
+    /**
+     * Provides document highlights at the given caret position in the query text.
+     * @param query Query.
+     * @param position Caret position in the query text (starts with 0).
+     */
     provideHighlights(query: Query, position: number): DocumentHighlight[] {
         const documentHighlights: DocumentHighlight[] = [];
         const touchingNodes = query.getTouchingAtPosition(position);

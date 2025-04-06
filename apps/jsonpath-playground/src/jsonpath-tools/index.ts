@@ -74,7 +74,7 @@ export {
 
     Type,
 
-    DiagnosticsSeverity as DiagnosticsType,
+    DiagnosticsSeverity,
 
     TextRange,
     TextChange,

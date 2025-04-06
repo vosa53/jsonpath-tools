@@ -16,7 +16,7 @@ export class Diagnostics {
         readonly message: string,
 
         /**
-         * The range in the text of the query to which the diagnostic relates.
+         * Range in the text of the query to which the diagnostic relates.
          */
         readonly textRange: TextRange
     ) { }
