@@ -13,7 +13,7 @@ import { serializeDataType } from "./data-type-serializer";
 import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
 
 /**
- * Language service session related to one editor instance.
+ * Language service frontend session related to one editor instance.
  */
 export class LanguageServiceSession {
     private cancellationToken = new CancellationToken();

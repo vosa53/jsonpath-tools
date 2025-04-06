@@ -65,7 +65,7 @@ export type {
     NodesType,
 
     Diagnostics
-}
+};
 
 export { 
     JSONPath,

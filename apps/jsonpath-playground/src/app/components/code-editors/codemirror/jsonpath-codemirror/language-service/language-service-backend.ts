@@ -5,10 +5,20 @@ import { UpdateOptionsLanguageServiceMessage, UpdateQueryLanguageServiceMessage,
 import { defaultQueryOptions } from "@/jsonpath-tools/options";
 import { FunctionHandler } from "@/jsonpath-tools/functions/function";
 
+/**
+ * Serves as a backend for a language service providing services for editors.
+ */
 export class LanguageServiceBackend {
     private readonly rpc: SimpleRPC<LanguageServiceBackendSession>;
 
-    constructor(sendToFrontend: (data: JSONValue) => void, resolveFunctionHandler?: (functionName: string) => FunctionHandler) {
+    /**
+     * @param sendToFrontend Callback that sends a given data to the frontend.
+     * @param resolveFunctionHandler Callback that returns a handler for the given function name.
+     */
+    constructor(
+        sendToFrontend: (data: JSONValue) => void, 
+        resolveFunctionHandler?: (functionName: string) => FunctionHandler
+    ) {
         resolveFunctionHandler ??= fn => {
             const exists = Object.hasOwn(defaultQueryOptions.functions, fn);
             if (!exists) throw new Error(`Function '${fn}' not found.`);
@@ -34,6 +44,10 @@ export class LanguageServiceBackend {
         this.rpc.registerHandlerAction("disconnect", (h, message: DisconnectLanguageServiceMessage) => h.disconnect(message));
     }
 
+    /**
+     * Receives the given data from the frontend.
+     * @param data Data.
+     */
     receiveFromFrontend(data: JSONValue) {
         this.rpc.receive(data);
     }

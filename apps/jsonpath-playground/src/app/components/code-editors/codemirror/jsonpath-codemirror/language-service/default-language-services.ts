@@ -12,7 +12,7 @@ export class DefaultLanguageServices {
     /**
      * A language service working directly on the UI thread. 
      * 
-     * **Not recommended, because can cause UI freezes.** The recommended is {@link worker}.
+     * **Not recommended, because it can cause UI freezes.** The recommended is {@link worker}.
      */
     static get local(): LanguageService {
         this._local ??= this.createLocalLanguageService();
