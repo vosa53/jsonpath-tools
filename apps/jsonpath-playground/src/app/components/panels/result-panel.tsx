@@ -11,6 +11,9 @@ import { saveTextFile } from "@/app/services/files";
 import { isJSONString } from "@/app/validators/is-json-string";
 import { isJSONPatchString } from "@/app/validators/is-json-patch-string";
 
+/**
+ * Panel displaying JSONPath query result values.
+ */
 const ResultPanel = memo(({
     resultText,
     operation,

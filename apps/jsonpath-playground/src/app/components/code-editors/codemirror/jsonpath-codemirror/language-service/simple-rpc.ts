@@ -1,5 +1,8 @@
 import { logPerformance } from "@/jsonpath-tools/helpers/utils";
 
+/**
+ * Simple RPC primarily for web workers.
+ */
 export class SimpleRPC<THandler> {
     private readonly messageTypeToHandlerActions = new Map<string, (handler: THandler, data: any) => any>();
     private readonly messageIDToPromiseActions = new Map<string, { resolve: (data: any) => void, reject: (error: Error) => void }>();

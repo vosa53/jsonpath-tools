@@ -1,6 +1,9 @@
 import { useMemo } from "react";
 import { renderMarkdownToHTML } from "../services/markdown";
 
+/**
+ * Renders Markdown code.
+ */
 export function MarkdownView({ markdown, withSpacing = false }: { markdown: string, withSpacing?: boolean }) {
     const markdownHTML = useMemo(() => renderMarkdownToHTML(markdown), [markdown]);
     return (

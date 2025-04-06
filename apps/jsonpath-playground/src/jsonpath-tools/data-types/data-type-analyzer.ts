@@ -45,7 +45,7 @@ export class DataTypeAnalyzer {
     ) { }
 
     /**
-     * Resolves data type for the given tree.
+     * Resolves a data type for the given tree.
      * @param tree Tree.
      */
     getType(tree: SyntaxTree): DataType {

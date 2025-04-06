@@ -2,6 +2,9 @@ import { ActionIcon, Burger, Flex, Group, Indicator, Title, useMantineColorSchem
 import { IconBrandGithub, IconMoon, IconRoute, IconSun } from "@tabler/icons-react";
 import { memo } from "react";
 
+/**
+ * Application logo, title and links.
+ */
 const Header = memo(({
     navbarOpened,
     onNavbarOpenedChanged

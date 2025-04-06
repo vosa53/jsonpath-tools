@@ -1,5 +1,9 @@
 import { AnyDataType, ArrayDataType, DataType, DataTypeAnnotation, LiteralDataType, NeverDataType, ObjectDataType, PrimitiveDataType, UnionDataType } from "@/jsonpath-tools/data-types/data-types";
 
+/**
+ * Serializes a data type for a use with the structured clone algorithm.
+ * @param type Data type.
+ */
 export function serializeDataType(type: DataType) {
     const fromCache = serializedTypeCache.get(type);
     if (fromCache !== undefined) return fromCache;
@@ -26,6 +30,10 @@ export function serializeDataType(type: DataType) {
     return serializedType;
 }
 
+/**
+ * Deserializes a data type serialized with {@link serializeDataType}.
+ * @param serializedType Serialized data type.
+ */
 export function deserializeDataType(serializedType: any): DataType {
     const fromCache = deserializedTypeCache.get(serializedType);
     if (fromCache !== undefined) return fromCache;

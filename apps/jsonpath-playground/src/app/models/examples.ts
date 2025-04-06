@@ -1,10 +1,31 @@
+/**
+ * Example data.
+ */
 export interface Example {
+    /**
+     * Display name of the example.
+     */
     readonly name: string;
+
+    /**
+     * JSON data in a text form.
+     */
     readonly jsonText: string;
+
+    /**
+     * JSON Schema for the JSON data in a text form.
+     */
     readonly jsonSchemaText: string;
+
+    /**
+     * JSON Type Definition for the JSON data in a text form.
+     */
     readonly jsonTypeDefinitionText: string;
 }
 
+/**
+ * Application example data.
+ */
 export const examples: readonly Example[] = [
     {
         name: "Car Dealership",

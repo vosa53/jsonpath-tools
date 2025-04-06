@@ -11,6 +11,9 @@ import { EditorFormAdapter } from "../editor-form-adapter";
 import documentationMarkdown from "./custom-function-editor-documentation.md?raw";
 import { MarkdownView } from "../markdown-view";
 
+/**
+ * Editor for a custom JSONPath function.
+ */
 export default function CustomFunctionEditor({
     customFunction,
     existsName,

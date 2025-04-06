@@ -6,6 +6,9 @@ import PanelShell from "../panel-shell";
 import { IconFileDownload } from "@tabler/icons-react";
 import { saveTextFile } from "@/app/services/files";
 
+/**
+ * Panel displaying JSONPath query result paths.
+ */
 const PathsPanel = memo(({
     pathsText,
     pathType,

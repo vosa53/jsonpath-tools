@@ -1,6 +1,9 @@
 import { Stack, Switch } from "@mantine/core";
 import { Settings } from "../models/settings";
 
+/**
+ * Editor for the application settings.
+ */
 export default function SettingsEditor({
     settings,
     onSettingsChanged

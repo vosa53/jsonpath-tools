@@ -7,14 +7,9 @@ import { CustomFunction } from "../../models/custom-function";
 import CustomFunctionEditor from "./custom-function-editor";
 import CustomFunctionView from "./custom-function-view";
 
-const newCustomFunction: CustomFunction = {
-    name: "",
-    description: "",
-    code: "",
-    parameters: [],
-    returnType: Type.valueType
-};
-
+/**
+ * Displays custom JSONPath functions.
+ */
 export default function CustomFunctionsView({
     customFunctions,
     onCustomFunctionsChanged
@@ -70,3 +65,11 @@ export default function CustomFunctionsView({
         </div>
     );
 }
+
+const newCustomFunction: CustomFunction = {
+    name: "",
+    description: "",
+    code: "",
+    parameters: [],
+    returnType: Type.valueType
+};

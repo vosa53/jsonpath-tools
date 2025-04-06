@@ -1,9 +1,12 @@
 import { Diagnostics, DiagnosticsSeverity } from "@/jsonpath-tools/diagnostics";
 import { Checkbox, DefaultMantineColor, Group, Table, ThemeIcon } from "@mantine/core";
-import { IconAlertTriangle, IconAlertTriangleFilled, IconExclamationCircle, IconExclamationCircleFilled } from "@tabler/icons-react";
+import { IconAlertTriangleFilled, IconExclamationCircleFilled } from "@tabler/icons-react";
 import { memo, ReactNode, useMemo, useState } from "react";
 import PanelShell from "../panel-shell";
 
+/**
+ * Panel displaying JSONPath query diagnostics.
+ */
 const DiagnosticsPanel = memo(({
     diagnostics,
     onSelectedDiagnosticsChanged

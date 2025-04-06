@@ -12,6 +12,9 @@ import { highlightStyle } from "./highlight-style";
 import { tabKeymap } from "./tab-keymap";
 import { themeCommon, themeDark, themeLight } from "./theme";
 
+/**
+ * CodeMirror code editor component.
+ */
 export default function CodeMirrorEditor({
     value,
     readonly = false,

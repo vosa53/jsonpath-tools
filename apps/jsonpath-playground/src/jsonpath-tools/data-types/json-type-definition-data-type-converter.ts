@@ -178,6 +178,9 @@ class JSONTypeDefinitionDataTypeConverterContext {
     }
 }
 
+/**
+ * JSON Type Definition.
+ */
 export interface JSONTypeDefinition {
     readonly type?: JSONTypeDefinitionType;
     readonly enum?: readonly string[];

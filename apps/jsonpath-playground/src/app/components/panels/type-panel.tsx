@@ -7,6 +7,9 @@ import { DataTypeRaw, DataTypeRawFormat } from "@/app/models/data-type-raw";
 import { examples } from "@/app/models/examples";
 import { openTextFile } from "@/app/services/files";
 
+/**
+ * Panel for query argument type editation.
+ */
 const TypePanel = memo(({
     queryArgumentTypeRaw,
     onQueryArgumentTypeRawChanged

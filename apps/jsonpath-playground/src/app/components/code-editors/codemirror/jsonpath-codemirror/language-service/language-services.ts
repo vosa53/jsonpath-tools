@@ -31,5 +31,7 @@ export class LanguageServices {
         worker.addEventListener("message", e => languageService.receiveFromBackend(e.data));
         return languageService;
     }
+
+    private constructor() { }
 }
 

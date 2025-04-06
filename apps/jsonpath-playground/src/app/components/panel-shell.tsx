@@ -1,6 +1,9 @@
 import { Divider, Flex } from "@mantine/core";
 import { ReactNode } from "react";
 
+/**
+ * Wrapper for main application panels.
+ */
 export default function PanelShell({
     toolbar,
     children,

@@ -16,6 +16,9 @@ import { rangeHighlighter, setHighlightedRangeEffect } from "./codemirror/range-
 import { AnyDataType, DataType } from "@/jsonpath-tools/data-types/data-types";
 import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
 
+/**
+ * JSONPath editor component.
+ */
 export default function JSONPathEditor({
     value,
     options = defaultQueryOptions,

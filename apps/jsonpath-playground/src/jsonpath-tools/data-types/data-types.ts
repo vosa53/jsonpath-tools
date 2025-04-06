@@ -47,7 +47,7 @@ export class DataTypeAnnotation {
 }
 
 /**
- * Data type. Refines JSONPath type.
+ * Data type. Refines the JSONPath types.
  */
 export abstract class DataType {
     constructor(
@@ -123,14 +123,39 @@ export abstract class DataType {
     }
 }
 
+/**
+ * Type of a primitive data type.
+ */
 export enum PrimitiveDataTypeType {
+    /**
+     * JSON number.
+     */
     number = "number",
+
+    /**
+     * JSON string.
+     */
     string = "string",
+
+    /**
+     * JSON boolean.
+     */
     boolean = "boolean",
+
+    /**
+     * JSON `null`.
+     */
     null = "null",
+
+    /**
+     * JSONPath `Nothing`.
+     */
     nothing = "nothing"
 }
 
+/**
+ * Unit data type. Contains only the {@link value}.
+ */
 export class LiteralDataType extends DataType {
     private constructor(
         readonly value: string | number | boolean,
@@ -191,6 +216,9 @@ export class LiteralDataType extends DataType {
     }
 }
 
+/**
+ * Data type for primitive JSON values and a special JSONPath value `Nothing`. Contains all values from {@link type}.
+ */
 export class PrimitiveDataType extends DataType {
     private constructor(
         readonly type: PrimitiveDataTypeType,
@@ -245,6 +273,9 @@ export class PrimitiveDataType extends DataType {
     }
 }
 
+/**
+ * Data type for JSON objects. Contains all JSON objects that meet criteria from {@link propertyTypes}, {@link restPropertyType} and {@link requiredProperties}.
+ */
 export class ObjectDataType extends DataType {
     private constructor(
         readonly propertyTypes: ReadonlyMap<string, DataType>,
@@ -335,6 +366,9 @@ export class ObjectDataType extends DataType {
     }
 }
 
+/**
+ * Data type for JSON arrays. Contains all JSON arrays that meet criteria from {@link prefixElementTypes}, {@link restElementType} and {@link requiredElementCount}.
+ */
 export class ArrayDataType extends DataType {
     private constructor(
         readonly prefixElementTypes: readonly DataType[],
@@ -443,6 +477,9 @@ export class ArrayDataType extends DataType {
     }
 }
 
+/**
+ * Sum data type. Contains values from an union of the {@link types}.
+ */
 export class UnionDataType extends DataType {
     private constructor(
         readonly types: readonly DataType[],
@@ -536,6 +573,9 @@ export class UnionDataType extends DataType {
     }
 }
 
+/**
+ * Bottom data type. Contains no values.
+ */
 export class NeverDataType extends DataType {
     private static readonly instance: NeverDataType = new NeverDataType(DataTypeAnnotation.EMPTY_SET);
 
@@ -589,6 +629,9 @@ export class NeverDataType extends DataType {
     }
 }
 
+/**
+ * Top data type. Contains all values.
+ */
 export class AnyDataType extends DataType {
     private static readonly instance: AnyDataType = new AnyDataType();
 

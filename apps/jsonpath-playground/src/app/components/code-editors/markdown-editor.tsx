@@ -3,6 +3,9 @@ import { EditorView } from "codemirror";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
 import { FocusEventHandler } from "react";
 
+/**
+ * Markdown editor component.
+ */
 export default function MarkdownEditor({
     value,
     onValueChanged,

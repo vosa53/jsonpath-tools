@@ -2,6 +2,9 @@ import { javascript } from "@codemirror/lang-javascript";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
 import { FocusEventHandler } from "react";
 
+/**
+ * JavaScript editor component.
+ */
 export default function JavaScriptEditor({
     value,
     onValueChanged,

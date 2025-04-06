@@ -10,6 +10,9 @@ import { getNodeAtPath, getPathAtTreeCursor, pathsHighlighter, setCurrentHighlig
 import { EMPTY_ARRAY, logPerformance } from "@/jsonpath-tools/helpers/utils";
 import { ensureParsed } from "./codemirror/ensure-parsed";
 
+/**
+ * JSON editor component.
+ */
 export default function JSONEditor({
     value,
     readonly = false,

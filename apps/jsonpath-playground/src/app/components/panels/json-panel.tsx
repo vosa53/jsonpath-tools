@@ -8,6 +8,9 @@ import PanelShell from "../panel-shell";
 import { examples } from "@/app/models/examples";
 import { openTextFile } from "@/app/services/files";
 
+/**
+ * Panel for query argument JSON editation.
+ */
 const JSONPanel = memo(({
     queryArgumentText,
     paths,

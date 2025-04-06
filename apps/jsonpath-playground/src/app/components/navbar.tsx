@@ -10,6 +10,9 @@ import jsonPathGuide from "./jsonpath-guide.md?raw";
 import applicationGuide from "./application-guide.md?raw";
 import classes from "./navbar.module.css";
 
+/**
+ * Application side navigation.
+ */
 const Navbar = memo(({
     customFunctions,
     settings,

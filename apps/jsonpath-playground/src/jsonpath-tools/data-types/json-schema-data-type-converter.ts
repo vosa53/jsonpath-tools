@@ -347,11 +347,24 @@ const fullySupportedKeywords: ReadonlySet<string> = new Set([
     "$anchor"
 ]);
 
+/**
+ * JSON schema with its URI.
+ */
 export interface JsonSchemaWithURI {
+    /**
+     * JSON Schema.
+     */
     readonly schema: JSONSchema;
+
+    /**
+     * Optional URI of the JSON Schema.
+     */
     readonly uri?: string;
 }
 
+/**
+ * JSON Schema.
+ */
 export type JSONSchema = boolean | ObjectJSONSchema;
 
 export interface ObjectJSONSchema {

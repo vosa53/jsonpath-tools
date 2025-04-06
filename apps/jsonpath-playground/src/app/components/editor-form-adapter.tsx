@@ -3,6 +3,9 @@ import { useUncontrolled } from "@mantine/hooks";
 import { CSSProperties, FocusEventHandler, ReactNode } from "react";
 import classes from "./editor-form-adapter.module.css";
 
+/**
+ * Adapts code editors for use with Mantine forms.
+ */
 export function EditorFormAdapter({
     editor,
     style,

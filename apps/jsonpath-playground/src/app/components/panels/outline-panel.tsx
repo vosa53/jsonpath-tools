@@ -11,6 +11,9 @@ import PanelShell from "../panel-shell";
 import classes from "./outline-panel.module.css";
 import { MarkdownView } from "../markdown-view";
 
+/**
+ * Panel displaying JSONPath query in a tree form.
+ */
 const OutlinePanel = memo(({
     query,
     onSelectedNodeChanged

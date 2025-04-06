@@ -26,7 +26,7 @@ export interface Function {
     readonly returnDataType: DataType;
 
     /**
-     * JavaScript function that executes the function.
+     * JavaScript function that implements the JSONPath function.
      */
     readonly handler: FunctionHandler;
 }
@@ -57,7 +57,9 @@ export interface FunctionParameter {
 }
 
 /**
- * JavaScript function that executes a JSONPath function.
+ * JavaScript function that implements a JSONPath function.
+ * @param context Context of the function execution.
+ * @param args Arguments with which the JSONPath function was called.
  */
 export type FunctionHandler = (context: FunctionContext, ...args: FilterValue[]) => FilterValue;
 

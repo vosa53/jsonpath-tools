@@ -3,6 +3,9 @@ import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { CustomFunction } from "../../models/custom-function";
 import { MarkdownView } from "../markdown-view";
 
+/**
+ * Displays a custom JSONPath function.
+ */
 export default function CustomFunctionView({
     customFunction,
     onEditClick

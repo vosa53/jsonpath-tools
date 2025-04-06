@@ -1,4 +1,9 @@
+/**
+ * Lezer grammar for JSONPath data type text representation.
+ */
+ 
 // Adapted from: https://github.com/lezer-parser/json/blob/main/src/json.grammar
+
 @top JSONPathDataType { dataType }
 
 dataType { Union }
