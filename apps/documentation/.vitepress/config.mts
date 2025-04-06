@@ -45,9 +45,13 @@ export default defineConfig({
             ]
         },
 
+        outline: {
+            level: [2, 3]
+        },
+
         socialLinks: [
             { icon: "github", link: "https://github.com/vosa53/jsonpath-tools" }
         ]
     },
     base: "/jsonpath-tools/"
-})
+});
