@@ -28,7 +28,7 @@ export class JSONPath {
     }
 
     /**
-     * Executes the given query and replaces the selected nodes in the query argument.
+     * Executes the given query and replaces the selected nodes in the query argument with the specified value.
      * @param queryText Text of the query.
      * @param queryArgument Argument of the query (JSON value the query is applied to).
      * @param replacer JSON value that should be used as a replacement or a function to create that value based on the replaced value.

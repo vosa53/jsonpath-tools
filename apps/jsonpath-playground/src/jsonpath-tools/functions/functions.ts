@@ -3,6 +3,11 @@ import { IRegexp } from "../iregexp";
 import { Type, FilterValue, isNodesType, isValueType, Nothing, LogicalFalse, LogicalTrue } from "../values/types";
 import { Function, FunctionContext } from "./function";
 
+/**
+ * Standard JSONPath `length` function.
+ * 
+ * Gets the length of a value.
+ */
 export const lengthFunction: Function = {
     description: "Gets the length of a value.",
     parameters: [
@@ -20,6 +25,11 @@ export const lengthFunction: Function = {
     }
 };
 
+/**
+ * Standard JSONPath `count` function.
+ * 
+ * Counts the number of nodes.
+ */
 export const countFunction: Function = {
     description: "Counts the number of nodes.",
     parameters: [
@@ -34,6 +44,11 @@ export const countFunction: Function = {
     }
 };
 
+/**
+ * Standard JSONPath `match` function.
+ * 
+ * Matches a text against a pattern.
+ */
 export const matchFunction: Function = {
     description: "Matches a text against a pattern.",
     parameters: [
@@ -58,6 +73,11 @@ export const matchFunction: Function = {
     }
 };
 
+/**
+ * Standard JSONPath `search` function.
+ * 
+ * Searches a text for a pattern.
+ */
 export const searchFunction: Function = {
     description: "Searches a text for a pattern.",
     parameters: [
@@ -82,8 +102,13 @@ export const searchFunction: Function = {
     }
 };
 
+/**
+ * Standard JSONPath `value` function.
+ * 
+ * Gets a value of a node.
+ */
 export const valueFunction: Function = {
-    description: "Gets the value of a node.",
+    description: "Gets a value of a node.",
     parameters: [
         { name: "nodes", description: "The nodes to get the value of.", type: Type.nodesType, dataType: AnyDataType.create() }
     ],

@@ -1,5 +1,10 @@
 import { NormalizedPath } from "../normalized-path";
 
+/**
+ * Converts a string to a text representation.
+ * @param value String value.
+ * @param quotes Type of quotes that should be used.
+ */
 export function serializeString(value: string, quotes = StringQuotes.double): string {
     let serialized = "";
     serialized += quotes;
@@ -19,18 +24,34 @@ export function serializeString(value: string, quotes = StringQuotes.double): st
     return serialized;
 }
 
+/**
+ * Converts a number to a text representation.
+ * @param value Number value.
+ */
 export function serializeNumber(value: number): string {
     return value.toString();
 }
 
+/**
+ * Converts a boolean to a text representation.
+ * @param value Boolean value.
+ */
 export function serializeBoolean(value: boolean) {
     return value ? "true" : "false";
 }
 
+/**
+ * Converts a null to a text representation.
+ */
 export function serializeNull() {
     return "null";
 }
 
+/**
+ * Converts a literal to a text representation.
+ * @param value Literal value.
+ * @param stringQuotes Type of string quotes that should be used.
+ */
 export function serializeLiteral(value: string | number | boolean | null, stringQuotes = StringQuotes.double) {
     if (typeof value === "string")
         return serializeString(value, stringQuotes);
@@ -42,11 +63,25 @@ export function serializeLiteral(value: string | number | boolean | null, string
         return serializeNull();
 }
 
+/**
+ * Converts a normalized path to a text representation.
+ * @param path Normalized path.
+ */
 export function serializedNormalizedPath(path: NormalizedPath): string {
     return "$" + path.map(ps => `[${serializeLiteral(ps, StringQuotes.single)}]`).join("");
 }
 
+/**
+ * Type of string quotes.
+ */
 export enum StringQuotes {
+    /**
+     * Single.
+     */
     single = "'",
+
+    /**
+     * Double.
+     */
     double = "\""
 }

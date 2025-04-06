@@ -1,5 +1,9 @@
 export type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue; };
 
+/**
+ * Returns a type of the given JSON value.
+ * @param value JSON value.
+ */
 export function getJSONType(value: JSONValue): JSONType {
     const javaScriptType = typeof value;
     if (javaScriptType == "object") {
@@ -16,6 +20,9 @@ export function getJSONType(value: JSONValue): JSONType {
         return javaScriptType as JSONType;
 }
 
+/**
+ * Type of a JSON value.
+ */
 export enum JSONType {
     string = "string",
     number = "number",

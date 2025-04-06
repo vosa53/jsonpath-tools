@@ -7,6 +7,7 @@ import { JSONValue } from './json/json-types';
 import { serializedNormalizedPath } from './serialization/serialization';
 import { JSONPath } from './jsonpath';
 
+// Tests the library for RFC 9535 standard compliance using https://github.com/jsonpath-standard/jsonpath-compliance-test-suite.
 describe("JSONPath Compliance Test Suite", () => {
     for (const test of cts.tests) {
         it(test.name, () => {

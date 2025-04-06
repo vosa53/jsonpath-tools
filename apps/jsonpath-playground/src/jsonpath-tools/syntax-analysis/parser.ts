@@ -27,9 +27,18 @@ import { SyntaxTreeToken } from "../query/syntax-tree-token";
 import { TextRange } from "../text/text-range";
 import { CharacterCategorizer } from "./character-categorizer";
 
+/**
+ * JSONPath query parser.
+ */
 export class Parser {
-    parse(input: string): Query {
-        const context = new ParserContext(input);
+    /**
+     * Parses a query text to syntax tree. 
+     * 
+     * Parse is fault-tolerant and does not throw any exceptions. Errors are returned in {@link Query.syntaxDiagnostics}.
+     * @param queryText Text of the query.
+     */
+    parse(queryText: string): Query {
+        const context = new ParserContext(queryText);
         const query = this.parseQuery(context, false);
         const endOfFileToken = context.collectToken(SyntaxTreeType.endOfFileToken);
 
@@ -538,12 +547,12 @@ export class Parser {
 }
 
 class ParserContext {
+    private readonly _diagnostics: Diagnostics[] = [];
     private _currentIndex = 0;
     private _skippedCount = 0;
     private _collectedCount = 0;
-    private _diagnostics: Diagnostics[] = [];
 
-    constructor(readonly input: string) {
+    constructor(private readonly queryText: string) {
 
     }
 
@@ -552,14 +561,14 @@ class ParserContext {
     }
 
     get current(): string | null {
-        return this._currentIndex < this.input.length 
-            ? this.input[this._currentIndex] 
+        return this._currentIndex < this.queryText.length 
+            ? this.queryText[this._currentIndex] 
             : null;
     }
 
     get next(): string | null {
-        return this._currentIndex + 1 < this.input.length 
-            ? this.input[this._currentIndex + 1] 
+        return this._currentIndex + 1 < this.queryText.length 
+            ? this.queryText[this._currentIndex + 1] 
             : null;
     }
 
@@ -589,15 +598,15 @@ class ParserContext {
     }
 
     addError(message: string, textRange?: TextRange) {
-        textRange ??= new TextRange(this._currentIndex, this.currentIndex < this.input.length ? 1 : 0);
+        textRange ??= new TextRange(this._currentIndex, this.currentIndex < this.queryText.length ? 1 : 0);
         const diagnostics = new Diagnostics(DiagnosticsSeverity.error, message, textRange);
         this._diagnostics.push(diagnostics);
     }
 
     collectToken(type: SyntaxTreeType): SyntaxTreeToken {
         const position = this._currentIndex - this._collectedCount - this._skippedCount;
-        const skippedText = this.input.substring(this._currentIndex - this._collectedCount - this._skippedCount, this._currentIndex - this._collectedCount);
-        const collectedText = this.input.substring(this._currentIndex - this._collectedCount, this._currentIndex);
+        const skippedText = this.queryText.substring(this._currentIndex - this._collectedCount - this._skippedCount, this._currentIndex - this._collectedCount);
+        const collectedText = this.queryText.substring(this._currentIndex - this._collectedCount, this._currentIndex);
         this._skippedCount = 0;
         this._collectedCount = 0;
         return new SyntaxTreeToken(type, position, collectedText, skippedText);

@@ -22,11 +22,19 @@ import { SyntaxTree } from "../query/syntax-tree";
 import { SyntaxTreeToken } from "../query/syntax-tree-token";
 import { TextRange } from "../text/text-range";
 
+/**
+ * JSONPath query checker.
+ */
 export class TypeChecker {
     constructor (private readonly options: QueryOptions) {
 
     }
 
+    /**
+     * Checks whether the query is valid.
+     * @param query Query.
+     * @returns Query diagnostics.
+     */
     check(query: Query): readonly Diagnostics[] {
         const context = new TypeCheckerContext();
         this.checkRecursive(query, null, context);

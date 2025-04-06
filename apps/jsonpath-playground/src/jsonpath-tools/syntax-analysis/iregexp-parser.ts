@@ -1,21 +1,20 @@
-const unicodeCategories = new Map<string, Set<string>>([
-    ["L", new Set(["l", "m", "o", "t", "u"])],
-    ["M", new Set(["c", "e", "n"])],
-    ["N", new Set(["d", "l", "o"])],
-    ["P", new Set(["c", "d", "e", "f", "i", "o", "s"])],
-    ["Z", new Set(["l", "p", "s"])],
-    ["S", new Set(["c", "k", "m", "o"])],
-    ["C", new Set(["c", "f", "n", "o"])],
-]);
-
+/**
+ * I-Regexp expression parser.
+ */
 export class IRegexpParser {
-    parse(iregexp: string): { isSuccess: boolean, dotIndices: number[] } {
-        const context = new ParserContext(iregexp);
+    /**
+     * Checks whether an expression text is valid and returns indices of dot characters.
+     * 
+     * Parse is fault-tolerant and does not throw any exceptions.
+     * @param expressionText Text of the expression.
+     */
+    parse(expressionText: string): { isSuccess: boolean, dotIndices: number[] } {
+        const context = new ParserContext(expressionText);
         const isSuccess = this.parseIRegexp(context) && context.current === null;
         return { isSuccess, dotIndices: context.dotIndices };
     }
 
-    parseIRegexp(context: ParserContext): boolean {
+    private parseIRegexp(context: ParserContext): boolean {
         if (!this.parseBranch(context)) return false;
         while (context.current === "|") {
             context.goNext();
@@ -24,14 +23,14 @@ export class IRegexpParser {
         return true;
     }
 
-    parseBranch(context: ParserContext): boolean {
+    private parseBranch(context: ParserContext): boolean {
         while (context.current !== "|" && context.current !== ")" && context.current !== null) {
             if (!this.parsePiece(context)) return false;
         }
         return true;
     }
 
-    parsePiece(context: ParserContext): boolean {
+    private parsePiece(context: ParserContext): boolean {
         if (!this.parseAtom(context)) return false;
         if (context.current === "?" || context.current === "*" || context.current === "+" || context.current === "{") {
             if (!this.parseQuantifier(context)) return false;
@@ -39,7 +38,7 @@ export class IRegexpParser {
         return true;
     }
 
-    parseQuantifier(context: ParserContext): boolean {
+    private parseQuantifier(context: ParserContext): boolean {
         if (context.current !== "{") {
             context.goNext();
             return true;
@@ -61,7 +60,7 @@ export class IRegexpParser {
         }
     }
 
-    parseQuantExact(context: ParserContext): boolean {
+    private parseQuantExact(context: ParserContext): boolean {
         if (this.isDigit(context.current)) {
             context.goNext();
             while (this.isDigit(context.current))
@@ -72,7 +71,7 @@ export class IRegexpParser {
             return false;
     }
 
-    parseAtom(context: ParserContext): boolean {
+    private parseAtom(context: ParserContext): boolean {
         if (context.current === ".") {
             return this.parseDot(context);
         }
@@ -94,7 +93,7 @@ export class IRegexpParser {
         return this.tryParseNormalChar(context);
     }
 
-    tryParseNormalChar(context: ParserContext): boolean {
+    private tryParseNormalChar(context: ParserContext): boolean {
         if (context.current === null) return false;
 
         if (context.current >= "\u0000" && context.current <= "\u0027" ||
@@ -120,13 +119,13 @@ export class IRegexpParser {
         return false;
     }
 
-    parseDot(context: ParserContext): boolean {
+    private parseDot(context: ParserContext): boolean {
         context.addDotIndex();
         context.goNext();
         return true;
     }
 
-    parseSubIRegexp(context: ParserContext): boolean {
+    private parseSubIRegexp(context: ParserContext): boolean {
         context.goNext();
         if (!this.parseIRegexp(context)) return false;
         if (context.current !== ")") return false;
@@ -134,7 +133,7 @@ export class IRegexpParser {
         return true;
     }
 
-    parseSingleCharEsc(context: ParserContext): boolean {
+    private parseSingleCharEsc(context: ParserContext): boolean {
         context.goNext();
         if (context.current === null) return false;
 
@@ -152,7 +151,7 @@ export class IRegexpParser {
         return false;
     }
 
-    parseCatEsc(context: ParserContext): boolean {
+    private parseCatEsc(context: ParserContext): boolean {
         context.goNext();
         context.goNext();
         if (context.current !== "{") return false;
@@ -173,7 +172,7 @@ export class IRegexpParser {
         return true;
     }
 
-    parseCharClassExpr(context: ParserContext): boolean {
+    private parseCharClassExpr(context: ParserContext): boolean {
         context.goNext();
         if (context.current === "^") context.goNext();
         if (context.current === "-") context.goNext();
@@ -191,7 +190,7 @@ export class IRegexpParser {
         return true;
     } 
 
-    parseCCE1(context: ParserContext): boolean {
+    private parseCCE1(context: ParserContext): boolean {
         if (context.current === "\\" && (context.next === "p" || context.next === "P")) {
             return this.parseCatEsc(context);
         }
@@ -205,7 +204,7 @@ export class IRegexpParser {
         }
     }
 
-    parseCCchar(context: ParserContext): boolean {
+    private parseCCchar(context: ParserContext): boolean {
         if (context.current === null) return false;
 
         if (context.current >= "\u0000" && context.current <= "\u002C" ||
@@ -238,10 +237,10 @@ export class IRegexpParser {
 }
 
 class ParserContext {
+    private readonly _dotIndices: number[] = [];
     private _currentIndex = 0;
-    private _dotIndices: number[] = [];
 
-    constructor(readonly input: string) {
+    constructor(private readonly expressionText: string) {
 
     }
 
@@ -250,14 +249,14 @@ class ParserContext {
     }
 
     get current(): string | null {
-        return this._currentIndex < this.input.length 
-            ? this.input[this._currentIndex] 
+        return this._currentIndex < this.expressionText.length 
+            ? this.expressionText[this._currentIndex] 
             : null;
     }
 
     get next(): string | null {
-        return this._currentIndex + 1 < this.input.length 
-            ? this.input[this._currentIndex + 1] 
+        return this._currentIndex + 1 < this.expressionText.length 
+            ? this.expressionText[this._currentIndex + 1] 
             : null;
     }
 
@@ -273,3 +272,13 @@ class ParserContext {
         this._dotIndices.push(this._currentIndex);
     }
 }
+
+const unicodeCategories = new Map<string, Set<string>>([
+    ["L", new Set(["l", "m", "o", "t", "u"])],
+    ["M", new Set(["c", "e", "n"])],
+    ["N", new Set(["d", "l", "o"])],
+    ["P", new Set(["c", "d", "e", "f", "i", "o", "s"])],
+    ["Z", new Set(["l", "p", "s"])],
+    ["S", new Set(["c", "k", "m", "o"])],
+    ["C", new Set(["c", "f", "n", "o"])],
+]);
