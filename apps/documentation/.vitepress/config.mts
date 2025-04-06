@@ -33,7 +33,7 @@ export default defineConfig({
                     items: [
                         { text: "Get Started", link: "/documentation/editor/get-started" },
                         { text: "React", link: "/documentation/editor/react-component" },
-                        { text: "CodeMirror", link: "/documentation/editor/codemirror-plugin" }
+                        { text: "CodeMirror", link: "/documentation/editor/codemirror-extension" }
                     ]
                 }
             ],

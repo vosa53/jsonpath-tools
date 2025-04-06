@@ -1,4 +1,5 @@
 /**
+ * JSONPath language support for CodeMirror editor.
  * @module @jsonpath-tools/codemirror-lang-jsonpath
  */
 

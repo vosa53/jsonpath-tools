@@ -1,4 +1,5 @@
 /**
+ * JSONPath query evaluation, analysis and editor services.
  * @module @jsonpath-tools/jsonpath
  */
 
