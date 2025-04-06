@@ -5,16 +5,31 @@ import { EditorState, Extension, Range, StateEffect, StateField, Text } from "@c
 import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { SyntaxNode, TreeCursor } from "@lezer/common";
 
-export function pathsHighlighter(): Extension {
+/**
+ * CodeMirror extension to highlight JSON values at given paths.
+ */
+export function jsonValueHighlighter(): Extension {
     return [
-        pathsHighlighterPlugin,
-        pathsHighlighterBaseTheme
+        jsonValueHighlighterPlugin,
+        jsonValueHighlighterBaseTheme
     ];
 }
 
-export const setCurrentHighlightedPathEffect = StateEffect.define<NormalizedPath>();
-export const setHighlightedPathsEffect = StateEffect.define<readonly NormalizedPath[]>();
+/**
+ * State effect to set a path to a JSON value that should be highlighted as current.
+ */
+export const setCurrentHighlightedValuePathEffect = StateEffect.define<NormalizedPath>();
 
+/**
+ * State effect to set paths to JSON values that should be highlighted.
+ */
+export const setHighlightedValuesPathsEffect = StateEffect.define<readonly NormalizedPath[]>();
+
+/**
+ * Returns path to the JSON value at the given tree cursor.
+ * @param cursor Tree cursor.
+ * @param state Editor state.
+ */
 export function getPathAtTreeCursor(cursor: TreeCursor, state: EditorState): NormalizedPath {
     const path: NormalizedPathSegment[] = [];
 
@@ -37,6 +52,11 @@ export function getPathAtTreeCursor(cursor: TreeCursor, state: EditorState): Nor
     return path;
 }
 
+/**
+ * Returns the JSON syntax node for the given path or `null` when there is no syntax node at the given path.
+ * @param path Path.
+ * @param state Editor state.
+ */
 export function getNodeAtPath(path: NormalizedPath, state: EditorState): SyntaxNode | null {
     const cursor = syntaxTree(state).cursor();
     cursor.firstChild();
@@ -70,8 +90,8 @@ export function getNodeAtPath(path: NormalizedPath, state: EditorState): SyntaxN
 const valueNodeNames = new Set(["True", "False", "Null", "Number", "String", "Object", "Array"]);
 const inArrayContext = ["Array"];
 
-const currentHighlightedPathDecoration = Decoration.mark({ class: "cmjpp-highlighted-path-current" });
-const highlightedPathDecoration = Decoration.mark({ class: "cmjpp-highlighted-path" });
+const currentHighlightedValueDecoration = Decoration.mark({ class: "cmjpp-highlighted-json-value-current" });
+const highlightedValueDecoration = Decoration.mark({ class: "cmjpp-highlighted-json-value" });
 
 const arrayIndexCacheStateField = StateField.define<Map<number, number>>({
     create: state => new Map(),
@@ -81,7 +101,7 @@ const arrayIndexCacheStateField = StateField.define<Map<number, number>>({
     }
 });
 
-const pathsHighlighterPlugin = ViewPlugin.fromClass(class {
+const jsonValueHighlighterPlugin = ViewPlugin.fromClass(class {
     private _decorationSet: DecorationSet;
     private serializedPaths: Set<string> = new Set<string>();
     private serializedCurrentPath = "[]";
@@ -98,13 +118,13 @@ const pathsHighlighterPlugin = ViewPlugin.fromClass(class {
         let pathsUpdated = false;
         for (const transaction of update.transactions) {
             for (const effect of transaction.effects) {
-                if (effect.is(setHighlightedPathsEffect)) {
+                if (effect.is(setHighlightedValuesPathsEffect)) {
                     logPerformance("Serialize result paths for highlighting", () => {
                         this.serializedPaths = new Set(effect.value.map(p => JSON.stringify(p)));
                         pathsUpdated = true;
                     });
                 }
-                if (effect.is(setCurrentHighlightedPathEffect)) {
+                if (effect.is(setCurrentHighlightedValuePathEffect)) {
                     this.serializedCurrentPath = JSON.stringify(effect.value);
                     pathsUpdated = true;
                 }
@@ -132,9 +152,9 @@ const pathsHighlighterPlugin = ViewPlugin.fromClass(class {
                         if (valueNodeNames.has(node.name)) {
                             const pathString = JSON.stringify(path);
                             if (this.serializedCurrentPath === pathString)
-                                decorations.push(currentHighlightedPathDecoration.range(node.from, node.to));
+                                decorations.push(currentHighlightedValueDecoration.range(node.from, node.to));
                             else if (this.serializedPaths.has(pathString))
-                                decorations.push(highlightedPathDecoration.range(node.from, node.to));
+                                decorations.push(highlightedValueDecoration.range(node.from, node.to));
                         }
 
                         if (node.name === "Property") {
@@ -203,7 +223,7 @@ function isPropertyWithNameAtTreeCursor(cursor: TreeCursor, document: Text, name
     return foundName === name;
 }
 
-const pathsHighlighterBaseTheme = EditorView.baseTheme({
-    "& .cmjpp-highlighted-path": { background: "yellow" },
-    "& .cmjpp-highlighted-path-current": { background: "orange" }
+const jsonValueHighlighterBaseTheme = EditorView.baseTheme({
+    "& .cmjpp-highlighted-json-value": { background: "yellow" },
+    "& .cmjpp-highlighted-json-value-current": { background: "orange" }
 });

@@ -4,7 +4,7 @@ import { highlightCode } from "@lezer/highlight";
 import { parser as jsonParser } from "@lezer/json";
 import { parser as jsonPathDataTypeParser } from "./data-type/data-type-parser"
 import { Parser } from "@lezer/common";
-import { highlightStyle } from "../highlight-style";
+import { applicationHighlightStyle } from "../application-highlight-style";
 import MarkdownIt from "markdown-it";
 
 export class MarkdownRenderer {
@@ -15,7 +15,7 @@ export class MarkdownRenderer {
             if (parser === undefined)
                 return code;
             else
-                return highlight(code, parser, highlightStyle);
+                return highlight(code, parser, applicationHighlightStyle);
         }
     })
         .use(markdownItLinksTargetBlank);

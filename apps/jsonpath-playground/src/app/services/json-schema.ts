@@ -4,10 +4,18 @@ import jsonTypeDefinitionSchema from "../json-schemas/json-type-definition.schem
 import { JSONSchema } from "@/jsonpath-tools/data-types/json-schema-data-type-converter";
 import { JSONTypeDefinition } from "@/jsonpath-tools/data-types/json-type-definition-data-type-converter";
 
+/**
+ * Checks whether the given JSON Schema is valid.
+ * @param jsonSchema JSON Schema.
+ */
 export function isValidJSONSchema(jsonSchema: any): jsonSchema is JSONSchema {
     return jsonSchemaValidator(jsonSchema);
 }
 
+/**
+ * Checks whether the given JSON Type Definition is valid.
+ * @param jsonSchema JSON Type Definition.
+ */
 export function isValidJSONTypeDefinition(jsonTypeDefinition: any): jsonTypeDefinition is JSONTypeDefinition {
     return jsonTypeDefinitionValidator(jsonTypeDefinition);
 }

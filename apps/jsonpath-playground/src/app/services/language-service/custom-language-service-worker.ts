@@ -6,6 +6,11 @@ import { LogicalFalse, LogicalTrue, Nothing } from "@/jsonpath-tools/values/type
 import { NodeList } from "@/jsonpath-tools/values/node-list";
 import { Node } from "@/jsonpath-tools/values/node";
 
+/**
+ * Application specific language service worker.
+ * In addition to the default language service worker it handles custom functions.
+ */
+
 const customFunctions = new Map<string, FunctionHandler>();
 
 const backend = new LanguageServiceBackend(

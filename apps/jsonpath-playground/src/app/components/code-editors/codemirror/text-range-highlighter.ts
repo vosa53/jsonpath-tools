@@ -2,13 +2,19 @@ import { TextRange } from "@/jsonpath-tools/text/text-range";
 import { Extension, StateEffect, StateField } from "@codemirror/state";
 import { Decoration, DecorationSet, EditorView } from "@codemirror/view";
 
-export function rangeHighlighter(): Extension {
+/**
+ * CodeMirror extension to highlight a given text range.
+ */
+export function textRangeHighlighter(): Extension {
     return [
         highlightedRangeStateField,
         rangeHighlighterBaseTheme
     ];
 }
 
+/**
+ * State effect to set the current highlighted range.
+ */
 export const setHighlightedRangeEffect = StateEffect.define<TextRange | null>({
     map: (textRange, change) => {
         if (textRange === null) return null;

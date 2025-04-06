@@ -8,9 +8,9 @@ import { crosshairCursor, drawSelection, dropCursor, highlightActiveLine, highli
 import { useComputedColorScheme } from "@mantine/core";
 import { EditorView } from "codemirror";
 import { CSSProperties, FocusEventHandler, useEffect, useRef } from "react";
-import { highlightStyle } from "./highlight-style";
-import { tabKeymap } from "./tab-keymap";
-import { themeCommon, themeDark, themeLight } from "./theme";
+import { applicationHighlightStyle } from "./application-highlight-style";
+import { applicationKeymap } from "./application-keymap";
+import { applicationThemeCommon, applicationThemeDark, applicationThemeLight } from "./application-theme";
 
 /**
  * CodeMirror code editor component.
@@ -83,12 +83,12 @@ export default function CodeMirrorEditor({
                     ...foldKeymap,
                     ...completionKeymap,
                     ...lintKeymap,
-                    ...tabKeymap
+                    ...applicationKeymap
                 ]),
                 indentUnit.of("    "),
-                themeCommon,
+                applicationThemeCommon,
                 themeCompartment.of(colorSchemeToTheme(colorScheme)),
-                syntaxHighlighting(highlightStyle),
+                syntaxHighlighting(applicationHighlightStyle),
                 readonlyCompartment.of(EditorState.readOnly.of(readonly)),
                 EditorView.updateListener.of(u => {
                     if (u.docChanged) {
@@ -136,5 +136,5 @@ const themeCompartment = new Compartment();
 const readonlyCompartment = new Compartment();
 
 function colorSchemeToTheme(colorScheme: "light" | "dark"): Extension {
-    return colorScheme === "dark" ? themeDark : themeLight;
+    return colorScheme === "dark" ? applicationThemeDark : applicationThemeLight;
 }

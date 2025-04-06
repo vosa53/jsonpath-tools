@@ -6,7 +6,7 @@ import { StateEffect } from "@codemirror/state";
 import { EditorView } from "codemirror";
 import { FocusEventHandler, useEffect, useRef } from "react";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
-import { getNodeAtPath, getPathAtTreeCursor, pathsHighlighter, setCurrentHighlightedPathEffect, setHighlightedPathsEffect } from "./codemirror/paths-highlighter";
+import { getNodeAtPath, getPathAtTreeCursor, jsonValueHighlighter, setCurrentHighlightedValuePathEffect, setHighlightedValuesPathsEffect } from "./codemirror/json-value-highlighter";
 import { EMPTY_ARRAY, logPerformance } from "@/jsonpath-tools/helpers/utils";
 import { ensureParsed } from "./codemirror/ensure-parsed";
 
@@ -38,13 +38,13 @@ export default function JSONEditor({
 
     useEffect(() => {
         if (editorViewRef.current !== null)
-            editorViewRef.current.dispatch({ effects: setHighlightedPathsEffect.of(paths) });
+            editorViewRef.current.dispatch({ effects: setHighlightedValuesPathsEffect.of(paths) });
     }, [paths]);
 
     useEffect(() => {
         if (editorViewRef.current !== null) {
             logPerformance("Change current highlighted path", () => {
-                const effects: StateEffect<any>[] = [setCurrentHighlightedPathEffect.of(currentPath)];
+                const effects: StateEffect<any>[] = [setCurrentHighlightedValuePathEffect.of(currentPath)];
                 const node = getNodeAtPath(currentPath, editorViewRef.current!.state);
                 if (node !== null) effects.push(EditorView.scrollIntoView(node.from, { y: "center" }));
                 editorViewRef.current!.dispatch({ effects });
@@ -56,7 +56,7 @@ export default function JSONEditor({
         return [
             json(),
             linter(jsonParseLinter()), // TODO: Disable in readonly editor.
-            pathsHighlighter(),
+            jsonValueHighlighter(),
             ensureParsed({ onParsingProgressChanged: (inProgress: boolean) => onParsingProgressChanged?.(inProgress) }),
             EditorView.updateListener.of(u => {
                 if (onCurrentPathChanged !== undefined && u.selectionSet) {
@@ -71,7 +71,7 @@ export default function JSONEditor({
     };
 
     const onEditorViewCreated = (view: EditorView) => {
-        view.dispatch({ effects: [setHighlightedPathsEffect.of(paths), setCurrentHighlightedPathEffect.of(currentPath)] });
+        view.dispatch({ effects: [setHighlightedValuesPathsEffect.of(paths), setCurrentHighlightedValuePathEffect.of(currentPath)] });
         editorViewRef.current = view;
     };
 

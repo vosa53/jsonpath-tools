@@ -1,5 +1,8 @@
 import { alpha, createTheme, CSSVariablesResolver, Input } from "@mantine/core";
 
+/**
+ * Application theme.
+ */
 export const applicationTheme = createTheme({
     fontFamily: "Roboto",
     fontFamilyMonospace: "Cascadia Mono",
@@ -20,6 +23,9 @@ export const applicationTheme = createTheme({
     }
 });
 
+/**
+ * Application CSS variables.
+ */
 export const applicationCSSVariablesResolver: CSSVariablesResolver = (theme) => ({
     variables: {
 

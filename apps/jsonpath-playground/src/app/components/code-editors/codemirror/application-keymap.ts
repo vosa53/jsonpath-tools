@@ -2,7 +2,10 @@ import { acceptCompletion } from "@codemirror/autocomplete";
 import { indentLess, indentMore } from "@codemirror/commands";
 import { KeyBinding } from "@codemirror/view";
 
-export const tabKeymap: readonly KeyBinding[] = [
+/**
+ * Application CodeMirror keymap.
+ */
+export const applicationKeymap: readonly KeyBinding[] = [
     {
         key: "Tab",
         run: acceptCompletion,

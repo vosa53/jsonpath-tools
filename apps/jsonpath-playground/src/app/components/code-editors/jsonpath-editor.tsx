@@ -12,7 +12,7 @@ import { getQuery } from "./codemirror/jsonpath-codemirror/parser";
 import { getResult, updateOptionsEffect, updateQueryArgumentEffect, updateQueryArgumentTypeEffect } from "./codemirror/jsonpath-codemirror/state";
 import { LanguageService } from "./codemirror/jsonpath-codemirror/language-service/language-service";
 import { TextRange } from "@/jsonpath-tools/text/text-range";
-import { rangeHighlighter, setHighlightedRangeEffect } from "./codemirror/range-highlighter";
+import { textRangeHighlighter, setHighlightedRangeEffect } from "./codemirror/text-range-highlighter";
 import { AnyDataType, DataType } from "@/jsonpath-tools/data-types/data-types";
 import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
 
@@ -77,7 +77,7 @@ export default function JSONPathEditor({
                 languageService,
                 onDiagnosticsCreated
             }),
-            rangeHighlighter(),
+            textRangeHighlighter(),
             EditorView.theme({
                 "&": { fontSize: "18px !important" },
                 "& .cm-content": { padding: "10px 2px" }

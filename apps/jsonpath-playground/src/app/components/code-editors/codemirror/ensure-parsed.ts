@@ -2,14 +2,25 @@ import { ensureSyntaxTree, syntaxTreeAvailable } from "@codemirror/language";
 import { Extension, Facet } from "@codemirror/state";
 import { EditorView, PluginValue, ViewPlugin, ViewUpdate } from "@codemirror/view";
 
+/**
+ * CodeMirror extension that ensures that the document is always parsed whole. Normally CodeMirror parses only until a timeout is reached.
+ * @param config Configuration.
+ */
 export function ensureParsed(config: EnsureParsedConfig): Extension {
     return [
         ensureParsedConfigFacet.of(config),
         ViewPlugin.fromClass(EnsureParsedPlugin)
-    ]
+    ];
 }
 
+/**
+ * Configuration for {@link ensureParsed} extension.
+ */
 export interface EnsureParsedConfig {
+    /**
+     * Callback to listen for parsing progress changes.
+     * @param inProgress Whether the parsing is in progress.
+     */
     onParsingProgressChanged: (inProgress: boolean) => void;
 }
 
@@ -58,18 +69,4 @@ class EnsureParsedPlugin implements PluginValue {
         for (const config of configs)
             config.onParsingProgressChanged(inProgress);
     }
-
-    /*private estimateParsedFraction(): number {
-        const MIN_PRECISION = 1 / 10;
-        let low = 0;
-        let high = 1;
-        while (high - low > MIN_PRECISION) {
-            const middle = (low + high) / 2;
-            if (syntaxTreeAvailable(this.view.state, middle * this.view.state.doc.length))
-                low = middle;
-            else
-                high = middle;
-        }
-        return (low + high) / 2;
-    }*/
 }

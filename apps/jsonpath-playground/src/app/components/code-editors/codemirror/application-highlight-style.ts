@@ -1,8 +1,10 @@
 import { HighlightStyle } from "@codemirror/language";
 import { tags as t } from "@lezer/highlight";
 
-
-export const highlightStyle = HighlightStyle.define([
+/**
+ * Application CodeMirror highlight style.
+ */
+export const applicationHighlightStyle = HighlightStyle.define([
     { tag: t.keyword, color: "var(--mantine-color-blue-text)" },
     { tag: t.bool, color: "var(--mantine-color-blue-text)" },
     { tag: t.null, color: "var(--mantine-color-blue-text)" },
