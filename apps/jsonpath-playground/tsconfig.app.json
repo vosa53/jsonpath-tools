@@ -28,6 +28,7 @@
                 "./src/*"
             ]
         },
+        "stripInternal": true
     },
     "include": [
         "src"
