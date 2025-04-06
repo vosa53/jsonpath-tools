@@ -8,10 +8,10 @@ import { SyntaxNode, TreeCursor } from "@lezer/common";
 /**
  * CodeMirror extension to highlight JSON values at given paths.
  */
-export function jsonValueHighlighter(): Extension {
+export function jsonValuesHighlighter(): Extension {
     return [
-        jsonValueHighlighterPlugin,
-        jsonValueHighlighterBaseTheme
+        jsonValuesHighlighterPlugin,
+        jsonValuesHighlighterBaseTheme
     ];
 }
 
@@ -101,7 +101,7 @@ const arrayIndexCacheStateField = StateField.define<Map<number, number>>({
     }
 });
 
-const jsonValueHighlighterPlugin = ViewPlugin.fromClass(class {
+const jsonValuesHighlighterPlugin = ViewPlugin.fromClass(class {
     private _decorationSet: DecorationSet;
     private serializedPaths: Set<string> = new Set<string>();
     private serializedCurrentPath = "[]";
@@ -223,7 +223,7 @@ function isPropertyWithNameAtTreeCursor(cursor: TreeCursor, document: Text, name
     return foundName === name;
 }
 
-const jsonValueHighlighterBaseTheme = EditorView.baseTheme({
+const jsonValuesHighlighterBaseTheme = EditorView.baseTheme({
     "& .cmjpp-highlighted-json-value": { background: "yellow" },
     "& .cmjpp-highlighted-json-value-current": { background: "orange" }
 });

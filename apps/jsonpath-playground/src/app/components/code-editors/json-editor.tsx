@@ -6,7 +6,7 @@ import { StateEffect } from "@codemirror/state";
 import { EditorView } from "codemirror";
 import { FocusEventHandler, useEffect, useRef } from "react";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
-import { getNodeAtPath, getPathAtTreeCursor, jsonValueHighlighter, setCurrentHighlightedValuePathEffect, setHighlightedValuesPathsEffect } from "./codemirror/json-value-highlighter";
+import { getNodeAtPath, getPathAtTreeCursor, jsonValuesHighlighter, setCurrentHighlightedValuePathEffect, setHighlightedValuesPathsEffect } from "./codemirror/json-values-highlighter";
 import { EMPTY_ARRAY, logPerformance } from "@/jsonpath-tools/helpers/utils";
 import { ensureParsed } from "./codemirror/ensure-parsed";
 
@@ -56,7 +56,7 @@ export default function JSONEditor({
         return [
             json(),
             linter(jsonParseLinter()), // TODO: Disable in readonly editor.
-            jsonValueHighlighter(),
+            jsonValuesHighlighter(),
             ensureParsed({ onParsingProgressChanged: (inProgress: boolean) => onParsingProgressChanged?.(inProgress) }),
             EditorView.updateListener.of(u => {
                 if (onCurrentPathChanged !== undefined && u.selectionSet) {
