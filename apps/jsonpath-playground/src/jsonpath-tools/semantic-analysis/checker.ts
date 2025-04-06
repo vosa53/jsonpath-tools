@@ -26,14 +26,18 @@ import { TextRange } from "../text/text-range";
  * JSONPath query checker.
  */
 export class Checker {
-    constructor (private readonly options: QueryOptions) {
+    constructor (
+        /**
+         * Query options.
+         */
+        private readonly options: QueryOptions
+    ) {
 
     }
 
     /**
-     * Checks whether the query is valid.
+     * Checks whether the query is valid and returns diagnostics. The query is valid if and only if the returned diagnostics contains no errors.
      * @param query Query.
-     * @returns Query diagnostics.
      */
     check(query: Query): readonly Diagnostics[] {
         const context = new CheckerContext();

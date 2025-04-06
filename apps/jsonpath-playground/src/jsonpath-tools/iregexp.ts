@@ -30,4 +30,6 @@ export class IRegexp {
             throw new Error("Invalid I-Regexp.");
         }
     }
+
+    private constructor() { }
 }

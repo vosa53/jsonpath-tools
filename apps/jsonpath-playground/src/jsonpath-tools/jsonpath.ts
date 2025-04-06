@@ -77,6 +77,8 @@ export class JSONPath {
             throw new JSONPathError(typeCheckerDiagnostics);
         return query;
     }
+
+    private constructor() { }
 }
 
 /**
