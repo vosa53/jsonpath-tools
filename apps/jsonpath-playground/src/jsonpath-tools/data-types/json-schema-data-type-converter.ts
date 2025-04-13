@@ -9,7 +9,7 @@ import { normalize, parse, resolve, serialize } from "uri-js";
  * @param jsonSchema JSON schema with its URI (optional).
  * @param additionalJSONSchemas Additional JSON Schemas that can be referenced from the {@link jsonSchema} (via `$ref`).
  */
-export function jsonSchemaToType(jsonSchema: JsonSchemaWithURI, additionalJSONSchemas: JsonSchemaWithURI[] = []): DataType {
+export function jsonSchemaToType(jsonSchema: JSONSchemaWithURI, additionalJSONSchemas: JSONSchemaWithURI[] = []): DataType {
     const context = new JSONSchemaDataTypeConverterContext(jsonSchema, additionalJSONSchemas);
     return context.jsonSchemaToType(jsonSchema.schema);
 }
@@ -21,7 +21,7 @@ class JSONSchemaDataTypeConverterContext {
     private readonly schemaURIToSchema = new Map<string, JSONSchema>();
     private readonly schemaToBaseURI = new Map<JSONSchema, string>();
 
-    constructor(jsonSchema: JsonSchemaWithURI, additionalJsonSchemas: JsonSchemaWithURI[]) {
+    constructor(jsonSchema: JSONSchemaWithURI, additionalJsonSchemas: JSONSchemaWithURI[]) {
         this.indexSchemaWithURI(jsonSchema);
         for (const additionalJSONSchema of additionalJsonSchemas)
             this.indexSchemaWithURI(additionalJSONSchema);
@@ -271,7 +271,7 @@ class JSONSchemaDataTypeConverterContext {
         }
     }
 
-    private indexSchemaWithURI(jsonSchemaWithURI: JsonSchemaWithURI) {
+    private indexSchemaWithURI(jsonSchemaWithURI: JSONSchemaWithURI) {
         const baseURI = jsonSchemaWithURI.uri ?? "/";
         this.schemaURIToSchema.set(baseURI, jsonSchemaWithURI.schema);
         this.indexSchema(jsonSchemaWithURI.schema, baseURI);
@@ -350,7 +350,7 @@ const fullySupportedKeywords: ReadonlySet<string> = new Set([
 /**
  * JSON schema with its URI.
  */
-export interface JsonSchemaWithURI {
+export interface JSONSchemaWithURI {
     /**
      * JSON Schema.
      */

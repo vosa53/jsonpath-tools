@@ -219,4 +219,4 @@ export const languageFacet = defineLanguageFacet();
 /**
  * CodeMirror JSONPath language parser.
  */
-export const parser = new CodeMirrorJSONPathParser();
+export const parser: Parser = new CodeMirrorJSONPathParser();

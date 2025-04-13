@@ -4,12 +4,12 @@
  */
 
 import { DataType, DataTypeAnnotation } from "./data-types/data-types";
-import { jsonSchemaToType } from "./data-types/json-schema-data-type-converter";
-import { jsonTypeDefinitionToType } from "./data-types/json-type-definition-data-type-converter";
+import { JSONSchema, JSONSchemaDictionary, jsonSchemaToType, JSONSchemaType, JSONSchemaWithURI, ObjectJSONSchema } from "./data-types/json-schema-data-type-converter";
+import { JSONTypeDefinition, JSONTypeDefinitionDictionary, jsonTypeDefinitionToType, JSONTypeDefinitionType } from "./data-types/json-type-definition-data-type-converter";
 import { Diagnostics, DiagnosticsSeverity } from "./diagnostics";
 import { EditorService } from "./editor-services/editor-service";
 import { JSONValue } from "./json/json-types";
-import { JSONPath } from "./jsonpath";
+import { JSONPath, JSONPathError } from "./jsonpath";
 import { Node } from "./values/node";
 import { NodeList } from "./values/node-list";
 import { NormalizedPath, NormalizedPathSegment } from "./normalized-path";
@@ -18,7 +18,7 @@ import { Function, FunctionContext, FunctionHandler, FunctionParameter } from ".
 import { Type } from "./values/types";
 import { AndExpression } from "./query/filter-expression/and-expression";
 import { BooleanLiteralExpression } from "./query/filter-expression/boolean-literal-expression";
-import { ComparisonExpression } from "./query/filter-expression/comparison-expression";
+import { ComparisonExpression, JSONPathComparisonOperator } from "./query/filter-expression/comparison-expression";
 import { FilterExpression } from "./query/filter-expression/filter-expression";
 import { FilterQueryExpression } from "./query/filter-expression/filter-query-expression";
 import { FunctionExpression } from "./query/filter-expression/function-expression";
@@ -47,6 +47,11 @@ import { TextChange } from "./text/text-change";
 import { TextRange } from "./text/text-range";
 import { removeAtPaths, replaceAtPaths } from "./transformations";
 import { LogicalFalse, LogicalTrue, Nothing, ValueType, LogicalType, NodesType, isValueType, isNodesType, isLogicalType, FilterValue } from "./values/types";
+import { CompletionItem, CompletionItemTextType, CompletionItemType } from "./editor-services/completion-service";
+import { Signature, SignatureParameter } from "./editor-services/signature-help-service";
+import { Tooltip } from "./editor-services/tooltip-service";
+import { DocumentHighlight } from "./editor-services/document-highlights-service";
+import { FilterExpressionContext, QueryContext } from "./query/evaluation";
 
 export type {
     JSONValue,
@@ -57,6 +62,9 @@ export type {
     FunctionHandler,
     FunctionContext,
 
+    QueryContext,
+    FilterExpressionContext,
+
     NormalizedPath,
     NormalizedPathSegment,
 
@@ -65,11 +73,21 @@ export type {
     LogicalType,
     NodesType,
 
-    Diagnostics
+    Diagnostics,
+
+    JSONSchemaWithURI,
+    JSONSchema,
+    ObjectJSONSchema,
+    JSONSchemaDictionary,
+    JSONSchemaType,
+    JSONTypeDefinition,
+    JSONTypeDefinitionDictionary,
+    JSONTypeDefinitionType
 };
 
 export { 
     JSONPath,
+    JSONPathError,
 
     defaultQueryOptions,
 
@@ -124,8 +142,16 @@ export {
     BooleanLiteralExpression,
     NullLiteralExpression,
     MissingExpression,
+    JSONPathComparisonOperator,
 
     EditorService,
+    CompletionItem,
+    CompletionItemType,
+    CompletionItemTextType,
+    Signature,
+    SignatureParameter,
+    Tooltip,
+    DocumentHighlight,
 
     DataType,
     DataTypeAnnotation,
