@@ -56,8 +56,8 @@ const JSONPanel = memo(({
                     )}
                     <Popover width={400} position="bottom" withArrow shadow="md" onChange={() => setCurrentNormalizedPath(serializedNormalizedPath(currentNormalizedPathGetter.current()))}>
                         <Popover.Target>
-                            <Tooltip label="Get Normalized Path Under the Caret">
-                                <ActionIcon variant="default" aria-label="Get Normalized Path Under the Caret" ml="auto">
+                            <Tooltip label="Normalized Path under Caret">
+                                <ActionIcon variant="default" aria-label="Get Normalized Path under the Caret" ml="auto">
                                     <IconRouteSquare style={{ width: "70%", height: "70%" }} stroke={1.5} />
                                 </ActionIcon>
                             </Tooltip>
@@ -76,7 +76,7 @@ const JSONPanel = memo(({
                         </Popover.Dropdown>
                     </Popover>
                     <Divider orientation="vertical" />
-                    <Tooltip label="Load From a File">
+                    <Tooltip label="Load From File">
                         <ActionIcon variant="default" aria-label="Load From a File" onClick={async () => {
                             const content = await openTextFile(".json");
                             if (content !== null) onQueryArgumentTextChanged(content);

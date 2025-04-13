@@ -34,7 +34,7 @@ const PathsPanel = memo(({
                             onChange={value => onPathTypeChanged(value as PathType)}
                         />
                     </Tooltip>
-                    <Tooltip label="Save To a File">
+                    <Tooltip label="Save To File">
                         <ActionIcon variant="default" aria-label="Save To a File" ml="auto" onClick={async () => await saveTextFile("paths.json", "application/json", ".json", pathsText)}>
                             <IconFileDownload style={{ width: "70%", height: "70%" }} stroke={1.5} />
                         </ActionIcon>

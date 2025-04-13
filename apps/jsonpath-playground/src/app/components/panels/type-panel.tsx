@@ -34,7 +34,7 @@ const TypePanel = memo(({
                             onChange={value => onQueryArgumentTypeRawChanged({ ...queryArgumentTypeRaw, format: value as DataTypeRawFormat })}
                         />
                     </Tooltip>
-                    <Tooltip label="Load From a File">
+                    <Tooltip label="Load From File">
                         <ActionIcon variant="default" aria-label="Load From a File" ml="auto" onClick={async () => {
                             const content = await openTextFile(".json");
                             if (content === null) return;
