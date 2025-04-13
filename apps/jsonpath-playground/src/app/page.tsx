@@ -62,8 +62,8 @@ export default function Page() {
                             onRun={viewModel.onRun} />
                         {!viewModel.settings.autoRun &&
                             <Tooltip label="Evaluate Query">
-                                <ActionIcon variant="filled" aria-label="Settings" size="lg" style={{ alignSelf: "end" }} m={5.2} onClick={viewModel.onRun}>
-                                    <IconPlayerPlay style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                                <ActionIcon variant="filled" aria-label="Evaluate Query" size="lg" style={{ alignSelf: "end" }} m={5.2} onClick={viewModel.onRun}>
+                                    <IconPlayerPlay style={{ width: "70%", height: "70%" }} stroke={1.5} />
                                 </ActionIcon>
                             </Tooltip>
                         }

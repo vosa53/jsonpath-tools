@@ -35,7 +35,7 @@ const TypePanel = memo(({
                         />
                     </Tooltip>
                     <Tooltip label="Load From a File">
-                        <ActionIcon variant="default" aria-label="Settings" ml="auto" onClick={async () => {
+                        <ActionIcon variant="default" aria-label="Load From a File" ml="auto" onClick={async () => {
                             const content = await openTextFile(".json");
                             if (content === null) return;
                             if (queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema)
@@ -43,7 +43,7 @@ const TypePanel = memo(({
                             else
                                 onQueryArgumentTypeRawChanged({ ...queryArgumentTypeRaw, jsonTypeDefinitionText: content });
                         }}>
-                            <IconFileUpload style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                            <IconFileUpload style={{ width: "70%", height: "70%" }} stroke={1.5} />
                         </ActionIcon>
                     </Tooltip>
                     <Menu shadow="md" width={200}>

@@ -31,7 +31,7 @@ const Header = memo(({
             </Group>
             <Group pr="xs">
                 <Tooltip label="GitHub Repository">
-                    <ActionIcon variant="subtle" color="violet" size="lg" aria-label="GitHub Page" visibleFrom="xs" component="a" href="https://github.com/vosa53/jsonpath-tools" target="_blank">
+                    <ActionIcon variant="subtle" color="violet" size="lg" aria-label="GitHub Repository" visibleFrom="xs" component="a" href="https://github.com/vosa53/jsonpath-tools" target="_blank">
                         <IconBrandGithub style={{ width: "70%", height: "70%" }} stroke={1.5} />
                     </ActionIcon>
                 </Tooltip>

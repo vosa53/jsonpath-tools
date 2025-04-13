@@ -33,13 +33,13 @@ const JSONPanel = memo(({
             toolbar={
                 <Group gap="xs" w="100%">
                     <Tooltip label="Previous Result">
-                        <ActionIcon variant="default" aria-label="Settings" disabled={paths.length === 0} onClick={() => onCurrentPathIndexChanged((paths.length + currentPathIndex - 1) % paths.length)}>
-                            <IconArrowUp style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                        <ActionIcon variant="default" aria-label="Previous Result" disabled={paths.length === 0} onClick={() => onCurrentPathIndexChanged((paths.length + currentPathIndex - 1) % paths.length)}>
+                            <IconArrowUp style={{ width: "70%", height: "70%" }} stroke={1.5} />
                         </ActionIcon>
                     </Tooltip>
                     <Tooltip label="Next Result">
-                        <ActionIcon variant="default" aria-label="Settings" disabled={paths.length === 0} onClick={() => onCurrentPathIndexChanged((paths.length + currentPathIndex + 1) % paths.length)}>
-                            <IconArrowDown style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                        <ActionIcon variant="default" aria-label="Next Result" disabled={paths.length === 0} onClick={() => onCurrentPathIndexChanged((paths.length + currentPathIndex + 1) % paths.length)}>
+                            <IconArrowDown style={{ width: "70%", height: "70%" }} stroke={1.5} />
                         </ActionIcon>
                     </Tooltip>
                     {paths.length > 0 ? (
@@ -57,8 +57,8 @@ const JSONPanel = memo(({
                     <Popover width={400} position="bottom" withArrow shadow="md" onChange={() => setCurrentNormalizedPath(serializedNormalizedPath(currentNormalizedPathGetter.current()))}>
                         <Popover.Target>
                             <Tooltip label="Get Normalized Path Under the Caret">
-                                <ActionIcon variant="default" aria-label="Settings" ml="auto">
-                                    <IconRouteSquare style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                                <ActionIcon variant="default" aria-label="Get Normalized Path Under the Caret" ml="auto">
+                                    <IconRouteSquare style={{ width: "70%", height: "70%" }} stroke={1.5} />
                                 </ActionIcon>
                             </Tooltip>
                         </Popover.Target>
@@ -77,11 +77,11 @@ const JSONPanel = memo(({
                     </Popover>
                     <Divider orientation="vertical" />
                     <Tooltip label="Load From a File">
-                        <ActionIcon variant="default" aria-label="Settings" onClick={async () => {
+                        <ActionIcon variant="default" aria-label="Load From a File" onClick={async () => {
                             const content = await openTextFile(".json");
                             if (content !== null) onQueryArgumentTextChanged(content);
                         }}>
-                            <IconFileUpload style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                            <IconFileUpload style={{ width: "70%", height: "70%" }} stroke={1.5} />
                         </ActionIcon>
                     </Tooltip>
                     <Menu shadow="md" width={200}>
