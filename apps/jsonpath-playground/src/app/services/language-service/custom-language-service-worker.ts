@@ -1,8 +1,8 @@
 import { defaultQueryOptions } from "@/jsonpath-tools/options";
-import { FunctionHandler } from "@/jsonpath-tools/functions/function";
+import { FunctionContext, FunctionHandler } from "@/jsonpath-tools/functions/function";
 import { LanguageServiceBackend } from "../../components/code-editors/codemirror/jsonpath-codemirror/language-service/language-service-backend";
 import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";
-import { LogicalFalse, LogicalTrue, Nothing } from "@/jsonpath-tools/values/types";
+import { FilterValue, LogicalFalse, LogicalTrue, Nothing } from "@/jsonpath-tools/values/types";
 import { NodeList } from "@/jsonpath-tools/values/node-list";
 import { Node } from "@/jsonpath-tools/values/node";
 
@@ -43,7 +43,7 @@ function resolveFunction(functionName: string): FunctionHandler {
 
 function compileCustomFunction(customFunction: CustomLanguageServiceFunction): FunctionHandler {
     try {
-        const compiledCustomFunction = new Function("jp", "context", ...customFunction.parameterNames, customFunction.code) as FunctionHandler;
+        const compiledCustomFunction = new Function("jp", "context", ...customFunction.parameterNames, customFunction.code) as CustomFunctionHandler;
         return createJSONPathFunctionHandler(compiledCustomFunction, customFunction.name);
     }
     catch (e) {
@@ -54,7 +54,7 @@ function compileCustomFunction(customFunction: CustomLanguageServiceFunction): F
     }
 }
 
-function createJSONPathFunctionHandler(customFunction: Function, functionName: string): FunctionHandler {
+function createJSONPathFunctionHandler(customFunction: CustomFunctionHandler, functionName: string): FunctionHandler {
     return (context, ...args) => {
         try {
             const result = customFunction(JSONPATH_LIBRARY, context, ...args);
@@ -75,3 +75,5 @@ const JSONPATH_LIBRARY = {
     NodeList,
     Node
 };
+
+type CustomFunctionHandler = (jp: typeof JSONPATH_LIBRARY, context: FunctionContext, ...args: FilterValue[]) => FilterValue;
