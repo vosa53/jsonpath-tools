@@ -23,10 +23,10 @@ describe("Markdown", () => {
     });
 
     it("renderMarkdownToHTML - Renders a 'javascript' code block highlighted", () => {
-        expect(renderMarkdownToHTML("```javascript\nconst abc = '';\n```").trim()).toBe(`<pre><code class="language-javascript"><span class="ͼo">const</span> <span class="ͼ1d">abc</span> <span class="ͼr">=</span> <span class="ͼx">''</span>;\n</code></pre>`);
+        expect(renderMarkdownToHTML("```javascript\nconst abc = '';\n```").trim()).toBe(`<pre><code class="language-javascript"><span class="ͼo">const</span> <span class="ͼ1b">abc</span> <span class="ͼr">=</span> <span class="ͼx">''</span>;\n</code></pre>`);
     });
 
     it("renderMarkdownToHTML - Renders a 'typescript' code block highlighted", () => {
-        expect(renderMarkdownToHTML("```typescript\nconst abc: def = '';\n```").trim()).toBe(`<pre><code class="language-typescript"><span class="ͼo">const</span> <span class="ͼ1d">abc</span>: <span class="ͼ1f">def</span> <span class="ͼr">=</span> <span class="ͼx">''</span>;\n</code></pre>`);
+        expect(renderMarkdownToHTML("```typescript\nconst abc: def = '';\n```").trim()).toBe(`<pre><code class="language-typescript"><span class="ͼo">const</span> <span class="ͼ1b">abc</span>: <span class="ͼ1c">def</span> <span class="ͼr">=</span> <span class="ͼx">''</span>;\n</code></pre>`);
     });
 });
