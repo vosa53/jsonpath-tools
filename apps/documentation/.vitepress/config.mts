@@ -25,7 +25,9 @@ export default defineConfig({
                 {
                     text: "Evaluator",
                     items: [
-                        { text: "Get Started", link: "/documentation/evaluator/get-started" }
+                        { text: "Get Started", link: "/documentation/evaluator/get-started" },
+                        { text: "Custom Functions", link: "/documentation/evaluator/custom-functions" },
+                        { text: "Editor Services", link: "/documentation/evaluator/editor-services" }
                     ]
                 },
                 {
