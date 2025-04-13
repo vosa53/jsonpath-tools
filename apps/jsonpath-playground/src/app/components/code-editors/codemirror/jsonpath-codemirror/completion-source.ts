@@ -9,15 +9,14 @@ import { MarkdownRenderer } from "./markdown-renderer";
  */
 export function completionSource(): CompletionSource {
     return async (context: CompletionContext) => {
-        // TODO: Add all word and number characters.
-        if (context.explicit || context.matchBefore(/\w|\.|\[|\(|,\s|"|'|\?/)) {
-            const word = context.matchBefore(/[\w"]*/);
+        if (context.explicit || context.matchBefore(TRIGGER_REGEX)) {
+            const completedRange = context.matchBefore(RANGE_REGEX);
             const languageServiceSession = context.state.field(languageServiceSessionStateField);
             try {
                 const completions = await languageServiceSession.getCompletions(context.pos);
 
                 return {
-                    from: word!.from,
+                    from: completedRange!.from,
                     options: completions.map((c, i) => {
                         const completion: Completion = {
                             label: c.label,
@@ -60,6 +59,9 @@ export function completionSource(): CompletionSource {
             return null;
     };
 }
+
+const TRIGGER_REGEX = /[a-zA-Z0-9_\u0080-\uFFFF]|\.|\[|\(|(==|!=|<|>|<=|>=|,)\s|"|'|\?/;
+const RANGE_REGEX = /[a-zA-Z0-9_\u0080-\uFFFF"']*/;
 
 const completionItemTypeToCodemirrorType: ReadonlyMap<CompletionItemType, string> = new Map<CompletionItemType, string>([
     [CompletionItemType.name, "property"],

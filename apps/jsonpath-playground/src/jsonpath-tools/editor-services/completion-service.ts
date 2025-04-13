@@ -12,7 +12,7 @@ import { Segment, SegmentType } from "../query/segment";
 import { Selector } from "../query/selectors/selector";
 import { SyntaxTree } from "../query/syntax-tree";
 import { SyntaxTreeType } from "../query/syntax-tree-type";
-import { serializeLiteral, serializeString } from "../serialization/serialization";
+import { serializeLiteral, serializeNumber, serializeString, StringQuotes } from "../serialization/serialization";
 import { CharacterCategorizer } from "../syntax-analysis/character-categorizer";
 import { TextRange } from "../text/text-range";
 import { JSONValue } from "../json/json-types";
@@ -20,6 +20,8 @@ import { AnalysisDescriptionService } from "./analysis-description-service";
 import { SyntaxDescriptionService } from "./syntax-description-service";
 import { NormalizedPathSegment } from "../normalized-path";
 import { FilterValue } from "../values/types";
+import { NameSelector } from "../query/selectors/name-selector";
+import { StringLiteralExpression } from "../query/filter-expression/string-literal-expression";
 
 /**
  * Provides completion items.
@@ -80,12 +82,12 @@ export class CompletionService {
             lastButOneNode.type === SyntaxTreeType.booleanLiteralExpression ||
             lastButOneNode.type === SyntaxTreeType.nullLiteralExpression
         ) {
-            const range = lastButOneNode.textRangeWithoutSkipped;
             if (lastButOneNode.parent instanceof ComparisonExpression) {
-                const referenceExpression = lastButOneNode.parent.left === lastButOneNode
-                    ? lastButOneNode.parent.right
-                    : lastButOneNode.parent.left;
-                this.completeValues(completions, range, referenceExpression, query, queryArgument, queryArgumentType);
+                let expression = lastButOneNode.parent.right;
+                let reference = lastButOneNode.parent.left;
+                if (lastButOneNode.parent.left === lastButOneNode)
+                    [expression, reference] = [reference, expression];
+                this.completeValues(completions, expression, reference, query, queryArgument, queryArgumentType);
             }
         }
         if (lastButOneNode.type === SyntaxTreeType.missingExpression ||
@@ -158,9 +160,9 @@ export class CompletionService {
         }
     }
 
-    private completeValues(completions: CompletionItem[], range: TextRange, reference: FilterExpression, query: Query, queryArgument: JSONValue | undefined, queryArgumentType: DataType) {
+    private completeValues(completions: CompletionItem[], expression: FilterExpression, reference: FilterExpression, query: Query, queryArgument: JSONValue | undefined, queryArgumentType: DataType) {
+        const range = expression.textRangeWithoutSkipped;
         const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType, this.options);
-
         const literals = queryArgument !== undefined
             ? this.getAllLiteralsOutputtedFromExpression(queryArgument, query, reference)
             : this.getAllLiteralsFromExpressionType(typeAnalyzer.getType(reference));
@@ -168,7 +170,7 @@ export class CompletionService {
             const literalType = typeof literal;
             completions.push(new CompletionItem(
                 CompletionItemType.literal,
-                serializeLiteral(literal),
+                serializeLiteral(literal, expression instanceof StringLiteralExpression && expression.valueToken.text.startsWith("'") ? StringQuotes.single : StringQuotes.double),
                 range,
                 undefined,
                 literalType,
@@ -198,9 +200,11 @@ export class CompletionService {
             ? segment.textRangeWithoutSkipped
             : selector.textRangeWithoutSkipped;
         let text = typeof pathSegment === "number"
-            ? pathSegment.toString()
+            ? serializeNumber(pathSegment)
             : (
-                useBracketNotation ? serializeString(pathSegment) : pathSegment
+                useBracketNotation 
+                    ? serializeString(pathSegment, selector instanceof NameSelector && selector.nameToken.text.startsWith("'") ? StringQuotes.single : StringQuotes.double) 
+                    : pathSegment
             );
         if (willUseBracketNotation)
             text = `[${text}]`;
