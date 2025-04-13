@@ -25,6 +25,7 @@ import { jsonTypeDefinitionToType } from "@/jsonpath-tools/data-types/json-type-
 import { isValidJSONSchema, isValidJSONTypeDefinition } from "./services/json-schema";
 import { JSONPatch, applyJSONPatch } from "./services/json-patch";
 import { examples } from "./models/examples";
+import { normalizedPathToJSONPointer } from "./services/json-pointer";
 
 interface State {
     customFunctions: readonly CustomFunction[];
@@ -115,7 +116,7 @@ export function usePageViewModel() {
         const resultPathsTransformed = logPerformance("Transform result paths", () => {
             return pathType === PathType.normalizedPath
                 ? resultPaths.map(p => serializedNormalizedPath(p))
-                : resultPaths.map(p => toJSONPointer(p));
+                : resultPaths.map(p => normalizedPathToJSONPointer(p));
         });
         return logPerformance("Stringify result paths", () => JSON.stringify(resultPathsTransformed, undefined, 4));
     }, [resultPaths, pathType]);
@@ -287,11 +288,6 @@ function executeOperation(
         return removeAtPaths(queryArgument, resultPaths);
     else
         throw new Error(`Unknown operation type: ${operation.type}.`);
-}
-
-function toJSONPointer(path: NormalizedPath): string {
-    // Escaping according to the JSON Pointer specification RFC 6901 https://datatracker.ietf.org/doc/html/rfc6901.
-    return "/" + path.map(s => s.toString().replace("~", "~0").replace("/", "~1")).join("/");
 }
 
 const worker = new Worker(new URL("./services/language-service/custom-language-service-worker.ts", import.meta.url), { type: "module" });
