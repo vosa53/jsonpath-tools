@@ -1,5 +1,5 @@
 import { DiagnosticsSeverity } from '@/jsonpath-tools/diagnostics';
-import { ActionIcon, AppShell, Divider, Flex, Indicator, Stack, Tabs } from '@mantine/core';
+import { ActionIcon, AppShell, Divider, Flex, Indicator, Stack, Tabs, Tooltip } from '@mantine/core';
 import { IconBraces, IconEqual, IconExclamationCircle, IconListTree, IconPlayerPlay, IconRouteSquare, IconSitemap } from '@tabler/icons-react';
 import { useMemo, useState } from "react";
 import JSONPathEditor from "./components/code-editors/jsonpath-editor";
@@ -61,25 +61,31 @@ export default function Page() {
                             onGetResultAvailable={viewModel.onGetResultAvailable}
                             onRun={viewModel.onRun} />
                         {!viewModel.settings.autoRun &&
-                            <ActionIcon variant="filled" aria-label="Settings" size="lg" style={{ alignSelf: "end" }} m={5.2} onClick={viewModel.onRun}>
-                                <IconPlayerPlay style={{ width: '70%', height: '70%' }} stroke={1.5} />
-                            </ActionIcon>
+                            <Tooltip label="Evaluate Query">
+                                <ActionIcon variant="filled" aria-label="Settings" size="lg" style={{ alignSelf: "end" }} m={5.2} onClick={viewModel.onRun}>
+                                    <IconPlayerPlay style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                                </ActionIcon>
+                            </Tooltip>
                         }
                     </Flex>
                     <Divider size="xs" />
                     <Flex flex="1 1 0" direction={{ sm: "row", base: "column" }}>
                         <Tabs defaultValue="data" flex="1" miw={0} display="flex" style={{ flexDirection: "column" }}>
                             <Tabs.List>
-                                <Tabs.Tab value="data" leftSection={<IconBraces size={20} />}>
-                                    <Indicator color="red" label="!" size={16} offset={-4} disabled={viewModel.isQueryArgumentValid}>
-                                        Data
-                                    </Indicator>
-                                </Tabs.Tab>
-                                <Tabs.Tab value="type" leftSection={<IconSitemap size={20} />}>
-                                    <Indicator color="red" label="!" size={16} offset={-4} disabled={viewModel.isQueryArgumentTypeValid}>
-                                        Schema
-                                    </Indicator>
-                                </Tabs.Tab>
+                                <Tooltip label="Query Argument JSON">
+                                    <Tabs.Tab value="data" leftSection={<IconBraces size={20} />}>
+                                        <Indicator color="red" label="!" size={16} offset={-4} disabled={viewModel.isQueryArgumentValid}>
+                                            Data
+                                        </Indicator>
+                                    </Tabs.Tab>
+                                </Tooltip>
+                                <Tooltip label="Query Argument Schema">
+                                    <Tabs.Tab value="type" leftSection={<IconSitemap size={20} />}>
+                                        <Indicator color="red" label="!" size={16} offset={-4} disabled={viewModel.isQueryArgumentTypeValid}>
+                                            Schema
+                                        </Indicator>
+                                    </Tabs.Tab>
+                                </Tooltip>
                             </Tabs.List>
                             <Tabs.Panel value="data" flex="1 1 0" mih={0}>
                                 <JSONPanel
@@ -100,20 +106,28 @@ export default function Page() {
                         <Divider size="xs" orientation="horizontal" hiddenFrom="sm" />
                         <Tabs defaultValue="result" flex="1" miw={0} display="flex" style={{ flexDirection: "column" }}>
                             <Tabs.List>
-                                <Tabs.Tab value="result" leftSection={<IconEqual size={20} />}>
-                                    Result
-                                </Tabs.Tab>
-                                <Tabs.Tab value="paths" leftSection={<IconRouteSquare size={20} />}>
-                                    Paths
-                                </Tabs.Tab>
-                                <Tabs.Tab value="errors" leftSection={<IconExclamationCircle size={20} />}>
-                                    <Indicator color="red" label={errorCount} size={16} offset={-4} disabled={errorCount === 0}>
-                                        Errors
-                                    </Indicator>
-                                </Tabs.Tab>
-                                <Tabs.Tab value="outline" leftSection={<IconListTree size={20} />}>
-                                    Outline
-                                </Tabs.Tab>
+                                <Tooltip label="Result JSON">
+                                    <Tabs.Tab value="result" leftSection={<IconEqual size={20} />}>
+                                        Result
+                                    </Tabs.Tab>
+                                </Tooltip>
+                                <Tooltip label="Result Paths">
+                                    <Tabs.Tab value="paths" leftSection={<IconRouteSquare size={20} />}>
+                                        Paths
+                                    </Tabs.Tab>
+                                </Tooltip>
+                                <Tooltip label="Query Errors and Warnings">
+                                    <Tabs.Tab value="errors" leftSection={<IconExclamationCircle size={20} />}>
+                                        <Indicator color="red" label={errorCount} size={16} offset={-4} disabled={errorCount === 0}>
+                                            Errors
+                                        </Indicator>
+                                    </Tabs.Tab>
+                                </Tooltip>
+                                <Tooltip label="Query Tree Structure">
+                                    <Tabs.Tab value="outline" leftSection={<IconListTree size={20} />}>
+                                        Outline
+                                    </Tabs.Tab>
+                                </Tooltip>
                             </Tabs.List>
                             <Tabs.Panel value="result" flex="1 1 0" mih={0}>
                                 <ResultPanel

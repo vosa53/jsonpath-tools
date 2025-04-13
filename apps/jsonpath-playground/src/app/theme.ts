@@ -1,4 +1,4 @@
-import { alpha, createTheme, CSSVariablesResolver, Input } from "@mantine/core";
+import { alpha, createTheme, CSSVariablesResolver, Input, Tooltip } from "@mantine/core";
 
 /**
  * Application theme.
@@ -18,6 +18,11 @@ export const applicationTheme = createTheme({
         InputWrapper: Input.Wrapper.extend({
             defaultProps: {
                 inputWrapperOrder: ["label", "input", "description", "error"]
+            }
+        }),
+        Tooltip: Tooltip.extend({
+            defaultProps: {
+                openDelay: 500
             }
         })
     }

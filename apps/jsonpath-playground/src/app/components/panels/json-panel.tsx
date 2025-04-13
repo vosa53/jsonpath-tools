@@ -1,6 +1,6 @@
 import { serializedNormalizedPath } from "@/jsonpath-tools/serialization/serialization";
 import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
-import { ActionIcon, Button, CopyButton, Divider, Group, Loader, Menu, Popover, Text, TextInput } from "@mantine/core";
+import { ActionIcon, Button, CopyButton, Divider, Group, Loader, Menu, Popover, Text, TextInput, Tooltip } from "@mantine/core";
 import { IconArrowDown, IconArrowUp, IconChevronDown, IconFileUpload, IconRouteSquare } from "@tabler/icons-react";
 import { memo, useRef, useState } from "react";
 import JSONEditor from "../code-editors/json-editor";
@@ -32,12 +32,16 @@ const JSONPanel = memo(({
         <PanelShell
             toolbar={
                 <Group gap="xs" w="100%">
-                    <ActionIcon variant="default" aria-label="Settings" disabled={paths.length === 0} onClick={() => onCurrentPathIndexChanged((paths.length + currentPathIndex - 1) % paths.length)}>
-                        <IconArrowUp style={{ width: '70%', height: '70%' }} stroke={1.5} />
-                    </ActionIcon>
-                    <ActionIcon variant="default" aria-label="Settings" disabled={paths.length === 0} onClick={() => onCurrentPathIndexChanged((paths.length + currentPathIndex + 1) % paths.length)}>
-                        <IconArrowDown style={{ width: '70%', height: '70%' }} stroke={1.5} />
-                    </ActionIcon>
+                    <Tooltip label="Previous Result">
+                        <ActionIcon variant="default" aria-label="Settings" disabled={paths.length === 0} onClick={() => onCurrentPathIndexChanged((paths.length + currentPathIndex - 1) % paths.length)}>
+                            <IconArrowUp style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                        </ActionIcon>
+                    </Tooltip>
+                    <Tooltip label="Next Result">
+                        <ActionIcon variant="default" aria-label="Settings" disabled={paths.length === 0} onClick={() => onCurrentPathIndexChanged((paths.length + currentPathIndex + 1) % paths.length)}>
+                            <IconArrowDown style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                        </ActionIcon>
+                    </Tooltip>
                     {paths.length > 0 ? (
                         <Text>{(currentPathIndex + 1).toLocaleString("en-US")} of <strong>{paths.length.toLocaleString("en-US")}</strong></Text>
                     ) : (
@@ -52,9 +56,11 @@ const JSONPanel = memo(({
                     )}
                     <Popover width={400} position="bottom" withArrow shadow="md" onChange={() => setCurrentNormalizedPath(serializedNormalizedPath(currentNormalizedPathGetter.current()))}>
                         <Popover.Target>
-                            <ActionIcon variant="default" aria-label="Settings" ml="auto">
-                                <IconRouteSquare style={{ width: '70%', height: '70%' }} stroke={1.5} />
-                            </ActionIcon>
+                            <Tooltip label="Get Normalized Path Under the Caret">
+                                <ActionIcon variant="default" aria-label="Settings" ml="auto">
+                                    <IconRouteSquare style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                                </ActionIcon>
+                            </Tooltip>
                         </Popover.Target>
                         <Popover.Dropdown>
                             <Group align="end" gap="xs">
@@ -70,12 +76,14 @@ const JSONPanel = memo(({
                         </Popover.Dropdown>
                     </Popover>
                     <Divider orientation="vertical" />
-                    <ActionIcon variant="default" aria-label="Settings" onClick={async () => {
-                        const content = await openTextFile(".json");
-                        if (content !== null) onQueryArgumentTextChanged(content);
-                    }}>
-                        <IconFileUpload style={{ width: '70%', height: '70%' }} stroke={1.5} />
-                    </ActionIcon>
+                    <Tooltip label="Load From a File">
+                        <ActionIcon variant="default" aria-label="Settings" onClick={async () => {
+                            const content = await openTextFile(".json");
+                            if (content !== null) onQueryArgumentTextChanged(content);
+                        }}>
+                            <IconFileUpload style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                        </ActionIcon>
+                    </Tooltip>
                     <Menu shadow="md" width={200}>
                         <Menu.Target>
                             <Button variant="default" size="xs" rightSection={<IconChevronDown size={14} />}>Example Data</Button>

@@ -1,5 +1,5 @@
 import { Operation, OperationType, OperationReplacement, OperationReplacementType } from "@/app/models/operation";
-import { ActionIcon, Button, Group, InputWrapper, Modal, SegmentedControl, Select, Stack } from "@mantine/core";
+import { ActionIcon, Button, Group, InputWrapper, Modal, SegmentedControl, Select, Stack, Tooltip } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { IconDeviceFloppy, IconFileDownload } from "@tabler/icons-react";
@@ -40,25 +40,29 @@ const ResultPanel = memo(({
                             onReplacementSaved={onReplacementSaved}
                             onCancelled={close} />
                     </Modal>
-                    <Select
-                        size="xs"
-                        allowDeselect={false}
-                        data={[
-                            { label: "Select", value: OperationType.select },
-                            { label: "Replace", value: OperationType.replace },
-                            { label: "Delete", value: OperationType.delete }
-                        ]}
-                        value={operation.type}
-                        onChange={value => onOperationChanged({ ...operation, type: value as OperationType })}
-                    />
+                    <Tooltip label="Operation">
+                        <Select
+                            size="xs"
+                            allowDeselect={false}
+                            data={[
+                                { label: "Select", value: OperationType.select },
+                                { label: "Replace", value: OperationType.replace },
+                                { label: "Delete", value: OperationType.delete }
+                            ]}
+                            value={operation.type}
+                            onChange={value => onOperationChanged({ ...operation, type: value as OperationType })}
+                        />
+                    </Tooltip>
                     {
                         operation.type === OperationType.replace &&
                         <Button
                             variant="subtle" size="compact-sm" onClick={() => open()}>Edit Replacement</Button>
                     }
-                    <ActionIcon variant="default" aria-label="Settings" ml="auto" onClick={async () => await saveTextFile("result.json", "application/json", ".json", resultText)}>
-                        <IconFileDownload style={{ width: '70%', height: '70%' }} stroke={1.5} />
-                    </ActionIcon>
+                    <Tooltip label="Save To a File">
+                        <ActionIcon variant="default" aria-label="Settings" ml="auto" onClick={async () => await saveTextFile("result.json", "application/json", ".json", resultText)}>
+                            <IconFileDownload style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                        </ActionIcon>
+                    </Tooltip>
                 </Group>
             }
         >

@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Group, Menu, Select } from "@mantine/core";
+import { ActionIcon, Button, Group, Menu, Select, Tooltip } from "@mantine/core";
 import { IconChevronDown, IconFileUpload } from "@tabler/icons-react";
 import { memo } from "react";
 import JSONEditor from "../code-editors/json-editor";
@@ -21,27 +21,31 @@ const TypePanel = memo(({
         <PanelShell
             toolbar={
                 <Group gap="xs" w="100%">
-                    <Select
-                        size="xs"
-                        w="200px"
-                        allowDeselect={false}
-                        data={[
-                            { label: "JSON Schema Draft 2020-12", value: DataTypeRawFormat.jsonSchema },
-                            { label: "JSON Type Definition", value: DataTypeRawFormat.jsonTypeDefinition }
-                        ]}
-                        value={queryArgumentTypeRaw.format}
-                        onChange={value => onQueryArgumentTypeRawChanged({ ...queryArgumentTypeRaw, format: value as DataTypeRawFormat })}
-                    />
-                    <ActionIcon variant="default" aria-label="Settings" ml="auto" onClick={async () => {
-                        const content = await openTextFile(".json");
-                        if (content === null) return;
-                        if (queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema)
-                            onQueryArgumentTypeRawChanged({ ...queryArgumentTypeRaw, jsonSchemaText: content });
-                        else
-                            onQueryArgumentTypeRawChanged({ ...queryArgumentTypeRaw, jsonTypeDefinitionText: content });
-                    }}>
-                        <IconFileUpload style={{ width: '70%', height: '70%' }} stroke={1.5} />
-                    </ActionIcon>
+                    <Tooltip label="Schema Format">
+                        <Select
+                            size="xs"
+                            w="200px"
+                            allowDeselect={false}
+                            data={[
+                                { label: "JSON Schema Draft 2020-12", value: DataTypeRawFormat.jsonSchema },
+                                { label: "JSON Type Definition", value: DataTypeRawFormat.jsonTypeDefinition }
+                            ]}
+                            value={queryArgumentTypeRaw.format}
+                            onChange={value => onQueryArgumentTypeRawChanged({ ...queryArgumentTypeRaw, format: value as DataTypeRawFormat })}
+                        />
+                    </Tooltip>
+                    <Tooltip label="Load From a File">
+                        <ActionIcon variant="default" aria-label="Settings" ml="auto" onClick={async () => {
+                            const content = await openTextFile(".json");
+                            if (content === null) return;
+                            if (queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema)
+                                onQueryArgumentTypeRawChanged({ ...queryArgumentTypeRaw, jsonSchemaText: content });
+                            else
+                                onQueryArgumentTypeRawChanged({ ...queryArgumentTypeRaw, jsonTypeDefinitionText: content });
+                        }}>
+                            <IconFileUpload style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                        </ActionIcon>
+                    </Tooltip>
                     <Menu shadow="md" width={200}>
                         <Menu.Target>
                             <Button variant="default" size="xs" rightSection={<IconChevronDown size={14} />}>Example Schema</Button>

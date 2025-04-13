@@ -1,4 +1,4 @@
-import { ActionIcon, Burger, Flex, Group, Indicator, Title, useMantineColorScheme } from "@mantine/core";
+import { ActionIcon, Burger, Flex, Group, Indicator, Title, Tooltip, useMantineColorScheme } from "@mantine/core";
 import { IconBrandGithub, IconMoon, IconRoute, IconSun } from "@tabler/icons-react";
 import { memo } from "react";
 
@@ -30,15 +30,21 @@ const Header = memo(({
                 </Indicator>
             </Group>
             <Group pr="xs">
-                <ActionIcon variant="subtle" color="violet" size="lg" aria-label="GitHub Page" visibleFrom="xs" component="a" href="https://github.com/vosa53/jsonpath-tools" target="_blank">
-                    <IconBrandGithub style={{ width: "70%", height: "70%" }} stroke={1.5} />
-                </ActionIcon>
-                <ActionIcon variant="subtle" color="violet" size="lg" aria-label="Set Dark Color Scheme" darkHidden onClick={() => colorScheme.setColorScheme("dark")}>
-                    <IconMoon style={{ width: "70%", height: "70%" }} stroke={1.5} />
-                </ActionIcon>
-                <ActionIcon variant="subtle" color="violet" size="lg" aria-label="Set Light Color Scheme" lightHidden onClick={() => colorScheme.setColorScheme("light")}>
-                    <IconSun style={{ width: "70%", height: "70%" }} stroke={1.5} />
-                </ActionIcon>
+                <Tooltip label="GitHub Repository">
+                    <ActionIcon variant="subtle" color="violet" size="lg" aria-label="GitHub Page" visibleFrom="xs" component="a" href="https://github.com/vosa53/jsonpath-tools" target="_blank">
+                        <IconBrandGithub style={{ width: "70%", height: "70%" }} stroke={1.5} />
+                    </ActionIcon>
+                </Tooltip>
+                <Tooltip label="Set Dark Color Scheme">
+                    <ActionIcon variant="subtle" color="violet" size="lg" aria-label="Set Dark Color Scheme" darkHidden onClick={() => colorScheme.setColorScheme("dark")}>
+                        <IconMoon style={{ width: "70%", height: "70%" }} stroke={1.5} />
+                    </ActionIcon>
+                </Tooltip>
+                <Tooltip label="Set Light Color Scheme">
+                    <ActionIcon variant="subtle" color="violet" size="lg" aria-label="Set Light Color Scheme" lightHidden onClick={() => colorScheme.setColorScheme("light")}>
+                        <IconSun style={{ width: "70%", height: "70%" }} stroke={1.5} />
+                    </ActionIcon>
+                </Tooltip>
             </Group>
         </Flex>
     );

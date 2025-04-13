@@ -1,7 +1,7 @@
 import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
 
 /**
- * Converts the given normalized path to JSON Pointer [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901).
+ * Converts the given normalized path to JSON Pointer ([RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901)).
  * @param path Normalized path.
  */
 export function normalizedPathToJSONPointer(path: NormalizedPath): string {
