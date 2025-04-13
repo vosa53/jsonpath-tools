@@ -18,11 +18,17 @@ export abstract class SyntaxTree {
         readonly length: number
     ) { }
 
-    // TODO
     /**
      * Parent or `null` when no parent is assigned.
      */
-    parent: SyntaxTreeNode | null = null;
+    get parent(): SyntaxTreeNode | null {
+        return this._parent;
+    }
+
+    /**
+     * @internal
+     */
+    _parent: SyntaxTreeNode | null = null;
 
     /**
      * Type.

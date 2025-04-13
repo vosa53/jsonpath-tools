@@ -592,7 +592,6 @@ class ParserContext {
     }
 
     goNext() {
-        // TODO: Check UTF-16 validity? (Unpaired surrogates)
         this._collectedCount++;
         this._currentIndex++;
     }

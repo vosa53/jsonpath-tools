@@ -13,6 +13,7 @@ import { SliceSelector } from "../query/selectors/slice-selector";
 import { SyntaxTree } from "../query/syntax-tree";
 import { TextChange } from "../text/text-change";
 import { TextRange } from "../text/text-range";
+import { CharacterCategorizer } from "../syntax-analysis/character-categorizer";
 
 /**
  * Formats query text to be more readable and consistent.
@@ -157,13 +158,12 @@ export class FormattingService {
         let whitespaceCount = 0;
         let onlyCorrectCharacters = true;
         for (let i = textOffset; i < textOffset + textLength; i++) {
-            if (text[i] === " " || text[i] === "\r" || text[i] === "\n") whitespaceCount++; // TODO: More whitespace characters.
+            if (CharacterCategorizer.isBlank(text[i])) whitespaceCount++;
             else break;
             if (text[i] !== character) onlyCorrectCharacters = false;
         }
         if (whitespaceCount === count && onlyCorrectCharacters) return;
         context.addEdit(new TextChange(new TextRange(textPosition + textOffset, whitespaceCount), character.repeat(count)));
-
     }
 }
 

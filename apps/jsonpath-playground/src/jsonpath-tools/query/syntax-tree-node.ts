@@ -20,8 +20,11 @@ export abstract class SyntaxTreeNode extends SyntaxTree {
             throw new Error("Expected at least one non null child.");
         super(notNullChildren[0].position, notNullChildren.reduce((p, c) => p + c.length, 0));
         this.children = notNullChildren;
-        for (const child of this.children)
-            child.parent = this;
+        for (const child of this.children) {
+            if (child.parent !== null)
+                throw new Error("Child has already assigned a parent.");
+            child._parent = this;
+        }
     }
 
     /**
