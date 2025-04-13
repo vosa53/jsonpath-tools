@@ -67,7 +67,8 @@ function createJSONPathFunctionHandler(customFunction: CustomFunctionHandler, fu
     }
 }
 
-// TODO: Probably pass the whole library to custom functions (import *).
+// Later we will maybe pass the whole library to custom functions (import *). 
+// But for now we will just stick with this basic API. We can always expand it but not the other way around.
 const JSONPATH_LIBRARY = {
     Nothing,
     LogicalFalse,

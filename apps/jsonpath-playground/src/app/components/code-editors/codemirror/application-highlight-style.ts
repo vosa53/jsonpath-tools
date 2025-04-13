@@ -20,8 +20,6 @@ export const applicationHighlightStyle = HighlightStyle.define([
     { tag: t.paren, color: "var(--mantine-color-grape-text)" },
     { tag: t.brace, color: "var(--mantine-color-yellow-text)" },
     { tag: t.controlOperator, color: "var(--mantine-color-violet-text)" },
-
-    // TODO: Adapt to the application style.
     { tag: t.meta, color: "var(--mantine-color-indigo-text)" },
     { tag: t.link, textDecoration: "underline" },
     { tag: t.heading, textDecoration: "underline", fontWeight: "bold" },
@@ -29,13 +27,13 @@ export const applicationHighlightStyle = HighlightStyle.define([
     { tag: t.strong, fontWeight: "bold" },
     { tag: t.strikethrough, textDecoration: "line-through" },
     { tag: [t.atom, t.url, t.contentSeparator, t.labelName], color: "var(--mantine-color-blue-text)" },
-    { tag: [t.literal, t.inserted], color: "#164" },
-    { tag: [t.deleted], color: "#a11" },
-    { tag: [t.regexp, t.escape, t.special(t.string)], color: "#e40" },
+    //{ tag: [t.literal, t.inserted], color: "#164" },
+    //{ tag: [t.deleted], color: "#a11" },
+    { tag: [t.regexp, t.escape, t.special(t.string)], color: "var(--mantine-color-pink-text)" },
     { tag: t.definition(t.variableName), color: "var(--mantine-color-yellow-text)" },
-    { tag: t.local(t.variableName), color: "#30a" },
+    //{ tag: t.local(t.variableName), color: "#30a" },
     { tag: [t.typeName, t.namespace], color: "var(--mantine-color-green-text)" },
-    { tag: [t.special(t.variableName), t.macroName], color: "#256" },
+    //{ tag: [t.special(t.variableName), t.macroName], color: "#256" },
     { tag: t.definition(t.propertyName), color: "var(--mantine-color-yellow-text)" },
     { tag: t.comment, color: "var(--mantine-color-green-text)" },
     { tag: t.invalid, color: "var(--mantine-color-red-text)" }

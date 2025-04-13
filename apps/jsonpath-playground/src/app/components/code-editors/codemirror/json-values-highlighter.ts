@@ -39,7 +39,7 @@ export function getPathAtTreeCursor(cursor: TreeCursor, state: EditorState): Nor
         if (cursor.name === "Property") {
             cursor.firstChild();
             const nameString = state.doc.sliceString(cursor.from, cursor.to);
-            const name = JSON.parse(nameString); // TODO: Invalid property name.
+            const name = tryParseJSONString(nameString);
             path.push(name);
             cursor.parent();
         }
@@ -158,9 +158,9 @@ const jsonValuesHighlighterPlugin = ViewPlugin.fromClass(class {
                         }
 
                         if (node.name === "Property") {
-                            const propertyNameNode = node.node.firstChild!; // TODO: return false
+                            const propertyNameNode = node.node.firstChild!;
                             if (propertyNameNode === null || propertyNameNode.name !== "PropertyName") return false;
-                            path.push(JSON.parse(view.state.doc.sliceString(propertyNameNode.from, propertyNameNode.to))); // TODO: Invalid property name.
+                            path.push(tryParseJSONString(view.state.doc.sliceString(propertyNameNode.from, propertyNameNode.to)));
                         }
                         else if (node.name === "Array") path.push(-1);
                     },
@@ -218,9 +218,18 @@ function isPropertyWithNameAtTreeCursor(cursor: TreeCursor, document: Text, name
         return false;
     }
     const foundNameString = document.sliceString(cursor.from, cursor.to);
-    const foundName = JSON.parse(foundNameString); // TODO: Invalid property name.
+    const foundName = tryParseJSONString(foundNameString);
     cursor.parent();
     return foundName === name;
+}
+
+function tryParseJSONString(jsonString: string) {
+    try {
+        return JSON.parse(jsonString);
+    }
+    catch {
+        return jsonString;
+    }
 }
 
 const jsonValuesHighlighterBaseTheme = EditorView.baseTheme({
