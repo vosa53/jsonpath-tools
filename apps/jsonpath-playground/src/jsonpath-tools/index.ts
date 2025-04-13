@@ -52,6 +52,7 @@ import { Signature, SignatureParameter } from "./editor-services/signature-help-
 import { Tooltip } from "./editor-services/tooltip-service";
 import { DocumentHighlight } from "./editor-services/document-highlights-service";
 import { FilterExpressionContext, QueryContext } from "./query/evaluation";
+import { IndexOnlyArray, PushOnlyArray } from "./helpers/array";
 
 export type {
     JSONValue,
@@ -82,7 +83,10 @@ export type {
     JSONSchemaType,
     JSONTypeDefinition,
     JSONTypeDefinitionDictionary,
-    JSONTypeDefinitionType
+    JSONTypeDefinitionType,
+
+    IndexOnlyArray,
+    PushOnlyArray
 };
 
 export { 

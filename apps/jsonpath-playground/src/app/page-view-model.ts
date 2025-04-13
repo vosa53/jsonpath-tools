@@ -290,8 +290,8 @@ function executeOperation(
 }
 
 function toJSONPointer(path: NormalizedPath): string {
-    if (path.length === 0) return "/";
-    return "/" + path.join("/"); // TODO: Escaping.
+    // Escaping according to the JSON Pointer specification RFC 6901 https://datatracker.ietf.org/doc/html/rfc6901.
+    return "/" + path.map(s => s.toString().replace("~", "~0").replace("/", "~1")).join("/");
 }
 
 const worker = new Worker(new URL("./services/language-service/custom-language-service-worker.ts", import.meta.url), { type: "module" });

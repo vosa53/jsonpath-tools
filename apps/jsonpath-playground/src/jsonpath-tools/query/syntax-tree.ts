@@ -54,6 +54,10 @@ export abstract class SyntaxTree {
      */
     abstract forEach(action: (tree: SyntaxTree) => void | boolean): void;
 
+    /**
+     * Returns the innermost subtree that spans the given position or `null` when the position is outside of a range of the current tree.
+     * @param position Position (character index).
+     */
     getAtPosition(position: number): SyntaxTree | null {
         if (position < this.position)
             return null;
@@ -73,12 +77,20 @@ export abstract class SyntaxTree {
         return current;
     }
 
+    /**
+     * Returns all innermost subtrees that touch the given position.
+     * @param position Position (caret position index).
+     */
     getTouchingAtPosition(position: number): SyntaxTree[] {
         const results: SyntaxTree[] = [];
         this.getTouchingAtPositionRecursive(position, results);
         return results;
     }
 
+    /**
+     * Returns the innermost subtree that fully contains the given position *(not just touches)* or `null` when the position is not contained in range of the current tree.
+     * @param position Position (caret position index).
+     */
     getContainingAtPosition(position: number): SyntaxTree | null {
         if (position <= this.position)
             return null;
