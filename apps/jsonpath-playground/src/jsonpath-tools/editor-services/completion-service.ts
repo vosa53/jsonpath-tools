@@ -315,26 +315,87 @@ export class CompletionService {
     }
 }
 
+/**
+ * Completion item.
+ */
 export class CompletionItem {
     constructor(
+        /**
+         * Type.
+         */
         readonly type: CompletionItemType,
+
+        /**
+         * Text to be inserted instead of {@link range}.
+         * 
+         * When {@link textType} is {@link CompletionItemTextType.snippet} it should be inserted as a snippet. 
+         * Snippet parts are defined using `${}`, for example `${start}:${end}:${step}`.
+         */
         readonly text: string,
+
+        /**
+         * Text range to be replaced with {@link text}.
+         */
         readonly range: TextRange,
+
+        /**
+         * Text to display in user interface.
+         */
         readonly label: string = text,
+
+        /**
+         * Additional text to show next to {@link label} in user interface. For example a type.
+         */
         readonly detail?: string,
+
+        /**
+         * Function that computes the long description. In Markdown format.
+         */
         readonly resolveDescription?: () => string,
+
+        /**
+         * Whether the {@link text} should be inserted as is or as a snippet.
+         */
         readonly textType: CompletionItemTextType = CompletionItemTextType.plain
     ) { }
 }
 
+/**
+ * Type of a completion item.
+ */
 export enum CompletionItemType {
+    /**
+     * Object property name.
+     */
     name,
+
+    /**
+     * Literal value. For example some concrete string or a number.
+     */
     literal,
+
+    /**
+     * Function.
+     */
     function,
+
+    /**
+     * Other syntax parts.
+     */
     syntax
 }
 
+/**
+ * Type of a completion item text.
+ */
 export enum CompletionItemTextType {
+    /**
+     * Insert the text as is.
+     */
     plain,
+
+    /**
+     * Insert the text as a snippet.
+     */
     snippet
 }

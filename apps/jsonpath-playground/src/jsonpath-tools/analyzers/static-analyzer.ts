@@ -7,7 +7,7 @@ import { Selector } from "../query/selectors/selector";
 import { DataTypeAnalyzer } from "../data-types/data-type-analyzer";
 
 /**
- * Analyzes a query for mistakes by static analysis with a type.
+ * Analyzes a query for mistakes by static analysis with a data type.
  */
 export class StaticAnalyzer {
     constructor(

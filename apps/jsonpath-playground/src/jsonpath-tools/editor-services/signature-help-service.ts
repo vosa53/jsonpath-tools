@@ -16,7 +16,7 @@ export class SignatureHelpService {
     ) { }
 
     /**
-     * Provides a signature at the given caret position in the query text.
+     * Provides a signature at the given caret position in the query text. When no signature is available it returns `null`.
      * @param query Query.
      * @param position Caret position in the query text (starts with 0).
      */
@@ -64,18 +64,46 @@ export class SignatureHelpService {
     }
 }
 
+/**
+ * Signature.
+ */
 export class Signature {
     constructor(
+        /**
+         * Text.
+         */
         readonly text: string,
+
+        /**
+         * Parameters.
+         */
         readonly parameters: readonly SignatureParameter[],
+
+        /**
+         * Index of a parameter from {@link parameters} where the caret is.
+         */
         readonly activeParameterIndex: number,
+
+        /**
+         * Documentation. In Markdown format.
+         */
         readonly documentation: string
     ) { }
 }
 
+/**
+ * Signature parameter.
+ */
 export class SignatureParameter {
     constructor(
+        /**
+         * Parameter range in the signature text.
+         */
         readonly rangeInSignatureText: TextRange,
+
+        /**
+         * Documentation. In Markdown format.
+         */
         readonly documentation: string
     ) { }
 }

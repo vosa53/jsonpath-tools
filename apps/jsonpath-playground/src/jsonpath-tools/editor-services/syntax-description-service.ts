@@ -12,7 +12,11 @@ import { NameSelector } from "../query/selectors/name-selector";
 import { SliceSelector } from "../query/selectors/slice-selector";
 import { SyntaxTree } from "../query/syntax-tree";
 import { SyntaxTreeType } from "../query/syntax-tree-type";
+import { NullLiteralExpression } from "../query/filter-expression/null-literal-expression";
 
+/**
+ * Provides a description for parts of a query syntax tree.
+ */
 export class SyntaxDescriptionService {
     private readonly descriptionProviders = new Map<SyntaxTreeType, (node: SyntaxTree) => SyntaxDescription>([
         [SyntaxTreeType.subQuery, n => {
@@ -76,17 +80,28 @@ export class SyntaxDescriptionService {
     ]);
 
     constructor(
+        /**
+         * Query options.
+         */
         private readonly options: QueryOptions
     ) { }
 
-    provideDescription(node: SyntaxTree): SyntaxDescription | null {
-        const descriptionProvider = this.descriptionProviders.get(node.type);
+    /**
+     * Provides a description for the given part of a query syntax tree. When the part has no description available it returns `null`. 
+     * @param tree Part of a query syntax tree.
+     */
+    provideDescription(tree: SyntaxTree): SyntaxDescription | null {
+        const descriptionProvider = this.descriptionProviders.get(tree.type);
         if (descriptionProvider !== undefined)
-            return descriptionProvider(node);
+            return descriptionProvider(tree);
         else
             return null;
     }
 
+    /**
+     * Provides a description for {@link SubQuery}.
+     * @param isRelative {@link SubQuery.isRelative}.
+     */
     provideDescriptionForQuery(isRelative: boolean): SyntaxDescription {
         return new SyntaxDescription(
             isRelative ? "Relative Query" : "Absolute Query",
@@ -94,10 +109,17 @@ export class SyntaxDescriptionService {
         );
     }
 
+    /**
+     * Provides a description for {@link FilterSelector}.
+     */
     provideDescriptionForFilterSelector(): SyntaxDescription {
         return new SyntaxDescription("Filter Selector", "Selects values from an array/object that satisfy a logical expression. Current tested value is represented with `@`.");
     }
 
+    /**
+     * Provides a description for {@link IndexSelector}.
+     * @param index {@link IndexSelector.index}.
+     */
     provideDescriptionForIndexSelector(index?: number): SyntaxDescription {
         if (index === undefined)
             return new SyntaxDescription("Index Selector", "Selects a value at the given index from an array.");
@@ -105,6 +127,10 @@ export class SyntaxDescriptionService {
             return new SyntaxDescription(`Index Selector \`${index}\``, `Selects a value at the index \`${index}\` from an array.`);
     }
 
+    /**
+     * Provides a description for {@link NameSelector}.
+     * @param name {@link NameSelector.name}.
+     */
     provideDescriptionForNameSelector(name?: string): SyntaxDescription {
         if (name === undefined)
             return new SyntaxDescription("Name Selector", "Selects a property from an object.");
@@ -112,6 +138,12 @@ export class SyntaxDescriptionService {
             return new SyntaxDescription(`Name Selector \`${name}\``, `Selects the property \`${name}\` from an object.`);
     }
 
+    /**
+     * Provides a description for {@link SliceSelector}.
+     * @param start {@link SliceSelector.start}.
+     * @param end {@link SliceSelector.end}.
+     * @param step {@link SliceSelector.step}.
+     */
     provideDescriptionForSliceSelector(start?: number | null, end?: number | null, step?: number | null): SyntaxDescription {
         if (start === undefined || end === undefined || step === undefined)
             return new SyntaxDescription("Slice Selector", "Selects values in the given range from an array.");
@@ -121,14 +153,24 @@ export class SyntaxDescriptionService {
         }
     }
 
+    /**
+     * Provides a description for {@link WildcardSelector}.
+     */
     provideDescriptionForWildcardSelector(): SyntaxDescription {
         return new SyntaxDescription("Wildcard Selector", "Selects all values from an array/object.");
     }
 
+    /**
+     * Provides a description for {@link MissingSelector}.
+     */
     provideDescriptionForMissingSelector(): SyntaxDescription {
         return new SyntaxDescription("Missing Selector", "Represents a mising selector (syntax error).");
     }
 
+    /**
+     * Provides a description for {@link ComparisonExpression}.
+     * @param operator {@link ComparisonExpression.operator}.
+     */
     provideDescriptionForComparisonExpression(operator: JSONPathComparisonOperator): SyntaxDescription {
         let operatorDescription;
         if (operator === JSONPathComparisonOperator.equals) operatorDescription = "Equality";
@@ -141,6 +183,11 @@ export class SyntaxDescriptionService {
         return new SyntaxDescription(`${operatorDescription} Comparison`, "Compares left and right.");
     }
 
+    /**
+     * Provides a description for {@link FunctionExpression}.
+     * @param name {@link FunctionExpression.name}.
+     * @param functionDefinition Definition of the function.
+     */
     provideDescriptionForFunctionExpression(name: string, functionDefinition?: Function): SyntaxDescription {
         let text = "";
         if (functionDefinition !== undefined) {
@@ -154,26 +201,47 @@ export class SyntaxDescriptionService {
         return new SyntaxDescription(`Function \`${name}\``, text);
     }
 
+    /**
+     * Provides a description for {@link StringLiteralExpression}.
+     * @param value {@link StringLiteralExpression.value}.
+     */
     provideDescriptionForStringLiteralExpression(value: string): SyntaxDescription {
         return this.createLiteralDescription("String Literal", value);
     }
 
+    /**
+     * Provides a description for {@link NumberLiteralExpression}.
+     * @param value {@link NumberLiteralExpression.value}.
+     */
     provideDescriptionForNumberLiteralExpression(value: number): SyntaxDescription {
         return this.createLiteralDescription("Number Literal", value);
     }
 
+    /**
+     * Provides a description for {@link BooleanLiteralExpression}.
+     * @param value {@link BooleanLiteralExpression.value}.
+     */
     provideDescriptionForBooleanLiteralExpression(value: boolean): SyntaxDescription {
         return this.createLiteralDescription("Boolean Literal", value);
     }
 
+    /**
+     * Provides a description for {@link NullLiteralExpression}.
+     */
     provideDescriptionForNullLiteralExpression(): SyntaxDescription {
         return this.createLiteralDescription("Null Literal", null);
     }
 
+    /**
+     * Provides a description for {@link SyntaxTreeType.dollarToken}.
+     */
     provideDescriptionForDollarToken(): SyntaxDescription {
         return new SyntaxDescription("Root Identifier", "Represents the root query argument.");
     }
 
+    /**
+     * Provides a description for {@link SyntaxTreeType.atToken}.
+     */
     provideDescriptionForAtToken(): SyntaxDescription {
         return new SyntaxDescription("Current Identifier", "Represents the current value in the filter selector expression.");
     }
@@ -188,12 +256,25 @@ export class SyntaxDescriptionService {
     }
 }
 
+/**
+ * Description of a part of a query syntax tree.
+ */
 export class SyntaxDescription {
     constructor(
+        /**
+         * Title.
+         */
         readonly title: string,
+
+        /**
+         * Text. In Markdown format.
+         */
         readonly text: string
     ) { }
 
+    /**
+     * Converts the whole description to Markdown format.
+     */
     toMarkdown(): string {
         return `#### ${this.title}\n${this.text}`;
     }

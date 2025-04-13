@@ -79,8 +79,14 @@ export class DocumentHighlightsService {
     }
 }
 
+/**
+ * One document highlight.
+ */
 export class DocumentHighlight {
     constructor(
-        readonly range: TextRange,
+        /**
+         * Text range to be highlighted.
+         */
+        readonly range: TextRange
     ) { }
 }

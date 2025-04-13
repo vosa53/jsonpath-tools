@@ -94,22 +94,41 @@ export class EditorService {
         this.queryArgumentType = newQueryArgumentType;
     }
 
+    /**
+     * Provides completion items at the given caret position in the query text.
+     * @param position Caret position in the query text (starts with 0).
+     */
     getCompletions(position: number): CompletionItem[] {
         return logPerformance("Get completions", () => this.completionProvider.provideCompletions(this.query, this.queryArgument, this.queryArgumentType, position));
     }
 
+    /**
+     * Provides a signature at the given caret position in the query text. When no signature is available it returns `null`.
+     * @param position Caret position in the query text (starts with 0).
+     */
     getSignature(position: number): Signature | null {
         return this.signatureProvider.provideSignature(this.query, position);
     }
 
+    /**
+     * Provides document highlights at the given caret position in the query text.
+     * @param position Caret position in the query text (starts with 0).
+     */
     getDocumentHighlights(position: number): DocumentHighlight[] {
         return this.documentHighlightsProvider.provideHighlights(this.query, position);
     }
 
+    /**
+     * Provides a tooltip at the given position in the query text.
+     * @param position Position in the query text (character index).
+     */
     getTooltip(position: number): Tooltip | null {
         return this.tooltipProvider.provideTooltip(this.query, this.queryArgument, this.queryArgumentType, position);
     }
 
+    /**
+     * Provides the query errors and warnings.
+     */
     getDiagnostics(): Diagnostics[] {
         const syntaxDiagnostics = this.query.syntaxDiagnostics;
         const typeCheckerDiagnostics = this.typeChecker.check(this.query);
@@ -122,10 +141,16 @@ export class EditorService {
         return diagnostics;
     }
 
+    /**
+     * Provides text changes that can be used to format the query text.
+     */
     getFormattingEdits(): TextChange[] {
         return this.formatter.getFormattingEdits(this.query);
     }
 
+    /**
+     * Returns the query result (selected nodes).
+     */
     getResult(): NodeList {
         return this.getDynamicAnalysisResult().queryResult;
     }
