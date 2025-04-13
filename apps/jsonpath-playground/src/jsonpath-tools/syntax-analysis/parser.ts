@@ -1,7 +1,7 @@
 import { Diagnostics, DiagnosticsSeverity } from "../diagnostics";
 import { AndExpression } from "../query/filter-expression/and-expression";
 import { BooleanLiteralExpression } from "../query/filter-expression/boolean-literal-expression";
-import { ComparisonExpression, JSONPathComparisonOperator } from "../query/filter-expression/comparison-expression";
+import { ComparisonExpression, ComparisonOperator } from "../query/filter-expression/comparison-expression";
 import { FilterExpression } from "../query/filter-expression/filter-expression";
 import { FilterQueryExpression } from "../query/filter-expression/filter-query-expression";
 import { FunctionExpression } from "../query/filter-expression/function-expression";
@@ -13,8 +13,8 @@ import { OrExpression } from "../query/filter-expression/or-expression";
 import { ParanthesisExpression } from "../query/filter-expression/paranthesis-expression";
 import { StringLiteralExpression } from "../query/filter-expression/string-literal-expression";
 import { Query } from "../query/query";
-import { SubQuery } from "../query/sub-query";
-import { Segment } from "../query/segment";
+import { QueryType, SubQuery } from "../query/sub-query";
+import { Segment, SegmentType } from "../query/segment";
 import { FilterSelector } from "../query/selectors/filter-selector";
 import { IndexSelector } from "../query/selectors/index-selector";
 import { MissingSelector } from "../query/selectors/missing-selector";
@@ -49,13 +49,13 @@ export class Parser {
     private parseQuery(context: ParserContext, allowedRelative: boolean): SubQuery {
         this.skipWhitespace(context, false);
 
-        const isRelative = context.current === "@";
+        const type = context.current === "@" ? QueryType.relative : QueryType.absolute;
         if (context.current === "$" || context.current === "@")
             context.goNext();
         else
             context.addError(`Expected $ ${allowedRelative ? "or @" : ""}.`);
-        const identifier = context.collectToken(isRelative ? SyntaxTreeType.atToken : SyntaxTreeType.dollarToken);
-        if (isRelative && !allowedRelative)
+        const identifier = context.collectToken(type === QueryType.absolute ? SyntaxTreeType.dollarToken : SyntaxTreeType.atToken);
+        if (type === QueryType.relative && !allowedRelative)
             context.addError("Relative queries are not allowed here.", identifier.textRangeWithoutSkipped);
         
         const segments: Segment[] = [];
@@ -72,15 +72,15 @@ export class Parser {
             }
         }
 
-        return new SubQuery(identifier, segments, isRelative);
+        return new SubQuery(identifier, segments, type);
     }
 
     private parseSegment(context: ParserContext): Segment {
         const hasDot = context.current === ".";
         if (hasDot) context.goNext();
-        const isRecursive = context.current === ".";
-        if (isRecursive) context.goNext();
-        const dotToken = hasDot ? context.collectToken(isRecursive ? SyntaxTreeType.doubleDotToken : SyntaxTreeType.dotToken) : null;
+        const type = context.current === "." ? SegmentType.descendant : SegmentType.child;
+        if (type === SegmentType.descendant) context.goNext();
+        const dotToken = hasDot ? context.collectToken(type === SegmentType.child ? SyntaxTreeType.dotToken : SyntaxTreeType.doubleDotToken) : null;
 
         this.skipWhitespace(context, false);
 
@@ -88,21 +88,21 @@ export class Parser {
             context.addError("Expected '.' or '..' or '['.");
 
         if (context.current === "[") {
-            if (hasDot && !isRecursive) context.addError("'.' is not allowed before '['.", dotToken!.textRangeWithoutSkipped);
-            return this.parseBracketedSelection(context, dotToken, isRecursive);
+            if (hasDot && type === SegmentType.child) context.addError("'.' is not allowed before '['.", dotToken!.textRangeWithoutSkipped);
+            return this.parseBracketedSelection(context, dotToken, type);
         }
         else if (context.current === "*") {
             const wildcardSelector = this.parseWildcardSelector(context);
-            return new Segment(dotToken, null, [{ selector: wildcardSelector, commaToken: null }], null, isRecursive);
+            return new Segment(dotToken, null, [{ selector: wildcardSelector, commaToken: null }], null, type);
         }
         else if (context.current !== null && CharacterCategorizer.isNameFirst(context.current)) {
             const nameSelector = this.parseMemberNameShorthand(context);
-            return new Segment(dotToken, null, [{ selector: nameSelector, commaToken: null }], null, isRecursive);
+            return new Segment(dotToken, null, [{ selector: nameSelector, commaToken: null }], null, type);
         }
         else {
             context.addError("Expected a selector/selectors.");
             const missingSelector = new MissingSelector(context.collectToken(SyntaxTreeType.missingToken));
-            return new Segment(dotToken, null, [{ selector: missingSelector, commaToken: null }], null, isRecursive);
+            return new Segment(dotToken, null, [{ selector: missingSelector, commaToken: null }], null, type);
         }
     }
 
@@ -111,7 +111,7 @@ export class Parser {
         return new NameSelector(name.token, name.value);
     }
 
-    private parseBracketedSelection(context: ParserContext, dotToken: SyntaxTreeToken | null, isRecursive: boolean): Segment {
+    private parseBracketedSelection(context: ParserContext, dotToken: SyntaxTreeToken | null, type: SegmentType): Segment {
         context.goNext();
         const openingToken = context.collectToken(SyntaxTreeType.openingBracketToken);
 
@@ -135,7 +135,7 @@ export class Parser {
         else
             context.addError("Expected ']'.");
         const closingToken = context.collectToken(SyntaxTreeType.closingBracketToken);
-        return new Segment(dotToken, openingToken, selectors, closingToken, isRecursive);
+        return new Segment(dotToken, openingToken, selectors, closingToken, type);
     }
 
     private skipToSelector(context: ParserContext) {
@@ -265,14 +265,14 @@ export class Parser {
         const left = this.parseNotExpression(context);
         this.skipWhitespace(context);
 
-        let operator: JSONPathComparisonOperator;
+        let operator: ComparisonOperator;
         let operatorTokenType: SyntaxTreeType;
-        if (context.current === "=" && context.next === "=") { operator = JSONPathComparisonOperator.equals; operatorTokenType = SyntaxTreeType.doubleEqualsToken; }
-        else if (context.current === "!" && context.next === "=") { operator = JSONPathComparisonOperator.notEquals; operatorTokenType = SyntaxTreeType.exclamationMarkEqualsToken; }
-        else if (context.current === "<" && context.next === "=") { operator = JSONPathComparisonOperator.lessThanEquals; operatorTokenType = SyntaxTreeType.lessThanEqualsToken; }
-        else if (context.current === ">" && context.next === "=") { operator = JSONPathComparisonOperator.greaterThanEquals; operatorTokenType = SyntaxTreeType.greaterThanEqualsToken; }
-        else if (context.current === "<") { operator = JSONPathComparisonOperator.lessThan; operatorTokenType = SyntaxTreeType.lessThanToken; }
-        else if (context.current === ">") { operator = JSONPathComparisonOperator.greaterThan; operatorTokenType = SyntaxTreeType.greaterThanToken; }
+        if (context.current === "=" && context.next === "=") { operator = ComparisonOperator.equals; operatorTokenType = SyntaxTreeType.doubleEqualsToken; }
+        else if (context.current === "!" && context.next === "=") { operator = ComparisonOperator.notEquals; operatorTokenType = SyntaxTreeType.exclamationMarkEqualsToken; }
+        else if (context.current === "<" && context.next === "=") { operator = ComparisonOperator.lessThanEquals; operatorTokenType = SyntaxTreeType.lessThanEqualsToken; }
+        else if (context.current === ">" && context.next === "=") { operator = ComparisonOperator.greaterThanEquals; operatorTokenType = SyntaxTreeType.greaterThanEqualsToken; }
+        else if (context.current === "<") { operator = ComparisonOperator.lessThan; operatorTokenType = SyntaxTreeType.lessThanToken; }
+        else if (context.current === ">") { operator = ComparisonOperator.greaterThan; operatorTokenType = SyntaxTreeType.greaterThanToken; }
         else return left;
         for (let i = 0; i < operator.length; i++) context.goNext();
         const operatorToken = context.collectToken(operatorTokenType);

@@ -2,26 +2,56 @@ import { TextRange } from "../text/text-range";
 import type { SyntaxTreeNode } from "./syntax-tree-node";
 import { SyntaxTreeType } from "./syntax-tree-type";
 
+/**
+ * Part of a query syntax tree.
+ */
 export abstract class SyntaxTree {
     constructor(
+        /**
+         * Position in the text.
+         */
         readonly position: number,
+
+        /**
+         * Length in the text.
+         */
         readonly length: number
     ) { }
 
     // TODO
+    /**
+     * Parent or `null` when no parent is assigned.
+     */
     parent: SyntaxTreeNode | null = null;
 
+    /**
+     * Type.
+     */
     abstract readonly type: SyntaxTreeType;
+
+    /**
+     * Text that was skipped during parsing.
+     */
     abstract readonly skippedTextBefore: string;
 
+    /**
+     * Range in the text.
+     */
     get textRange(): TextRange {
         return new TextRange(this.position, this.length);
     }
 
+    /**
+     * Range in the text excluding skipped text before.
+     */
     get textRangeWithoutSkipped(): TextRange {
         return new TextRange(this.position + this.skippedTextBefore.length, this.length - this.skippedTextBefore.length);
     }
 
+    /**
+     * Executes the given action for this and all descendant trees in a pre-order tree traversal.
+     * @param action Action.
+     */
     abstract forEach(action: (tree: SyntaxTree) => void | boolean): void;
 
     getAtPosition(position: number): SyntaxTree | null {

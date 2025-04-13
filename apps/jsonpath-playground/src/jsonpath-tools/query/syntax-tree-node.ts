@@ -1,9 +1,17 @@
 import { SyntaxTree } from "./syntax-tree";
 
-
+/**
+ * Nonterminal symbols of the grammar.
+ */
 export abstract class SyntaxTreeNode extends SyntaxTree {
+    /**
+     * Children.
+     */
     readonly children: SyntaxTree[];
 
+    /**
+     * @param children Children.
+     */
     constructor(
         children: (SyntaxTree | null)[]
     ) {
@@ -16,11 +24,17 @@ export abstract class SyntaxTreeNode extends SyntaxTree {
             child.parent = this;
     }
 
+    /**
+     * @inheritdoc
+     */
     get skippedTextBefore(): string {
         // @ts-ignore
         return this.children[0].skippedTextBefore;
     }
 
+    /**
+     * @inheritdoc
+     */
     forEach(action: (tree: SyntaxTree) => void | boolean): void {
         const shouldContinue = action(this);
         if (shouldContinue !== false) {

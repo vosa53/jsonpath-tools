@@ -1,6 +1,6 @@
 import { AndExpression } from "@/jsonpath-tools/query/filter-expression/and-expression";
 import { BooleanLiteralExpression } from "@/jsonpath-tools/query/filter-expression/boolean-literal-expression";
-import { ComparisonExpression, JSONPathComparisonOperator } from "@/jsonpath-tools/query/filter-expression/comparison-expression";
+import { ComparisonExpression, ComparisonOperator } from "@/jsonpath-tools/query/filter-expression/comparison-expression";
 import { FilterExpression } from "@/jsonpath-tools/query/filter-expression/filter-expression";
 import { FilterQueryExpression } from "@/jsonpath-tools/query/filter-expression/filter-query-expression";
 import { NotExpression } from "@/jsonpath-tools/query/filter-expression/not-expression";
@@ -8,8 +8,8 @@ import { NullLiteralExpression } from "@/jsonpath-tools/query/filter-expression/
 import { NumberLiteralExpression } from "@/jsonpath-tools/query/filter-expression/number-literal-expression";
 import { OrExpression } from "@/jsonpath-tools/query/filter-expression/or-expression";
 import { StringLiteralExpression } from "@/jsonpath-tools/query/filter-expression/string-literal-expression";
-import { SubQuery } from "@/jsonpath-tools/query/sub-query";
-import { Segment } from "@/jsonpath-tools/query/segment";
+import { QueryType, SubQuery } from "@/jsonpath-tools/query/sub-query";
+import { Segment, SegmentType } from "@/jsonpath-tools/query/segment";
 import { FilterSelector } from "@/jsonpath-tools/query/selectors/filter-selector";
 import { IndexSelector } from "@/jsonpath-tools/query/selectors/index-selector";
 import { NameSelector } from "@/jsonpath-tools/query/selectors/name-selector";
@@ -168,7 +168,7 @@ export class DataTypeAnalyzer {
         const segmentIndex = query.segments.indexOf(segment);
         const previousSegment = segmentIndex === 0 ? query.identifierToken : query.segments[segmentIndex - 1];
         const previousSegmentType = this.getType(previousSegment);
-        if (segment.isDescendant)
+        if (segment.segmentType === SegmentType.descendant)
             return UnionDataType.create([previousSegmentType, previousSegmentType.getDescendantType()]);
         else
             return previousSegmentType;
@@ -190,10 +190,10 @@ export class DataTypeAnalyzer {
     }
 
     private narrowTypeByComparison(type: DataType, comparisonExpression: ComparisonExpression, isTrue: boolean): DataType {
-        if (comparisonExpression.operator !== JSONPathComparisonOperator.equals && comparisonExpression.operator !== JSONPathComparisonOperator.notEquals)
+        if (comparisonExpression.operator !== ComparisonOperator.equals && comparisonExpression.operator !== ComparisonOperator.notEquals)
             return type;
 
-        if (comparisonExpression.operator === JSONPathComparisonOperator.notEquals)
+        if (comparisonExpression.operator === ComparisonOperator.notEquals)
             isTrue = !isTrue;
 
         let narrowedType = type;
@@ -203,7 +203,7 @@ export class DataTypeAnalyzer {
     }
 
     private narrowTypeByEquals(type: DataType, sideToNarrow: FilterExpression, otherSide: FilterExpression, isTrue: boolean): DataType {
-        if (!(sideToNarrow instanceof FilterQueryExpression) || !sideToNarrow.query.isRelative)
+        if (!(sideToNarrow instanceof FilterQueryExpression) || sideToNarrow.query.queryType === QueryType.absolute)
             return type;
         const path = sideToNarrow.query.toNormalizedPath();
         if (path === null)
@@ -218,7 +218,7 @@ export class DataTypeAnalyzer {
     }
 
     private narrowTypeByFilterQuery(type: DataType, filterQueryExpression: FilterQueryExpression, isTrue: boolean): DataType {
-        if (!filterQueryExpression.query.isRelative)
+        if (filterQueryExpression.query.queryType === QueryType.absolute)
             return type;
         const path = filterQueryExpression.query.toNormalizedPath();
         if (path === null)

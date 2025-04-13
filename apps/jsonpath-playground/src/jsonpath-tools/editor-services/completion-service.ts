@@ -8,7 +8,7 @@ import { FilterExpression } from "../query/filter-expression/filter-expression";
 import { convertToValueType } from "../query/evaluation";
 import { Query } from "../query/query";
 import { Node } from "../values/node";
-import { Segment } from "../query/segment";
+import { Segment, SegmentType } from "../query/segment";
 import { Selector } from "../query/selectors/selector";
 import { SyntaxTree } from "../query/syntax-tree";
 import { SyntaxTreeType } from "../query/syntax-tree-type";
@@ -194,7 +194,7 @@ export class CompletionService {
         const isValidName = typeof pathSegment === "string" && this.isValidName(pathSegment);
         const useBracketNotation = !isValidName || segment.usesBracketNotation;
         const willUseBracketNotation = useBracketNotation && !segment.usesBracketNotation;
-        const range = willUseBracketNotation && !segment.isDescendant
+        const range = willUseBracketNotation && segment.segmentType === SegmentType.child
             ? segment.textRangeWithoutSkipped
             : selector.textRangeWithoutSkipped;
         let text = typeof pathSegment === "number"

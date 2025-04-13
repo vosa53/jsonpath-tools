@@ -5,16 +5,27 @@ import { SyntaxTreeType } from "../syntax-tree-type";
 import { SyntaxTreeToken } from "../syntax-tree-token";
 import { Selector } from "./selector";
 
-
+/**
+ * Wildcard selector.
+ */
 export class WildcardSelector extends Selector {
     constructor(
+        /**
+         * Star token.
+         */
         readonly starToken: SyntaxTreeToken
     ) {
         super([starToken]);
     }
 
+    /**
+     * @inheritdoc
+     */
     get type() { return SyntaxTreeType.wildcardSelector; }
 
+    /**
+     * @inheritdoc
+     */
     select(input: Node, output: PushOnlyArray<Node>, queryContext: QueryContext): void {
         if (Array.isArray(input.value)) {
             for (let i = 0; i < input.value.length; i++)

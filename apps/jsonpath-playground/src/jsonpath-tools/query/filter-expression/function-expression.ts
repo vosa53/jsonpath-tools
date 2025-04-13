@@ -7,21 +7,47 @@ import { SyntaxTreeType } from "../syntax-tree-type";
 import { SyntaxTreeToken } from "../syntax-tree-token";
 import { FilterExpression } from "./filter-expression";
 
-
+/**
+ * Function.
+ */
 export class FunctionExpression extends FilterExpression {
     constructor(
+        /**
+         * Name token.
+         */
         readonly nameToken: SyntaxTreeToken,
+
+        /**
+         * Opening paranthesis token.
+         */
         readonly openingParanthesisToken: SyntaxTreeToken,
+
+        /**
+         * Arguments.
+         */
         readonly args: readonly { arg: FilterExpression; commaToken: SyntaxTreeToken | null; }[],
+
+        /**
+         * Closing paranthesis token.
+         */
         readonly closingParanthesisToken: SyntaxTreeToken,
 
+        /**
+         * Name.
+         */
         readonly name: string
     ) {
         super([nameToken, openingParanthesisToken, ...args.flatMap(a => [a.arg, a.commaToken]), closingParanthesisToken]);
     }
 
+    /**
+     * @inheritdoc
+     */
     get type() { return SyntaxTreeType.functionExpression; }
 
+    /**
+     * @inheritdoc
+     */
     protected evaluateImplementation(queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): FilterValue {
         const functionDefinition = queryContext.options.functions[this.name];
         if (functionDefinition === undefined) return Nothing;

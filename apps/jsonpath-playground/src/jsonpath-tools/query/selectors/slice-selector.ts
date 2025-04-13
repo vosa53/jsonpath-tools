@@ -5,24 +5,62 @@ import { SyntaxTreeType } from "../syntax-tree-type";
 import { SyntaxTreeToken } from "../syntax-tree-token";
 import { Selector } from "./selector";
 
-
+/**
+ * Slice selector.
+ */
 export class SliceSelector extends Selector {
     constructor(
+        /**
+         * Range start index token. 
+         */
         readonly startToken: SyntaxTreeToken | null,
+        
+        /**
+         * Colon token delimiting start and end tokens. 
+         */
         readonly firstColonToken: SyntaxTreeToken,
+
+        /**
+         * Range end index token. 
+         */
         readonly endToken: SyntaxTreeToken | null,
+
+        /**
+         * Colon token delimiting end and step tokens.
+         */
         readonly secondColonToken: SyntaxTreeToken | null,
+
+        /**
+         * Range step token.
+         */
         readonly stepToken: SyntaxTreeToken | null,
 
+        /**
+         * Range start index (inclusive).
+         */
         readonly start: number | null,
+
+        /**
+         * Range end index (exclusive).
+         */
         readonly end: number | null,
+
+        /**
+         * Range step.
+         */
         readonly step: number | null
     ) {
         super([startToken, firstColonToken, endToken, secondColonToken, stepToken]);
     }
 
+    /**
+     * @inheritdoc
+     */
     get type() { return SyntaxTreeType.sliceSelector; }
 
+    /**
+     * @inheritdoc
+     */
     select(input: Node, output: PushOnlyArray<Node>, queryContext: QueryContext): void {
         const isArray = Array.isArray(input.value);
         if (!isArray)

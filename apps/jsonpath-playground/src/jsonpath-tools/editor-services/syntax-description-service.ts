@@ -1,12 +1,12 @@
 import { QueryOptions } from "../options";
 import { Function } from "../functions/function";
 import { BooleanLiteralExpression } from "../query/filter-expression/boolean-literal-expression";
-import { ComparisonExpression, JSONPathComparisonOperator } from "../query/filter-expression/comparison-expression";
+import { ComparisonExpression, ComparisonOperator } from "../query/filter-expression/comparison-expression";
 import { FunctionExpression } from "../query/filter-expression/function-expression";
 import { NumberLiteralExpression } from "../query/filter-expression/number-literal-expression";
 import { StringLiteralExpression } from "../query/filter-expression/string-literal-expression";
-import { SubQuery } from "../query/sub-query";
-import { Segment } from "../query/segment";
+import { QueryType, SubQuery } from "../query/sub-query";
+import { Segment, SegmentType } from "../query/segment";
 import { IndexSelector } from "../query/selectors/index-selector";
 import { NameSelector } from "../query/selectors/name-selector";
 import { SliceSelector } from "../query/selectors/slice-selector";
@@ -21,14 +21,14 @@ export class SyntaxDescriptionService {
     private readonly descriptionProviders = new Map<SyntaxTreeType, (node: SyntaxTree) => SyntaxDescription>([
         [SyntaxTreeType.subQuery, n => {
             const query = n as SubQuery;
-            return this.provideDescriptionForQuery(query.isRelative);
+            return this.provideDescriptionForQuery(query.queryType);
         }],
         [SyntaxTreeType.segment, n => {
             const segment = n as Segment;
-            if (segment.isDescendant)
-                return new SyntaxDescription("Descendant Segment", "Selects values with its selectors from the current value **and all its descendants**.");
-            else
+            if (segment.segmentType === SegmentType.child)
                 return new SyntaxDescription("Child Segment", "Selects values with its selectors from the current value.");
+            else
+                return new SyntaxDescription("Descendant Segment", "Selects values with its selectors from the current value **and all its descendants**.");
         }],
 
         [SyntaxTreeType.filterSelector, n => this.provideDescriptionForFilterSelector()],
@@ -100,11 +100,11 @@ export class SyntaxDescriptionService {
 
     /**
      * Provides a description for {@link SubQuery}.
-     * @param isRelative {@link SubQuery.isRelative}.
+     * @param queryType {@link SubQuery.queryType}.
      */
-    provideDescriptionForQuery(isRelative: boolean): SyntaxDescription {
+    provideDescriptionForQuery(queryType: QueryType): SyntaxDescription {
         return new SyntaxDescription(
-            isRelative ? "Relative Query" : "Absolute Query",
+            queryType === QueryType.absolute ? "Absolute Query" : "Relative Query",
             "A sequence of segments that consists of selectors to select or filter values from objects/arrays."
         );
     }
@@ -171,14 +171,14 @@ export class SyntaxDescriptionService {
      * Provides a description for {@link ComparisonExpression}.
      * @param operator {@link ComparisonExpression.operator}.
      */
-    provideDescriptionForComparisonExpression(operator: JSONPathComparisonOperator): SyntaxDescription {
+    provideDescriptionForComparisonExpression(operator: ComparisonOperator): SyntaxDescription {
         let operatorDescription;
-        if (operator === JSONPathComparisonOperator.equals) operatorDescription = "Equality";
-        else if (operator === JSONPathComparisonOperator.notEquals) operatorDescription = "Inequality";
-        else if (operator === JSONPathComparisonOperator.lessThan) operatorDescription = "Less Than";
-        else if (operator === JSONPathComparisonOperator.greaterThan) operatorDescription = "Greater Than";
-        else if (operator === JSONPathComparisonOperator.lessThanEquals) operatorDescription = "Less Than Equals";
-        else if (operator === JSONPathComparisonOperator.greaterThanEquals) operatorDescription = "Greater Than Equals";
+        if (operator === ComparisonOperator.equals) operatorDescription = "Equality";
+        else if (operator === ComparisonOperator.notEquals) operatorDescription = "Inequality";
+        else if (operator === ComparisonOperator.lessThan) operatorDescription = "Less Than";
+        else if (operator === ComparisonOperator.greaterThan) operatorDescription = "Greater Than";
+        else if (operator === ComparisonOperator.lessThanEquals) operatorDescription = "Less Than Equals";
+        else if (operator === ComparisonOperator.greaterThanEquals) operatorDescription = "Greater Than Equals";
         else throw new Error("Unknown operator.");
         return new SyntaxDescription(`${operatorDescription} Comparison`, "Compares left and right.");
     }

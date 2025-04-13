@@ -8,17 +8,32 @@ import { SyntaxTreeType } from "../syntax-tree-type";
 import { SyntaxTreeToken } from "../syntax-tree-token";
 import { Selector } from "./selector";
 
-
+/**
+ * Filter selector.
+ */
 export class FilterSelector extends Selector {
     constructor(
+        /**
+         * Preceding question mark token.
+         */
         readonly questionMarkToken: SyntaxTreeToken,
+
+        /**
+         * Filter logical expression.
+         */
         readonly expression: FilterExpression
     ) {
         super([questionMarkToken, expression]);
     }
 
+    /**
+     * @inheritdoc
+     */
     get type() { return SyntaxTreeType.filterSelector; }
 
+    /**
+     * @inheritdoc
+     */
     select(input: Node, output: PushOnlyArray<Node>, queryContext: QueryContext): void {
         if (Array.isArray(input.value)) {
             for (let i = 0; i < input.value.length; i++) {

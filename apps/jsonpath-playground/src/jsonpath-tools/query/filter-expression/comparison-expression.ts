@@ -6,35 +6,58 @@ import { SyntaxTreeType } from "../syntax-tree-type";
 import { SyntaxTreeToken } from "../syntax-tree-token";
 import { FilterExpression } from "./filter-expression";
 
+/**
+ * Comparison.
+ */
 export class ComparisonExpression extends FilterExpression {
     constructor(
+        /**
+         * Left expression.
+         */
         readonly left: FilterExpression,
+
+        /**
+         * Operator token.
+         */
         readonly operatorToken: SyntaxTreeToken,
+
+        /**
+         * Right expression.
+         */
         readonly right: FilterExpression,
 
-        readonly operator: JSONPathComparisonOperator
+        /**
+         * Operator.
+         */
+        readonly operator: ComparisonOperator
     ) {
         super([left, operatorToken, right]);
     }
 
+    /**
+     * @inheritdoc
+     */
     get type() { return SyntaxTreeType.comparisonExpression; }
 
+    /**
+     * @inheritdoc
+     */
     protected evaluateImplementation(queryContext: QueryContext, filterExpressionContext: FilterExpressionContext): FilterValue {
         const leftValue = evaluateAsValueType(this.left, queryContext, filterExpressionContext);
         const rightValue = evaluateAsValueType(this.right, queryContext, filterExpressionContext);
 
         let result: boolean;
-        if (this.operator === JSONPathComparisonOperator.equals)
+        if (this.operator === ComparisonOperator.equals)
             result = this.isEqual(leftValue, rightValue);
-        else if (this.operator === JSONPathComparisonOperator.notEquals)
+        else if (this.operator === ComparisonOperator.notEquals)
             result = !this.isEqual(leftValue, rightValue);
-        else if (this.operator === JSONPathComparisonOperator.lessThan)
+        else if (this.operator === ComparisonOperator.lessThan)
             result = this.isLower(leftValue, rightValue);
-        else if (this.operator === JSONPathComparisonOperator.greaterThan)
+        else if (this.operator === ComparisonOperator.greaterThan)
             result = this.isLower(rightValue, leftValue);
-        else if (this.operator === JSONPathComparisonOperator.lessThanEquals)
+        else if (this.operator === ComparisonOperator.lessThanEquals)
             result = this.isLower(leftValue, rightValue) || this.isEqual(leftValue, rightValue);
-        else if (this.operator === JSONPathComparisonOperator.greaterThanEquals)
+        else if (this.operator === ComparisonOperator.greaterThanEquals)
             result = this.isLower(rightValue, leftValue) || this.isEqual(leftValue, rightValue);
         else
             throw new Error("Unknown operator.");
@@ -59,11 +82,37 @@ export class ComparisonExpression extends FilterExpression {
     }
 }
 
-export enum JSONPathComparisonOperator {
+/**
+ * Comparison operator.
+ */
+export enum ComparisonOperator {
+    /**
+     * Equal.
+     */
     equals = "==",
+
+    /**
+     * Not equal.
+     */
     notEquals = "!=",
+
+    /**
+     * Less than.
+     */
     lessThan = "<",
+
+    /**
+     * Greater than.
+     */
     greaterThan = ">",
+
+    /**
+     * Less than or equal.
+     */
     lessThanEquals = "<=",
+
+    /**
+     * Greater than or equal.
+     */
     greaterThanEquals = ">="
 }

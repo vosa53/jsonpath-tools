@@ -5,18 +5,32 @@ import { SyntaxTreeType } from "../syntax-tree-type";
 import { SyntaxTreeToken } from "../syntax-tree-token";
 import { Selector } from "./selector";
 
-
+/**
+ * Index selector.
+ */
 export class IndexSelector extends Selector {
     constructor(
+        /**
+         * Index token.
+         */
         readonly indexToken: SyntaxTreeToken,
 
+        /**
+         * Index.
+         */
         readonly index: number
     ) {
         super([indexToken]);
     }
 
+    /**
+     * @inheritdoc
+     */
     get type() { return SyntaxTreeType.indexSelector; }
 
+    /**
+     * @inheritdoc
+     */
     select(input: Node, output: PushOnlyArray<Node>, queryContext: QueryContext): void {
         const isArray = Array.isArray(input.value);
         if (isArray) {

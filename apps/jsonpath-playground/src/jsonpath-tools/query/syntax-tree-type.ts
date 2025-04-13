@@ -1,3 +1,6 @@
+/**
+ * Type of a syntax tree.
+ */
 export enum SyntaxTreeType {
     dollarToken = "DollarToken",
     atToken = "AtToken",

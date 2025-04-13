@@ -5,15 +5,26 @@ import { SyntaxTreeType } from "../syntax-tree-type";
 import { SyntaxTreeToken } from "../syntax-tree-token";
 import { Selector } from "./selector";
 
-
+/**
+ * Missing selector.
+ */
 export class MissingSelector extends Selector {
     constructor(
-            readonly missingToken: SyntaxTreeToken
-        ) {
-            super([missingToken]);
-        }
+        /**
+         * Missing token.
+         */
+        readonly missingToken: SyntaxTreeToken
+    ) {
+        super([missingToken]);
+    }
 
+    /**
+     * @inheritdoc
+     */
     get type() { return SyntaxTreeType.missingSelector; }
 
+    /**
+     * @inheritdoc
+     */
     select(input: Node, output: PushOnlyArray<Node>, queryContext: QueryContext): void { }
 }
