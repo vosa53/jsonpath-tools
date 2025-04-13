@@ -20,7 +20,7 @@ test("Inserts input data, writes a query with autocomplete and checks output", a
     expect(JSON.parse(text)).toEqual(["Lorem impsum"]);
 });
 
-let step = 0;
+//let step = 0;
 
 async function selectCompletionItem(page: Page, completionItemText: string) {
     await page.waitForSelector(".cm-tooltip-autocomplete");

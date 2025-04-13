@@ -17,7 +17,7 @@ export class IRegexp {
         const parseResult = this.iRegexpParser.parse(iRegexpText);
         if (!parseResult.isSuccess) throw new Error("Invalid I-Regexp.");
         
-        let iRegexpCharacters = iRegexpText.split("");
+        const iRegexpCharacters = iRegexpText.split("");
         for (const dotIndex of parseResult.dotIndices)
             iRegexpCharacters[dotIndex] = "[^\n\r]";
         let transformedIRegexp = iRegexpCharacters.join("");

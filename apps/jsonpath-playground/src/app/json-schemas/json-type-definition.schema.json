@@ -10,6 +10,7 @@
                 "properties": { "$ref": "#/$defs/jsonTypeDefinitionDictionary" },
                 "optionalProperties": { "$ref": "#/$defs/jsonTypeDefinitionDictionary" },
                 "additionalProperties": { "type": "boolean" },
+                "values": { "$ref": "#/$defs/jsonTypeDefinition" },
                 "discriminator": { "type": "string" },
                 "mapping": { "$ref": "#/$defs/jsonTypeDefinitionDictionary" },
                 "ref": { "type": "string" },

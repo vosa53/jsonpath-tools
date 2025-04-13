@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { stringifySyntaxTree } from '../helpers/utils';
 import { Parser } from './parser';
-import { SyntaxTree } from '../query/syntax-tree';
-import { SyntaxTreeToken } from '../query/syntax-tree-token';
-import { SyntaxTreeNode } from '../query/syntax-tree-node';
 
 describe("Parser", () => {
     it("Parses an empty expression", () => {

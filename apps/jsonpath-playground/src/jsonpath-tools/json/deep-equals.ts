@@ -37,7 +37,7 @@ function jsonDeepEqualsObjects(valueA: { [key: string]: JSONValue; }, valueB: { 
     if (leftKeys.length !== rightKeys.length)
         return false;
     for (const key of leftKeys) {
-        if (!valueB.hasOwnProperty(key) || !jsonDeepEquals(valueA[key], valueB[key]))
+        if (!Object.hasOwn(valueB, key) || !jsonDeepEquals(valueA[key], valueB[key]))
             return false;
     }
     return true;

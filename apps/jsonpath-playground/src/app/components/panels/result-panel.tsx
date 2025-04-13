@@ -1,5 +1,5 @@
 import { Operation, OperationType, OperationReplacement, OperationReplacementType } from "@/app/models/operation";
-import { ActionIcon, Anchor, Button, Group, InputWrapper, Modal, SegmentedControl, Select, Stack } from "@mantine/core";
+import { ActionIcon, Button, Group, InputWrapper, Modal, SegmentedControl, Select, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { IconDeviceFloppy, IconFileDownload } from "@tabler/icons-react";

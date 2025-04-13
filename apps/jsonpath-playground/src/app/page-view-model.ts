@@ -110,7 +110,7 @@ export function usePageViewModel() {
         });
         if (operationResult === undefined) return "";
         else return logPerformance("Stringify result", () => JSON.stringify(operationResult, undefined, 4));
-    }, [result, operation, operationReplacementJSONValue, operationReplacementJSONPatch]);
+    }, [result, operation, operationReplacementJSONValue, operationReplacementJSONPatch, queryArgument, resultPaths]);
     const resultPathsText = useMemo(() => {
         const resultPathsTransformed = logPerformance("Transform result paths", () => {
             return pathType === PathType.normalizedPath
@@ -194,7 +194,7 @@ export function usePageViewModel() {
         resultTimeoutRef.current = window.setTimeout(async () => {
             await run();
         }, 500);
-    }, [queryText, queryArgument, getResultRef.current]);
+    }, [queryText, queryArgument, settings.autoRun]);
 
     async function run() {
         try {

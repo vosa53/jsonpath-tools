@@ -31,6 +31,7 @@ export class DefaultLanguageServices {
 
     private static createLocalLanguageService(): LanguageService {
         // TODO: Queue.
+        // eslint-disable-next-line prefer-const
         let backend: LanguageServiceBackend;
         const sendToBackend = (data: JSONValue) => backend!.receiveFromFrontend(data);
         const languageService = new LanguageService(sendToBackend);

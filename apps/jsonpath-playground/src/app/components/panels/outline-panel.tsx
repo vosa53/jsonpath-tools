@@ -5,7 +5,7 @@ import { SyntaxTreeNode } from "@/jsonpath-tools/query/syntax-tree-node";
 import { SyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
 import { SyntaxTreeType } from "@/jsonpath-tools/query/syntax-tree-type";
 import { SyntaxTreeToken } from "@/jsonpath-tools/query/syntax-tree-token";
-import { Box, Group, Paper, Stack, Text } from "@mantine/core";
+import { Box, Group, Paper, Stack } from "@mantine/core";
 import { memo } from "react";
 import PanelShell from "../panel-shell";
 import classes from "./outline-panel.module.css";

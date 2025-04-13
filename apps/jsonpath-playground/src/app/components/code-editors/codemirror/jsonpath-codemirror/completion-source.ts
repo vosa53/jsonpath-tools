@@ -19,7 +19,7 @@ export function completionSource(): CompletionSource {
                 return {
                     from: word!.from,
                     options: completions.map((c, i) => {
-                        let completion: Completion = {
+                        const completion: Completion = {
                             label: c.label,
                             type: convertCompletionItemTypeToCodemirrorType(c.type),
                             detail: c.detail,

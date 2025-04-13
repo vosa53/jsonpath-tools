@@ -30,7 +30,7 @@ export class SliceSelector extends Selector {
         if (this.step === 0)
             return;
 
-        let step = this.step ?? 1;
+        const step = this.step ?? 1;
         let start = this.start ?? (step > 0 ? 0 : input.value.length - 1);
         let end = this.end ?? (step > 0 ? input.value.length : -input.value.length - 1);
         if (start < 0) start = input.value.length + start;

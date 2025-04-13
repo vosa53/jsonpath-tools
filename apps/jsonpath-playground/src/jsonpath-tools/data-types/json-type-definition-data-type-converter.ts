@@ -128,7 +128,7 @@ class JSONTypeDefinitionDataTypeConverterContext {
         return ObjectDataType.create(propertyTypes, restPropertyType, requiredProperties);
     }
 
-    private createValuesType(jsonTypeDefinition: any): DataType | null {
+    private createValuesType(jsonTypeDefinition: JSONTypeDefinition): DataType | null {
         if (jsonTypeDefinition.values === undefined)
             return null;
         const valueType = this.jsonTypeDefinitionToType(jsonTypeDefinition.values);
@@ -188,6 +188,7 @@ export interface JSONTypeDefinition {
     readonly properties?: JSONTypeDefinitionDictionary;
     readonly optionalProperties?: JSONTypeDefinitionDictionary;
     readonly additionalProperties?: boolean;
+    readonly values?: JSONTypeDefinition;
     readonly discriminator?: string;
     readonly mapping?: JSONTypeDefinitionDictionary;
     readonly ref?: string;

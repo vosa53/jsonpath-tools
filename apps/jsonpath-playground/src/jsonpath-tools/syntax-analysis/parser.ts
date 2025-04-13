@@ -531,7 +531,7 @@ export class Parser {
 
     private checkIsInteger(numberToken: SyntaxTreeToken, context: ParserContext) {
         if (numberToken.text === "-0")
-            context.addError("Negative zero is not allowed"), numberToken.textRangeWithoutSkipped;
+            context.addError("Negative zero is not allowed", numberToken.textRangeWithoutSkipped);
         if (numberToken.text.includes("."))
             context.addError("Only integers are allowed here.", numberToken.textRangeWithoutSkipped);
         if (numberToken.text.includes("e") || numberToken.text.includes("E"))

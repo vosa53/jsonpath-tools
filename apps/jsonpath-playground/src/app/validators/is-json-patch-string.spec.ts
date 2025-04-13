@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { isJSONString } from "./is-json-string";
 import { isJSONPatchString } from "./is-json-patch-string";
 
 describe("Is JSON Patch string validator", () => {
