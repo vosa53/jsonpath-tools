@@ -3,8 +3,8 @@ import { DataType, DataTypeAnnotation } from "../data-types/data-types";
 import { getJSONType } from "../json/json-types";
 import { QueryOptions } from "../options";
 import { QueryContext } from "../query/evaluation";
-import { ComparisonExpression } from "../query/filter-expression/comparison-expression";
-import { FilterExpression } from "../query/filter-expression/filter-expression";
+import { ComparisonExpression } from "../query/filter-expressions/comparison-expression";
+import { FilterExpression } from "../query/filter-expressions/filter-expression";
 import { convertToValueType } from "../query/evaluation";
 import { Query } from "../query/query";
 import { Node } from "../values/node";
@@ -21,7 +21,7 @@ import { SyntaxDescriptionService } from "./syntax-description-service";
 import { NormalizedPathSegment } from "../normalized-path";
 import { FilterValue } from "../values/types";
 import { NameSelector } from "../query/selectors/name-selector";
-import { StringLiteralExpression } from "../query/filter-expression/string-literal-expression";
+import { StringLiteralExpression } from "../query/filter-expressions/string-literal-expression";
 
 /**
  * Provides completion items.

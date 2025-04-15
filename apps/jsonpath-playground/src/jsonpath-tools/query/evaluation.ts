@@ -2,7 +2,7 @@ import { Diagnostics } from "../diagnostics";
 import { QueryOptions } from "../options";
 import { FilterValue, isLogicalType, isNodesType, isValueType, LogicalFalse, LogicalTrue, LogicalType, NodesType, Nothing, Type, ValueType } from "../values/types";
 import { JSONValue } from "../json/json-types";
-import { FilterExpression } from "./filter-expression/filter-expression";
+import { FilterExpression } from "./filter-expressions/filter-expression";
 import { Node } from "../values/node";
 import { SubQuery } from "./sub-query";
 import { Segment } from "./segment";

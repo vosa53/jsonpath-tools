@@ -1,5 +1,5 @@
 import { QueryOptions } from "../options";
-import { FunctionExpression } from "../query/filter-expression/function-expression";
+import { FunctionExpression } from "../query/filter-expressions/function-expression";
 import { Query } from "../query/query";
 import { SubQuery } from "../query/sub-query";
 import { FilterSelector } from "../query/selectors/filter-selector";

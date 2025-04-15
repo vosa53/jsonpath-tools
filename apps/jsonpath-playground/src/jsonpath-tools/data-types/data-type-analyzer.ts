@@ -1,13 +1,13 @@
-import { AndExpression } from "@/jsonpath-tools/query/filter-expression/and-expression";
-import { BooleanLiteralExpression } from "@/jsonpath-tools/query/filter-expression/boolean-literal-expression";
-import { ComparisonExpression, ComparisonOperator } from "@/jsonpath-tools/query/filter-expression/comparison-expression";
-import { FilterExpression } from "@/jsonpath-tools/query/filter-expression/filter-expression";
-import { FilterQueryExpression } from "@/jsonpath-tools/query/filter-expression/filter-query-expression";
-import { NotExpression } from "@/jsonpath-tools/query/filter-expression/not-expression";
-import { NullLiteralExpression } from "@/jsonpath-tools/query/filter-expression/null-literal-expression";
-import { NumberLiteralExpression } from "@/jsonpath-tools/query/filter-expression/number-literal-expression";
-import { OrExpression } from "@/jsonpath-tools/query/filter-expression/or-expression";
-import { StringLiteralExpression } from "@/jsonpath-tools/query/filter-expression/string-literal-expression";
+import { AndExpression } from "@/jsonpath-tools/query/filter-expressions/and-expression";
+import { BooleanLiteralExpression } from "@/jsonpath-tools/query/filter-expressions/boolean-literal-expression";
+import { ComparisonExpression, ComparisonOperator } from "@/jsonpath-tools/query/filter-expressions/comparison-expression";
+import { FilterExpression } from "@/jsonpath-tools/query/filter-expressions/filter-expression";
+import { FilterQueryExpression } from "@/jsonpath-tools/query/filter-expressions/filter-query-expression";
+import { NotExpression } from "@/jsonpath-tools/query/filter-expressions/not-expression";
+import { NullLiteralExpression } from "@/jsonpath-tools/query/filter-expressions/null-literal-expression";
+import { NumberLiteralExpression } from "@/jsonpath-tools/query/filter-expressions/number-literal-expression";
+import { OrExpression } from "@/jsonpath-tools/query/filter-expressions/or-expression";
+import { StringLiteralExpression } from "@/jsonpath-tools/query/filter-expressions/string-literal-expression";
 import { QueryType, SubQuery } from "@/jsonpath-tools/query/sub-query";
 import { Segment, SegmentType } from "@/jsonpath-tools/query/segment";
 import { FilterSelector } from "@/jsonpath-tools/query/selectors/filter-selector";
@@ -20,11 +20,11 @@ import { SyntaxTreeToken } from "@/jsonpath-tools/query/syntax-tree-token";
 import { DataType, LiteralDataType, PrimitiveDataType, PrimitiveDataTypeType, AnyDataType, UnionDataType, NeverDataType } from "./data-types";
 import { intersectTypes, subtractTypes, isSubtypeOf, isEquvivalentTypeWith } from "./operations";
 import { SliceSelector } from "../query/selectors/slice-selector";
-import { FunctionExpression } from "../query/filter-expression/function-expression";
+import { FunctionExpression } from "../query/filter-expressions/function-expression";
 import { QueryOptions } from "../options";
-import { ParanthesisExpression } from "../query/filter-expression/paranthesis-expression";
+import { ParanthesisExpression } from "../query/filter-expressions/paranthesis-expression";
 import { MissingSelector } from "../query/selectors/missing-selector";
-import { MissingExpression } from "../query/filter-expression/missing-expression";
+import { MissingExpression } from "../query/filter-expressions/missing-expression";
 
 /**
  * Resolves data types for a query syntax tree parts.

@@ -1,17 +1,17 @@
 import { Diagnostics, DiagnosticsSeverity } from "../diagnostics";
-import { AndExpression } from "../query/filter-expression/and-expression";
-import { BooleanLiteralExpression } from "../query/filter-expression/boolean-literal-expression";
-import { ComparisonExpression, ComparisonOperator } from "../query/filter-expression/comparison-expression";
-import { FilterExpression } from "../query/filter-expression/filter-expression";
-import { FilterQueryExpression } from "../query/filter-expression/filter-query-expression";
-import { FunctionExpression } from "../query/filter-expression/function-expression";
-import { MissingExpression } from "../query/filter-expression/missing-expression";
-import { NotExpression } from "../query/filter-expression/not-expression";
-import { NullLiteralExpression } from "../query/filter-expression/null-literal-expression";
-import { NumberLiteralExpression } from "../query/filter-expression/number-literal-expression";
-import { OrExpression } from "../query/filter-expression/or-expression";
-import { ParanthesisExpression } from "../query/filter-expression/paranthesis-expression";
-import { StringLiteralExpression } from "../query/filter-expression/string-literal-expression";
+import { AndExpression } from "../query/filter-expressions/and-expression";
+import { BooleanLiteralExpression } from "../query/filter-expressions/boolean-literal-expression";
+import { ComparisonExpression, ComparisonOperator } from "../query/filter-expressions/comparison-expression";
+import { FilterExpression } from "../query/filter-expressions/filter-expression";
+import { FilterQueryExpression } from "../query/filter-expressions/filter-query-expression";
+import { FunctionExpression } from "../query/filter-expressions/function-expression";
+import { MissingExpression } from "../query/filter-expressions/missing-expression";
+import { NotExpression } from "../query/filter-expressions/not-expression";
+import { NullLiteralExpression } from "../query/filter-expressions/null-literal-expression";
+import { NumberLiteralExpression } from "../query/filter-expressions/number-literal-expression";
+import { OrExpression } from "../query/filter-expressions/or-expression";
+import { ParanthesisExpression } from "../query/filter-expressions/paranthesis-expression";
+import { StringLiteralExpression } from "../query/filter-expressions/string-literal-expression";
 import { Query } from "../query/query";
 import { QueryType, SubQuery } from "../query/sub-query";
 import { Segment, SegmentType } from "../query/segment";
@@ -162,7 +162,7 @@ export class Parser {
         return new NameSelector(string.token, string.value);
     }
 
-    private parseWildcardSelector(context: ParserContext) {
+    private parseWildcardSelector(context: ParserContext): WildcardSelector {
         context.goNext();
         const starToken = context.collectToken(SyntaxTreeType.starToken);
         return new WildcardSelector(starToken);

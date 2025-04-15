@@ -1,9 +1,9 @@
-import { AndExpression } from "../query/filter-expression/and-expression";
-import { ComparisonExpression } from "../query/filter-expression/comparison-expression";
-import { FunctionExpression } from "../query/filter-expression/function-expression";
-import { NotExpression } from "../query/filter-expression/not-expression";
-import { OrExpression } from "../query/filter-expression/or-expression";
-import { ParanthesisExpression } from "../query/filter-expression/paranthesis-expression";
+import { AndExpression } from "../query/filter-expressions/and-expression";
+import { ComparisonExpression } from "../query/filter-expressions/comparison-expression";
+import { FunctionExpression } from "../query/filter-expressions/function-expression";
+import { NotExpression } from "../query/filter-expressions/not-expression";
+import { OrExpression } from "../query/filter-expressions/or-expression";
+import { ParanthesisExpression } from "../query/filter-expressions/paranthesis-expression";
 import { Query } from "../query/query";
 import { SyntaxTreeNode } from "../query/syntax-tree-node";
 import { SubQuery } from "../query/sub-query";

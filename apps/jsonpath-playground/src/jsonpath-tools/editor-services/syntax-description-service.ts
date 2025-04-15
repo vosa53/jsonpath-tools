@@ -1,10 +1,10 @@
 import { QueryOptions } from "../options";
 import { Function } from "../functions/function";
-import { BooleanLiteralExpression } from "../query/filter-expression/boolean-literal-expression";
-import { ComparisonExpression, ComparisonOperator } from "../query/filter-expression/comparison-expression";
-import { FunctionExpression } from "../query/filter-expression/function-expression";
-import { NumberLiteralExpression } from "../query/filter-expression/number-literal-expression";
-import { StringLiteralExpression } from "../query/filter-expression/string-literal-expression";
+import { BooleanLiteralExpression } from "../query/filter-expressions/boolean-literal-expression";
+import { ComparisonExpression, ComparisonOperator } from "../query/filter-expressions/comparison-expression";
+import { FunctionExpression } from "../query/filter-expressions/function-expression";
+import { NumberLiteralExpression } from "../query/filter-expressions/number-literal-expression";
+import { StringLiteralExpression } from "../query/filter-expressions/string-literal-expression";
 import { QueryType, SubQuery } from "../query/sub-query";
 import { Segment, SegmentType } from "../query/segment";
 import { IndexSelector } from "../query/selectors/index-selector";
@@ -12,7 +12,7 @@ import { NameSelector } from "../query/selectors/name-selector";
 import { SliceSelector } from "../query/selectors/slice-selector";
 import { SyntaxTree } from "../query/syntax-tree";
 import { SyntaxTreeType } from "../query/syntax-tree-type";
-import { NullLiteralExpression } from "../query/filter-expression/null-literal-expression";
+import { NullLiteralExpression } from "../query/filter-expressions/null-literal-expression";
 
 /**
  * Provides a description for parts of a query syntax tree.
