@@ -4,7 +4,7 @@ import { Node } from "./node";
 describe("Node", () => {
     it("createNormalizedPath - Empty path", () => {
         const node = new Node("test", "", null);
-        expect(node.createNormalizedPath()).toEqual([]);
+        expect(node.toNormalizedPath()).toEqual([]);
     });
 
     it("createNormalizedPath - Path with two segments", () => {
@@ -14,6 +14,6 @@ describe("Node", () => {
                 new Node(rootObject, "", null)
             )
         );
-        expect(node.createNormalizedPath()).toEqual([1, "def"]);
+        expect(node.toNormalizedPath()).toEqual([1, "def"]);
     });
 });

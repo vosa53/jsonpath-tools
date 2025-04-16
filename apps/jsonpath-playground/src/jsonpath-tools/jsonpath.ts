@@ -38,7 +38,7 @@ export class JSONPath {
      */
     static replace(queryText: string, queryArgument: JSONValue, replacer: JSONValue | ((value: JSONValue) => JSONValue | undefined), queryOptions: QueryOptions = defaultQueryOptions): JSONValue | undefined {
         const nodes = this.select(queryText, queryArgument, queryOptions);
-        const paths = nodes.createNormalizedPaths();
+        const paths = nodes.toNormalizedPaths();
         const replacerFunction = typeof replacer !== "function" 
             ? (() => replacer as JSONValue) 
             : replacer;
@@ -55,7 +55,7 @@ export class JSONPath {
      */
     static remove(queryText: string, queryArgument: JSONValue, queryOptions: QueryOptions = defaultQueryOptions): JSONValue | undefined {
         const nodes = this.select(queryText, queryArgument, queryOptions);
-        const paths = nodes.createNormalizedPaths();
+        const paths = nodes.toNormalizedPaths();
         return removeAtPaths(queryArgument, paths);
     }
 

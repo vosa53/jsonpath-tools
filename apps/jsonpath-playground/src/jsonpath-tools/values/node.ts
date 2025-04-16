@@ -25,16 +25,16 @@ export class Node {
     /**
      * Creates a normalized path from the location.
      */
-    createNormalizedPath(): NormalizedPath {
-        return this.createNormalizedPathRecursive();
+    toNormalizedPath(): NormalizedPath {
+        return this.toNormalizedPathRecursive();
     }
 
-    private createNormalizedPathRecursive(depth = 0): NormalizedPathSegment[] {
+    private toNormalizedPathRecursive(depth = 0): NormalizedPathSegment[] {
         if (this.parent === null) {
             return new Array(depth);
         }
         else {
-            const path = this.parent.createNormalizedPathRecursive(depth + 1);
+            const path = this.parent.toNormalizedPathRecursive(depth + 1);
             path[path.length - depth - 1] = this.pathSegment;
             return path;
         }

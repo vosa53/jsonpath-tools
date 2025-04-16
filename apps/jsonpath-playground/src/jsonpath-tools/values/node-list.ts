@@ -21,14 +21,14 @@ export class NodeList {
     /**
      * Creates normalized paths from the nodes locations.
      */
-    createNormalizedPaths(): NormalizedPath[] {
-        return this.nodes.map(n => n.createNormalizedPath());
+    toNormalizedPaths(): NormalizedPath[] {
+        return this.nodes.map(n => n.toNormalizedPath());
     }
 
     /**
      * Extracts JSON values from the nodes.
      */
-    createValues(): JSONValue[] {
+    toValues(): JSONValue[] {
         return this.nodes.map(n => n.value);
     }
 }

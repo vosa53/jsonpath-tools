@@ -20,7 +20,7 @@ describe("JSONPath Compliance Test Suite", () => {
                 if (test.document !== undefined) {
                     const result = query.select({ argument: test.document as JSONValue, options: defaultQueryOptions });
                     const resultValues = result.nodes.map(n => n.value);
-                    const resultPaths = result.nodes.map(n => serializedNormalizedPath(n.createNormalizedPath()));
+                    const resultPaths = result.nodes.map(n => serializedNormalizedPath(n.toNormalizedPath()));
                     if (test.result !== undefined)
                         expect(resultValues).toEqual(test.result);
                     if (test.results !== undefined)

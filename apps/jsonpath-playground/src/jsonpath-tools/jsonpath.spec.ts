@@ -5,8 +5,8 @@ import { stringifySyntaxTree } from "./helpers/utils";
 describe("JSONPath", () => {
     it("select - Returns selected nodes", () => {
         const result = JSONPath.select(`$.items[?search(@.name, "[aA]pple")].price`, testQueryArgument);
-        expect(result.createValues()).toEqual([19, 30]);
-        expect(result.createNormalizedPaths()).toEqual([
+        expect(result.toValues()).toEqual([19, 30]);
+        expect(result.toNormalizedPaths()).toEqual([
             ["items", 0, "price"],
             ["items", 2, "price"]
         ]);
