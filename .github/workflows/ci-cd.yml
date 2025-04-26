@@ -44,7 +44,7 @@ jobs:
       - name: Run tests
         run: npm run test --workspaces --if-present
       - name: Run end-to-end tests
-        run: "npm run test:e2e --workspaces --if-present
+        run: npm run test:e2e --workspaces --if-present
       - name: Build @jsonpath-tools/documentation
         run: |
           npm run typedoc --workspace @jsonpath-tools/documentation
