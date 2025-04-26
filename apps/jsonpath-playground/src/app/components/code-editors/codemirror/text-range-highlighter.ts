@@ -1,4 +1,4 @@
-import { TextRange } from "@/jsonpath-tools/text/text-range";
+import { TextRange } from "@jsonpath-tools/jsonpath";
 import { Extension, StateEffect, StateField } from "@codemirror/state";
 import { Decoration, DecorationSet, EditorView } from "@codemirror/view";
 

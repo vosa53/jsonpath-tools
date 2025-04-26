@@ -1,9 +1,9 @@
-import { Query } from "@/jsonpath-tools/query/query";
-import { SyntaxTreeNode } from "@/jsonpath-tools/query/syntax-tree-node";
-import { SyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
-import { SyntaxTreeType } from "@/jsonpath-tools/query/syntax-tree-type";
-import { SyntaxTreeToken } from "@/jsonpath-tools/query/syntax-tree-token";
-import { Parser as JSONPathParser } from "@/jsonpath-tools/syntax-analysis/parser";
+import { Query } from "@jsonpath-tools/jsonpath";
+import { SyntaxTreeNode } from "@jsonpath-tools/jsonpath";
+import { SyntaxTree } from "@jsonpath-tools/jsonpath";
+import { SyntaxTreeType } from "@jsonpath-tools/jsonpath";
+import { SyntaxTreeToken } from "@jsonpath-tools/jsonpath";
+import { Parser as JSONPathParser } from "@jsonpath-tools/jsonpath";
 import { continuedIndent, defineLanguageFacet, delimitedIndent, foldInside, foldNodeProp, indentNodeProp, languageDataProp } from "@codemirror/language";
 import { Input, NodeProp, NodeSet, NodeType, Parser, PartialParse, Tree, TreeFragment } from "@lezer/common";
 import { styleTags, tags as t } from "@lezer/highlight";

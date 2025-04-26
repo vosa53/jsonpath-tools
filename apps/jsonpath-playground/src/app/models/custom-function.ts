@@ -1,4 +1,4 @@
-import { Type } from "@/jsonpath-tools/values/types";
+import { Type } from "@jsonpath-tools/jsonpath";
 
 /**
  * Custom JSONPath function.

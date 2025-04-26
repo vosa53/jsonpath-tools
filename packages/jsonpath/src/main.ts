@@ -1,3 +1,4 @@
-import { pes } from "../";
+import { JSONPath } from "../";
 
-pes();
+const result = JSONPath.select("$", {});
+console.log(result);

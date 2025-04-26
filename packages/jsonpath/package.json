@@ -4,6 +4,12 @@
     "author": "Jan Jörka",
     "license": "MIT",
     "description": "",
+    "homepage": "https://vosa53.github.io/jsonpath-tools/",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/vosa53/jsonpath-tools",
+        "directory": "packages/jsonpath"
+    },
     "type": "module",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -14,6 +20,7 @@
         "dev": "vite",
         "build": "tsc && vite build",
         "preview": "vite preview",
+        "test": "vitest",
         "prepublishOnly": "npm run build"
     },
     "dependencies": {
@@ -23,6 +30,7 @@
     "devDependencies": {
         "typescript": "~5.7.2",
         "vite": "^6.2.0",
-        "vite-plugin-dts": "^4.5.3"
+        "vite-plugin-dts": "^4.5.3",
+        "vitest": "^3.1.2"
     }
 }

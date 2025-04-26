@@ -1,4 +1,4 @@
-import { DiagnosticsSeverity } from '@/jsonpath-tools/diagnostics';
+import { DiagnosticsSeverity } from '@jsonpath-tools/jsonpath';
 import { ActionIcon, AppShell, Divider, Flex, Indicator, Stack, Tabs, Tooltip } from '@mantine/core';
 import { IconBraces, IconEqual, IconExclamationCircle, IconListTree, IconPlayerPlay, IconRouteSquare, IconSitemap } from '@tabler/icons-react';
 import { useMemo, useState } from "react";

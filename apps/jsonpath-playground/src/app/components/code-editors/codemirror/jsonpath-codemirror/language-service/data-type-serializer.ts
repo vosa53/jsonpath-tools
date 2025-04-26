@@ -1,4 +1,4 @@
-import { AnyDataType, ArrayDataType, DataType, DataTypeAnnotation, LiteralDataType, NeverDataType, ObjectDataType, PrimitiveDataType, UnionDataType } from "@/jsonpath-tools/data-types/data-types";
+import { AnyDataType, ArrayDataType, DataType, DataTypeAnnotation, LiteralDataType, NeverDataType, ObjectDataType, PrimitiveDataType, UnionDataType } from "@jsonpath-tools/jsonpath";
 
 /**
  * Serializes a data type for a use with the structured clone algorithm.

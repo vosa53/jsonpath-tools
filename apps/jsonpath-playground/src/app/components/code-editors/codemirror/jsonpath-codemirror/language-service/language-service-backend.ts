@@ -1,9 +1,9 @@
-import { JSONValue } from "@/jsonpath-tools/json/json-types";
+import { JSONValue } from "@jsonpath-tools/jsonpath";
 import { SimpleRPC } from "./simple-rpc";
 import { LanguageServiceBackendSession } from "./language-service-backend-session";
 import { UpdateOptionsLanguageServiceMessage, UpdateQueryLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessage, GetResultLanguageServiceMessage, DisconnectLanguageServiceMessage, GetSignatureLanguageServiceMessage, GetTooltipLanguageServiceMessage, ResolveCompletionLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage as UpdateQueryArgumentTypeLanguageServiceMessage } from "./language-service-messages";
-import { defaultQueryOptions } from "@/jsonpath-tools/options";
-import { FunctionHandler } from "@/jsonpath-tools/functions/function";
+import { defaultQueryOptions } from "@jsonpath-tools/jsonpath";
+import { FunctionHandler } from "@jsonpath-tools/jsonpath";
 
 /**
  * Serves as a backend for a language service providing services for editors.

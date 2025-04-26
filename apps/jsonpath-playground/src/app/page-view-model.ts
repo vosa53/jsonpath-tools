@@ -1,31 +1,30 @@
-import { Diagnostics } from "@/jsonpath-tools/diagnostics";
-import { Query } from "@/jsonpath-tools/query/query";
-import { removeAtPaths, replaceAtPaths } from "@/jsonpath-tools/transformations";
-import { serializedNormalizedPath } from "@/jsonpath-tools/serialization/serialization";
-import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
-import { Nothing } from "@/jsonpath-tools/values/types";
-import { JSONValue } from "@/jsonpath-tools/json/json-types";
+import { Diagnostics, JSONPath } from "@jsonpath-tools/jsonpath";
+import { Query } from "@jsonpath-tools/jsonpath";
+import { removeAtPaths, replaceAtPaths } from "@jsonpath-tools/jsonpath";
+import { serializedNormalizedPath } from "@jsonpath-tools/jsonpath";
+import { NormalizedPath } from "@jsonpath-tools/jsonpath";
+import { Nothing } from "@jsonpath-tools/jsonpath";
+import { JSONValue } from "@jsonpath-tools/jsonpath";
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { OperationCancelledError } from "./components/code-editors/codemirror/jsonpath-codemirror/cancellation-token";
 import { CustomFunction } from "./models/custom-function";
 import { Operation, OperationReplacementType, OperationType } from "./models/operation";
 import { PathType } from "./models/path-type";
-import { Parser } from "@/jsonpath-tools/syntax-analysis/parser";
 import { Settings } from "./models/settings";
-import { logPerformance } from "@/jsonpath-tools/helpers/utils";
-import { defaultQueryOptions, QueryOptions } from "@/jsonpath-tools/options";
+import { defaultQueryOptions, QueryOptions } from "@jsonpath-tools/jsonpath";
 import { LanguageService } from "./components/code-editors/codemirror/jsonpath-codemirror/language-service/language-service";
 import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./services/language-service/custom-language-service-worker-mesages";
-import { TextRange } from "@/jsonpath-tools/text/text-range";
-import { SyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
-import { jsonSchemaToType } from "@/jsonpath-tools/data-types/json-schema-data-type-converter";
-import { AnyDataType, DataType } from "@/jsonpath-tools/data-types/data-types";
+import { TextRange } from "@jsonpath-tools/jsonpath";
+import { SyntaxTree } from "@jsonpath-tools/jsonpath";
+import { jsonSchemaToType } from "@jsonpath-tools/jsonpath";
+import { AnyDataType, DataType } from "@jsonpath-tools/jsonpath";
 import { DataTypeRaw, DataTypeRawFormat } from "./models/data-type-raw";
-import { jsonTypeDefinitionToType } from "@/jsonpath-tools/data-types/json-type-definition-data-type-converter";
+import { jsonTypeDefinitionToType } from "@jsonpath-tools/jsonpath";
 import { isValidJSONSchema, isValidJSONTypeDefinition } from "./services/json-schema";
 import { JSONPatch, applyJSONPatch } from "./services/json-patch";
 import { examples } from "./models/examples";
 import { normalizedPathToJSONPointer } from "./services/json-pointer";
+import { logPerformance } from "./services/utils";
 
 interface State {
     customFunctions: readonly CustomFunction[];
@@ -266,7 +265,7 @@ const testOperation: Operation = {
     }
 };
 const testQueryText = `$..inventory[?@.features[?@ == "Bluetooth"] && match(@.make, "[tT].+")]`;
-const testQuery = new Parser().parse(testQueryText);
+const testQuery = JSONPath.parse(testQueryText);
 
 function executeOperation(
     operation: Operation,

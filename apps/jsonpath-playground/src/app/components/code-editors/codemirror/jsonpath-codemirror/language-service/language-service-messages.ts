@@ -1,13 +1,13 @@
-import { Diagnostics } from "@/jsonpath-tools/diagnostics";
-import { CompletionItem } from "@/jsonpath-tools/editor-services/completion-service";
-import { DocumentHighlight } from "@/jsonpath-tools/editor-services/document-highlights-service";
-import { Signature } from "@/jsonpath-tools/editor-services/signature-help-service";
-import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-service";
-import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
-import { QueryOptions } from "@/jsonpath-tools/options";
-import { Function, FunctionParameter } from "@/jsonpath-tools/functions/function";
-import { TextChange } from "@/jsonpath-tools/text/text-change";
-import { JSONValue } from "@/jsonpath-tools/json/json-types";
+import { Diagnostics } from "@jsonpath-tools/jsonpath";
+import { CompletionItem } from "@jsonpath-tools/jsonpath";
+import { DocumentHighlight } from "@jsonpath-tools/jsonpath";
+import { Signature } from "@jsonpath-tools/jsonpath";
+import { Tooltip } from "@jsonpath-tools/jsonpath";
+import { NormalizedPath } from "@jsonpath-tools/jsonpath";
+import { QueryOptions } from "@jsonpath-tools/jsonpath";
+import { Function, FunctionParameter } from "@jsonpath-tools/jsonpath";
+import { TextChange } from "@jsonpath-tools/jsonpath";
+import { JSONValue } from "@jsonpath-tools/jsonpath";
 
 export enum LanguageServiceMessageType {
     updateOptions = "updateOptions",

@@ -1,5 +1,5 @@
 import { QueryContext } from "../evaluation";
-import { PushOnlyArray } from "@/jsonpath-tools/helpers/array";
+import { PushOnlyArray } from "../../helpers/array";
 import { Node } from "../../values/node";
 import { SyntaxTreeType } from "../syntax-tree-type";
 import { SyntaxTreeToken } from "../syntax-tree-token";

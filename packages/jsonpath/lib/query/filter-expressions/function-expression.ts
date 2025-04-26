@@ -1,5 +1,5 @@
-import { Diagnostics, DiagnosticsSeverity } from "@/jsonpath-tools/diagnostics";
-import { FunctionContext, nullFunctionContext } from "@/jsonpath-tools/functions/function";
+import { Diagnostics, DiagnosticsSeverity } from "../../diagnostics";
+import { FunctionContext, nullFunctionContext } from "../../functions/function";
 import { FilterValue, Nothing } from "../../values/types";
 import { FilterExpressionContext, QueryContext } from "../evaluation";
 import { evaluateAs } from "../evaluation";

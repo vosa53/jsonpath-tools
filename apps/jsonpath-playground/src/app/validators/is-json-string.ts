@@ -1,4 +1,4 @@
-import { JSONValue } from "@/jsonpath-tools/json/json-types";
+import { JSONValue } from "@jsonpath-tools/jsonpath";
 
 /**
  * Validator checking whether the given text is a valid JSON. Additionally it can check also its stucture using {@link dataValidator}.

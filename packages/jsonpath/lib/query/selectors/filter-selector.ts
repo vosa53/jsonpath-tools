@@ -1,6 +1,6 @@
 import { LogicalTrue } from "../../values/types";
 import { FilterExpressionContext, QueryContext } from "../evaluation";
-import { PushOnlyArray } from "@/jsonpath-tools/helpers/array";
+import { PushOnlyArray } from "../../helpers/array";
 import { FilterExpression } from "../filter-expressions/filter-expression";
 import { evaluateAsLogicalType } from "../evaluation";
 import { Node } from "../../values/node";

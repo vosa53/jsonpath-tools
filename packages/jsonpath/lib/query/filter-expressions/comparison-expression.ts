@@ -1,5 +1,5 @@
 import { FilterValue, LogicalFalse, LogicalTrue, Nothing, ValueType } from "../../values/types";
-import { jsonDeepEquals } from "@/jsonpath-tools/json/deep-equals";
+import { jsonDeepEquals } from "../../json/deep-equals";
 import { FilterExpressionContext, QueryContext } from "../evaluation";
 import { evaluateAsValueType } from "../evaluation";
 import { SyntaxTreeType } from "../syntax-tree-type";

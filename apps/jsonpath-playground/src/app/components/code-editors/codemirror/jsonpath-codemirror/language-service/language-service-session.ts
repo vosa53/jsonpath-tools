@@ -1,16 +1,16 @@
-import { Diagnostics } from "@/jsonpath-tools/diagnostics";
-import { QueryOptions } from "@/jsonpath-tools/options";
-import { JSONValue } from "@/jsonpath-tools/json/json-types";
+import { Diagnostics } from "@jsonpath-tools/jsonpath";
+import { QueryOptions } from "@jsonpath-tools/jsonpath";
+import { JSONValue } from "@jsonpath-tools/jsonpath";
 import { CancellationToken } from "../cancellation-token";
 import { GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, SerializableCompletionItem, SerializableJSONPathFunction, SerializableJSONPathOptions, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage as UpdateQueryArgumentTypeLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
 import { SimpleRPCTopic } from "./simple-rpc";
-import { Signature } from "@/jsonpath-tools/editor-services/signature-help-service";
-import { Tooltip } from "@/jsonpath-tools/editor-services/tooltip-service";
-import { DocumentHighlight } from "@/jsonpath-tools/editor-services/document-highlights-service";
-import { TextChange } from "@/jsonpath-tools/text/text-change";
-import { DataType } from "@/jsonpath-tools/data-types/data-types";
+import { Signature } from "@jsonpath-tools/jsonpath";
+import { Tooltip } from "@jsonpath-tools/jsonpath";
+import { DocumentHighlight } from "@jsonpath-tools/jsonpath";
+import { TextChange } from "@jsonpath-tools/jsonpath";
+import { DataType } from "@jsonpath-tools/jsonpath";
 import { serializeDataType } from "./data-type-serializer";
-import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
+import { NormalizedPath } from "@jsonpath-tools/jsonpath";
 
 /**
  * Language service frontend session related to one editor instance.

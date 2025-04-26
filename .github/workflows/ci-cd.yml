@@ -1,4 +1,4 @@
-name: Build, test and deploy
+name: Build, Test and Deploy
 
 on:
   push:
@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   build-test:
-    name: Build and test
+    name: Build and Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,33 +24,37 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-      - name: Setup Pages
+      - name: Setup GitHub Pages
         uses: actions/configure-pages@v4
       - name: Install dependencies
         run: npm ci
-      - name: Install Playwright Browsers
+      - name: Install Playwright browsers
         run: npx playwright install chromium --with-deps
-      - name: Build JSONPath Playground
+      - name: Build @jsonpath-tools/jsonpath
+        run: npm run build --workspace @jsonpath-tools/jsonpath
+      - name: Build @jsonpath-tools/jsonpath-playground
         run: npm run build --workspace @jsonpath-tools/jsonpath-playground
+      #- name: Run lint
+      #  run: npm run lint --workspaces --if-present
       - name: Run tests
         run: npm run test --workspaces --if-present
       - name: Run end-to-end tests
-        run: "npm run test:e2e --workspace @jsonpath-tools/jsonpath-playground"
-      - name: Build documentation
+        run: "npm run test:e2e --workspaces --if-present
+      - name: Build @jsonpath-tools/documentation
         run: |
           npm run typedoc --workspace @jsonpath-tools/documentation
           npm run build --workspace @jsonpath-tools/documentation
-      - name: Upload JSONPath playground artifact
+      - name: Upload @jsonpath-tools/jsonpath-playground artifact
         uses: actions/upload-artifact@v4
         with:
           name: jsonpath-playground-build
           path: apps/jsonpath-playground/dist/
-      - name: Upload documentation artifact
+      - name: Upload @jsonpath-tools/documentation artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: apps/documentation/.vitepress/dist
@@ -64,7 +68,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Download JSONPath Playground artifact
+      - name: Download @jsonpath-tools/jsonpath-playground artifact
         uses: actions/download-artifact@v4
         with:
           name: jsonpath-playground-build

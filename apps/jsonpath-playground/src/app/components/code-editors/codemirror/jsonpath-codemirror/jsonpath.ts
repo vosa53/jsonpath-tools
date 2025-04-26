@@ -1,4 +1,4 @@
-import { Diagnostics } from "@/jsonpath-tools/diagnostics";
+import { Diagnostics } from "@jsonpath-tools/jsonpath";
 import { Language, LanguageSupport } from "@codemirror/language";
 import { linter } from "@codemirror/lint";
 import { completionSource } from "./completion-source";

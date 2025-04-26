@@ -1,4 +1,4 @@
-import { JSONValue } from "@/jsonpath-tools/json/json-types";
+import { JSONValue } from "@jsonpath-tools/jsonpath";
 import { applyPatch, JsonPatchError, validate } from "fast-json-patch";
 
 /**

@@ -1,9 +1,9 @@
-import { NormalizedPath, NormalizedPathSegment } from "@/jsonpath-tools/normalized-path";
-import { logPerformance } from "@/jsonpath-tools/helpers/utils";
+import { NormalizedPath, NormalizedPathSegment } from "@jsonpath-tools/jsonpath";
 import { syntaxTree } from "@codemirror/language";
 import { EditorState, Extension, Range, StateEffect, StateField, Text } from "@codemirror/state";
 import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { SyntaxNode, TreeCursor } from "@lezer/common";
+import { logPerformance } from "@/app/services/utils";
 
 /**
  * CodeMirror extension to highlight JSON values at given paths.

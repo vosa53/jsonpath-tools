@@ -1,4 +1,4 @@
-import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
+import { NormalizedPath } from "@jsonpath-tools/jsonpath";
 import { json, jsonParseLinter } from "@codemirror/lang-json";
 import { syntaxTree } from "@codemirror/language";
 import { linter } from "@codemirror/lint";
@@ -7,8 +7,8 @@ import { EditorView } from "codemirror";
 import { FocusEventHandler, useEffect, useRef } from "react";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
 import { getNodeAtPath, getPathAtTreeCursor, jsonValuesHighlighter, setCurrentHighlightedValuePathEffect, setHighlightedValuesPathsEffect } from "./codemirror/json-values-highlighter";
-import { EMPTY_ARRAY, logPerformance } from "@/jsonpath-tools/helpers/utils";
 import { ensureParsed } from "./codemirror/ensure-parsed";
+import { EMPTY_ARRAY, logPerformance } from "@/app/services/utils";
 
 /**
  * JSON editor component.

@@ -1,10 +1,10 @@
-import { defaultQueryOptions } from "@/jsonpath-tools/options";
-import { FunctionContext, FunctionHandler } from "@/jsonpath-tools/functions/function";
+import { defaultQueryOptions } from "@jsonpath-tools/jsonpath";
+import { FunctionContext, FunctionHandler } from "@jsonpath-tools/jsonpath";
 import { LanguageServiceBackend } from "../../components/code-editors/codemirror/jsonpath-codemirror/language-service/language-service-backend";
 import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";
-import { FilterValue, LogicalFalse, LogicalTrue, Nothing } from "@/jsonpath-tools/values/types";
-import { NodeList } from "@/jsonpath-tools/values/node-list";
-import { Node } from "@/jsonpath-tools/values/node";
+import { FilterValue, LogicalFalse, LogicalTrue, Nothing } from "@jsonpath-tools/jsonpath";
+import { NodeList } from "@jsonpath-tools/jsonpath";
+import { Node } from "@jsonpath-tools/jsonpath";
 
 /**
  * Application specific language service worker.

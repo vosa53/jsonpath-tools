@@ -1,4 +1,4 @@
-import { DocumentHighlight } from "@/jsonpath-tools/editor-services/document-highlights-service";
+import { DocumentHighlight } from "@jsonpath-tools/jsonpath";
 import { EditorState, Extension, StateEffect, StateField } from "@codemirror/state";
 import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";

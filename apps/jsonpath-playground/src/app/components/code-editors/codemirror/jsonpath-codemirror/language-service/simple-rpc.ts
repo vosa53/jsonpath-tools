@@ -1,4 +1,4 @@
-import { logPerformance } from "@/jsonpath-tools/helpers/utils";
+import { logPerformance } from "@/app/services/utils";
 
 /**
  * Simple RPC intended primarily for web workers.

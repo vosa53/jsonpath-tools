@@ -1,5 +1,5 @@
-import { defaultQueryOptions } from "@/jsonpath-tools/options";
-import { Type } from "@/jsonpath-tools/values/types";
+import { defaultQueryOptions } from "@jsonpath-tools/jsonpath";
+import { Type } from "@jsonpath-tools/jsonpath";
 import { ActionIcon, Button, Collapse, Flex, Group, Input, Select, Stack, TextInput } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";

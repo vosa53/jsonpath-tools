@@ -1,4 +1,4 @@
-import { Diagnostics, DiagnosticsSeverity } from "@/jsonpath-tools/diagnostics";
+import { Diagnostics, DiagnosticsSeverity } from "@jsonpath-tools/jsonpath";
 import { Checkbox, DefaultMantineColor, Group, Table, ThemeIcon } from "@mantine/core";
 import { IconAlertTriangleFilled, IconExclamationCircleFilled } from "@tabler/icons-react";
 import { memo, ReactNode, useMemo, useState } from "react";

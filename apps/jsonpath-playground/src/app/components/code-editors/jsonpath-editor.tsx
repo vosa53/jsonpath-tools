@@ -1,20 +1,20 @@
-import { defaultQueryOptions, QueryOptions } from "@/jsonpath-tools/options";
-import { Query } from "@/jsonpath-tools/query/query";
-import { JSONValue } from "@/jsonpath-tools/json/json-types";
+import { defaultQueryOptions, QueryOptions } from "@jsonpath-tools/jsonpath";
+import { Query } from "@jsonpath-tools/jsonpath";
+import { JSONValue } from "@jsonpath-tools/jsonpath";
 import { syntaxTree } from "@codemirror/language";
 import { EditorView, keymap } from "@codemirror/view";
 import { Prec } from "@codemirror/state";
 import { useEffect, useRef } from "react";
-import { Diagnostics } from "../../../jsonpath-tools/diagnostics";
+import { Diagnostics } from "@jsonpath-tools/jsonpath";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
 import { jsonpath } from "./codemirror/jsonpath-codemirror/jsonpath";
 import { getQueryForTree } from "./codemirror/jsonpath-codemirror/parser";
 import { getResult, updateOptionsEffect, updateQueryArgumentEffect, updateQueryArgumentTypeEffect } from "./codemirror/jsonpath-codemirror/core";
 import { LanguageService } from "./codemirror/jsonpath-codemirror/language-service/language-service";
-import { TextRange } from "@/jsonpath-tools/text/text-range";
+import { TextRange } from "@jsonpath-tools/jsonpath";
 import { textRangeHighlighter, setHighlightedRangeEffect } from "./codemirror/text-range-highlighter";
-import { AnyDataType, DataType } from "@/jsonpath-tools/data-types/data-types";
-import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
+import { AnyDataType, DataType } from "@jsonpath-tools/jsonpath";
+import { NormalizedPath } from "@jsonpath-tools/jsonpath";
 
 /**
  * JSONPath editor component.

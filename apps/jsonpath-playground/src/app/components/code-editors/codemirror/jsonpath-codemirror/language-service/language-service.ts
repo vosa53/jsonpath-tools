@@ -1,4 +1,4 @@
-import { JSONValue } from "@/jsonpath-tools/json/json-types";
+import { JSONValue } from "@jsonpath-tools/jsonpath";
 import { LanguageServiceSession } from "./language-service-session";
 import { SimpleRPC } from "./simple-rpc";
 

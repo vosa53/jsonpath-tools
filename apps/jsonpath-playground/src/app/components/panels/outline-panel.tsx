@@ -1,10 +1,10 @@
-import { SyntaxDescriptionService } from "@/jsonpath-tools/editor-services/syntax-description-service";
-import { defaultQueryOptions } from "@/jsonpath-tools/options";
-import { Query } from "@/jsonpath-tools/query/query";
-import { SyntaxTreeNode } from "@/jsonpath-tools/query/syntax-tree-node";
-import { SyntaxTree } from "@/jsonpath-tools/query/syntax-tree";
-import { SyntaxTreeType } from "@/jsonpath-tools/query/syntax-tree-type";
-import { SyntaxTreeToken } from "@/jsonpath-tools/query/syntax-tree-token";
+import { SyntaxDescriptionService } from "@jsonpath-tools/jsonpath";
+import { defaultQueryOptions } from "@jsonpath-tools/jsonpath";
+import { Query } from "@jsonpath-tools/jsonpath";
+import { SyntaxTreeNode } from "@jsonpath-tools/jsonpath";
+import { SyntaxTree } from "@jsonpath-tools/jsonpath";
+import { SyntaxTreeType } from "@jsonpath-tools/jsonpath";
+import { SyntaxTreeToken } from "@jsonpath-tools/jsonpath";
 import { Box, Group, Paper, Stack } from "@mantine/core";
 import { memo } from "react";
 import PanelShell from "../panel-shell";

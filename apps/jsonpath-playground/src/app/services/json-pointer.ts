@@ -1,4 +1,4 @@
-import { NormalizedPath } from "@/jsonpath-tools/normalized-path";
+import { NormalizedPath } from "@jsonpath-tools/jsonpath";
 
 /**
  * Converts the given normalized path to JSON Pointer ([RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901)).

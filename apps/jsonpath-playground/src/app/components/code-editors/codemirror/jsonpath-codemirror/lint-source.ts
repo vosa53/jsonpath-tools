@@ -1,4 +1,4 @@
-import { Diagnostics, DiagnosticsSeverity } from "@/jsonpath-tools/diagnostics";
+import { Diagnostics, DiagnosticsSeverity } from "@jsonpath-tools/jsonpath";
 import { LintSource } from "@codemirror/lint";
 import { ViewUpdate } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";
