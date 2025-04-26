@@ -22,7 +22,7 @@ function format(queryText: string): string {
     const parser = new Parser();
     const query = parser.parse(queryText);
     const formattingService = new FormattingService();
-    const edits = formattingService.getFormattingEdits(query);
+    const edits = formattingService.provideFormattingEdits(query);
     const formattedText = applyTextChanges(queryText, edits);
     return formattedText;
 }

@@ -145,7 +145,7 @@ export class EditorService {
      * Provides text changes that can be used to format the query text.
      */
     getFormattingEdits(): TextChange[] {
-        return this.formatter.getFormattingEdits(this.query);
+        return this.formatter.provideFormattingEdits(this.query);
     }
 
     /**

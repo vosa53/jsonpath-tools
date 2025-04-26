@@ -20,10 +20,10 @@ import { CharacterCategorizer } from "../syntax-analysis/character-categorizer";
  */
 export class FormattingService {
     /**
-     * Returns text changes that can be used to format the given query text.
+     * Provides text changes that can be used to format the given query text.
      * @param query Query.
      */
-    getFormattingEdits(query: Query): TextChange[] {
+    provideFormattingEdits(query: Query): TextChange[] {
         const context = new FormatterContext();
         this.formatTree(query, 0, context);
         return context.edits;
