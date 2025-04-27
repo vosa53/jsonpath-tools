@@ -1,6 +1,6 @@
 import { Signature } from "@jsonpath-tools/jsonpath";
 import { EditorState, Extension, StateEffect, StateField, Transaction } from "@codemirror/state";
-import { EditorView, showTooltip, ViewPlugin, ViewUpdate } from "@codemirror/view";
+import { Command, EditorView, keymap, showTooltip, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";
 import { languageServiceSessionStateField, markdownRendererFacet } from "./core";
 import { MarkdownRenderer } from "./markdown-renderer";
@@ -15,6 +15,22 @@ export function signatureHelp(): Extension {
     ];
 }
 
+/**
+ * CodeMirror command to explicity start signature help.
+ */
+export const startSignatureHelp: Command = view => {
+    view.dispatch({ effects: startSignatureHelpEffect.of(true) });
+    return true;
+};
+
+/**
+ * Default CodeMirror keymap for JSONPath signature help using `Ctrl+Shift+Space`.
+ */
+export const signatureHelpKeymap = keymap.of([
+    { key: "Ctrl-Shift-Space", run: startSignatureHelp }
+]);
+
+const startSignatureHelpEffect = StateEffect.define<boolean>();
 const setSignatureEffect = StateEffect.define<Signature | null>();
 
 const signatureStateField = StateField.define<Signature | null>({
@@ -56,7 +72,7 @@ const signatureHelpPlugin = ViewPlugin.fromClass(class {
     update(update: ViewUpdate) {
         const currentSignature = update.view.state.field(signatureStateField);
         const wasChange = update.docChanged || update.transactions.some(t => t.startState.selection.main.head !== t.state.selection.main.head);
-        if (wasChange && currentSignature !== null || update.transactions.some(t => isTransactionTriggeringCompletion(t)))
+        if (wasChange && currentSignature !== null || update.transactions.some(t => isTransactionTriggeringSignatureHelp(t)))
             this.updateSignature(update.state);
     }
 
@@ -75,7 +91,9 @@ const signatureHelpPlugin = ViewPlugin.fromClass(class {
     provide: v => signatureStateField
 });
 
-function isTransactionTriggeringCompletion(transaction: Transaction): boolean {
+function isTransactionTriggeringSignatureHelp(transaction: Transaction): boolean {
+    if (transaction.effects.some(e => e.is(startSignatureHelpEffect)))
+        return true;
     if (!transaction.docChanged || !transaction.isUserEvent("input.type") || transaction.changes.empty)
         return false;
 

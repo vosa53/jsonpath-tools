@@ -6,7 +6,7 @@ import { documentHighlights } from "./document-highlights";
 import { formatKeymap } from "./format";
 import { lintSource, lintSourceNeedsRefresh } from "./lint-source";
 import { languageFacet, parser } from "./parser";
-import { signatureHelp } from "./signature-help";
+import { signatureHelp, signatureHelpKeymap } from "./signature-help";
 import { languageServiceFacet, core, markdownRendererFacet, diagnosticsCreatedFacet } from "./core";
 import { tooltip } from "./tooltip";
 import { LanguageService } from "./language-service/language-service";
@@ -40,6 +40,7 @@ export function jsonpath(config: {
         tooltip(),
         signatureHelp(),
         documentHighlights(),
+        signatureHelpKeymap,
         formatKeymap
     ]);
 }
