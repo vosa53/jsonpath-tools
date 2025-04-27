@@ -6,6 +6,9 @@
         },
         {
             "path": "../../packages/codemirror-lang-jsonpath/tsconfig.json"
+        },
+        {
+            "path": "../../packages/jsonpath-editor-react/tsconfig.json"
         }
     ]
 }

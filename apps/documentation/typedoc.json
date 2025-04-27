@@ -2,7 +2,8 @@
     "name": "JSONPath Tools",
     "entryPoints": [
         "../../packages/jsonpath/lib/index.ts",
-        "../../packages/codemirror-lang-jsonpath/lib/index.ts"
+        "../../packages/codemirror-lang-jsonpath/lib/index.ts",
+        "../../packages/jsonpath-editor-react/lib/index.ts"
     ],
     "plugin": [
         "typedoc-plugin-markdown",

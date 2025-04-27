@@ -33,6 +33,7 @@ Editor can work with concrete JSON data and/or with JSON Schema (or JSON Type de
 
 - `Ctrl+Enter`: Execute query.
 - `Ctrl+Space`: Trigger completion.
+- `Ctrl+Shift+Space`: Trigger signature help.
 - `Alt+Shift+F`: Format query.
 
 ### Custom functions

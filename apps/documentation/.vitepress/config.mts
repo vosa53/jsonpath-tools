@@ -11,7 +11,7 @@ export default defineConfig({
         nav: [
             { text: "Documentation", link: "/documentation/introduction/overview" },
             { text: "API Reference", link: "/api" },
-            { text: "JSONPath Playground", link: "https://jsonpath-playground.pages.dev", target: "_blank" }
+            { text: "JSONPath Playground", link: "https://jsonpath.dev", target: "_blank" }
         ],
 
         sidebar: {

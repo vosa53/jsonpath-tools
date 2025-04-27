@@ -19,6 +19,7 @@
     "scripts": {
         "dev": "vite",
         "build": "tsc && vite build",
+        "build-data-type-grammar": "lezer-generator --typeScript lib/data-type/data-type.grammar -o lib/data-type/data-type-parser.ts",
         "preview": "vite preview",
         "test": "vitest",
         "prepublishOnly": "npm run build"
@@ -35,6 +36,8 @@
         "@jsonpath-tools/jsonpath": "^0.1.0"
     },
     "devDependencies": {
+        "@lezer/generator": "^1.7.2",
+        "@types/markdown-it": "^14.1.2",
         "typescript": "~5.7.2",
         "vite": "^6.2.0",
         "vite-plugin-dts": "^4.5.3",
