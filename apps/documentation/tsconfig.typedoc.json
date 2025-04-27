@@ -1,0 +1,11 @@
+{
+    "files": [],
+    "references": [
+        {
+            "path": "../../packages/jsonpath/tsconfig.json"
+        },
+        {
+            "path": "../../packages/codemirror-lang-jsonpath/tsconfig.json"
+        }
+    ]
+}
