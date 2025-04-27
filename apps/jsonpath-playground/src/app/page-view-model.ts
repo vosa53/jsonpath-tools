@@ -24,7 +24,7 @@ import { isValidJSONSchema, isValidJSONTypeDefinition } from "./services/json-sc
 import { JSONPatch, applyJSONPatch } from "./services/json-patch";
 import { examples } from "./models/examples";
 import { normalizedPathToJSONPointer } from "./services/json-pointer";
-import { logPerformance } from "./services/utils";
+import { logPerformance } from "../../../../shared/utils";
 
 interface State {
     customFunctions: readonly CustomFunction[];

@@ -23,11 +23,6 @@
         "noUnusedParameters": false,
         "noFallthroughCasesInSwitch": false,
         "noUncheckedSideEffectImports": false,
-        "paths": {
-            "@/*": [
-                "./src/*"
-            ]
-        },
         "stripInternal": true
     },
     "include": [

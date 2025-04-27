@@ -5,8 +5,8 @@ import { IconArrowDown, IconArrowUp, IconChevronDown, IconFileUpload, IconRouteS
 import { memo, useRef, useState } from "react";
 import JSONEditor from "../code-editors/json-editor";
 import PanelShell from "../panel-shell";
-import { examples } from "@/app/models/examples";
-import { openTextFile } from "@/app/services/files";
+import { examples } from "../../models/examples";
+import { openTextFile } from "../../services/files";
 
 /**
  * Panel for query argument JSON editation.

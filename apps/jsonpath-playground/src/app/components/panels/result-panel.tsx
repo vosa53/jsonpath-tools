@@ -1,4 +1,4 @@
-import { Operation, OperationType, OperationReplacement, OperationReplacementType } from "@/app/models/operation";
+import { Operation, OperationType, OperationReplacement, OperationReplacementType } from "../../models/operation";
 import { ActionIcon, Button, Group, InputWrapper, Modal, SegmentedControl, Select, Stack, Tooltip } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -7,9 +7,9 @@ import { memo, useState } from "react";
 import JSONEditor from "../code-editors/json-editor";
 import { EditorFormAdapter } from "../editor-form-adapter";
 import PanelShell from "../panel-shell";
-import { saveTextFile } from "@/app/services/files";
-import { isJSONString } from "@/app/validators/is-json-string";
-import { isJSONPatchString } from "@/app/validators/is-json-patch-string";
+import { saveTextFile } from "../../services/files";
+import { isJSONString } from "../../validators/is-json-string";
+import { isJSONPatchString } from "../../validators/is-json-patch-string";
 
 /**
  * Panel displaying JSONPath query result values.

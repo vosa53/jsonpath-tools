@@ -6,6 +6,7 @@ import dts from "vite-plugin-dts";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
+    base: "./",
     plugins: [
         dts({
             include: ["lib"],

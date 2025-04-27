@@ -8,7 +8,8 @@ import { FocusEventHandler, useEffect, useRef } from "react";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
 import { getNodeAtPath, getPathAtTreeCursor, jsonValuesHighlighter, setCurrentHighlightedValuePathEffect, setHighlightedValuesPathsEffect } from "./codemirror/json-values-highlighter";
 import { ensureParsed } from "./codemirror/ensure-parsed";
-import { EMPTY_ARRAY, logPerformance } from "@/app/services/utils";
+import { EMPTY_ARRAY } from "../../services/utils";
+import { logPerformance } from "../../../../../../shared/utils";
 
 /**
  * JSON editor component.

@@ -3,9 +3,9 @@ import { IconChevronDown, IconFileUpload } from "@tabler/icons-react";
 import { memo } from "react";
 import JSONEditor from "../code-editors/json-editor";
 import PanelShell from "../panel-shell";
-import { DataTypeRaw, DataTypeRawFormat } from "@/app/models/data-type-raw";
-import { examples } from "@/app/models/examples";
-import { openTextFile } from "@/app/services/files";
+import { DataTypeRaw, DataTypeRawFormat } from "../../models/data-type-raw";
+import { examples } from "../../models/examples";
+import { openTextFile } from "../../services/files";
 
 /**
  * Panel for query argument type editation.

@@ -1,10 +1,10 @@
-import { PathType } from "@/app/models/path-type";
 import { ActionIcon, Group, Select, Tooltip } from "@mantine/core";
 import { memo } from "react";
 import JSONEditor from "../code-editors/json-editor";
 import PanelShell from "../panel-shell";
 import { IconFileDownload } from "@tabler/icons-react";
-import { saveTextFile } from "@/app/services/files";
+import { PathType } from "../../models/path-type";
+import { saveTextFile } from "../../services/files";
 
 /**
  * Panel displaying JSONPath query result paths.
