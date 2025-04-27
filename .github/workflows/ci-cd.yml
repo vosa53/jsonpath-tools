@@ -37,6 +37,8 @@ jobs:
         run: npx playwright install chromium --with-deps
       - name: Build @jsonpath-tools/jsonpath
         run: npm run build --workspace @jsonpath-tools/jsonpath
+      - name: Build @jsonpath-tools/codemirror-lang-jsonpath
+        run: npm run build --workspace @jsonpath-tools/codemirror-lang-jsonpath
       - name: Build @jsonpath-tools/jsonpath-playground
         run: npm run build --workspace @jsonpath-tools/jsonpath-playground
       #- name: Run lint
