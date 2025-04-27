@@ -2,8 +2,7 @@ import { Extension } from "@codemirror/state";
 import { Decoration, hoverTooltip } from "@codemirror/view";
 import { EditorView } from "codemirror";
 import { OperationCancelledError } from "./cancellation-token";
-import { languageServiceSessionStateField } from "./core";
-import { MarkdownRenderer } from "./markdown-renderer";
+import { languageServiceSessionStateField, markdownRendererFacet } from "./core";
 
 /**
  * CodeMirror extension adding JSONPath hover tooltips.
@@ -27,8 +26,9 @@ const jsonPathHoverTooltip = hoverTooltip(async (view, pos, side) => {
             pos: tooltip.range.position,
             end: tooltip.range.position + tooltip.range.length,
             create(view) {
+                const markdownRenderer = view.state.facet(markdownRendererFacet)[0];
                 const containerElement = document.createElement("div");
-                containerElement.innerHTML = MarkdownRenderer.renderToHTML(tooltip.text);
+                containerElement.innerHTML = markdownRenderer.renderToHTML(tooltip.text);
                 return { dom: containerElement };
             }
         };

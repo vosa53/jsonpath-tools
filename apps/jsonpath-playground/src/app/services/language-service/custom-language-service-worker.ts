@@ -1,6 +1,6 @@
 import { defaultQueryOptions } from "@jsonpath-tools/jsonpath";
 import { FunctionContext, FunctionHandler } from "@jsonpath-tools/jsonpath";
-import { LanguageServiceBackend } from "../../components/code-editors/codemirror/jsonpath-codemirror/language-service/language-service-backend";
+import { LanguageServiceBackend } from "@jsonpath-tools/codemirror-lang-jsonpath";
 import { CustomLanguageServiceFunction, CustomLanguageServiceWorkerMessage } from "./custom-language-service-worker-mesages";
 import { FilterValue, LogicalFalse, LogicalTrue, Nothing } from "@jsonpath-tools/jsonpath";
 import { NodeList } from "@jsonpath-tools/jsonpath";

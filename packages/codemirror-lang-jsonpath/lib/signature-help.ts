@@ -2,7 +2,7 @@ import { Signature } from "@jsonpath-tools/jsonpath";
 import { EditorState, Extension, StateEffect, StateField, Transaction } from "@codemirror/state";
 import { EditorView, showTooltip, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";
-import { languageServiceSessionStateField } from "./core";
+import { languageServiceSessionStateField, markdownRendererFacet } from "./core";
 import { MarkdownRenderer } from "./markdown-renderer";
 
 /**
@@ -39,9 +39,12 @@ const signatureStateField = StateField.define<Signature | null>({
                 pos: state.selection.main.head,
                 end: state.selection.main.head,
                 above: true,
-                create: (view) => ({
-                    dom: createElementForSignature(currentSignature)
-                })
+                create: (view) => {
+                    const markdownRenderer = view.state.facet(markdownRendererFacet)[0];
+                    return {
+                        dom: createElementForSignature(currentSignature, markdownRenderer)
+                    };
+                }
             };
     })
 });
@@ -83,7 +86,7 @@ function isTransactionTriggeringCompletion(transaction: Transaction): boolean {
     return typedCharacter === "(" || typedCharacter === ",";
 }
 
-function createElementForSignature(signature: Signature): HTMLElement {
+function createElementForSignature(signature: Signature, markdownRenderer: MarkdownRenderer): HTMLElement {
     const tooltipElement = document.createElement("div");
     tooltipElement.classList.add("cmjp-tooltip-signatureHelp");
     const signatureElement = document.createElement("div");
@@ -106,7 +109,7 @@ function createElementForSignature(signature: Signature): HTMLElement {
         signatureElement.appendChild(afterActiveParameterElement);
 
         const activeParameterDocumentationElement = document.createElement("div");
-        activeParameterDocumentationElement.innerHTML = MarkdownRenderer.renderToHTML(activeParameter.documentation);
+        activeParameterDocumentationElement.innerHTML = markdownRenderer.renderToHTML(activeParameter.documentation);
         tooltipElement.appendChild(activeParameterDocumentationElement);
     }
     else

@@ -9,12 +9,12 @@ import { Parser } from "../syntax-analysis/parser";
 import { TextChange } from "../text/text-change";
 import { JSONValue } from "../json/json-types";
 import { NodeList } from "../values/node-list";
-import { logPerformance } from "../helpers/utils";
 import { CompletionItem, CompletionService } from "./completion-service";
 import { DocumentHighlight, DocumentHighlightsService } from "./document-highlights-service";
 import { FormattingService } from "./formatting-service";
 import { Signature, SignatureHelpService } from "./signature-help-service";
 import { Tooltip, TooltipService } from "./tooltip-service";
+import { logPerformance } from "../../../../shared/utils";
 
 /**
  * Provides services for JSONPath editors.

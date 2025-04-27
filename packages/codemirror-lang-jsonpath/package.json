@@ -1,9 +1,43 @@
 {
     "name": "@jsonpath-tools/codemirror-lang-jsonpath",
     "version": "0.1.0",
-    "main": "src/index.ts",
     "author": "Jan Jörka",
     "license": "MIT",
-    "description": ""
-  }
-  
+    "description": "",
+    "homepage": "https://vosa53.github.io/jsonpath-tools",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/vosa53/jsonpath-tools",
+        "directory": "packages/codemirror-lang-jsonpath"
+    },
+    "type": "module",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview",
+        "test": "vitest",
+        "prepublishOnly": "npm run build"
+    },
+    "dependencies": {
+        "@codemirror/autocomplete": "^6.0.1",
+        "@codemirror/language": "^6.0.1",
+        "@codemirror/lint": "^6.0.1",
+        "@codemirror/state": "^6.0.1",
+        "@codemirror/view": "^6.0.1",
+        "@lezer/common": "^1.0.0",
+        "@lezer/highlight": "^1.0.0",
+        "markdown-it": "^14.1.0",
+        "@jsonpath-tools/jsonpath": "^0.1.0"
+    },
+    "devDependencies": {
+        "typescript": "~5.7.2",
+        "vite": "^6.2.0",
+        "vite-plugin-dts": "^4.5.3",
+        "vitest": "^3.1.2"
+    }
+}

@@ -1,4 +1,4 @@
-import { QueryOptions } from "@jsonpath-tools/jsonpath";
+import { Diagnostics, QueryOptions } from "@jsonpath-tools/jsonpath";
 import { JSONValue } from "@jsonpath-tools/jsonpath";
 import { EditorState, Extension, Facet, StateEffect, StateField } from "@codemirror/state";
 import { EditorView, PluginValue, ViewPlugin, ViewUpdate } from "@codemirror/view";
@@ -6,6 +6,7 @@ import { LanguageService } from "./language-service/language-service";
 import { LanguageServiceSession } from "./language-service/language-service-session";
 import { DataType } from "@jsonpath-tools/jsonpath";
 import { NormalizedPath } from "@jsonpath-tools/jsonpath";
+import { MarkdownRenderer } from "./markdown-renderer";
 
 export function core(): Extension {
     return [
@@ -16,16 +17,16 @@ export function core(): Extension {
 export const updateOptionsEffect = StateEffect.define<QueryOptions>();
 export const updateQueryArgumentEffect = StateEffect.define<JSONValue | undefined>();
 export const updateQueryArgumentTypeEffect = StateEffect.define<DataType>();
-export const jsonPathConfigFacet = Facet.define<{
-    languageService: LanguageService
-}>();
+export const languageServiceFacet = Facet.define<LanguageService>();
+export const markdownRendererFacet = Facet.define<MarkdownRenderer>();
+export const diagnosticsCreatedFacet = Facet.define<(diagnostics: readonly Diagnostics[]) => void>();
 
 export const languageServiceSessionStateField = StateField.define<LanguageServiceSession>({
     create(state) {
-        const configFacet = state.facet(jsonPathConfigFacet);
-        if (configFacet.length !== 1) throw new Error("Expected exactly one config.");
+        const languageServices = state.facet(languageServiceFacet);
+        if (languageServices.length !== 1) throw new Error("Expected exactly one config.");
 
-        const languageServiceSession = configFacet[0].languageService.createSession();
+        const languageServiceSession = languageServices[0].createSession();
         languageServiceSession.updateQuery(state.doc.toString());
         return languageServiceSession;
     },
@@ -47,7 +48,7 @@ export const languageServiceSessionStateField = StateField.define<LanguageServic
 class JSONPathPlugin implements PluginValue {
     private readonly languageServiceSession: LanguageServiceSession;
 
-    constructor(private readonly view: EditorView) {
+    constructor(view: EditorView) {
         this.languageServiceSession = view.state.field(languageServiceSessionStateField);
     }
 

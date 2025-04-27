@@ -1,18 +1,20 @@
-import { Diagnostics, DiagnosticsSeverity } from "@jsonpath-tools/jsonpath";
+import { DiagnosticsSeverity } from "@jsonpath-tools/jsonpath";
 import { LintSource } from "@codemirror/lint";
 import { ViewUpdate } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";
-import { languageServiceSessionStateField, updateOptionsEffect, updateQueryArgumentEffect } from "./core";
+import { diagnosticsCreatedFacet, languageServiceSessionStateField, updateOptionsEffect, updateQueryArgumentEffect } from "./core";
 
 /**
  * CodeMirror lint source for JSONPath.
  */
-export function lintSource(options: { onDiagnosticsCreated?: (diagnostics: readonly Diagnostics[]) => void } = {}): LintSource {
+export function lintSource(): LintSource {
     return async view => {
         const languageServiceSession = view.state.field(languageServiceSessionStateField);
+        const onDiagnosticsCreated = view.state.facet(diagnosticsCreatedFacet);
         try {
             const diagnostics = await languageServiceSession.getDiagnostics();
-            options.onDiagnosticsCreated?.(diagnostics);
+            for (const onDiagnosticsCreatedHadler of onDiagnosticsCreated)
+                onDiagnosticsCreatedHadler(diagnostics);
 
             return diagnostics.map(d => ({
                 from: d.textRange.position,

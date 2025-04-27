@@ -1,4 +1,4 @@
-import { logPerformance } from "@/app/services/utils";
+import { logPerformance } from "../../../../shared/utils";
 
 /**
  * Simple RPC intended primarily for web workers.

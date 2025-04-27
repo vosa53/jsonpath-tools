@@ -1,8 +1,7 @@
 import { CompletionItemTextType, CompletionItemType } from "@jsonpath-tools/jsonpath";
 import { Completion, CompletionContext, CompletionSource, insertCompletionText, pickedCompletion, snippet } from "@codemirror/autocomplete";
 import { OperationCancelledError } from "./cancellation-token";
-import { languageServiceSessionStateField } from "./core";
-import { MarkdownRenderer } from "./markdown-renderer";
+import { languageServiceSessionStateField, markdownRendererFacet } from "./core";
 
 /**
  * CodeMirror completion source for JSONPath.
@@ -12,6 +11,7 @@ export function completionSource(): CompletionSource {
         if (context.explicit || context.matchBefore(TRIGGER_REGEX)) {
             const completedRange = context.matchBefore(RANGE_REGEX);
             const languageServiceSession = context.state.field(languageServiceSessionStateField);
+            const markdownRenderer = context.state.facet(markdownRendererFacet)[0];
             try {
                 const completions = await languageServiceSession.getCompletions(context.pos);
 
@@ -26,7 +26,7 @@ export function completionSource(): CompletionSource {
                                 try {
                                     const description = await languageServiceSession.resolveCompletion(i);
                                     const element = document.createElement("div");
-                                    element.innerHTML = MarkdownRenderer.renderToHTML(description);
+                                    element.innerHTML = markdownRenderer.renderToHTML(description);
                                     return element;
                                 }
                                 catch (error) {

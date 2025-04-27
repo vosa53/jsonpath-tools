@@ -29,7 +29,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "uri-js": "^4.4.1",
-    "@jsonpath-tools/jsonpath": "^0.1.0"
+    "@jsonpath-tools/jsonpath": "^0.1.0",
+    "@jsonpath-tools/codemirror-lang-jsonpath": "^0.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
