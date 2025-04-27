@@ -46,5 +46,5 @@ const jsonPathTooltipDecorations = EditorView.decorations.from(jsonPathHoverTool
 });
 
 const jsonPathTooltipBaseTheme = EditorView.baseTheme({
-    "& .cmjp-tooltip-range": { background: "orange" }
+    "& .cmjp-tooltip-range": { background: "#ffe06633" }
 });

@@ -1,7 +1,10 @@
 import { HighlightStyle } from "@codemirror/language";
 import { tags as t } from "@lezer/highlight";
 
-export const libraryHighlightStyle = HighlightStyle.define([
+/**
+ * JSONPath editor highlight style.
+ */
+export const jsonpathEditorHighlightStyle = HighlightStyle.define([
     { tag: t.keyword, color: "var(--jpei-code-keyword)" },
     { tag: t.bool, color: "var(--jpei-code-keyword)" },
     { tag: t.null, color: "var(--jpei-code-keyword)" },

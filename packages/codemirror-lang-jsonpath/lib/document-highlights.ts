@@ -82,5 +82,5 @@ const documentsHighlightsPlugin = ViewPlugin.fromClass(class {
 });
 
 const documentHighlightsBaseTheme = EditorView.baseTheme({
-    "& .cmjp-document-highlight": { background: "#328c8252" }
+    "& .cmjp-document-highlight": { background: "#4dabf740" }
 });

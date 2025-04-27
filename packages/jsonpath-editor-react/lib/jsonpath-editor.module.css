@@ -1,11 +1,19 @@
 .container {
-    --jpei-background: var(--jpe-background, black);
-    --jpei-color: var(--jpe-color, white);
-    --jpei-border: var(--jpe-border, solid 1px #ced4da);
+    --jpei-background: var(--jpe-background, white);
+    --jpei-background-code: var(--jpe-background-code, #e9ecef);
+    --jpei-color: var(--jpe-color, black);
+    --jpei-border: var(--jpe-border, #ced4da);
     --jpei-font-text: var(--jpe-font-text, "Segoe UI", Verdana);
     --jpei-font-code: var(--jpe-font-code, "Cascadia Mono", consolas);
     --jpei-hover: var(--jpe-hover, #f8f9fa);
+    --jpei-dimmed: var(--jpe-dimmed, #868e96);
+    --jpei-selection: var(--jpe-selection, #7950f233);
+    --jpei-highlighted: var(--jpe-highlighted, #e6770033);
+    --jpei-highlighted-match: var(--jpe-highlighted-match, #4dabf740);
     --jpei-primary: var(--jpe-primary, #7950f2);
+    --jpei-diagnostics-error: var(--jpe-diagnostics-error, #fa5252);
+    --jpei-diagnostics-warning: var(--jpe-diagnostics-warning, #fab005);
+    --jpei-line-current: var(--jpe-line-current, #f1f3f5);
 
     --jpei-code-keyword: var(--jpe-code-keyword, #228be6);
     --jpei-code-operator: var(--jpe-code-operator, #15aabf);
@@ -47,7 +55,7 @@
     }
 
     a {
-        color: #7950f2;
+        color: var(--jpei-primary);
         text-decoration: none;
     }
 
@@ -57,13 +65,13 @@
 
     hr {
         border: none;
-        border-top: var(--jpei-code-border);
+        border-top: solid 1px var(--jpei-border);
     }
 
     pre,
     code {
         border-radius: 2px;
-        background: var(--application-color-code-block);
+        background: var(--jpei-background-code);
     }
 
     code {
@@ -95,7 +103,7 @@
     th,
     td {
         padding: 6px 6px;
-        border-bottom: var(--jpei-border);
+        border-bottom: solid 1px var(--jpei-border);
     }
 
     ::-webkit-scrollbar {
@@ -112,10 +120,10 @@
     }
 
     ::-webkit-scrollbar-thumb {
-        background: var(--mantine-color-default-border);
+        background: var(--jpei-border);
     }
 
     ::-webkit-scrollbar-thumb:hover {
-        background: var(--mantine-color-dimmed);
+        background: var(--jpei-dimmed);
     }
 }

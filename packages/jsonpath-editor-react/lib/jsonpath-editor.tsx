@@ -8,29 +8,57 @@ import { crosshairCursor, drawSelection, dropCursor, EditorView, highlightActive
 import { DefaultLanguageServices, jsonpath, updateOptionsEffect, updateQueryArgumentEffect, updateQueryArgumentTypeEffect } from "@jsonpath-tools/codemirror-lang-jsonpath";
 import { AnyDataType, DataType, defaultQueryOptions, JSONValue, QueryOptions } from "@jsonpath-tools/jsonpath";
 import { CSSProperties, useEffect, useRef } from "react";
-import { libraryHighlightStyle } from "./library-highlight-style";
-import { libraryTheme } from "./library-theme";
+import { jsonpathEditorHighlightStyle } from "./jsonpath-editor-highlight-style";
+import { jsonpathEditorTheme } from "./jsonpath-editor-theme";
 import classes from "./jsonpath-editor.module.css";
 
 /**
- * JSONPath editor component.
+ * JSONPath editor compliant with ([RFC 9535](https://datatracker.ietf.org/doc/rfc9535/)).
  */
 export default function JSONPathEditor({
     value,
-    options = defaultQueryOptions,
+    queryOptions = defaultQueryOptions,
     queryArgument = undefined,
     queryArgumentType = AnyDataType.create(),
     readonly = false,
     style,
     onValueChanged
 }: {
+    /**
+     * Query text.
+     */
     value: string,
-    options: QueryOptions,
-    queryArgument: JSONValue | undefined,
-    queryArgumentType: DataType,
+
+    /**
+     * Query options.
+     */
+    queryOptions?: QueryOptions,
+
+    /**
+     * Query argument.
+     */
+    queryArgument?: JSONValue | undefined,
+
+    /**
+     * Query argument type.
+     */
+    queryArgumentType?: DataType,
+
+    /**
+     * Whether the editor should be read-only.
+     */
     readonly?: boolean,
+
+    /**
+     * Inline CSS style.
+     */
     style?: CSSProperties,
-    onValueChanged: (value: string) => void,
+
+    /**
+     * Called when the query text changes.
+     * @param value New query text.
+     */
+    onValueChanged: (value: string) => void
 }) {
     const editorViewRef = useRef<EditorView>(null);
     const containerElementRef = useRef<HTMLDivElement>(null);
@@ -38,8 +66,8 @@ export default function JSONPathEditor({
 
     useEffect(() => {
         if (editorViewRef.current !== null)
-            editorViewRef.current.dispatch({ effects: updateOptionsEffect.of(options) });
-    }, [options]);
+            editorViewRef.current.dispatch({ effects: updateOptionsEffect.of(queryOptions) });
+    }, [queryOptions]);
 
     useEffect(() => {
         if (editorViewRef.current !== null)
@@ -89,7 +117,7 @@ export default function JSONPathEditor({
                     ...lintKeymap,
                 ]),
                 indentUnit.of("    "),
-                syntaxHighlighting(libraryHighlightStyle),
+                syntaxHighlighting(jsonpathEditorHighlightStyle),
                 readonlyCompartment.of(EditorState.readOnly.of(readonly)),
                 EditorView.updateListener.of(u => {
                     if (u.docChanged) {
@@ -102,9 +130,9 @@ export default function JSONPathEditor({
                 }),
                 jsonpath({
                     languageService: DefaultLanguageServices.worker,
-                    codeHighlighter: libraryHighlightStyle
+                    codeHighlighter: jsonpathEditorHighlightStyle
                 }),
-                libraryTheme
+                jsonpathEditorTheme
             ],
             parent: containerElementRef.current!
         });
@@ -112,7 +140,7 @@ export default function JSONPathEditor({
         editorViewRef.current = editorView;
         editorView.dispatch({
             effects: [
-                updateOptionsEffect.of(options),
+                updateOptionsEffect.of(queryOptions),
                 updateQueryArgumentEffect.of(queryArgument),
                 updateQueryArgumentTypeEffect.of(queryArgumentType)
             ]
