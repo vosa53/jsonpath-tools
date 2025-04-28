@@ -2,7 +2,9 @@ name: Build, Test and Deploy
 
 on:
   push:
-    branches: [main]
+    branches: ['**']
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions:
@@ -66,7 +68,7 @@ jobs:
 
   deploy:
     name: Deploy
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'release'
     needs: build-test
     runs-on: ubuntu-latest
     environment:
