@@ -61,10 +61,12 @@ jobs:
         with:
           name: jsonpath-playground-build
           path: apps/jsonpath-playground/dist/
+          retention-days: 1
       - name: Upload @jsonpath-tools/documentation artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: apps/documentation/.vitepress/dist
+          retention-days: 1
 
   deploy:
     name: Deploy

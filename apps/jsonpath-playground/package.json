@@ -1,7 +1,7 @@
 {
     "name": "@jsonpath-tools/jsonpath-playground",
     "private": true,
-    "version": "0.1.0-alpha",
+    "version": "0.1.1-alpha",
     "type": "module",
     "scripts": {
         "dev": "vite",
