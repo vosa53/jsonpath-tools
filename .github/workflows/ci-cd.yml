@@ -102,12 +102,11 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
       - name: Deploy @jsonpath-tools/jsonpath-playground to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{secrets.CLOUDFLARE_API_TOKEN}}
           accountId: ${{secrets.CLOUDFLARE_ACCOUNT_ID}}
-          projectName: jsonpath-playground
-          directory: apps/jsonpath-playground/dist/
+          command: pages deploy apps/jsonpath-playground/dist/ --project-name=jsonpath-playground --branch main
           gitHubToken: ${{secrets.GITHUB_TOKEN}}
       - name: Deploy @jsonpath-tools/documentation to GitHub Pages
         id: deployment

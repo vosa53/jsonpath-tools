@@ -38,4 +38,4 @@ Editor can work with concrete JSON data and/or with JSON Schema (or JSON Type de
 
 ### Custom functions
 
-TODO
+TODO TODO
