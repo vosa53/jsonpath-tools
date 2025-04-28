@@ -73,11 +73,30 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install dependencies
+        run: npm ci
       - name: Download @jsonpath-tools/jsonpath-playground artifact
         uses: actions/download-artifact@v4
         with:
           name: jsonpath-playground-build
           path: apps/jsonpath-playground/dist/
+      - name: Deploy Packages to NPM Registry
+        run: |
+          npm publish --provenance --access public --workspace @jsonpath-tools/jsonpath
+          npm publish --provenance --access public --workspace @jsonpath-tools/codemirror-lang-jsonpath
+          npm publish --provenance --access public --workspace @jsonpath-tools/jsonpath-editor-react
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
       - name: Deploy @jsonpath-tools/jsonpath-playground to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:

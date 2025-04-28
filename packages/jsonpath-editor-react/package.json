@@ -1,6 +1,6 @@
 {
     "name": "@jsonpath-tools/jsonpath-editor-react",
-    "version": "0.1.0",
+    "version": "0.1.0-alpha",
     "author": "Jan Jörka",
     "license": "MIT",
     "description": "",
