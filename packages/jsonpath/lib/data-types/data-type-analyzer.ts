@@ -209,7 +209,7 @@ export class DataTypeAnalyzer {
         if (path === null)
             return type;
         const otherType = this.getType(otherSide);
-        let narrowedType = type.changeTypeAtPath(path, t => isTrue ? intersectTypes(t, otherType) : subtractTypes(t, otherType));
+        let narrowedType = type.changeTypeAtPath(path, t => isTrue ? intersectTypes(t, otherType) : (otherSide instanceof LiteralDataType ? subtractTypes(t, otherType) : t));
         const pathSurelyExists = isTrue && !isSubtypeOf(PrimitiveDataType.create(PrimitiveDataTypeType.nothing), otherType) ||
             !isTrue && isEquvivalentTypeWith(PrimitiveDataType.create(PrimitiveDataTypeType.nothing), otherType);
         if (pathSurelyExists)
