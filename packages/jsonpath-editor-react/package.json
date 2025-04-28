@@ -24,8 +24,8 @@
         "prepublishOnly": "npm run build"
     },
     "dependencies": {
-        "@jsonpath-tools/codemirror-lang-jsonpath": "^0.1.0",
-        "@jsonpath-tools/jsonpath": "^0.1.0"
+        "@jsonpath-tools/codemirror-lang-jsonpath": "^0.1.0-alpha",
+        "@jsonpath-tools/jsonpath": "^0.1.0-alpha"
     },
     "peerDependencies": {
         "react": "^19.0.0",
