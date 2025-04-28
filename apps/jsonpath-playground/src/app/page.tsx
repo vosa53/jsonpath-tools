@@ -1,5 +1,5 @@
 import { DiagnosticsSeverity } from '@jsonpath-tools/jsonpath';
-import { ActionIcon, AppShell, Divider, Flex, Indicator, Stack, Tabs, Tooltip } from '@mantine/core';
+import { ActionIcon, AppShell, Divider, Flex, Indicator, Stack, Tabs, Tooltip, Text } from '@mantine/core';
 import { IconBraces, IconEqual, IconExclamationCircle, IconListTree, IconPlayerPlay, IconRouteSquare, IconSitemap } from '@tabler/icons-react';
 import { useMemo, useState } from "react";
 import JSONPathEditor from "./components/code-editors/jsonpath-editor";
@@ -72,16 +72,22 @@ export default function Page() {
                     <Flex flex="1 1 0" direction={{ sm: "row", base: "column" }}>
                         <Tabs defaultValue="data" flex="1" miw={0} display="flex" style={{ flexDirection: "column" }}>
                             <Tabs.List>
-                                <Tooltip label="Query Argument JSON">
+                                <Tooltip label={<>
+                                    <div>Query Argument JSON</div>
+                                    {viewModel.queryArgumentError !== null && <div style={{ color: "var(--mantine-color-error)" }}>{viewModel.queryArgumentError}</div>}
+                                </>}>
                                     <Tabs.Tab value="data" leftSection={<IconBraces size={20} />}>
-                                        <Indicator color="red" label="!" size={16} offset={-4} disabled={viewModel.isQueryArgumentValid}>
+                                        <Indicator color="red" label="!" size={16} offset={-4} disabled={viewModel.queryArgumentError === null}>
                                             Data
                                         </Indicator>
                                     </Tabs.Tab>
                                 </Tooltip>
-                                <Tooltip label="Query Argument Schema">
+                                <Tooltip label={<>
+                                    <div>Query Argument Schema</div>
+                                    {viewModel.queryArgumentTypeError !== null && <div style={{ color: "var(--mantine-color-error)" }}>{viewModel.queryArgumentTypeError}</div>}
+                                </>}>
                                     <Tabs.Tab value="type" leftSection={<IconSitemap size={20} />}>
-                                        <Indicator color="red" label="!" size={16} offset={-4} disabled={viewModel.isQueryArgumentTypeValid}>
+                                        <Indicator color="red" label="!" size={16} offset={-4} disabled={viewModel.queryArgumentTypeError === null}>
                                             Schema
                                         </Indicator>
                                     </Tabs.Tab>

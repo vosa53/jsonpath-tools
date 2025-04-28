@@ -63,15 +63,15 @@ export function usePageViewModel() {
     }, [operation.replacement.jsonPatchText]);
     const [pathType, setPathType] = useState<PathType>(PathType.normalizedPath);
     const [query, setQuery] = useState<Query>(testQuery);
-    const [queryArgument, isQueryArgumentValid] = useMemo<[JSONValue | undefined, boolean]>(() => {
+    const [queryArgument, queryArgumentError] = useMemo<[JSONValue | undefined, string | null]>(() => {
         try {
-            return [logPerformance("Parse query argument", () => JSON.parse(queryArgumentText)), true];
+            return [logPerformance("Parse query argument", () => JSON.parse(queryArgumentText)), null];
         }
-        catch {
-            return [undefined, false];
+        catch (error: any) {
+            return [undefined, error.toString()];
         }
     }, [queryArgumentText]);
-    const [queryArgumentType, isQueryArgumentTypeValid] = useMemo<[DataType, boolean]>(() => {
+    const [queryArgumentType, queryArgumentTypeError] = useMemo<[DataType, string | null]>(() => {
         let json: JSONValue;
         const jsonText = queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema
             ? queryArgumentTypeRaw.jsonSchemaText
@@ -79,17 +79,17 @@ export function usePageViewModel() {
         try {
             json = logPerformance("Parse query argument type raw", () => JSON.parse(jsonText));
         }
-        catch {
-            return [AnyDataType.create(), false];
+        catch (error: any) {
+            return [AnyDataType.create(), error.toString()];
         }
 
         if (queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema) {
-            if (!isValidJSONSchema(json)) return [AnyDataType.create(), false];
-            else return [jsonSchemaToType({ schema: json }), true];
+            if (!isValidJSONSchema(json)) return [AnyDataType.create(), "Invalid JSON Schema Draft 2020-12"];
+            else return [jsonSchemaToType({ schema: json }), null];
         }
         else {
-            if (!isValidJSONTypeDefinition(json)) return [AnyDataType.create(), false];
-            else return [jsonTypeDefinitionToType(json), true];
+            if (!isValidJSONTypeDefinition(json)) return [AnyDataType.create(), "Invalid JSON Type Definition"];
+            else return [jsonTypeDefinitionToType(json), null];
         }
     }, [queryArgumentTypeRaw]);
     const options = useMemo<QueryOptions>(() => {
@@ -233,8 +233,8 @@ export function usePageViewModel() {
         query,
         queryArgument,
         queryArgumentType,
-        isQueryArgumentValid,
-        isQueryArgumentTypeValid,
+        queryArgumentError,
+        queryArgumentTypeError,
         options,
         resultPaths,
         resultText,
