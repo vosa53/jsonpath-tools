@@ -9,18 +9,24 @@ import { Function, FunctionParameter } from "@jsonpath-tools/jsonpath";
 import { TextChange } from "@jsonpath-tools/jsonpath";
 import { JSONValue } from "@jsonpath-tools/jsonpath";
 
-export enum LanguageServiceMessageType {
-    updateOptions = "updateOptions",
+export enum LanguageServiceMessageID {
+    updateQueryOptions = "updateQueryOptions",
     updateQuery = "updateQuery",
     updateQueryArgument = "updateQueryArgument",
+    updateQueryArgumentType = "updateQueryArgumentType",
     getCompletions = "getCompletions",
+    resolveCompletion = "resolveCompletion",
+    getSignature = "getSignature",
+    getDocumentHighlights = "getDocumentHighlights",
+    getTooltip = "getTooltip",
     getDiagnostics = "getDiagnostics",
+    getFormattingEdits = "getFormattingEdits",
     getResult = "getResult",
     disconnect = "disconnect"
 }
 
-export interface UpdateOptionsLanguageServiceMessage {
-    readonly newOptions: SerializableJSONPathOptions;
+export interface UpdateQueryOptionsLanguageServiceMessage {
+    readonly newQueryOptions: SerializableQueryOptions;
 }
 
 export interface UpdateQueryLanguageServiceMessage {
@@ -106,15 +112,15 @@ export interface DisconnectLanguageServiceMessage {
 
 export type SerializableCompletionItem = Omit<CompletionItem, "resolveDescription">;
 
-export type SerializableJSONPathOptions = Omit<QueryOptions, "functions"> & {
-    readonly functions: { [name: string]: SerializableJSONPathFunction };
+export type SerializableQueryOptions = Omit<QueryOptions, "functions"> & {
+    readonly functions: { [name: string]: SerializableFunction };
 }
 
-export type SerializableJSONPathFunction = Omit<Function, "parameters" | "returnDataType" | "handler"> & {
-    readonly parameters: readonly SerializableJSONPathFunctionParameter[];
+export type SerializableFunction = Omit<Function, "parameters" | "returnDataType" | "handler"> & {
+    readonly parameters: readonly SerializableFunctionParameter[];
     readonly returnDataType: any;
 }
 
-export type SerializableJSONPathFunctionParameter = Omit<FunctionParameter, "dataType"> & {
+export type SerializableFunctionParameter = Omit<FunctionParameter, "dataType"> & {
     readonly dataType: any;
 }

@@ -1,5 +1,5 @@
 import { Diagnostics, DiagnosticsSeverity } from "../diagnostics";
-import { QueryOptions } from "../options";
+import { QueryOptions } from "../query-options";
 import { Type } from "../values/types";
 import { AndExpression } from "../query/filter-expressions/and-expression";
 import { BooleanLiteralExpression } from "../query/filter-expressions/boolean-literal-expression";
@@ -30,7 +30,7 @@ export class Checker {
         /**
          * Query options.
          */
-        private readonly options: QueryOptions
+        private readonly queryOptions: QueryOptions
     ) { }
 
     /**
@@ -45,7 +45,7 @@ export class Checker {
 
     private checkRecursive(tree: SyntaxTreeNode, parent: SyntaxTree | null, context: CheckerContext) {
         if (tree instanceof FunctionExpression) {
-            const functionDefinition = this.options.functions[tree.name];
+            const functionDefinition = this.queryOptions.functions[tree.name];
             if (functionDefinition === undefined)
                 context.addError(`Function '${tree.name}' is not defined.`, tree.nameToken.textRangeWithoutSkipped);
             else {
@@ -86,7 +86,7 @@ export class Checker {
 
     private getType(targetType: Type | null, expression: FilterExpression, context: CheckerContext): Type | null {
         if (expression instanceof FunctionExpression) {
-            const functionDefinition = this.options.functions[expression.name];
+            const functionDefinition = this.queryOptions.functions[expression.name];
             if (functionDefinition === undefined) return null;
             else return functionDefinition.returnType;
         }

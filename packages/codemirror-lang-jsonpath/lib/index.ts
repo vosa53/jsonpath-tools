@@ -5,7 +5,7 @@
 
 import { OperationCancelledError } from "./cancellation-token";
 import { completionSource } from "./completion-source";
-import { getResult, updateOptionsEffect, updateQueryArgumentEffect, updateQueryArgumentTypeEffect } from "./core";
+import { getResult, updateQueryOptionsEffect, updateQueryArgumentEffect, updateQueryArgumentTypeEffect } from "./core";
 import { documentHighlights } from "./document-highlights";
 import { format, formatKeymap } from "./format";
 import { jsonpath, jsonpathLanguage } from "./jsonpath";
@@ -35,7 +35,7 @@ export {
     OperationCancelledError,
     getQueryForTree,
     getResult,
-    updateOptionsEffect,
+    updateQueryOptionsEffect,
     updateQueryArgumentEffect,
     updateQueryArgumentTypeEffect
 };

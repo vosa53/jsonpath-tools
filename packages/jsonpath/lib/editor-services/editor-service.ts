@@ -2,7 +2,7 @@ import { DynamicAnalysisResult, DynamicAnalyzer } from "../analyzers/dynamic-ana
 import { StaticAnalyzer } from "../analyzers/static-analyzer";
 import { AnyDataType, DataType } from "../data-types/data-types";
 import { Diagnostics } from "../diagnostics";
-import { defaultQueryOptions, QueryOptions } from "../options";
+import { defaultQueryOptions, QueryOptions } from "../query-options";
 import { Query } from "../query/query";
 import { Checker } from "../semantic-analysis/checker";
 import { Parser } from "../syntax-analysis/parser";
@@ -21,7 +21,7 @@ import { logPerformance } from "../../../../shared/utils";
  */
 export class EditorService {
     private readonly parser: Parser;
-    private options: QueryOptions;
+    private queryOptions: QueryOptions;
     private typeChecker: Checker;
     private completionProvider: CompletionService;
     private signatureProvider: SignatureHelpService;
@@ -37,14 +37,14 @@ export class EditorService {
 
     constructor() {
         this.parser = new Parser();
-        this.options = defaultQueryOptions;
-        this.typeChecker = new Checker(this.options);
-        this.completionProvider = new CompletionService(this.options);
-        this.signatureProvider = new SignatureHelpService(this.options);
-        this.documentHighlightsProvider = new DocumentHighlightsService(this.options);
-        this.tooltipProvider = new TooltipService(this.options);
-        this.staticAnalyzer = new StaticAnalyzer(this.options);
-        this.dynamicAnalyzer = new DynamicAnalyzer(this.options);
+        this.queryOptions = defaultQueryOptions;
+        this.typeChecker = new Checker(this.queryOptions);
+        this.completionProvider = new CompletionService(this.queryOptions);
+        this.signatureProvider = new SignatureHelpService(this.queryOptions);
+        this.documentHighlightsProvider = new DocumentHighlightsService(this.queryOptions);
+        this.tooltipProvider = new TooltipService(this.queryOptions);
+        this.staticAnalyzer = new StaticAnalyzer(this.queryOptions);
+        this.dynamicAnalyzer = new DynamicAnalyzer(this.queryOptions);
         this.formatter = new FormattingService();
         this.query = this.parser.parse("");
         this.queryArgument = undefined;
@@ -54,17 +54,17 @@ export class EditorService {
 
     /**
      * Updates query options.
-     * @param newOptions New query options.
+     * @param newQueryOptions New query options.
      */
-    updateOptions(newOptions: QueryOptions) {
-        this.options = newOptions;
-        this.typeChecker = new Checker(this.options);
-        this.completionProvider = new CompletionService(this.options);
-        this.signatureProvider = new SignatureHelpService(this.options);
-        this.documentHighlightsProvider = new DocumentHighlightsService(this.options);
-        this.tooltipProvider = new TooltipService(this.options);
-        this.staticAnalyzer = new StaticAnalyzer(this.options);
-        this.dynamicAnalyzer = new DynamicAnalyzer(this.options);
+    updateQueryOptions(newQueryOptions: QueryOptions) {
+        this.queryOptions = newQueryOptions;
+        this.typeChecker = new Checker(this.queryOptions);
+        this.completionProvider = new CompletionService(this.queryOptions);
+        this.signatureProvider = new SignatureHelpService(this.queryOptions);
+        this.documentHighlightsProvider = new DocumentHighlightsService(this.queryOptions);
+        this.tooltipProvider = new TooltipService(this.queryOptions);
+        this.staticAnalyzer = new StaticAnalyzer(this.queryOptions);
+        this.dynamicAnalyzer = new DynamicAnalyzer(this.queryOptions);
         this.dynamicAnalysisResult = null;
     }
 

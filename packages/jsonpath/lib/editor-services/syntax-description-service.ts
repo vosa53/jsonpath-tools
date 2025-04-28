@@ -1,4 +1,4 @@
-import { QueryOptions } from "../options";
+import { QueryOptions } from "../query-options";
 import { Function } from "../functions/function";
 import { BooleanLiteralExpression } from "../query/filter-expressions/boolean-literal-expression";
 import { ComparisonExpression, ComparisonOperator } from "../query/filter-expressions/comparison-expression";
@@ -58,7 +58,7 @@ export class SyntaxDescriptionService {
         [SyntaxTreeType.filterQueryExpression, n => new SyntaxDescription("Filter Query", "Query in filter expression. When used on its own it is considered an existence test.")],
         [SyntaxTreeType.functionExpression, n => {
             const functionExpression = n as FunctionExpression;
-            return this.provideDescriptionForFunctionExpression(functionExpression.name, this.options.functions[functionExpression.name]);
+            return this.provideDescriptionForFunctionExpression(functionExpression.name, this.queryOptions.functions[functionExpression.name]);
         }],
         [SyntaxTreeType.stringLiteralExpression, n => {
             const stringLiteral = n as StringLiteralExpression;
@@ -83,7 +83,7 @@ export class SyntaxDescriptionService {
         /**
          * Query options.
          */
-        private readonly options: QueryOptions
+        private readonly queryOptions: QueryOptions
     ) { }
 
     /**

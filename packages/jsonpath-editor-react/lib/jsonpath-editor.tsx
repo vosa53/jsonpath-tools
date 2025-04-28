@@ -5,7 +5,7 @@ import { lintKeymap } from "@codemirror/lint";
 import { Compartment, EditorState } from "@codemirror/state";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { crosshairCursor, drawSelection, dropCursor, EditorView, highlightActiveLine, highlightActiveLineGutter, highlightSpecialChars, keymap, lineNumbers, rectangularSelection } from "@codemirror/view";
-import { DefaultLanguageServices, jsonpath, updateOptionsEffect, updateQueryArgumentEffect, updateQueryArgumentTypeEffect } from "@jsonpath-tools/codemirror-lang-jsonpath";
+import { DefaultLanguageServices, jsonpath, updateQueryOptionsEffect, updateQueryArgumentEffect, updateQueryArgumentTypeEffect } from "@jsonpath-tools/codemirror-lang-jsonpath";
 import { AnyDataType, DataType, defaultQueryOptions, JSONValue, QueryOptions } from "@jsonpath-tools/jsonpath";
 import { CSSProperties, useEffect, useRef } from "react";
 import { jsonpathEditorHighlightStyle } from "./jsonpath-editor-highlight-style";
@@ -20,9 +20,9 @@ export default function JSONPathEditor({
     queryOptions = defaultQueryOptions,
     queryArgument = undefined,
     queryArgumentType = AnyDataType.create(),
-    readonly = false,
+    readOnly = false,
     style,
-    onValueChanged
+    onValueChange
 }: {
     /**
      * Query text.
@@ -47,7 +47,7 @@ export default function JSONPathEditor({
     /**
      * Whether the editor should be read-only.
      */
-    readonly?: boolean,
+    readOnly?: boolean,
 
     /**
      * Inline CSS style.
@@ -58,7 +58,7 @@ export default function JSONPathEditor({
      * Called when the query text changes.
      * @param value New query text.
      */
-    onValueChanged: (value: string) => void
+    onValueChange: (value: string) => void
 }) {
     const editorViewRef = useRef<EditorView>(null);
     const containerElementRef = useRef<HTMLDivElement>(null);
@@ -66,7 +66,7 @@ export default function JSONPathEditor({
 
     useEffect(() => {
         if (editorViewRef.current !== null)
-            editorViewRef.current.dispatch({ effects: updateOptionsEffect.of(queryOptions) });
+            editorViewRef.current.dispatch({ effects: updateQueryOptionsEffect.of(queryOptions) });
     }, [queryOptions]);
 
     useEffect(() => {
@@ -82,10 +82,10 @@ export default function JSONPathEditor({
     useEffect(() => {
         if (editorViewRef.current !== null) {
             editorViewRef.current.dispatch({
-                effects: readonlyCompartment.reconfigure(EditorState.readOnly.of(readonly))
+                effects: readOnlyCompartment.reconfigure(EditorState.readOnly.of(readOnly))
             });
         }
-    }, [readonly]);
+    }, [readOnly]);
 
     useEffect(() => {
         const editorView = new EditorView({
@@ -118,14 +118,14 @@ export default function JSONPathEditor({
                 ]),
                 indentUnit.of("    "),
                 syntaxHighlighting(jsonpathEditorHighlightStyle),
-                readonlyCompartment.of(EditorState.readOnly.of(readonly)),
+                readOnlyCompartment.of(EditorState.readOnly.of(readOnly)),
                 EditorView.updateListener.of(u => {
                     if (u.docChanged) {
                         const newValue = u.state.doc.toString();
                         const isFromParent = valueInEditorRef.current === newValue;
                         valueInEditorRef.current = newValue;
                         if (!isFromParent)
-                            onValueChanged(newValue);
+                            onValueChange(newValue);
                     }
                 }),
                 jsonpath({
@@ -140,7 +140,7 @@ export default function JSONPathEditor({
         editorViewRef.current = editorView;
         editorView.dispatch({
             effects: [
-                updateOptionsEffect.of(queryOptions),
+                updateQueryOptionsEffect.of(queryOptions),
                 updateQueryArgumentEffect.of(queryArgument),
                 updateQueryArgumentTypeEffect.of(queryArgumentType)
             ]
@@ -165,4 +165,4 @@ export default function JSONPathEditor({
     );
 }
 
-const readonlyCompartment = new Compartment();
+const readOnlyCompartment = new Compartment();

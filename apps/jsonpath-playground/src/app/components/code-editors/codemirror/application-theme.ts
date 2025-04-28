@@ -27,7 +27,7 @@ export const applicationThemeCommon = EditorView.theme({
 
     // Tooltips.
     "& .cm-tooltip": { fontFamily: "var(--mantine-font-family)", backgroundColor: "var(--mantine-color-body)", color: "var(--mantine-color-text)", border: "1px solid var(--app-shell-border-color)", boxShadow: "var(--mantine-shadow-xl)", borderRadius: "var(--mantine-radius-md)", padding: "var(--mantine-spacing-xs)" },
-    "& .cm-tooltip-section:not(:first-child)": { borderTop: "1px solid var(--mantine-color-default-border)", paddingTop: "var(--mantine-spacing-xs)" },
+    "& .cm-tooltip-section:not(:first-child)": { borderTop: "1px solid var(--mantine-color-default-border)", paddingTop: "var(--mantine-spacing-xs)", marginTop: "var(--mantine-spacing-xs)" },
 
     // Autocomplete.
     "& .cm-tooltip.cm-tooltip-autocomplete": {},

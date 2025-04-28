@@ -1,7 +1,7 @@
 import { getJSONType } from "../json/json-types";
 import { DataTypeAnalyzer } from "../data-types/data-type-analyzer";
 import { DataType, DataTypeAnnotation } from "../data-types/data-types";
-import { QueryOptions } from "../options";
+import { QueryOptions } from "../query-options";
 import { Query } from "../query/query";
 import { SyntaxTree } from "../query/syntax-tree";
 import { SyntaxTreeType } from "../query/syntax-tree-type";
@@ -21,9 +21,9 @@ export class TooltipService {
         /**
          * Query options.
          */
-        private readonly options: QueryOptions
+        private readonly queryOptions: QueryOptions
     ) {
-        this.syntaxDescriptionProvider = new SyntaxDescriptionService(options);
+        this.syntaxDescriptionProvider = new SyntaxDescriptionService(queryOptions);
         this.analysisDescriptionProvider = new AnalysisDescriptionService();
     }
 
@@ -96,7 +96,7 @@ export class TooltipService {
             return null;
 
         let text = description.toMarkdown();
-        const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType, this.options);
+        const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType, this.queryOptions);
         const type = typeAnalyzer.getType(node);
 
         const typeAnnotations = type.collectAnnotations();
@@ -127,7 +127,7 @@ export class TooltipService {
 
         query.select({
             argument: queryArgument,
-            options: this.options,
+            options: this.queryOptions,
             queryInstrumentationCallback: (query, input, outputArray, outputStartIndex, outputLength) => {
                 if (query.identifierToken !== node) return;
                 processValue(input.value);

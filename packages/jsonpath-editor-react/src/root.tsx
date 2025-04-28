@@ -10,7 +10,7 @@ export default function Root() {
     return (
         <JSONPathEditor
             value={value}
-            onValueChanged={setValue}
+            onValueChange={setValue}
             queryOptions={defaultQueryOptions}
             queryArgument={queryArgument}
             queryArgumentType={queryArgumentType} />

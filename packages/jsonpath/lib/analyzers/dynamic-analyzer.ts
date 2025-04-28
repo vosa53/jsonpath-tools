@@ -1,5 +1,5 @@
 import { Diagnostics, DiagnosticsSeverity } from "../diagnostics";
-import { QueryOptions } from "../options";
+import { QueryOptions } from "../query-options";
 import { QueryContext } from "../query/evaluation";
 import { Query } from "../query/query";
 import { Selector } from "../query/selectors/selector";
@@ -14,7 +14,7 @@ export class DynamicAnalyzer {
         /**
          * Query options.
          */
-        private readonly options: QueryOptions
+        private readonly queryOptions: QueryOptions
     ) { }
 
     /**
@@ -27,7 +27,7 @@ export class DynamicAnalyzer {
         const diagnosticsJSON = new Set<string>();
         const queryContext: QueryContext = {
             argument: queryArgument, 
-            options: this.options, 
+            options: this.queryOptions, 
             selectorInstrumentationCallback(s, i, oa, osi, ol) {
                 if (ol !== 0)
                     selectorsThatProducedOutput.add(s);

@@ -1,7 +1,7 @@
 import { DataTypeAnalyzer } from "../data-types/data-type-analyzer";
 import { DataType, DataTypeAnnotation } from "../data-types/data-types";
 import { getJSONType } from "../json/json-types";
-import { QueryOptions } from "../options";
+import { QueryOptions } from "../query-options";
 import { QueryContext } from "../query/evaluation";
 import { ComparisonExpression } from "../query/filter-expressions/comparison-expression";
 import { FilterExpression } from "../query/filter-expressions/filter-expression";
@@ -34,9 +34,9 @@ export class CompletionService {
         /**
          * Query options.
          */
-        private readonly options: QueryOptions
+        private readonly queryOptions: QueryOptions
     ) {
-        this.syntaxDescriptionProvider = new SyntaxDescriptionService(options);
+        this.syntaxDescriptionProvider = new SyntaxDescriptionService(queryOptions);
         this.analysisDescriptionProvider = new AnalysisDescriptionService();
     }
 
@@ -148,7 +148,7 @@ export class CompletionService {
     }
 
     private completeFunctions(completions: CompletionItem[], range: TextRange) {
-        for (const functionDefinition of Object.entries(this.options.functions)) {
+        for (const functionDefinition of Object.entries(this.queryOptions.functions)) {
             completions.push(new CompletionItem(
                 CompletionItemType.function,
                 functionDefinition[0],
@@ -162,7 +162,7 @@ export class CompletionService {
 
     private completeValues(completions: CompletionItem[], expression: FilterExpression, reference: FilterExpression, query: Query, queryArgument: JSONValue | undefined, queryArgumentType: DataType) {
         const range = expression.textRangeWithoutSkipped;
-        const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType, this.options);
+        const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType, this.queryOptions);
         const literals = queryArgument !== undefined
             ? this.getAllLiteralsOutputtedFromExpression(queryArgument, query, reference)
             : this.getAllLiteralsFromExpressionType(typeAnalyzer.getType(reference));
@@ -220,7 +220,7 @@ export class CompletionService {
     }
 
     private getIncomingType(segment: Segment, queryArgumentType: DataType): DataType {
-        const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType, this.options);
+        const typeAnalyzer = new DataTypeAnalyzer(queryArgumentType, this.queryOptions);
         return typeAnalyzer.getIncomingTypeToSegment(segment);
     }
 
@@ -260,7 +260,7 @@ export class CompletionService {
         const values: Node[] = [];
         const queryContext: QueryContext = {
             argument: queryArgument,
-            options: this.options,
+            options: this.queryOptions,
             segmentInstrumentationCallback(s, i) {
                 if (s === segment)
                     values.push(i);
@@ -274,7 +274,7 @@ export class CompletionService {
         const literals = new Set<string | number | boolean | null>();
         const queryContext: QueryContext = {
             argument: queryArgument,
-            options: this.options,
+            options: this.queryOptions,
             filterExpressionInstrumentationCallback: (fe, o) => {
                 if (fe === expression) {
                     const value = convertToValueType(o);

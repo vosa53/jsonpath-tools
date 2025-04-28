@@ -1,5 +1,5 @@
 import { Diagnostics } from "../diagnostics";
-import { QueryOptions } from "../options";
+import { QueryOptions } from "../query-options";
 import { FilterValue, isLogicalType, isNodesType, isValueType, LogicalFalse, LogicalTrue, LogicalType, NodesType, Nothing, Type, ValueType } from "../values/types";
 import { JSONValue } from "../json/json-types";
 import { FilterExpression } from "./filter-expressions/filter-expression";

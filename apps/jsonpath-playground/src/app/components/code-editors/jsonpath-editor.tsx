@@ -9,7 +9,7 @@ import { Diagnostics } from "@jsonpath-tools/jsonpath";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
 import { jsonpath } from "@jsonpath-tools/codemirror-lang-jsonpath";
 import { getQueryForTree } from "@jsonpath-tools/codemirror-lang-jsonpath";
-import { getResult, updateOptionsEffect, updateQueryArgumentEffect, updateQueryArgumentTypeEffect } from "@jsonpath-tools/codemirror-lang-jsonpath";
+import { getResult, updateQueryOptionsEffect, updateQueryArgumentEffect, updateQueryArgumentTypeEffect } from "@jsonpath-tools/codemirror-lang-jsonpath";
 import { LanguageService } from "@jsonpath-tools/codemirror-lang-jsonpath";
 import { TextRange } from "@jsonpath-tools/jsonpath";
 import { textRangeHighlighter, setHighlightedRangeEffect } from "./codemirror/text-range-highlighter";
@@ -51,7 +51,7 @@ export default function JSONPathEditor({
 
     useEffect(() => {
         if (editorViewRef.current !== null)
-            editorViewRef.current.dispatch({ effects: updateOptionsEffect.of(options) });
+            editorViewRef.current.dispatch({ effects: updateQueryOptionsEffect.of(options) });
     }, [options]);
 
     useEffect(() => {
@@ -105,7 +105,7 @@ export default function JSONPathEditor({
     const onEditorViewCreated = (view: EditorView) => {
         view.dispatch({
             effects: [
-                updateOptionsEffect.of(options),
+                updateQueryOptionsEffect.of(options),
                 updateQueryArgumentEffect.of(queryArgument),
                 updateQueryArgumentTypeEffect.of(queryArgumentType),
                 setHighlightedRangeEffect.of(highlightedRange)

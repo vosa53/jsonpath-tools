@@ -1,32 +1,32 @@
 .container {
+    --jpei-font-text: var(--jpe-font-text, "Segoe UI", Verdana, sans-serif);
+    --jpei-font-code: var(--jpe-font-code, "Cascadia Mono", consolas, monospace);
+    --jpei-color: var(--jpe-color, black);
     --jpei-background: var(--jpe-background, white);
     --jpei-background-code: var(--jpe-background-code, #e9ecef);
-    --jpei-color: var(--jpe-color, black);
     --jpei-border: var(--jpe-border, #ced4da);
-    --jpei-font-text: var(--jpe-font-text, "Segoe UI", Verdana);
-    --jpei-font-code: var(--jpe-font-code, "Cascadia Mono", consolas);
-    --jpei-hover: var(--jpe-hover, #f8f9fa);
+    --jpei-primary: var(--jpe-primary, #7950f2);
     --jpei-dimmed: var(--jpe-dimmed, #868e96);
+    --jpei-hover: var(--jpe-hover, #f8f9fa);
     --jpei-selection: var(--jpe-selection, #7950f233);
     --jpei-highlighted: var(--jpe-highlighted, #e6770033);
     --jpei-highlighted-match: var(--jpe-highlighted-match, #4dabf740);
-    --jpei-primary: var(--jpe-primary, #7950f2);
+    --jpei-line-current: var(--jpe-line-current, #f1f3f5);
     --jpei-diagnostics-error: var(--jpe-diagnostics-error, #fa5252);
     --jpei-diagnostics-warning: var(--jpe-diagnostics-warning, #fab005);
-    --jpei-line-current: var(--jpe-line-current, #f1f3f5);
 
     --jpei-code-keyword: var(--jpe-code-keyword, #228be6);
     --jpei-code-operator: var(--jpe-code-operator, #15aabf);
     --jpei-code-operator-control: var(--jpe-code-operator-control, #7950f2);
-    --jpei-code-variable: var(--jpe-code-variable, #e64980);
-    --jpei-code-number: var(--jpe-code-number, #12b886);
-    --jpei-code-class: var(--jpe-code-class, #fab005);
+    --jpei-code-type: var(--jpe-code-type, #40c057);
+    --jpei-code-name: var(--jpe-code-name, #4c6ef5);
+    --jpei-code-identifier: var(--jpe-code-identifier, #e64980);
+    --jpei-code-function: var(--jpe-code-function, #fab005);
     --jpei-code-string: var(--jpe-code-string, #fd7e14);
-    --jpei-code-property: var(--jpe-code-property, #4c6ef5);
+    --jpei-code-number: var(--jpe-code-number, #12b886);
+    --jpei-code-brace: var(--jpe-code-brace, #fab005);
     --jpei-code-bracket: var(--jpe-code-bracket, #be4bdb);
     --jpei-code-parenthesis: var(--jpe-code-parenthesis, #be4bdb);
-    --jpei-code-brace: var(--jpe-code-brace, #fab005);
-    --jpei-code-type: var(--jpe-code-type, #40c057);
 }
 
 .container {

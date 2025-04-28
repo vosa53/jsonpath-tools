@@ -1,4 +1,4 @@
-import { QueryOptions } from "../options";
+import { QueryOptions } from "../query-options";
 import { FunctionExpression } from "../query/filter-expressions/function-expression";
 import { Query } from "../query/query";
 import { SubQuery } from "../query/sub-query";
@@ -15,7 +15,7 @@ export class DocumentHighlightsService {
         /**
          * Query options.
          */
-        private readonly options: QueryOptions
+        private readonly queryOptions: QueryOptions
     ) { }
 
     /**
@@ -37,7 +37,7 @@ export class DocumentHighlightsService {
         const lastButOneNode = node.parent!;
 
         if (lastNode.type === SyntaxTreeType.nameToken && lastButOneNode instanceof FunctionExpression) {
-            if (Object.hasOwn(this.options.functions, lastButOneNode.name))
+            if (Object.hasOwn(this.queryOptions.functions, lastButOneNode.name))
                 this.highlightFunctions(query, lastButOneNode.name, documentHighlights);
         }
         if (lastNode.type === SyntaxTreeType.dollarToken && lastButOneNode.type === SyntaxTreeType.subQuery) {

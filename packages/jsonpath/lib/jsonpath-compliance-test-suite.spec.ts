@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import cts from "./jsonpath-compliance-test-suite/cts.json";
-import { defaultQueryOptions } from './options';
+import { defaultQueryOptions } from './query-options';
 import { jsonDeepEquals } from "./json/deep-equals";
 import { JSONValue } from './json/json-types';
 import { serializedNormalizedPath } from './serialization/serialization';

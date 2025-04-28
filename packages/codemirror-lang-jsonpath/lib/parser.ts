@@ -120,7 +120,7 @@ class CodeMirrorJSONPathParser extends Parser {
                 [SyntaxTreeType.falseToken]: t.bool,
                 [SyntaxTreeType.nullToken]: t.null,
                 [SyntaxTreeType.nameToken]: t.propertyName,
-                [SyntaxTreeType.functionExpression + "/" + SyntaxTreeType.nameToken]: t.className
+                [SyntaxTreeType.functionExpression + "/" + SyntaxTreeType.nameToken]: t.function(t.variableName)
             }),
             NodeProp.closedBy.add(NodeType.match({
                 [SyntaxTreeType.openingParanthesisToken]: [SyntaxTreeType.closingParanthesisToken],

@@ -14,7 +14,7 @@ export function core(): Extension {
     ];
 }
 
-export const updateOptionsEffect = StateEffect.define<QueryOptions>();
+export const updateQueryOptionsEffect = StateEffect.define<QueryOptions>();
 export const updateQueryArgumentEffect = StateEffect.define<JSONValue | undefined>();
 export const updateQueryArgumentTypeEffect = StateEffect.define<DataType>();
 export const languageServiceFacet = Facet.define<LanguageService>();
@@ -34,8 +34,8 @@ export const languageServiceSessionStateField = StateField.define<LanguageServic
         if (transaction.docChanged)
             languageServiceSession.updateQuery(transaction.newDoc.toString());
         for (const effect of transaction.effects) {
-            if (effect.is(updateOptionsEffect))
-                languageServiceSession.updateOptions(effect.value);
+            if (effect.is(updateQueryOptionsEffect))
+                languageServiceSession.updateQueryOptions(effect.value);
             else if (effect.is(updateQueryArgumentEffect))
                 languageServiceSession.updateQueryArgument(effect.value);
             else if (effect.is(updateQueryArgumentTypeEffect))

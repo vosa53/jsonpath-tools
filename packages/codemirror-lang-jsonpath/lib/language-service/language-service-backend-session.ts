@@ -2,7 +2,7 @@ import { CompletionItem } from "@jsonpath-tools/jsonpath";
 import { EditorService } from "@jsonpath-tools/jsonpath";
 import { Function, FunctionHandler } from "@jsonpath-tools/jsonpath";
 import { deserializeDataType } from "./data-type-serializer";
-import { DisconnectLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
+import { DisconnectLanguageServiceMessage, GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, UpdateQueryOptionsLanguageServiceMessage as UpdateQueryOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
 import { SimpleRPCTopic } from "./simple-rpc";
 import { logPerformance } from "../../../../shared/utils";
 
@@ -18,8 +18,8 @@ export class LanguageServiceBackendSession {
         private readonly resolveFunctionHandler: (functionName: string) => FunctionHandler
     ) { }
 
-    updateOptions(message: UpdateOptionsLanguageServiceMessage) {
-        const functions: [string, Function][] = Object.entries(message.newOptions.functions).map(([name, f]) => [
+    updateQueryOptions(message: UpdateQueryOptionsLanguageServiceMessage) {
+        const functions: [string, Function][] = Object.entries(message.newQueryOptions.functions).map(([name, f]) => [
             name,
             {
                 description: f.description,
@@ -37,7 +37,7 @@ export class LanguageServiceBackendSession {
         const newOptions = {
             functions: Object.fromEntries(functions)
         };
-        this.editorService.updateOptions(newOptions);
+        this.editorService.updateQueryOptions(newOptions);
     }
 
     updateQuery(message: UpdateQueryLanguageServiceMessage) {

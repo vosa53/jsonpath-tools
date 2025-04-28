@@ -4,7 +4,7 @@ import { testQueryOptions } from "../helpers/test-utils";
 import { Parser } from "../syntax-analysis/parser";
 import { TextRange } from "../text/text-range";
 import { DynamicAnalyzer } from "./dynamic-analyzer";
-import { QueryOptions } from "../options";
+import { QueryOptions } from "../query-options";
 import { AnyDataType } from "../data-types/data-types";
 import { FunctionContext } from "../functions/function";
 import { Type, FilterValue, LogicalTrue } from "../values/types";

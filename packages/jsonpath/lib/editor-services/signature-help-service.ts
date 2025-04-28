@@ -1,4 +1,4 @@
-import { QueryOptions } from "../options";
+import { QueryOptions } from "../query-options";
 import { FunctionExpression } from "../query/filter-expressions/function-expression";
 import { Query } from "../query/query";
 import { SyntaxTree } from "../query/syntax-tree";
@@ -12,7 +12,7 @@ export class SignatureHelpService {
         /**
          * Query options.
          */
-        private readonly options: QueryOptions
+        private readonly queryOptions: QueryOptions
     ) { }
 
     /**
@@ -31,7 +31,7 @@ export class SignatureHelpService {
         if (current === null) 
             return null;
         const functionExpression = current as FunctionExpression;
-        const functionDefinition = this.options.functions[functionExpression.name];
+        const functionDefinition = this.queryOptions.functions[functionExpression.name];
         if (functionDefinition === undefined)
             return null;
         

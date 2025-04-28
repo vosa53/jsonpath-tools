@@ -1,6 +1,6 @@
 import { AnyDataType } from "../data-types/data-types";
 import { Function, FunctionContext } from "../functions/function";
-import { QueryOptions } from "../options";
+import { QueryOptions } from "../query-options";
 import { Query } from "../query/query";
 import { Parser } from "../syntax-analysis/parser";
 import { Type, FilterValue, LogicalTrue } from "../values/types";

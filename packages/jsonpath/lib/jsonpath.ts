@@ -1,6 +1,6 @@
 import { JSONValue } from "./json/json-types";
 import { NodeList } from "./values/node-list";
-import { defaultQueryOptions, QueryOptions } from "./options";
+import { defaultQueryOptions, QueryOptions } from "./query-options";
 import { Query } from "./query/query";
 import { Checker } from "./semantic-analysis/checker";
 import { Parser } from "./syntax-analysis/parser";

@@ -27,7 +27,7 @@ export const jsonpathEditorTheme = EditorView.theme({
 
     // Tooltips.
     "& .cm-tooltip": { fontFamily: "var(--jpei-font-text)", backgroundColor: "var(--jpei-background)", color: "var(--jpei-font-color)", border: "solid 1px var(--jpei-border)", boxShadow: "0px 6px 29px -6px rgba(133,133,133,0.81)", borderRadius: "5px", padding: "10px" },
-    "& .cm-tooltip-section:not(:first-child)": { borderTop: "solid 1px var(--jpei-border)", paddingTop: "5px" },
+    "& .cm-tooltip-section:not(:first-child)": { borderTop: "solid 1px var(--jpei-border)", paddingTop: "5px", marginTop: "5px" },
 
     // Autocomplete.
     "& .cm-tooltip.cm-tooltip-autocomplete": {},

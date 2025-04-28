@@ -2,7 +2,7 @@ import { Diagnostics } from "@jsonpath-tools/jsonpath";
 import { QueryOptions } from "@jsonpath-tools/jsonpath";
 import { JSONValue } from "@jsonpath-tools/jsonpath";
 import { CancellationToken } from "../cancellation-token";
-import { GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, SerializableCompletionItem, SerializableJSONPathFunction, SerializableJSONPathOptions, UpdateOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage as UpdateQueryArgumentTypeLanguageServiceMessage, UpdateQueryLanguageServiceMessage } from "./language-service-messages";
+import { GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse, GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse, GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse, GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse, GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse, GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse, GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse, ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse, SerializableCompletionItem, SerializableFunction, SerializableQueryOptions, UpdateQueryOptionsLanguageServiceMessage, UpdateQueryArgumentLanguageServiceMessage, UpdateQueryArgumentTypeLanguageServiceMessage as UpdateQueryArgumentTypeLanguageServiceMessage, UpdateQueryLanguageServiceMessage, LanguageServiceMessageID } from "./language-service-messages";
 import { SimpleRPCTopic } from "./simple-rpc";
 import { Signature } from "@jsonpath-tools/jsonpath";
 import { Tooltip } from "@jsonpath-tools/jsonpath";
@@ -21,8 +21,8 @@ export class LanguageServiceSession {
 
     constructor(readonly rpcTopic: SimpleRPCTopic) { }
 
-    updateOptions(newOptions: QueryOptions) {
-        const serializableFunctions: [string, SerializableJSONPathFunction][] = Object.entries(newOptions.functions).map(([name, f]) => [
+    updateQueryOptions(newQueryOptions: QueryOptions) {
+        const serializableFunctions: [string, SerializableFunction][] = Object.entries(newQueryOptions.functions).map(([name, f]) => [
             name,
             {
                 description: f.description,
@@ -36,92 +36,92 @@ export class LanguageServiceSession {
                 returnDataType: serializeDataType(f.returnDataType)
             }
         ]);
-        const serializableNewOptions: SerializableJSONPathOptions = {
+        const serializableNewOptions: SerializableQueryOptions = {
             functions: Object.fromEntries(serializableFunctions)
         };
 
         this.cancelQueue();
-        this.rpcTopic.sendNotification<UpdateOptionsLanguageServiceMessage>("updateOptions", {
-            newOptions: serializableNewOptions
+        this.rpcTopic.sendNotification<UpdateQueryOptionsLanguageServiceMessage>(LanguageServiceMessageID.updateQueryOptions, {
+            newQueryOptions: serializableNewOptions
         });
     }
 
     updateQuery(newQuery: string) {
         this.cancelQueue();
-        this.rpcTopic.sendNotification<UpdateQueryLanguageServiceMessage>("updateQuery", {
+        this.rpcTopic.sendNotification<UpdateQueryLanguageServiceMessage>(LanguageServiceMessageID.updateQuery, {
             newQuery: newQuery
         });
     }
 
     updateQueryArgument(newQueryArgument: JSONValue | undefined) {
         this.cancelQueue();
-        this.rpcTopic.sendNotification<UpdateQueryArgumentLanguageServiceMessage>("updateQueryArgument", {
+        this.rpcTopic.sendNotification<UpdateQueryArgumentLanguageServiceMessage>(LanguageServiceMessageID.updateQueryArgument, {
             newQueryArgument: newQueryArgument
         });
     }
 
     updateQueryArgumentType(newQueryArgumentType: DataType) {
         this.cancelQueue();
-        this.rpcTopic.sendNotification<UpdateQueryArgumentTypeLanguageServiceMessage>("updateQueryArgumentType", {
+        this.rpcTopic.sendNotification<UpdateQueryArgumentTypeLanguageServiceMessage>(LanguageServiceMessageID.updateQueryArgumentType, {
             newQueryArgumentTypeSerialized: serializeDataType(newQueryArgumentType)
         });
     }
 
     async getCompletions(position: number): Promise<readonly SerializableCompletionItem[]> {
-        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse>("getCompletions", {
+        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetCompletionsLanguageServiceMessage, GetCompletionsLanguageServiceMessageResponse>(LanguageServiceMessageID.getCompletions, {
             position: position
         }), this.cancellationToken);
         return response.completions;
     }
 
     async resolveCompletion(index: number): Promise<string> {
-        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse>("resolveCompletion", {
+        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<ResolveCompletionLanguageServiceMessage, ResolveCompletionLanguageServiceMessageResponse>(LanguageServiceMessageID.resolveCompletion, {
             index: index
         }), this.cancellationToken);
         return response.description;
     }
 
     async getSignature(position: number): Promise<Signature | null> {
-        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse>("getSignature", {
+        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetSignatureLanguageServiceMessage, GetSignatureLanguageServiceMessageResponse>(LanguageServiceMessageID.getSignature, {
             position: position
         }), this.cancellationToken);
         return response.signature;
     }
 
     async getDocumentHighlights(position: number): Promise<DocumentHighlight[]> {
-        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse>("getDocumentHighlights", {
+        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetDocumentHighlightsLanguageServiceMessage, GetDocumentHighlightsLanguageServiceMessageResponse>(LanguageServiceMessageID.getDocumentHighlights, {
             position: position
         }), this.cancellationToken);
         return response.documentHighlights;
     }
 
     async getTooltip(position: number): Promise<Tooltip | null> {
-        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse>("getTooltip", {
+        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetTooltipLanguageServiceMessage, GetTooltipLanguageServiceMessageResponse>(LanguageServiceMessageID.getTooltip, {
             position: position
         }), this.cancellationToken);
         return response.tooltip;
     }
 
     async getDiagnostics(): Promise<readonly Diagnostics[]> {
-        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse>("getDiagnostics", {
+        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetDiagnosticsLanguageServiceMessage, GetDiagnosticsLanguageServiceMessageResponse>(LanguageServiceMessageID.getDiagnostics, {
         }), this.cancellationToken);
         return response.diagnostics;
     }
 
     async getFormattingEdits(): Promise<readonly TextChange[]> {
-        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse>("getFormattingEdits", {
+        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetFormattingEditsLanguageServiceMessage, GetFormattingEditsLanguageServiceMessageResponse>(LanguageServiceMessageID.getFormattingEdits, {
         }), this.cancellationToken);
         return response.formattingEdits;
     }
 
     async getResult(): Promise<{ nodes: readonly JSONValue[], paths: readonly NormalizedPath[] }> {
-        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse>("getResult", {
+        const response = await this.runInCancellableQueue(() => this.rpcTopic.sendRequest<GetResultLanguageServiceMessage, GetResultLanguageServiceMessageResponse>(LanguageServiceMessageID.getResult, {
         }), this.cancellationToken);
         return response;
     }
 
     dispose() {
-        this.rpcTopic.sendNotification("disconnect", null);
+        this.rpcTopic.sendNotification(LanguageServiceMessageID.disconnect, null);
         this.rpcTopic.dispose();
     }
 

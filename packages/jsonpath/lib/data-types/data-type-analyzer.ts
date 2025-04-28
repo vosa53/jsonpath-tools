@@ -21,7 +21,7 @@ import { DataType, LiteralDataType, PrimitiveDataType, PrimitiveDataTypeType, An
 import { intersectTypes, subtractTypes, isSubtypeOf, isEquvivalentTypeWith } from "./operations";
 import { SliceSelector } from "../query/selectors/slice-selector";
 import { FunctionExpression } from "../query/filter-expressions/function-expression";
-import { QueryOptions } from "../options";
+import { QueryOptions } from "../query-options";
 import { ParanthesisExpression } from "../query/filter-expressions/paranthesis-expression";
 import { MissingSelector } from "../query/selectors/missing-selector";
 import { MissingExpression } from "../query/filter-expressions/missing-expression";
@@ -41,7 +41,7 @@ export class DataTypeAnalyzer {
         /**
          * Query options.
          */
-        private readonly options: QueryOptions
+        private readonly queryOptions: QueryOptions
     ) { }
 
     /**
@@ -153,7 +153,7 @@ export class DataTypeAnalyzer {
     }
 
     private getFunctionType(functionExpression: FunctionExpression): DataType {
-        const functionDefinition = this.options.functions[functionExpression.name];
+        const functionDefinition = this.queryOptions.functions[functionExpression.name];
         if (functionDefinition === undefined)
             return NeverDataType.create();
         return functionDefinition.returnDataType;
