@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  deployments: write
   pages: write
   id-token: write
 
@@ -77,6 +78,14 @@ jobs:
         with:
           name: jsonpath-playground-build
           path: apps/jsonpath-playground/dist/
-      - name: Deploy to GitHub Pages
+      - name: Deploy @jsonpath-tools/jsonpath-playground to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{secrets.CLOUDFLARE_API_TOKEN}}
+          accountId: ${{secrets.CLOUDFLARE_ACCOUNT_ID}}
+          projectName: jsonpath-playground
+          directory: apps/jsonpath-playground/dist/
+          gitHubToken: ${{secrets.GITHUB_TOKEN}}
+      - name: Deploy @jsonpath-tools/documentation to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
