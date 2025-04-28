@@ -1,8 +1,9 @@
-import { Diagnostics, DiagnosticsSeverity } from "@jsonpath-tools/jsonpath";
+import { DiagnosticsSeverity } from "@jsonpath-tools/jsonpath";
 import { Checkbox, DefaultMantineColor, Group, Table, ThemeIcon } from "@mantine/core";
 import { IconAlertTriangleFilled, IconExclamationCircleFilled } from "@tabler/icons-react";
 import { memo, ReactNode, useMemo, useState } from "react";
 import PanelShell from "../panel-shell";
+import { CustomDiagnostics } from "../../models/custom-diagnostics";
 
 /**
  * Panel displaying JSONPath query diagnostics.
@@ -11,8 +12,8 @@ const DiagnosticsPanel = memo(({
     diagnostics,
     onSelectedDiagnosticsChanged
 }: {
-    diagnostics: readonly Diagnostics[],
-    onSelectedDiagnosticsChanged: (diagnostics: Diagnostics | null) => void
+    diagnostics: readonly CustomDiagnostics[],
+    onSelectedDiagnosticsChanged: (diagnostics: CustomDiagnostics | null) => void
 }) => {
     const [filters, setFilters] = useState<DiagnosticsFilters>({ showErrors: true, showWarnings: true });
     const {filteredDiagnostics, errorCount, warningCount} = useMemo(() => {
@@ -54,8 +55,8 @@ function DiagnosticsView({
     diagnostics,
     onSelectedDiagnosticsChanged
 }: { 
-    diagnostics: readonly Diagnostics[],
-    onSelectedDiagnosticsChanged: (diagnostics: Diagnostics | null) => void
+    diagnostics: readonly CustomDiagnostics[],
+    onSelectedDiagnosticsChanged: (diagnostics: CustomDiagnostics | null) => void
 }) {
     return (
         <Table>
@@ -65,6 +66,7 @@ function DiagnosticsView({
                     <Table.Th>Message</Table.Th>
                     <Table.Th>Line</Table.Th>
                     <Table.Th>Column</Table.Th>
+                    <Table.Th>Length</Table.Th>
                 </Table.Tr>
             </Table.Thead>
             <Table.Tbody>{diagnostics.map((d, i) => (
@@ -73,7 +75,8 @@ function DiagnosticsView({
                         <DiagnosticsIcon diagnosticsSeverity={d.severity} />
                     </Table.Td>
                     <Table.Td>{d.message}</Table.Td>
-                    <Table.Td>{d.textRange.position}</Table.Td>
+                    <Table.Td>{d.line}</Table.Td>
+                    <Table.Td>{d.column}</Table.Td>
                     <Table.Td>{d.textRange.length}</Table.Td>
                 </Table.Tr>
             ))}</Table.Tbody>

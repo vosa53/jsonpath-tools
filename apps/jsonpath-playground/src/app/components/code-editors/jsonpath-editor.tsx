@@ -16,6 +16,7 @@ import { textRangeHighlighter, setHighlightedRangeEffect } from "./codemirror/te
 import { AnyDataType, DataType } from "@jsonpath-tools/jsonpath";
 import { NormalizedPath } from "@jsonpath-tools/jsonpath";
 import { applicationHighlightStyle } from "./codemirror/application-highlight-style";
+import { CustomDiagnostics } from "../../models/custom-diagnostics";
 
 /**
  * JSONPath editor component.
@@ -43,7 +44,7 @@ export default function JSONPathEditor({
     readonly?: boolean,
     onValueChanged: (value: string) => void,
     onParsed?: (jsonPath: Query) => void,
-    onDiagnosticsCreated?: (diagnostics: readonly Diagnostics[]) => void,
+    onDiagnosticsCreated?: (diagnostics: readonly CustomDiagnostics[]) => void,
     onGetResultAvailable?: (getResult: () => Promise<{ nodes: readonly JSONValue[], paths: readonly NormalizedPath[] }>) => void,
     onRun?: () => void
 }) {
@@ -77,7 +78,13 @@ export default function JSONPathEditor({
             jsonpath({
                 languageService,
                 codeHighlighter: applicationHighlightStyle,
-                onDiagnosticsCreated
+                onDiagnosticsCreated: diagnotics => {
+                    const customDiagnostics = diagnotics.map(d => {
+                        const line = editorViewRef.current!.state.doc.lineAt(d.textRange.position)!;
+                        return new CustomDiagnostics(d.severity, d.message, d.textRange, line.number, d.textRange.position - line.from + 1);
+                    });
+                    onDiagnosticsCreated?.(customDiagnostics);
+                }
             }),
             textRangeHighlighter(),
             EditorView.theme({

@@ -25,6 +25,7 @@ import { JSONPatch, applyJSONPatch } from "./services/json-patch";
 import { examples } from "./models/examples";
 import { normalizedPathToJSONPointer } from "./services/json-pointer";
 import { logPerformance } from "../../../../shared/utils";
+import { CustomDiagnostics } from "./models/custom-diagnostics";
 
 interface State {
     customFunctions: readonly CustomFunction[];
@@ -120,7 +121,7 @@ export function usePageViewModel() {
         return logPerformance("Stringify result paths", () => JSON.stringify(resultPathsTransformed, undefined, 4));
     }, [resultPaths, pathType]);
     const [currentResultPathIndex, setCurrentResultPathIndex] = useState<number>(0);
-    const [diagnostics, setDiagnostics] = useState<readonly Diagnostics[]>([]);
+    const [diagnostics, setDiagnostics] = useState<readonly CustomDiagnostics[]>([]);
     const [highlightedRange, setHighlightedRange] = useState<TextRange | null>(null);
     const getResultRef = useRef<() => Promise<{ nodes: readonly JSONValue[], paths: readonly NormalizedPath[] }>>(null);
     const resultTimeoutRef = useRef<number | null>(null);
@@ -167,7 +168,7 @@ export function usePageViewModel() {
         setCurrentResultPathIndex(currentResultPathIndex);
     }, []);
 
-    const onDiagnosticsPublished = useCallback((diagnostics: readonly Diagnostics[]) => {
+    const onDiagnosticsPublished = useCallback((diagnostics: readonly CustomDiagnostics[]) => {
         setDiagnostics(diagnostics);
     }, []);
 
@@ -175,7 +176,7 @@ export function usePageViewModel() {
         getResultRef.current = getResult;
     }, []);
 
-    const onSelectedDiagnosticsChanged = useCallback((diagnostics: Diagnostics | null) => {
+    const onSelectedDiagnosticsChanged = useCallback((diagnostics: CustomDiagnostics | null) => {
         setHighlightedRange(diagnostics === null ? null : diagnostics.textRange);
     }, []);
 
