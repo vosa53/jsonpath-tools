@@ -65,6 +65,8 @@ export function usePageViewModel() {
     const [pathType, setPathType] = useState<PathType>(PathType.normalizedPath);
     const [query, setQuery] = useState<Query>(testQuery);
     const [queryArgument, queryArgumentError] = useMemo<[JSONValue | undefined, string | null]>(() => {
+        if (queryArgumentText.trim() === "")
+            return [undefined, null];
         try {
             return [logPerformance("Parse query argument", () => JSON.parse(queryArgumentText)), null];
         }
@@ -77,6 +79,8 @@ export function usePageViewModel() {
         const jsonText = queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema
             ? queryArgumentTypeRaw.jsonSchemaText
             : queryArgumentTypeRaw.jsonTypeDefinitionText;
+        if (jsonText.trim() === "")
+            return [AnyDataType.create(), null];
         try {
             json = logPerformance("Parse query argument type raw", () => JSON.parse(jsonText));
         }
