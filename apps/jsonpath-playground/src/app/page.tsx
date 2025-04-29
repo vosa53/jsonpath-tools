@@ -50,7 +50,7 @@ export default function Page() {
                     <Flex w="100%" style={{ background: "var(--mantine-color-body)" }}>
                         <JSONPathEditor
                             value={viewModel.queryText}
-                            options={viewModel.options}
+                            options={viewModel.queryOptions}
                             queryArgument={viewModel.queryArgument}
                             queryArgumentType={viewModel.queryArgumentType}
                             highlightedRange={viewModel.highlightedRange}

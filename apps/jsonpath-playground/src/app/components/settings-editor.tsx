@@ -14,13 +14,13 @@ export default function SettingsEditor({
     return (
         <Stack>
             <Switch
-                defaultChecked
                 label="Auto Run"
+                checked={settings.autoRun}
                 onChange={e => onSettingsChanged({ ...settings, autoRun: e.currentTarget.checked })}
             />
             <Switch
-                defaultChecked
-                label="Auto Save (TODO)"
+                label="Auto Save"
+                checked={settings.autoSave}
                 onChange={e => onSettingsChanged({ ...settings, autoSave: e.currentTarget.checked })}
             />
         </Stack>

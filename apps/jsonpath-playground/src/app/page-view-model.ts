@@ -1,4 +1,4 @@
-import { JSONPath } from "@jsonpath-tools/jsonpath";
+import { Parser } from "@jsonpath-tools/jsonpath";
 import { Query } from "@jsonpath-tools/jsonpath";
 import { removeAtPaths, replaceAtPaths } from "@jsonpath-tools/jsonpath";
 import { serializedNormalizedPath } from "@jsonpath-tools/jsonpath";
@@ -22,30 +22,21 @@ import { DataTypeRaw, DataTypeRawFormat } from "./models/data-type-raw";
 import { jsonTypeDefinitionToType } from "@jsonpath-tools/jsonpath";
 import { isValidJSONSchema, isValidJSONTypeDefinition } from "./services/json-schema";
 import { JSONPatch, applyJSONPatch } from "./services/json-patch";
-import { examples } from "./models/examples";
 import { normalizedPathToJSONPointer } from "./services/json-pointer";
 import { logPerformance } from "../../../../shared/utils";
 import { CustomDiagnostics } from "./models/custom-diagnostics";
-
-/*interface State {
-    customFunctions: readonly CustomFunction[];
-    settings: Settings;
-    queryText: string;
-    queryArgumentText: string;
-    operation: Operation;
-    pathType: PathType;
-}*/
+import { loadApplicationState, saveApplicationState } from "./services/application-state";
 
 /**
  * ViewModel of the application main page.
  */
 export function usePageViewModel() {
-    const [customFunctions, setCustomFunctions] = useState<readonly CustomFunction[]>([]);
-    const [settings, setSettings] = useState<Settings>(testSettings);
-    const [queryText, setQueryText] = useState<string>(testQueryText);
-    const [queryArgumentText, setQueryArgumentText] = useState<string>(examples[0].jsonText);
-    const [queryArgumentTypeRaw, setQueryArgumentTypeRaw] = useState<DataTypeRaw>(testQueryArgumentTypeRaw);
-    const [operation, setOperation] = useState<Operation>(testOperation);
+    const [customFunctions, setCustomFunctions] = useState<readonly CustomFunction[]>(initialApplicationState.customFunctions);
+    const [settings, setSettings] = useState<Settings>(initialApplicationState.settings);
+    const [queryText, setQueryText] = useState<string>(initialApplicationState.queryText);
+    const [queryArgumentText, setQueryArgumentText] = useState<string>(initialApplicationState.queryArgumentText);
+    const [queryArgumentTypeRaw, setQueryArgumentTypeRaw] = useState<DataTypeRaw>(initialApplicationState.queryArgumentTypeRaw);
+    const [operation, setOperation] = useState<Operation>(initialApplicationState.operation);
     const operationReplacementJSONValue = useMemo<JSONValue | undefined>(() => {
         try {
             return JSON.parse(operation.replacement.jsonValueText);
@@ -62,8 +53,8 @@ export function usePageViewModel() {
             return undefined;
         }
     }, [operation.replacement.jsonPatchText]);
-    const [pathType, setPathType] = useState<PathType>(PathType.normalizedPath);
-    const [query, setQuery] = useState<Query>(testQuery);
+    const [pathType, setPathType] = useState<PathType>(initialApplicationState.pathType);
+    const [query, setQuery] = useState<Query>(initialQuery);
     const [queryArgument, queryArgumentError] = useMemo<[JSONValue | undefined, string | null]>(() => {
         if (queryArgumentText.trim() === "")
             return [undefined, null];
@@ -97,7 +88,8 @@ export function usePageViewModel() {
             else return [jsonTypeDefinitionToType(json), null];
         }
     }, [queryArgumentTypeRaw]);
-    const options = useMemo<QueryOptions>(() => {
+    const queryOptions = useMemo<QueryOptions>(() => {
+        console.log(customFunctions);
         return {
             ...defaultQueryOptions,
             functions: {
@@ -129,14 +121,11 @@ export function usePageViewModel() {
     const [highlightedRange, setHighlightedRange] = useState<TextRange | null>(null);
     const getResultRef = useRef<() => Promise<{ nodes: readonly JSONValue[], paths: readonly NormalizedPath[] }>>(null);
     const resultTimeoutRef = useRef<number | null>(null);
+    const saveTimeoutRef = useRef<number | null>(null);
+    const lastAutoSave = useRef<boolean>(initialApplicationState.settings.autoSave);
 
     const onCustomFunctionsChanged = useCallback((customFunctions: readonly CustomFunction[]) => {
-        const customFunctionsForWorker = customFunctions.map(f => ({
-            name: f.name,
-            parameterNames: f.parameters.map(p => p.name),
-            code: f.code
-        } as CustomLanguageServiceFunction));
-        worker.postMessage({ type: "updateCustomFunctions", customFunctions: customFunctionsForWorker } as CustomLanguageServiceWorkerMessage);
+        sendCustomFunctionsToWorker(customFunctions);
         setCustomFunctions(customFunctions);
     }, []);
 
@@ -201,6 +190,15 @@ export function usePageViewModel() {
         }, 500);
     }, [queryText, queryArgument, settings.autoRun]);
 
+    useEffect(() => {
+        if (!settings.autoSave && !lastAutoSave.current) return;
+        if (saveTimeoutRef.current !== null) window.clearTimeout(saveTimeoutRef.current);
+        saveTimeoutRef.current = window.setTimeout(() => {
+            saveApplicationState({ customFunctions, settings, queryText, queryArgumentText, queryArgumentTypeRaw, operation, pathType });
+            lastAutoSave.current = settings.autoSave;
+        }, 5000);
+    }, [customFunctions, settings, queryText, queryArgumentText, queryArgumentTypeRaw, operation, pathType]);
+
     async function run() {
         try {
             const result = await getResultRef.current!();
@@ -240,7 +238,7 @@ export function usePageViewModel() {
         queryArgumentType,
         queryArgumentError,
         queryArgumentTypeError,
-        options,
+        queryOptions,
         resultPaths,
         resultText,
         resultPathsText,
@@ -250,27 +248,6 @@ export function usePageViewModel() {
         languageService
     };
 }
-
-const testQueryArgumentTypeRaw: DataTypeRaw = {
-    format: DataTypeRawFormat.jsonSchema,
-    jsonSchemaText: examples[0].jsonSchemaText,
-    jsonTypeDefinitionText: examples[0].jsonTypeDefinitionText
-};
-
-const testSettings: Settings = {
-    autoRun: true,
-    autoSave: true
-};
-const testOperation: Operation = {
-    type: OperationType.select,
-    replacement: {
-        type: OperationReplacementType.jsonValue,
-        jsonValueText: "{}",
-        jsonPatchText: "[]"
-    }
-};
-const testQueryText = `$..inventory[?@.features[?@ == "Bluetooth"] && match(@.make, "[tT].+")]`;
-const testQuery = JSONPath.parse(testQueryText);
 
 function executeOperation(
     operation: Operation,
@@ -294,6 +271,18 @@ function executeOperation(
         throw new Error(`Unknown operation type: ${operation.type}.`);
 }
 
+function sendCustomFunctionsToWorker(customFunctions: readonly CustomFunction[]) {
+    const customFunctionsForWorker = customFunctions.map(f => ({
+        name: f.name,
+        parameterNames: f.parameters.map(p => p.name),
+        code: f.code
+    } as CustomLanguageServiceFunction));
+    worker.postMessage({ type: "updateCustomFunctions", customFunctions: customFunctionsForWorker } as CustomLanguageServiceWorkerMessage);
+}
+
+const initialApplicationState = loadApplicationState();
+const initialQuery = new Parser().parse(initialApplicationState.queryText);
+
 const worker = new Worker(new URL("./services/language-service/custom-language-service-worker.ts", import.meta.url), { type: "module" });
 const languageService = new LanguageService(data => worker.postMessage({ type: "languageServiceData", data } as CustomLanguageServiceWorkerMessage));
 worker.addEventListener("message", e => {
@@ -303,3 +292,4 @@ worker.addEventListener("message", e => {
     else
         throw new Error(`Unexpected message type.`);
 });
+sendCustomFunctionsToWorker(initialApplicationState.customFunctions);
