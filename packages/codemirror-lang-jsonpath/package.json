@@ -1,6 +1,6 @@
 {
     "name": "@jsonpath-tools/codemirror-lang-jsonpath",
-    "version": "0.3.3-alpha",
+    "version": "0.3.4-alpha",
     "author": "Jan Jörka",
     "license": "MIT",
     "description": "",
@@ -34,7 +34,7 @@
         "@codemirror/lint": "^6.0.1",
         "@codemirror/state": "^6.0.1",
         "@codemirror/view": "^6.0.1",
-        "@jsonpath-tools/jsonpath": "^0.3.3-alpha",
+        "@jsonpath-tools/jsonpath": "^0.3.4-alpha",
         "@lezer/common": "^1.0.0",
         "@lezer/lr": "^1.0.0",
         "@lezer/highlight": "^1.0.0",

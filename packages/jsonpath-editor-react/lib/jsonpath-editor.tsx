@@ -10,6 +10,7 @@ import { AnyDataType, DataType, defaultQueryOptions, JSONValue, QueryOptions } f
 import { CSSProperties, useEffect, useRef } from "react";
 import { jsonpathEditorHighlightStyle } from "./jsonpath-editor-highlight-style";
 import { jsonpathEditorTheme } from "./jsonpath-editor-theme";
+// @ts-ignore
 import classes from "./jsonpath-editor.module.css";
 
 /**

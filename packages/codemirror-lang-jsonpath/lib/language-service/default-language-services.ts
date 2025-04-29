@@ -1,6 +1,8 @@
 import { JSONValue } from "@jsonpath-tools/jsonpath";
 import { LanguageService } from "./language-service";
 import { LanguageServiceBackend } from "./language-service-backend";
+// @ts-ignore
+import LanguageServiceWorker from "./language-service-worker?worker&inline";
 
 /**
  * Default language services.
@@ -40,7 +42,10 @@ export class DefaultLanguageServices {
     }
     
     private static createWorkerLanguageService(): LanguageService {
-        const worker = new Worker(new URL("./language-service-worker.ts", import.meta.url), { type: "module" });
+        const worker = new LanguageServiceWorker() as Worker;
+        // The following is better, because it generates the worker in a sepearate file. 
+        // But problem is that it is difficult for library consumers to properly bundle it.
+        //const worker = new Worker(new URL("./language-service-worker.ts", import.meta.url), { type: "module" });
         const languageService = new LanguageService(data => worker.postMessage(data));
         worker.addEventListener("message", e => languageService.receiveFromBackend(e.data));
         return languageService;
