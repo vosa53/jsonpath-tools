@@ -4,6 +4,13 @@
         "packages/*",
         "apps/*"
     ],
+    "devDependencies": {
+        "@eslint/js": "^9.21.0",
+        "eslint": "^9.21.0",
+        "eslint-plugin-react-hooks": "^5.1.0",
+        "eslint-plugin-react-refresh": "^0.4.19",
+        "typescript-eslint": "^8.24.1"
+    },
     "scripts": {
         "lint": "eslint packages/*/lib/**/*.{ts,tsx} apps/jsonpath-playground/src/**/*.{ts,tsx}"
     },
