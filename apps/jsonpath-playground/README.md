@@ -2,4 +2,4 @@
 
 [JSONPath Playground](https://jsonpath-playground.pages.dev)
 
-JSONPath playground.
+JSONPath (RFC 9535) playground.

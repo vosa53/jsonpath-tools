@@ -1,9 +1,9 @@
 {
     "name": "@jsonpath-tools/codemirror-lang-jsonpath",
-    "version": "0.3.4-alpha",
+    "version": "0.3.5-alpha",
     "author": "Jan Jörka",
     "license": "MIT",
-    "description": "",
+    "description": "JSONPath (RFC 9535) language support for CodeMirror editor.",
     "homepage": "https://vosa53.github.io/jsonpath-tools",
     "repository": {
         "type": "git",

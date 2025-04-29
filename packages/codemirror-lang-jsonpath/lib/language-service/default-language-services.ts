@@ -1,7 +1,6 @@
 import { JSONValue } from "@jsonpath-tools/jsonpath";
 import { LanguageService } from "./language-service";
 import { LanguageServiceBackend } from "./language-service-backend";
-// @ts-ignore
 import LanguageServiceWorker from "./language-service-worker?worker&inline";
 
 /**

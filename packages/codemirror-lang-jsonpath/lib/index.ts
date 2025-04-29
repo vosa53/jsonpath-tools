@@ -1,5 +1,5 @@
 /**
- * JSONPath language support for CodeMirror editor.
+ * JSONPath (RFC 9535) language support for CodeMirror editor.
  * @module @jsonpath-tools/codemirror-lang-jsonpath
  */
 

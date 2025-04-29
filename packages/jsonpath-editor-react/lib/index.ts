@@ -1,5 +1,5 @@
 /**
- * React JSONPath editor component.
+ * Advanced JSONPath (RFC 9535) editor for React.
  * @module @jsonpath-tools/jsonpath-editor-react
  */
 

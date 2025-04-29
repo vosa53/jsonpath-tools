@@ -2,4 +2,4 @@
 
 [Documentation](https://vosa53.github.io/jsonpath-tools/)
 
-JSONPath Tools documentation.
+Documentation for JSONPath Tools.
