@@ -1,6 +1,6 @@
 {
     "name": "@jsonpath-tools/jsonpath-editor-react",
-    "version": "0.3.0-alpha",
+    "version": "0.3.1-alpha",
     "author": "Jan Jörka",
     "license": "MIT",
     "description": "",
@@ -12,6 +12,10 @@
     },
     "type": "module",
     "main": "dist/index.js",
+    "exports": {
+        "import": "./dist/index.js",
+        "types": "./dist/index.d.ts"
+    },
     "types": "dist/index.d.ts",
     "files": [
         "dist"
