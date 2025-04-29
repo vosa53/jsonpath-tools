@@ -1,5 +1,5 @@
 import { Accordion, Anchor, Divider, Flex, Text } from "@mantine/core";
-import { IconHelp, IconMathFunction, IconSettings } from "@tabler/icons-react";
+import { IconHelp, IconMathFunction, IconPackage, IconSettings } from "@tabler/icons-react";
 import { memo } from "react";
 import { CustomFunction } from "../models/custom-function";
 import { Settings } from "../models/settings";
@@ -8,12 +8,12 @@ import SettingsEditor from "./settings-editor";
 import { MarkdownView } from "./markdown-view";
 import jsonPathGuide from "./jsonpath-guide.md?raw";
 import applicationGuide from "./application-guide.md?raw";
-import classes from "./navbar.module.css";
+import classes from "./sidebar.module.css";
 
 /**
  * Application side navigation.
  */
-const Navbar = memo(({
+const Sidebar = memo(({
     customFunctions,
     settings,
     onCustomFunctionsChanged,
@@ -64,8 +64,10 @@ const Navbar = memo(({
                 </Accordion.Item>
             </Accordion>
             <Divider mt="auto" />
-            <Text p="xs" c="dimmed">The editor component and parser are also available as standalone <Anchor href="https://vosa53.github.io/jsonpath-tools" target="_blank">libraries</Anchor>.</Text>
+            <Text p="xs" c="dimmed"><IconPackage size={14} /> The editor component and parser are also available as standalone <Anchor href="https://vosa53.github.io/jsonpath-tools" target="_blank">libraries</Anchor>.</Text>
+            <Divider />
+            <Text p="xs" c="dimmed" size="xs">Version: {JSONPATH_TOOLS_VERSION}</Text>
         </Flex>
     );
 });
-export default Navbar;
+export default Sidebar;

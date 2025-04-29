@@ -21,5 +21,8 @@ export default defineConfig({
         alias: [
             { find: "@tabler/icons-react", replacement: "@tabler/icons-react/dist/esm/icons/index.mjs" }
         ]
+    },
+    define: {
+        JSONPATH_TOOLS_VERSION: JSON.stringify(process.env.npm_package_version)
     }
 })

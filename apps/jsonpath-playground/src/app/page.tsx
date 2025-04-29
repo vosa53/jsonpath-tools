@@ -4,7 +4,7 @@ import { IconBraces, IconEqual, IconExclamationCircle, IconListTree, IconPlayerP
 import { useMemo, useState } from "react";
 import JSONPathEditor from "./components/code-editors/jsonpath-editor";
 import Header from "./components/header";
-import Navbar from "./components/navbar";
+import Sidebar from "./components/sidebar";
 import DiagnosticsPanel from "./components/panels/diagnostics-panel";
 import JSONPanel from "./components/panels/json-panel";
 import OutlinePanel from "./components/panels/outline-panel";
@@ -38,7 +38,7 @@ export default function Page() {
             </AppShell.Header>
 
             <AppShell.Navbar className={classes.navbar}>
-                <Navbar
+                <Sidebar
                     customFunctions={viewModel.customFunctions}
                     settings={viewModel.settings}
                     onCustomFunctionsChanged={viewModel.onCustomFunctionsChanged}
