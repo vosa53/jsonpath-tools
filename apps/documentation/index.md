@@ -7,8 +7,8 @@ hero:
   tagline: Tools for JSONPath query language
   actions:
     - theme: brand
-      text: Evaluator Quickstart
-      link: /documentation/evaluator/get-started
+      text: Evaluation Quickstart
+      link: /documentation/core/get-started
     - theme: brand
       text: Editor Quickstart
       link: /documentation/editor/get-started
@@ -20,7 +20,7 @@ hero:
       link: /api
 
 features:
-  - title: Query Evaluator
+  - title: Query Evaluation
     details: Use JSONPath to select, replace or remove JSON data.
   - title: Advanced Editor
     details: JSONPath editor available as a React component or a CodeMirror extension.

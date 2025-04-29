@@ -5,7 +5,6 @@ import { syntaxTree } from "@codemirror/language";
 import { EditorView, keymap } from "@codemirror/view";
 import { Prec } from "@codemirror/state";
 import { useEffect, useRef } from "react";
-import { Diagnostics } from "@jsonpath-tools/jsonpath";
 import CodeMirrorEditor from "./codemirror/codemirror-editor";
 import { jsonpath } from "@jsonpath-tools/codemirror-lang-jsonpath";
 import { getQueryForTree } from "@jsonpath-tools/codemirror-lang-jsonpath";

@@ -1,4 +1,4 @@
-# CodeMirror extension
+# CodeMirror Extension
 
 ## Installation
 

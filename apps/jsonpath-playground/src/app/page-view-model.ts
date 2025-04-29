@@ -1,4 +1,4 @@
-import { Diagnostics, JSONPath } from "@jsonpath-tools/jsonpath";
+import { JSONPath } from "@jsonpath-tools/jsonpath";
 import { Query } from "@jsonpath-tools/jsonpath";
 import { removeAtPaths, replaceAtPaths } from "@jsonpath-tools/jsonpath";
 import { serializedNormalizedPath } from "@jsonpath-tools/jsonpath";
@@ -27,14 +27,14 @@ import { normalizedPathToJSONPointer } from "./services/json-pointer";
 import { logPerformance } from "../../../../shared/utils";
 import { CustomDiagnostics } from "./models/custom-diagnostics";
 
-interface State {
+/*interface State {
     customFunctions: readonly CustomFunction[];
     settings: Settings;
     queryText: string;
     queryArgumentText: string;
     operation: Operation;
     pathType: PathType;
-}
+}*/
 
 /**
  * ViewModel of the application main page.

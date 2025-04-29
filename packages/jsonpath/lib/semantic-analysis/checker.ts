@@ -50,8 +50,7 @@ export class Checker {
                 context.addError(`Function '${tree.name}' is not defined.`, tree.nameToken.textRangeWithoutSkipped);
             else {
                 if (parent instanceof ComparisonExpression) this.checkType(tree, Type.valueType, context);
-                else if (parent instanceof FunctionExpression) { }
-                else this.checkType(tree, Type.logicalType, context);
+                else if (!(parent instanceof FunctionExpression)) this.checkType(tree, Type.logicalType, context);
 
                 if (functionDefinition.parameters.length !== tree.args.length)
                     context.addError(`Function '${tree.name}' expects ${functionDefinition.parameters.length} parameter/s but ${tree.args.length} was/were provided.`, tree.nameToken.textRangeWithoutSkipped);

@@ -12,6 +12,7 @@ import { NameSelector } from "../query/selectors/name-selector";
 import { SliceSelector } from "../query/selectors/slice-selector";
 import { SyntaxTree } from "../query/syntax-tree";
 import { SyntaxTreeType } from "../query/syntax-tree-type";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { NullLiteralExpression } from "../query/filter-expressions/null-literal-expression";
 
 /**

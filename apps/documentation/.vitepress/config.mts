@@ -23,11 +23,11 @@ export default defineConfig({
                     ]
                 },
                 {
-                    text: "Evaluator",
+                    text: "Core",
                     items: [
-                        { text: "Get Started", link: "/documentation/evaluator/get-started" },
-                        { text: "Custom Functions", link: "/documentation/evaluator/custom-functions" },
-                        { text: "Editor Services", link: "/documentation/evaluator/editor-services" }
+                        { text: "Get Started", link: "/documentation/core/get-started" },
+                        { text: "Custom Functions", link: "/documentation/core/custom-functions" },
+                        { text: "Editor Services", link: "/documentation/core/editor-services" }
                     ]
                 },
                 {

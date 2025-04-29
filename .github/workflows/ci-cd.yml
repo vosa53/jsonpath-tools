@@ -46,8 +46,8 @@ jobs:
         run: npm run build --workspace @jsonpath-tools/jsonpath-editor-react
       - name: Build @jsonpath-tools/jsonpath-playground
         run: npm run build --workspace @jsonpath-tools/jsonpath-playground
-      #- name: Run lint
-      #  run: npm run lint --workspaces --if-present
+      - name: Run linter
+        run: npm run lint
       - name: Run tests
         run: npm run test --workspaces --if-present
       - name: Run end-to-end tests

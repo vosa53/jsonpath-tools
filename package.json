@@ -3,5 +3,9 @@
     "workspaces": [
         "packages/*",
         "apps/*"
-    ]
+    ],
+    "scripts": {
+        "lint": "eslint packages/*/lib/**/*.{ts,tsx} apps/jsonpath-playground/src/**/*.{ts,tsx}"
+    },
+    "type": "module"
 }

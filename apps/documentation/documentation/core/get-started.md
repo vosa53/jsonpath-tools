@@ -1,4 +1,4 @@
-# Get started with a JSONPath evaluation
+# Get Started with a JSONPath Evaluation
 
 ## Installation
 
@@ -6,9 +6,9 @@
 npm install @jsonpath-tools/jsonpath
 ```
 
-## Selecting JSON values
+## Selecting JSON Values
 
-```typescript
+```ts
 import { JSONPath } from "@jsonpath-tools/jsonpath";
 
 const queryArgument = {
@@ -20,32 +20,32 @@ const resultValues = result.createValues();
 ```
 
 Getting paths to the selected values:
-```typescript
+```ts
 const resultPaths = result.createNormalizedPaths();
 ```
 
-## Transforming JSON values
+## Transforming JSON Values
 
 Replacing values:
 
-```typescript
+```ts
 const replaced = JSONPath.replace(`$.abc.def`, queryArgument, "New value");
 ```
 
 With a function:
 
-```typescript
+```ts
 const replaced = JSONPath.replace(`$.abc.def`, queryArgument, v => v * 2);
 ```
 
 Removing values:
 
-```typescript
+```ts
 const removed = JSONPath.remove(`$.abc.def`, queryArgument);
 ```
 
-## Parsing a query
+## Parsing a Query
 
-```typescript
+```ts
 const query = JSONPath.parse(`$.abc.def`);
 ```

@@ -81,34 +81,26 @@ export interface GetTooltipLanguageServiceMessageResponse {
     readonly tooltip: Tooltip | null;
 }
 
-export interface GetDiagnosticsLanguageServiceMessage {
-
-}
+export type GetDiagnosticsLanguageServiceMessage = object;
 
 export interface GetDiagnosticsLanguageServiceMessageResponse {
     readonly diagnostics: readonly Diagnostics[];
 }
 
-export interface GetFormattingEditsLanguageServiceMessage {
-
-}
+export type GetFormattingEditsLanguageServiceMessage = object;
 
 export interface GetFormattingEditsLanguageServiceMessageResponse {
     readonly formattingEdits: readonly TextChange[];
 }
 
-export interface GetResultLanguageServiceMessage {
-
-}
+export type GetResultLanguageServiceMessage = object;
 
 export interface GetResultLanguageServiceMessageResponse {
     readonly nodes: readonly JSONValue[];
     readonly paths: readonly NormalizedPath[];
 }
 
-export interface DisconnectLanguageServiceMessage {
-
-}
+export type DisconnectLanguageServiceMessage = object;
 
 export type SerializableCompletionItem = Omit<CompletionItem, "resolveDescription">;
 
