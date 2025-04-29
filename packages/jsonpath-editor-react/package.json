@@ -1,6 +1,6 @@
 {
     "name": "@jsonpath-tools/jsonpath-editor-react",
-    "version": "0.2.0-alpha",
+    "version": "0.3.0-alpha",
     "author": "Jan Jörka",
     "license": "MIT",
     "description": "",
@@ -24,8 +24,8 @@
         "prepublishOnly": "npm run build"
     },
     "dependencies": {
-        "@jsonpath-tools/codemirror-lang-jsonpath": "^0.1.0-alpha",
-        "@jsonpath-tools/jsonpath": "^0.1.0-alpha"
+        "@jsonpath-tools/codemirror-lang-jsonpath": "^0.3.0-alpha",
+        "@jsonpath-tools/jsonpath": "^0.3.0-alpha"
     },
     "peerDependencies": {
         "react": "^19.0.0",
