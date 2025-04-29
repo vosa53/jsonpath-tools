@@ -70,6 +70,10 @@ export class CompletionService {
                 completions.push(new CompletionItem(CompletionItemType.syntax, "${start}:${end}:${step}", range, "start:end:step", undefined, () => this.syntaxDescriptionProvider.provideDescriptionForSliceSelector().toMarkdown(), CompletionItemTextType.snippet));
             }
         }
+        if (lastNode.type === SyntaxTreeType.dollarToken && lastNode.textRangeWithoutSkipped.length === 0) {
+            const range = lastButOneNode.textRangeWithoutSkipped;
+            completions.push(new CompletionItem(CompletionItemType.syntax, "$", range, undefined, undefined, () => this.syntaxDescriptionProvider.provideDescriptionForDollarToken().toMarkdown()));
+        }
         if (lastButOneNode.type === SyntaxTreeType.missingExpression) {
             const range = lastButOneNode.textRangeWithoutSkipped;
             completions.push(new CompletionItem(CompletionItemType.syntax, "@", range, undefined, undefined, () => this.syntaxDescriptionProvider.provideDescriptionForAtToken().toMarkdown()));
