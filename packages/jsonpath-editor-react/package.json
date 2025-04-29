@@ -1,6 +1,6 @@
 {
     "name": "@jsonpath-tools/jsonpath-editor-react",
-    "version": "0.3.1-alpha",
+    "version": "0.3.2-alpha",
     "author": "Jan Jörka",
     "license": "MIT",
     "description": "",
@@ -20,6 +20,9 @@
     "files": [
         "dist"
     ],
+    "sideEffects": [
+        "**/*.css"
+    ],
     "scripts": {
         "dev": "vite",
         "build": "tsc && vite build",
@@ -28,6 +31,14 @@
         "prepublishOnly": "npm run build"
     },
     "dependencies": {
+        "@codemirror/search": "^6.0.1",
+        "@codemirror/commands": "^6.0.1",
+        "@codemirror/autocomplete": "^6.0.1",
+        "@codemirror/language": "^6.0.1",
+        "@codemirror/lint": "^6.0.1",
+        "@codemirror/state": "^6.0.1",
+        "@codemirror/view": "^6.0.1",
+        "@lezer/highlight": "^1.0.0",
         "@jsonpath-tools/codemirror-lang-jsonpath": "^0.3.0-alpha",
         "@jsonpath-tools/jsonpath": "^0.3.0-alpha"
     },

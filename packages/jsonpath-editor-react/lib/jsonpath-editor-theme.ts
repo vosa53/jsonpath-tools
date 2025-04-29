@@ -1,4 +1,4 @@
-import { EditorView } from "codemirror";
+import { EditorView } from "@codemirror/view";
 
 /**
  * JSONPath editor theme.
