@@ -20,17 +20,7 @@ export default defineConfig({
             name: "codemirror-lang-jsonpath"
         },
         rollupOptions: {
-            external: [
-                "@codemirror/autocomplete",
-                "@codemirror/language",
-                "@codemirror/lint",
-                "@codemirror/state",
-                "@codemirror/view",
-                "@lezer/common",
-                "@lezer/highlight",
-                "markdown-it",
-                "@jsonpath-tools/jsonpath"
-            ]
+            external: [/node_modules/, /@jsonpath-tools/]
         },
         copyPublicDir: false
     }

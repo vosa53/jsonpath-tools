@@ -24,12 +24,7 @@ export default defineConfig({
             name: "jsonpath-editor-react"
         },
         rollupOptions: {
-            external: [
-                "react",
-                "react-dom",
-                "@jsonpath-tools/codemirror-lang-jsonpath",
-                "@jsonpath-tools/jsonpath"
-            ]
+            external: [/node_modules/, /@jsonpath-tools/]
         },
         copyPublicDir: false
     }

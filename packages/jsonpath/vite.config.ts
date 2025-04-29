@@ -19,10 +19,7 @@ export default defineConfig({
             name: "jsonpath"
         },
         rollupOptions: {
-            external: [
-                "jsonpointer", 
-                "uri-js"
-            ]
+            external: [/node_modules/]
         },
         copyPublicDir: false
     }
