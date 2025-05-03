@@ -22,7 +22,7 @@ export function jsonpath(config: {
     languageService?: LanguageService,
     codeHighlighter?: Highlighter,
     onDiagnosticsCreated?: (diagnostics: readonly Diagnostics[]) => void
-}): LanguageSupport {
+} = {}): LanguageSupport {
     return new LanguageSupport(jsonpathLanguage, [
         languageServiceFacet.of(config.languageService ?? DefaultLanguageServices.worker),
         markdownRendererFacet.of(new MarkdownRenderer(config.codeHighlighter ?? defaultHighlightStyle)),

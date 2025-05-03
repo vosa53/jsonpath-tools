@@ -5,6 +5,7 @@ import Root from "./root";
 /**
  * JSONPath editor testing entry point.
  */
+
 createRoot(document.getElementById("app")!).render(
     <StrictMode>
         <Root />

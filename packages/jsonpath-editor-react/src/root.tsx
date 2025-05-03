@@ -1,5 +1,5 @@
 import { useState } from "react";
-import JSONPathEditor from "../lib/jsonpath-editor";
+import { JSONPathEditor } from "../lib";
 import { defaultQueryOptions, jsonSchemaToType } from "@jsonpath-tools/jsonpath";
 
 /**
@@ -97,8 +97,7 @@ const queryArgument = JSON.parse(`{
 }
 `);
 
-const queryArgumentType = jsonSchemaToType({
-    schema: JSON.parse(`{
+const queryArgumentSchema = JSON.parse(`{
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$defs": {
         "gcsCoordinates": {
@@ -263,5 +262,6 @@ const queryArgumentType = jsonSchemaToType({
     "required": ["dealership"],
     "additionalProperties": false
 }
-`)
-});
+`);
+
+const queryArgumentType = jsonSchemaToType({ schema: queryArgumentSchema });

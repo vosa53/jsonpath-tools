@@ -29,19 +29,19 @@ features:
   - title: Standard Compliant
     details: Fully compliant with the JSONPath standard RFC 9535.
   - title: Completion
-    details: Autocomplete of syntax, objects keys, functions, values, ...
+    details: Autocomplete of syntax, objects properties, functions, values, ...
   - title: Syntax Highlighting
     details: Color highlighting of the query syntax.
   - title: Diagnostics
-    details: Interactive diagnostics, warnings for missing keys, ...
+    details: Interactive diagnostics, warnings for missing properties, ...
   - title: Tooltips
     details: Tooltips with syntax explanation, functions documentation, schema annotations, ...
   - title: Signature Help
-    details: Shows signature of the called function.
+    details: Shows signature and documentation of the called function.
   - title: Formatting
     details: Automatic query formatting to be more consistent and readable.
   - title: JSON Schema Support
-    details: Supports JSON Schema/JSON Type Definition. Actually can work (autocomplete etc.) even without concrete data based only on schema.
+    details: Supports JSON Schema/JSON Type Definition. Actually can work (autocomplete, etc.) even without concrete data based on schema only.
   - title: And Many More...
     details: Document symbols highlighting, folding, automatic indentation, ...
 ---

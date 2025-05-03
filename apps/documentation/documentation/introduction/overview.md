@@ -7,6 +7,6 @@ It has the following parts:
 - [Core Library](/documentation/core/get-started) (evaluation, analysis and editor services)
 - [CodeMirror Editor Extension](/documentation/editor/codemirror-extension)
 - [React Editor Component](/documentation/editor/react-component)
-- [Playground Web Application](https://jsonpath-playground.pages.dev)
+- [Playground Web Application](https://jsonpath.dev)
 
 ![Image from the JSONPath Playground](image.png)

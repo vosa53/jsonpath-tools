@@ -12,40 +12,49 @@ npm install @jsonpath-tools/jsonpath
 import { JSONPath } from "@jsonpath-tools/jsonpath";
 
 const queryArgument = {
-
+    books: [
+        { title: "1984", author: "George Orwell" },
+        { title: "Epic of Gilgamesh", author: null },
+        { title: "The Old Man and the Sea", author: "Ernest Hemingway" }
+    ]
 };
 
-const result = JSONPath.select(`$.abc.def`, queryArgument);
-const resultValues = result.createValues();
+const nodes = JSONPath.select(`$.books[?@.author != null].title`, queryArgument);
+```
+
+Getting the selected values:
+```ts
+const values = nodes.toValues();
 ```
 
 Getting paths to the selected values:
 ```ts
-const resultPaths = result.createNormalizedPaths();
+const paths = nodes.toNormalizedPaths();
 ```
 
 ## Transforming JSON Values
 
 Replacing values:
-
 ```ts
-const replaced = JSONPath.replace(`$.abc.def`, queryArgument, "New value");
+const replaced = JSONPath.replace(`$.books[?@.author != null].title`, queryArgument, "New title");
 ```
 
 With a function:
-
 ```ts
-const replaced = JSONPath.replace(`$.abc.def`, queryArgument, v => v * 2);
+const replaced = JSONPath.replace(`$.books[?@.author != null].title`, queryArgument, v => (v as string).toUpperCase());
 ```
 
 Removing values:
-
 ```ts
-const removed = JSONPath.remove(`$.abc.def`, queryArgument);
+const removed = JSONPath.remove(`$.books[?@.author != null].title`, queryArgument);
 ```
 
 ## Parsing a Query
 
 ```ts
-const query = JSONPath.parse(`$.abc.def`);
+const query = JSONPath.parse(`$.books[?@.title == "1984", 3141]`);
 ```
+
+The result syntax tree will look like this:
+
+![Syntax tree example](images/syntax-tree-example.svg)
