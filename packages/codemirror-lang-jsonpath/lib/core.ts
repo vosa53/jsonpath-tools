@@ -1,6 +1,6 @@
-import { Diagnostics, QueryOptions } from "@jsonpath-tools/jsonpath";
+import { Diagnostics, QueryOptions, TextChange, TextRange } from "@jsonpath-tools/jsonpath";
 import { JSONValue } from "@jsonpath-tools/jsonpath";
-import { EditorState, Extension, Facet, StateEffect, StateField } from "@codemirror/state";
+import { EditorState, Extension, Facet, StateEffect, StateField, Text } from "@codemirror/state";
 import { EditorView, PluginValue, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { LanguageService } from "./language-service/language-service";
 import { LanguageServiceSession } from "./language-service/language-service-session";
@@ -27,12 +27,17 @@ export const languageServiceSessionStateField = StateField.define<LanguageServic
         if (languageServices.length !== 1) throw new Error("Expected exactly one config.");
 
         const languageServiceSession = languageServices[0].createSession();
-        languageServiceSession.updateQuery(state.doc.toString());
+        languageServiceSession.updateQuery([new TextChange(new TextRange(0, 0), state.doc.toString())]);
         return languageServiceSession;
     },
     update(languageServiceSession, transaction) {
-        if (transaction.docChanged)
-            languageServiceSession.updateQuery(transaction.newDoc.toString());
+        if (transaction.docChanged) {
+            const textChanges: TextChange[] = [];
+            transaction.changes.iterChanges((fromA: number, toA: number, fromB: number, toB: number, inserted: Text) => {
+                textChanges.push(new TextChange(new TextRange(fromA, toA - fromA), inserted.toString()));
+            });
+            languageServiceSession.updateQuery(textChanges);
+        }
         for (const effect of transaction.effects) {
             if (effect.is(updateQueryOptionsEffect))
                 languageServiceSession.updateQueryOptions(effect.value);

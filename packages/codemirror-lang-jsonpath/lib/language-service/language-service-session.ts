@@ -46,10 +46,10 @@ export class LanguageServiceSession {
         });
     }
 
-    updateQuery(newQuery: string) {
+    updateQuery(queryTextChanges: readonly TextChange[]) {
         this.cancelQueue();
         this.rpcTopic.sendNotification<UpdateQueryLanguageServiceMessage>(LanguageServiceMessageID.updateQuery, {
-            newQuery: newQuery
+            queryTextChanges: queryTextChanges
         });
     }
 

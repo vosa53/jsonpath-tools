@@ -41,7 +41,7 @@ export class LanguageServiceBackendSession {
     }
 
     updateQuery(message: UpdateQueryLanguageServiceMessage) {
-        this.editorService.updateQuery(message.newQuery);
+        this.editorService.updateQueryPartial(message.queryTextChanges);
     }
 
     updateQueryArgument(message: UpdateQueryArgumentLanguageServiceMessage) {

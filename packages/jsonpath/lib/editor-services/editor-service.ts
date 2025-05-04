@@ -15,6 +15,7 @@ import { FormattingService } from "./formatting-service";
 import { Signature, SignatureHelpService } from "./signature-help-service";
 import { Tooltip, TooltipService } from "./tooltip-service";
 import { logPerformance } from "../../../../shared/utils";
+import { applyTextChanges } from "../text/operations";
 
 /**
  * Provides services for JSONPath editors.
@@ -30,6 +31,7 @@ export class EditorService {
     private staticAnalyzer: StaticAnalyzer;
     private dynamicAnalyzer: DynamicAnalyzer;
     private formatter: FormattingService;
+    private queryText: string;
     private query: Query;
     private queryArgument: JSONValue | undefined;
     private queryArgumentType: DataType;
@@ -46,7 +48,8 @@ export class EditorService {
         this.staticAnalyzer = new StaticAnalyzer(this.queryOptions);
         this.dynamicAnalyzer = new DynamicAnalyzer(this.queryOptions);
         this.formatter = new FormattingService();
-        this.query = this.parser.parse("");
+        this.queryText = "";
+        this.query = this.parser.parse(this.queryText);
         this.queryArgument = undefined;
         this.queryArgumentType = AnyDataType.create();
         this.dynamicAnalysisResult = null;
@@ -70,11 +73,24 @@ export class EditorService {
 
     /**
      * Updates edited query text.
+     * 
      * @param newQuery New text of the edited query.
+     * @see updateQueryPartial for partial update.
      */
     updateQuery(newQuery: string) {
-        this.query = this.parser.parse(newQuery);
+        this.queryText = newQuery;
+        this.query = this.parser.parse(this.queryText);
         this.dynamicAnalysisResult = null;
+    }
+
+    /**
+     * Updates **part** of edited query text.
+     * @param queryTextChanges Text changes that should be applied to the edited query text.
+     * @see updateQuery for full update.
+     */
+    updateQueryPartial(queryTextChanges: readonly TextChange[]) {
+        const newQuery = applyTextChanges(this.queryText, queryTextChanges);
+        this.updateQuery(newQuery);
     }
 
     /**

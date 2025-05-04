@@ -30,7 +30,7 @@ export interface UpdateQueryOptionsLanguageServiceMessage {
 }
 
 export interface UpdateQueryLanguageServiceMessage {
-    readonly newQuery: string;
+    readonly queryTextChanges: readonly TextChange[];
 }
 
 export interface UpdateQueryArgumentLanguageServiceMessage {
