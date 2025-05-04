@@ -188,7 +188,7 @@ export function usePageViewModel() {
         resultTimeoutRef.current = window.setTimeout(async () => {
             await run();
         }, 500);
-    }, [queryText, queryArgument, settings.autoRun]);
+    }, [queryText, queryArgument, queryOptions, settings.autoRun]);
 
     useEffect(() => {
         if (!settings.autoSave && !lastAutoSave.current) return;

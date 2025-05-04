@@ -2,7 +2,7 @@ import { DiagnosticsSeverity } from "@jsonpath-tools/jsonpath";
 import { LintSource } from "@codemirror/lint";
 import { ViewUpdate } from "@codemirror/view";
 import { OperationCancelledError } from "./cancellation-token";
-import { diagnosticsCreatedFacet, languageServiceSessionStateField, updateQueryOptionsEffect, updateQueryArgumentEffect } from "./core";
+import { diagnosticsCreatedFacet, languageServiceSessionStateField, updateQueryOptionsEffect, updateQueryArgumentEffect, updateQueryArgumentTypeEffect } from "./core";
 
 /**
  * CodeMirror lint source for JSONPath.
@@ -35,7 +35,7 @@ export function lintSource(): LintSource {
  */
 export const lintSourceNeedsRefresh = (update: ViewUpdate): boolean => {
     for (const transaction of update.transactions) {
-        if (transaction.effects.some(e => e.is(updateQueryOptionsEffect) || e.is(updateQueryArgumentEffect))) 
+        if (transaction.effects.some(e => e.is(updateQueryOptionsEffect) || e.is(updateQueryArgumentEffect) || e.is(updateQueryArgumentTypeEffect))) 
             return true;
     }
     return false;
