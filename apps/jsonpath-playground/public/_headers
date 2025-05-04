@@ -1,7 +1,7 @@
 # Cloudflare Pages file specifying HTTP response headers
 
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-eval'; worker-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; base-uri 'self'; form-action 'self';
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-eval'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; base-uri 'self'; form-action 'self';
 
 /assets/custom-language-service-worker*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-eval'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; sandbox allow-scripts;
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-eval'; sandbox allow-scripts;
