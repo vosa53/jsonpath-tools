@@ -38,7 +38,7 @@ Or alternatively:
 $.dealership.inventory.*
 ```
 
-### Slice selector
+### Slice Selector
 To select a range of elements from an array, the *slice selector* is available. Its parameters are start index (inclusive), end index (exclusive), and step. It uses the syntax: `start:end:step`. Each of these parameters can be omitted, in which case a default value is used.
 
 For the following examples suppose 5 elements in the `inventory` array.
@@ -83,7 +83,7 @@ $.dealership.inventory[?@.make == "Ford"]
 ```
 It selects all values where `make` property is equal to `Ford`.
 
-#### Comparison operators
+#### Comparison Operators
 
 All available comparison operators are summarized in this table:
 | Operator | Description             |
@@ -95,7 +95,7 @@ All available comparison operators are summarized in this table:
 | `<=`       | Lower than or equal   |
 | `>=`       | Greater than or equal |
 
-#### Existence test
+#### Existence Test
 
 If no operator is used, the nested query is considered an existence test. Empty subquery result means `LogicalFalse` and not empty `LogicalTrue`.
 
@@ -104,7 +104,7 @@ For example, the following example selects all cars that have `Bluetooth` elemen
 $.dealership.inventory[?@.features[?@ == "Bluetooth"]]
 ```
 
-#### Logical operators
+#### Logical Operators
 
 Logical expressions can be combined with the following operators:
 | Operator | Description                       |
@@ -126,25 +126,29 @@ Filter expressions can also use *functions*. These functions use a simple type s
 A type `NodesType` can be implicitly converted to `LogicalType` (similar to the previously mentioned existence test).
 
 There are 5 built-in functions:
-- `length(): ValueType`
-- `count(): ValueType`
-- `match(): LogicalType`
-- `search(): LogicalType`
-- `value(): ValueType`
+- `length(ValueType): ValueType`: Gets the length of a value.
+- `count(NodesType): ValueType`: Counts the number of nodes.
+- `match(ValueType, ValueType): LogicalType`: Matches a text against a pattern.
+- `search(ValueType, ValueType): LogicalType`: Searches a text for a pattern.
+- `value(NodesType): ValueType`: Gets a value of a node.
 
-TODO
-
-#### I-Regexp - Regular expressions
+#### I-Regexp - Regular Expressions
 
 To ensure interoperability between programming languages, JSONPath filter functions use a simplified, standardized subset of common regular expressions called *I-Regexp* ([RFC 9485](https://datatracker.ietf.org/doc/rfc9485/)).
 
 I-Regexp supports the following patterns:
 
-TODO
+- Dot representing any character.
+- Character classes (e.g. `[a-zA-Z0-9_]`). Including a negation with `^`.
+- Unicode character categories (e.g. `\p{L}`).
+- Quantifiers `?`, `+` and `*`.
+- Range and exact quantifier (e.g. `{1,5}` a `{3}`).
+- Branching with `|`.
+- Subexpression in paranthesis `(` and `)`.
 
 It lacks more advanced features like lookahead or capture groups.
 
-### Multiple selectors
+### Multiple Selectors
 
 A single segment (represented with a `[` and `]`) can contain multiple selectors. For example, the following query selects the first employee and also the one with the name `Mike Johnson`.
 
@@ -154,7 +158,7 @@ $.dealership.employees[0, ?@.name == "Mike Johnson"]
 
 A value can also be selected multiple times.
 
-### Descendant segments
+### Descendant Segments
 
 JSONPath segments are actually of two types: *child segment* and *descendant segment*. The ones shown so far were child segments because they operated only on the value itself. Descendant selectors operate on the value and also on all its descendants.
 
@@ -171,7 +175,7 @@ Equivalent to a longer form:
 $..["id"]
 ```
 
-### Query output
+### Query Output
 
 The output of each query is a sequence of JSON values, along with their positions in the query argument (*nodes*) called *nodelist*. 
 
@@ -185,5 +189,5 @@ $.dealership.inventory[-1]
 The normalized path to the result node of this query is the following:
 
 ```jsonpath
-$["dealership"]["inventory"][4]
+$['dealership']['inventory'][4]
 ```
