@@ -22,10 +22,10 @@ export class Diagnostics {
     ) { }
 
     /**
-     * Converts the diagnostics to the text representation.
+     * Converts the diagnostics to a text representation.
      */
     toString(): string {
-        return `${this.severity} ${this.message} at ${this.textRange.position}:${this.textRange.length}`;
+        return `${this.severity} at ${this.textRange.position}:${this.textRange.length}: ${this.message}`;
     }
 }
 

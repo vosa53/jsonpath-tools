@@ -43,12 +43,12 @@ describe("Text operations", () => {
             new TextChange(new TextRange(3, 0), ""),
             new TextChange(new TextRange(1, 0), "12"),
             new TextChange(new TextRange(1, 0), "34"),
-            new TextChange(new TextRange(1, 1), "56"),
+            new TextChange(new TextRange(1, 1), "56")
         ]);
         expect(resultText).toBe("a123456c");
     });
 
-    it("applyTextChanges - Overlapping changes throws an error", () => {
+    it("applyTextChanges - Overlapping changes throw an error", () => {
         expect(() => {
             applyTextChanges("abc", [
                 new TextChange(new TextRange(0, 2), ""),

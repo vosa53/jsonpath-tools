@@ -21,11 +21,11 @@ Similarly, an *index selector* is used for arrays:
 $.dealership.inventory[2]
 ```
 
-Arrays are indexed **from zero**. It is also possible to index from end, negative indices are used for this:
+Arrays are indexed starting **from zero**. It is also possible to index from the end, negative indices are used for this:
 ```jsonpath
 $.dealership.inventory[-1]
 ```
-The previous query selects the **last** item from the inventory (item at `length - 1`).
+The previous query selects the **last** item from the inventory (the item at `length - 1`).
 
 ### Wildcard Selector
 

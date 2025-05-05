@@ -113,7 +113,7 @@ export class Checker {
 
     private checkIntegerRange(number: number, numberToken: SyntaxTreeToken, context: CheckerContext) {
         if (!Number.isSafeInteger(number))
-            context.addError("Integer has to be within interval [-(2^53)+1, (2^53)-1].", numberToken.textRangeWithoutSkipped);
+            context.addError("Integer has to be within the interval [-(2^53)+1, (2^53)-1].", numberToken.textRangeWithoutSkipped);
     }
 }
 

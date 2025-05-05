@@ -42,7 +42,7 @@ export class Parser {
         const query = this.parseQuery(context, false);
         const endOfFileToken = context.collectToken(SyntaxTreeType.endOfFileToken);
 
-        if (endOfFileToken.skippedTextBefore.length !== 0) context.addError("Whitespace is not allowed here", endOfFileToken.textRange);
+        if (endOfFileToken.skippedTextBefore.length !== 0) context.addError("Whitespace is not allowed here.", endOfFileToken.textRange);
         return new Query(query, endOfFileToken, context.diagnostics);
     }
 
@@ -53,7 +53,7 @@ export class Parser {
         if (context.current === "$" || context.current === "@")
             context.goNext();
         else
-            context.addError(`Expected $ ${allowedRelative ? "or @" : ""}.`);
+            context.addError(`Expected '$' ${allowedRelative ? "or '@'" : ""}.`);
         const identifier = context.collectToken(type === QueryType.absolute ? SyntaxTreeType.dollarToken : SyntaxTreeType.atToken);
         if (type === QueryType.relative && !allowedRelative)
             context.addError("Relative queries are not allowed here.", identifier.textRangeWithoutSkipped);
@@ -139,7 +139,7 @@ export class Parser {
     }
 
     private skipToSelector(context: ParserContext) {
-        context.skipWhile(c => c !== "[" && c !== "." && c !== "]" && c !== ",", "Invalid characters");
+        context.skipWhile(c => c !== "[" && c !== "." && c !== "]" && c !== ",", "Invalid characters.");
     }
 
     private parseSelector(context: ParserContext): Selector {
@@ -152,7 +152,7 @@ export class Parser {
         else if (context.current === "?")
             return this.parseFilterSelector(context);
         else {
-            context.addError("Expected selector.");
+            context.addError("Expected a selector.");
             return new MissingSelector(context.collectToken(SyntaxTreeType.missingToken));
         }
     }
@@ -312,7 +312,7 @@ export class Parser {
         else if (CharacterCategorizer.isNameFirst(context.current))
             return this.parseFunctionOrLiteral(context);
         else {
-            context.addError("Expected expression.");
+            context.addError("Expected an expression.");
             return new MissingExpression(context.collectToken(SyntaxTreeType.missingToken));
         }
     }
@@ -404,7 +404,7 @@ export class Parser {
     private parseString(context: ParserContext): { token: SyntaxTreeToken, value: string } {
         type HexCharacterLiteral = { range: TextRange, value: string };
         const checkSurrogates = (previous: HexCharacterLiteral | null, current: HexCharacterLiteral | null) => {
-            const errorMessage = "Unpaired surrogate.";
+            const errorMessage = "Unpaired surrogate is not allowed.";
             if (current !== null && CharacterCategorizer.isLowSurrogate(current.value) && (previous === null || !CharacterCategorizer.isHighSurrogate(previous.value)))
                 context.addError(errorMessage, current.range);
             if (previous !== null && CharacterCategorizer.isHighSurrogate(previous.value) && (current === null || !CharacterCategorizer.isLowSurrogate(current.value)))
@@ -448,7 +448,7 @@ export class Parser {
             else if (CharacterCategorizer.isString(context.current))
                 value += context.current;
             else
-                context.addError("Invalid character in string.");
+                context.addError("Invalid character in the string.");
             context.goNext();
             checkSurrogates(previousHexCharacterLiteral, currentHexCharacterLiteral);
             previousHexCharacterLiteral = currentHexCharacterLiteral;
@@ -516,7 +516,7 @@ export class Parser {
     private checkComparisionExpressionOperand(operand: FilterExpression, context: ParserContext) {
         if (operand instanceof FilterQueryExpression) {
             if (!operand.query.isSingular)
-                context.addError("Query in comparison expression must be singular.", operand.textRangeWithoutSkipped);
+                context.addError("Query in a comparison expression must be singular.", operand.textRangeWithoutSkipped);
         }
         else if (operand instanceof ParanthesisExpression)
             context.addError("Comparison expression operand can not be in paranthesis.", operand.textRangeWithoutSkipped);
@@ -526,12 +526,12 @@ export class Parser {
 
     private checkLogicalExpressionOperand(operand: FilterExpression, context: ParserContext) {
         if (operand instanceof BooleanLiteralExpression || operand instanceof NullLiteralExpression || operand instanceof StringLiteralExpression || operand instanceof NumberLiteralExpression)
-            context.addError("Only logical expression is allowed here.", operand.textRangeWithoutSkipped);
+            context.addError("Only a logical expression is allowed here.", operand.textRangeWithoutSkipped);
     }
 
     private checkIsInteger(numberToken: SyntaxTreeToken, context: ParserContext) {
         if (numberToken.text === "-0")
-            context.addError("Negative zero is not allowed", numberToken.textRangeWithoutSkipped);
+            context.addError("Negative zero is not allowed.", numberToken.textRangeWithoutSkipped);
         if (numberToken.text.includes("."))
             context.addError("Only integers are allowed here.", numberToken.textRangeWithoutSkipped);
         if (numberToken.text.includes("e") || numberToken.text.includes("E"))

@@ -1,6 +1,6 @@
 {
     "name": "@jsonpath-tools/jsonpath-editor-react",
-    "version": "0.4.0-alpha",
+    "version": "0.4.1-alpha",
     "author": "Jan Jörka",
     "license": "MIT",
     "description": "Advanced JSONPath (RFC 9535) editor for React.",
@@ -39,8 +39,8 @@
         "@codemirror/state": "^6.0.1",
         "@codemirror/view": "^6.0.1",
         "@lezer/highlight": "^1.0.0",
-        "@jsonpath-tools/codemirror-lang-jsonpath": "^0.4.0-alpha",
-        "@jsonpath-tools/jsonpath": "^0.4.0-alpha"
+        "@jsonpath-tools/codemirror-lang-jsonpath": "^0.4.1-alpha",
+        "@jsonpath-tools/jsonpath": "^0.4.1-alpha"
     },
     "peerDependencies": {
         "react": "^19.0.0",
