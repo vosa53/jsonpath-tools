@@ -260,7 +260,7 @@ export class CompletionService {
         return keysAndTypes;
     }
 
-    private getAllNodesOutputtedFromSegment(queryArgument: JSONValue, jsonPath: Query, segment: Segment): Node[] {
+    private getAllNodesOutputtedFromSegment(queryArgument: JSONValue, query: Query, segment: Segment): Node[] {
         const values: Node[] = [];
         const queryContext: QueryContext = {
             argument: queryArgument,
@@ -270,11 +270,11 @@ export class CompletionService {
                     values.push(i);
             }
         };
-        jsonPath.select(queryContext);
+        query.select(queryContext);
         return values;
     }
 
-    private getAllLiteralsOutputtedFromExpression(queryArgument: JSONValue, jsonPath: Query, expression: FilterExpression): Set<string | number | boolean | null> {
+    private getAllLiteralsOutputtedFromExpression(queryArgument: JSONValue, query: Query, expression: FilterExpression): Set<string | number | boolean | null> {
         const literals = new Set<string | number | boolean | null>();
         const queryContext: QueryContext = {
             argument: queryArgument,
@@ -287,7 +287,7 @@ export class CompletionService {
                 }
             }
         };
-        jsonPath.select(queryContext);
+        query.select(queryContext);
         return literals;
     }
 

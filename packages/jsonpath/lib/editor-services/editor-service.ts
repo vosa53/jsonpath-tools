@@ -23,14 +23,14 @@ import { applyTextChanges } from "../text/operations";
 export class EditorService {
     private readonly parser: Parser;
     private queryOptions: QueryOptions;
-    private typeChecker: Checker;
-    private completionProvider: CompletionService;
-    private signatureProvider: SignatureHelpService;
-    private documentHighlightsProvider: DocumentHighlightsService;
-    private tooltipProvider: TooltipService;
+    private checker: Checker;
+    private completionService: CompletionService;
+    private signatureHelpService: SignatureHelpService;
+    private documentHighlightsService: DocumentHighlightsService;
+    private tooltipService: TooltipService;
     private staticAnalyzer: StaticAnalyzer;
     private dynamicAnalyzer: DynamicAnalyzer;
-    private formatter: FormattingService;
+    private formattingService: FormattingService;
     private queryText: string;
     private query: Query;
     private queryArgument: JSONValue | undefined;
@@ -40,14 +40,14 @@ export class EditorService {
     constructor() {
         this.parser = new Parser();
         this.queryOptions = defaultQueryOptions;
-        this.typeChecker = new Checker(this.queryOptions);
-        this.completionProvider = new CompletionService(this.queryOptions);
-        this.signatureProvider = new SignatureHelpService(this.queryOptions);
-        this.documentHighlightsProvider = new DocumentHighlightsService(this.queryOptions);
-        this.tooltipProvider = new TooltipService(this.queryOptions);
+        this.checker = new Checker(this.queryOptions);
+        this.completionService = new CompletionService(this.queryOptions);
+        this.signatureHelpService = new SignatureHelpService(this.queryOptions);
+        this.documentHighlightsService = new DocumentHighlightsService(this.queryOptions);
+        this.tooltipService = new TooltipService(this.queryOptions);
         this.staticAnalyzer = new StaticAnalyzer(this.queryOptions);
         this.dynamicAnalyzer = new DynamicAnalyzer(this.queryOptions);
-        this.formatter = new FormattingService();
+        this.formattingService = new FormattingService();
         this.queryText = "";
         this.query = this.parser.parse(this.queryText);
         this.queryArgument = undefined;
@@ -61,11 +61,11 @@ export class EditorService {
      */
     updateQueryOptions(newQueryOptions: QueryOptions) {
         this.queryOptions = newQueryOptions;
-        this.typeChecker = new Checker(this.queryOptions);
-        this.completionProvider = new CompletionService(this.queryOptions);
-        this.signatureProvider = new SignatureHelpService(this.queryOptions);
-        this.documentHighlightsProvider = new DocumentHighlightsService(this.queryOptions);
-        this.tooltipProvider = new TooltipService(this.queryOptions);
+        this.checker = new Checker(this.queryOptions);
+        this.completionService = new CompletionService(this.queryOptions);
+        this.signatureHelpService = new SignatureHelpService(this.queryOptions);
+        this.documentHighlightsService = new DocumentHighlightsService(this.queryOptions);
+        this.tooltipService = new TooltipService(this.queryOptions);
         this.staticAnalyzer = new StaticAnalyzer(this.queryOptions);
         this.dynamicAnalyzer = new DynamicAnalyzer(this.queryOptions);
         this.dynamicAnalysisResult = null;
@@ -115,7 +115,7 @@ export class EditorService {
      * @param position Caret position in the query text (starts with 0).
      */
     getCompletions(position: number): CompletionItem[] {
-        return logPerformance("Get completions", () => this.completionProvider.provideCompletions(this.query, this.queryArgument, this.queryArgumentType, position));
+        return logPerformance("Get completions", () => this.completionService.provideCompletions(this.query, this.queryArgument, this.queryArgumentType, position));
     }
 
     /**
@@ -123,7 +123,7 @@ export class EditorService {
      * @param position Caret position in the query text (starts with 0).
      */
     getSignature(position: number): Signature | null {
-        return this.signatureProvider.provideSignature(this.query, position);
+        return this.signatureHelpService.provideSignature(this.query, position);
     }
 
     /**
@@ -131,7 +131,7 @@ export class EditorService {
      * @param position Caret position in the query text (starts with 0).
      */
     getDocumentHighlights(position: number): DocumentHighlight[] {
-        return this.documentHighlightsProvider.provideHighlights(this.query, position);
+        return this.documentHighlightsService.provideHighlights(this.query, position);
     }
 
     /**
@@ -139,7 +139,7 @@ export class EditorService {
      * @param position Position in the query text (character index).
      */
     getTooltip(position: number): Tooltip | null {
-        return this.tooltipProvider.provideTooltip(this.query, this.queryArgument, this.queryArgumentType, position);
+        return this.tooltipService.provideTooltip(this.query, this.queryArgument, this.queryArgumentType, position);
     }
 
     /**
@@ -147,7 +147,7 @@ export class EditorService {
      */
     getDiagnostics(): Diagnostics[] {
         const syntaxDiagnostics = this.query.syntaxDiagnostics;
-        const typeCheckerDiagnostics = this.typeChecker.check(this.query);
+        const typeCheckerDiagnostics = this.checker.check(this.query);
         const analysisDiagnostics = this.queryArgument === undefined
             ? this.staticAnalyzer.analyze(this.query, this.queryArgumentType)
             : this.getDynamicAnalysisResult().diagnostics;
@@ -161,7 +161,7 @@ export class EditorService {
      * Provides text changes that can be used to format the query text.
      */
     getFormattingEdits(): TextChange[] {
-        return this.formatter.provideFormattingEdits(this.query);
+        return this.formattingService.provideFormattingEdits(this.query);
     }
 
     /**

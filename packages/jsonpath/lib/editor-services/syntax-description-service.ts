@@ -56,7 +56,7 @@ export class SyntaxDescriptionService {
             const comparisonExpression = n as ComparisonExpression;
             return this.provideDescriptionForComparisonExpression(comparisonExpression.operator);
         }],
-        [SyntaxTreeType.filterQueryExpression, n => new SyntaxDescription("Filter Query", "Query in filter expression. When used on its own it is considered an existence test.")],
+        [SyntaxTreeType.filterQueryExpression, n => new SyntaxDescription("Filter Query", "Query in a filter expression. When used on its own it is considered an existence test.")],
         [SyntaxTreeType.functionExpression, n => {
             const functionExpression = n as FunctionExpression;
             return this.provideDescriptionForFunctionExpression(functionExpression.name, this.queryOptions.functions[functionExpression.name]);
@@ -106,7 +106,7 @@ export class SyntaxDescriptionService {
     provideDescriptionForQuery(queryType: QueryType): SyntaxDescription {
         return new SyntaxDescription(
             queryType === QueryType.absolute ? "Absolute Query" : "Relative Query",
-            "A sequence of segments that consists of selectors to select or filter values from objects/arrays."
+            "A sequence of segments that consist of selectors to select or filter values from objects/arrays."
         );
     }
 
@@ -181,7 +181,7 @@ export class SyntaxDescriptionService {
         else if (operator === ComparisonOperator.lessThanEquals) operatorDescription = "Less Than Equals";
         else if (operator === ComparisonOperator.greaterThanEquals) operatorDescription = "Greater Than Equals";
         else throw new Error("Unknown operator.");
-        return new SyntaxDescription(`${operatorDescription} Comparison`, "Compares left and right.");
+        return new SyntaxDescription(`${operatorDescription} Comparison`, "Compares the expression on the left with the expression on the right.");
     }
 
     /**
@@ -244,7 +244,7 @@ export class SyntaxDescriptionService {
      * Provides a description for {@link SyntaxTreeType.atToken}.
      */
     provideDescriptionForAtToken(): SyntaxDescription {
-        return new SyntaxDescription("Current Identifier", "Represents the current value in the filter selector expression.");
+        return new SyntaxDescription("Current Identifier", "Represents the currently filtered value in the filter selector expression.");
     }
 
     private createLiteralDescription(title: string, value: string | number | boolean | null): SyntaxDescription {
