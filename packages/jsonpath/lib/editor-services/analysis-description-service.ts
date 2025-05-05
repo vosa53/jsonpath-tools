@@ -1,6 +1,14 @@
 import { DataTypeAnnotation } from "../data-types/data-types";
 
+/**
+ * Provides a description based on an analysis.
+ */
 export class AnalysisDescriptionService {
+    /**
+     * Provides a Markdown formatted description for the given type and annotations.
+     * @param type Type in a text representation.
+     * @param annotations Type annotations.
+     */
     provideDescription(type?: string, annotations?: DataTypeAnnotation[]): string {
         let text = "";
         if (type !== undefined) {

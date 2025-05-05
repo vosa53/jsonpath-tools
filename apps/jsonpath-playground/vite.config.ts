@@ -19,6 +19,7 @@ export default defineConfig({
     },
     resolve: {
         alias: [
+            // Workaround to make Tabler Icons imports work.
             { find: "@tabler/icons-react", replacement: "@tabler/icons-react/dist/esm/icons/index.mjs" }
         ]
     },

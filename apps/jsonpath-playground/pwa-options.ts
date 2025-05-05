@@ -3,7 +3,7 @@ import { VitePWAOptions } from "vite-plugin-pwa";
 export const pwaOptions: Partial<VitePWAOptions> = {
     manifest: {
         name: "JSONPath Playground",
-        description: "Playground for JSONPath query language.",
+        description: "Playground for JSONPath (RFC 9535) query language.",
         start_url: "/",
         display: "standalone",
         icons: [
@@ -16,7 +16,7 @@ export const pwaOptions: Partial<VitePWAOptions> = {
         theme_color: "#7048e8"
     },
     devOptions: {
-        // Comment to disable PWA functionality in development.
+        // Enables PWA functionality in development.
         enabled: true
     }
 };

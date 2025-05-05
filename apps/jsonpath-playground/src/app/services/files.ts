@@ -25,12 +25,12 @@ export async function openTextFile(extension: string): Promise<string | null> {
         input.type = "file";
         input.accept = extension;
         input.addEventListener("change", () => {
-            const file = input!.files![0];
-            if (!file) resolve(null);
+            const files = input.files!;
+            if (files.length !== 1) resolve(null);
 
             const reader = new FileReader();
             reader.onload = () => resolve(reader.result as string);
-            reader.readAsText(file);
+            reader.readAsText(files[0]);
         });
         input.click();
     });

@@ -80,16 +80,15 @@ export function usePageViewModel() {
         }
 
         if (queryArgumentTypeRaw.format === DataTypeRawFormat.jsonSchema) {
-            if (!isValidJSONSchema(json)) return [AnyDataType.create(), "Invalid JSON Schema Draft 2020-12"];
+            if (!isValidJSONSchema(json)) return [AnyDataType.create(), "Invalid JSON Schema Draft 2020-12."];
             else return [jsonSchemaToType({ schema: json }), null];
         }
         else {
-            if (!isValidJSONTypeDefinition(json)) return [AnyDataType.create(), "Invalid JSON Type Definition"];
+            if (!isValidJSONTypeDefinition(json)) return [AnyDataType.create(), "Invalid JSON Type Definition."];
             else return [jsonTypeDefinitionToType(json), null];
         }
     }, [queryArgumentTypeRaw]);
     const queryOptions = useMemo<QueryOptions>(() => {
-        console.log(customFunctions);
         return {
             ...defaultQueryOptions,
             functions: {

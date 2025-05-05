@@ -11,7 +11,7 @@ import applicationGuide from "./application-guide.md?raw";
 import classes from "./sidebar.module.css";
 
 /**
- * Application side navigation.
+ * Application sidebar.
  */
 const Sidebar = memo(({
     customFunctions,

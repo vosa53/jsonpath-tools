@@ -53,7 +53,7 @@ export default function CustomFunctionsView({
             </Button>
             {customFunctions.map((cf, i) => (
                 <CustomFunctionView
-                    key={i}
+                    key={cf.name}
                     customFunction={cf}
                     onEditClick={() => {
                         setEditedCustomFunction(cf);

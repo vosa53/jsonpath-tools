@@ -17,7 +17,7 @@ export function renderMarkdownToHTML(markdown: string): string {
 
 const md = markdownit({
     linkify: true,
-    highlight: function (code, language) {
+    highlight: (code, language) => {
         const parser = parserMap.get(language);
         if (parser === undefined)
             return code;

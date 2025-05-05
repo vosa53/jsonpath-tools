@@ -1,11 +1,10 @@
-import { describe, expect, it } from 'vitest';
-
-import cts from "./jsonpath-compliance-test-suite/cts.json";
-import { defaultQueryOptions } from './query-options';
+import { describe, expect, it } from "vitest";
 import { jsonDeepEquals } from "./json/deep-equals";
-import { JSONValue } from './json/json-types';
-import { serializedNormalizedPath } from './serialization/serialization';
-import { JSONPath } from './jsonpath';
+import { JSONValue } from "./json/json-types";
+import { JSONPath } from "./jsonpath";
+import cts from "./jsonpath-compliance-test-suite/cts.json";
+import { defaultQueryOptions } from "./query-options";
+import { serializedNormalizedPath } from "./serialization/serialization";
 
 // Tests the library for RFC 9535 standard compliance using https://github.com/jsonpath-standard/jsonpath-compliance-test-suite.
 describe("JSONPath Compliance Test Suite", () => {

@@ -26,7 +26,6 @@ async function formatAsync(view: EditorView) {
         });
     }
     catch (error) {
-        if (error instanceof OperationCancelledError) return [];
-        else throw error;
+        if (!(error instanceof OperationCancelledError)) throw error;
     }
 }

@@ -33,7 +33,7 @@ export function EditorFormAdapter({
         value,
         defaultValue,
         finalValue: "Final",
-        onChange,
+        onChange
     });
 
     return (

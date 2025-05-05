@@ -1,6 +1,6 @@
 import { defaultQueryOptions } from "@jsonpath-tools/jsonpath";
 import { Type } from "@jsonpath-tools/jsonpath";
-import { ActionIcon, Button, Collapse, Flex, Group, Input, Select, Stack, TextInput } from "@mantine/core";
+import { ActionIcon, Button, Collapse, Flex, Group, Input, Select, Stack, TextInput, Tooltip } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { IconChevronDown, IconChevronUp, IconDeviceFloppy, IconHelp, IconPlus, IconTrash } from "@tabler/icons-react";
@@ -95,9 +95,11 @@ export default function CustomFunctionEditor({
                     {...form.getInputProps(`parameters.${i}.description`)}
                 />
             </Flex>
-            <ActionIcon variant="subtle" color="red" size="input-sm" onClick={() => form.removeListItem("parameters", i)}>
-                <IconTrash size={20} />
-            </ActionIcon>
+            <Tooltip label="Remove Parameter">
+                <ActionIcon variant="subtle" aria-label="Remove the Parameter" color="red" size="input-sm" onClick={() => form.removeListItem("parameters", i)}>
+                    <IconTrash size={20} />
+                </ActionIcon>
+            </Tooltip>
         </Flex>
     ));
 

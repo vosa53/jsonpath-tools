@@ -1,7 +1,7 @@
 import markdownit from "markdown-it";
 import { Highlighter } from "@lezer/highlight";
 import { parser as jsonParser } from "@lezer/json";
-import { parser as jsonPathDataTypeParser } from "./data-type/data-type-parser"
+import { parser as jsonPathDataTypeParser } from "./data-type/data-type-parser";
 import { Parser } from "@lezer/common";
 import MarkdownIt from "markdown-it";
 import { highlightCodeToHTML, markdownItLinksTargetBlank } from "../../../shared/markdown";

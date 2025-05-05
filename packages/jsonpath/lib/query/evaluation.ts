@@ -149,7 +149,8 @@ export function convertToLogicalType(value: FilterValue): LogicalType {
 export function convertToValueType(value: FilterValue): ValueType {
     if (isValueType(value)) return value;
 
-    // Implicit conversion.
+    // Implicit conversion. This is not defined in the specification, but it is very handy in the execution (e.g. subquery in a comparison expression).
+    // But of course, we are still compliant, thanks to the checker.
     if (isNodesType(value))
         return value.nodes.length !== 0 ? value.nodes[0].value : Nothing;
 

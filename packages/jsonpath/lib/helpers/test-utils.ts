@@ -5,6 +5,8 @@ import { Query } from "../query/query";
 import { Parser } from "../syntax-analysis/parser";
 import { Type, FilterValue, LogicalTrue } from "../values/types";
 
+// Helpers for tests.
+
 export const fooFunction: Function = {
     description: "Lorem impsum",
     parameters: [
@@ -45,4 +47,3 @@ export function parseQueryAndPosition(queryText: string): { query: Query; positi
     const query = parser.parse(queryTextWithoutCaret);
     return { query, position };
 }
-

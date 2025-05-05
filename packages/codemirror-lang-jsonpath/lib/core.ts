@@ -8,15 +8,30 @@ import { DataType } from "@jsonpath-tools/jsonpath";
 import { NormalizedPath } from "@jsonpath-tools/jsonpath";
 import { MarkdownRenderer } from "./markdown-renderer";
 
+/**
+ * JSONPath CodeMirror extension core.
+ */
 export function core(): Extension {
     return [
         jsonPathPlugin
     ];
 }
 
+/**
+ * State effect to update query options.
+ */
 export const updateQueryOptionsEffect = StateEffect.define<QueryOptions>();
+
+/**
+ * State effect to update query argument.
+ */
 export const updateQueryArgumentEffect = StateEffect.define<JSONValue | undefined>();
+
+/**
+ * State effect to update query argument type.
+ */
 export const updateQueryArgumentTypeEffect = StateEffect.define<DataType>();
+
 export const languageServiceFacet = Facet.define<LanguageService>();
 export const markdownRendererFacet = Facet.define<MarkdownRenderer>();
 export const diagnosticsCreatedFacet = Facet.define<(diagnostics: readonly Diagnostics[]) => void>();
@@ -72,6 +87,10 @@ const jsonPathPlugin = ViewPlugin.fromClass(JSONPathPlugin, {
     }
 });
 
+/**
+ * Returns the JSONPath query result.
+ * @param state Editor state.
+ */
 export function getResult(state: EditorState): Promise<{ nodes: readonly JSONValue[], paths: readonly NormalizedPath[] }> {
     const languageServiceSession = state.field(languageServiceSessionStateField);
     return languageServiceSession.getResult();

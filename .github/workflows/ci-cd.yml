@@ -104,10 +104,10 @@ jobs:
       - name: Deploy @jsonpath-tools/jsonpath-playground to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{secrets.CLOUDFLARE_API_TOKEN}}
-          accountId: ${{secrets.CLOUDFLARE_ACCOUNT_ID}}
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy apps/jsonpath-playground/dist/ --project-name=jsonpath-playground --branch main
-          gitHubToken: ${{secrets.GITHUB_TOKEN}}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
       - name: Deploy @jsonpath-tools/documentation to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

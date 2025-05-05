@@ -48,7 +48,7 @@ function compileCustomFunction(customFunction: CustomLanguageServiceFunction): F
     }
     catch (e) {
         return (context) => {
-            context.reportWarning(`Compilation of custom function '${customFunction.name}' failed: ${e}`);
+            context.reportWarning(`Compilation of the custom function '${customFunction.name}' failed: ${e}`);
             return Nothing;
         };
     }
@@ -61,7 +61,7 @@ function createJSONPathFunctionHandler(customFunction: CustomFunctionHandler, fu
             return result;
         }
         catch(e) {
-            context.reportWarning(`Error while executing custom function '${functionName}': ${e}`);
+            context.reportWarning(`Error while executing the custom function '${functionName}': ${e}`);
             return Nothing;
         }
     }

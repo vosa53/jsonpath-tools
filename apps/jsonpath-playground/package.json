@@ -24,11 +24,9 @@
         "ajv": "^8.17.1",
         "codemirror": "^6.0.1",
         "fast-json-patch": "^3.1.1",
-        "jsonpointer": "^5.0.1",
         "markdown-it": "^14.1.0",
         "react": "^19.0.0",
-        "react-dom": "^19.0.0",
-        "uri-js": "^4.4.1"
+        "react-dom": "^19.0.0"
     },
     "devDependencies": {
         "@lezer/generator": "^1.7.2",

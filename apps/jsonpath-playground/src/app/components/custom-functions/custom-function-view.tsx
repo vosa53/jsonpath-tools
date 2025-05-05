@@ -1,4 +1,4 @@
-import { ActionIcon, Box, Flex, Title } from "@mantine/core";
+import { ActionIcon, Box, Flex, Title, Tooltip } from "@mantine/core";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { CustomFunction } from "../../models/custom-function";
 import { MarkdownView } from "../markdown-view";
@@ -19,12 +19,16 @@ export default function CustomFunctionView({
                 <Box flex="1 1 0">
                     <Title order={4}>{customFunction.name}</Title>
                 </Box>
-                <ActionIcon variant="subtle" size="input-sm" onClick={onEditClick}>
-                    <IconEdit size={20} />
-                </ActionIcon>
-                <ActionIcon variant="subtle" size="input-sm">
-                    <IconTrash size={20} />
-                </ActionIcon>
+                <Tooltip label="Edit Function">
+                    <ActionIcon variant="subtle" aria-label="Edit the Function" size="input-sm" onClick={onEditClick}>
+                        <IconEdit size={20} />
+                    </ActionIcon>
+                </Tooltip>
+                <Tooltip label="Remove Function">
+                    <ActionIcon variant="subtle" aria-label="Remove the Function" size="input-sm">
+                        <IconTrash size={20} />
+                    </ActionIcon>
+                </Tooltip>
             </Flex>
             <MarkdownView markdown={customFunction.description} />
             <Title order={5}>Parameters</Title>

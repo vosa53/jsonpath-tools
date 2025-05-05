@@ -1,3 +1,9 @@
+/**
+ * Measures the execution time of the given code and logs it to the console.
+ * @param label Log label.
+ * @param action Code to measure.
+ * @returns Code result.
+ */
 export function logPerformance<TResult>(label: string, action: () => TResult) {
     const startMilliseconds = performance.now();
     const result = action();

@@ -92,8 +92,7 @@ export default function CodeMirrorEditor({
                 readonlyCompartment.of(EditorState.readOnly.of(readonly)),
                 EditorView.updateListener.of(u => {
                     if (u.docChanged) {
-                        const newValue = /*logPerformance("editor doc.toString", () => */u.state.doc.toString()/*)*/;
-                        //console.log("FROM EDITOR:",newValue);
+                        const newValue = u.state.doc.toString();
                         const isFromParent = valueInEditorRef.current === newValue;
                         valueInEditorRef.current = newValue;
                         if (!isFromParent)
@@ -113,19 +112,14 @@ export default function CodeMirrorEditor({
         };
     }, []);
 
-    //useEffect(() => {
     if (editorViewRef.current !== null && value !== valueInEditorRef.current) {
-        //console.log("FROM PARENT:",value, valueInEditorRef.current);
-        //logPerformance("editor set value", () => {
         queueMicrotask(() => {
             valueInEditorRef.current = value;
             editorViewRef.current!.dispatch({
                 changes: { from: 0, to: editorViewRef.current!.state.doc.length, insert: value },
             });
         });
-        //});
     }
-    //}, [value]);
 
     return (
         <div ref={containerElementRef} style={style} onFocus={onFocus} onBlur={onBlur}></div>
