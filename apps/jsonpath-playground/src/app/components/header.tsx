@@ -16,7 +16,7 @@ const Header = memo(({
 
     return (
         <Flex justify="space-between">
-            <Group p="xs" c="violet.4" gap={0}>
+            <Group p="xs" c="violet.4" gap={0} wrap="nowrap">
                 <Burger
                     opened={navbarOpened}
                     onClick={() => onNavbarOpenedChanged(!navbarOpened)}
@@ -25,8 +25,8 @@ const Header = memo(({
                     color="violet.4" />
                 <IconRoute size={33} stroke={2} />
                 <Indicator color="violet" label="RFC 9535" size={16}>
-                    <Title order={1} size="24" pl="xs" fw="600" visibleFrom="xs">JSONPath Playground</Title>
-                    <Title order={1} size="20" pl="xs" fw="600" hiddenFrom="xs">JSONPath Playground</Title>
+                    <Title order={1} pl="xs" fw="600" visibleFrom="xs" size="24">JSONPath Playground</Title>
+                    <Title order={1} pl="xs" fw="600" hiddenFrom="xs" style={{ fontSize: "calc(100vw / 20)", margin: "2px 0 0 0" }}>JSONPath Playground</Title>
                 </Indicator>
             </Group>
             <Group pr="xs">

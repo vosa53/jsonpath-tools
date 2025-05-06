@@ -5,7 +5,7 @@ import { SyntaxTreeNode } from "@jsonpath-tools/jsonpath";
 import { SyntaxTree } from "@jsonpath-tools/jsonpath";
 import { SyntaxTreeType } from "@jsonpath-tools/jsonpath";
 import { SyntaxTreeToken } from "@jsonpath-tools/jsonpath";
-import { Box, Group, Paper, Stack } from "@mantine/core";
+import { Box, Paper, Stack } from "@mantine/core";
 import { memo } from "react";
 import PanelShell from "../panel-shell";
 import classes from "./outline-panel.module.css";
@@ -24,8 +24,7 @@ const OutlinePanel = memo(({
     return (
         <PanelShell
             toolbar={
-                <Group gap="xs">
-                </Group>
+                <></>
             }
         >
             <Box p="xs" className={classes.container}>

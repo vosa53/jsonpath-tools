@@ -1,5 +1,5 @@
 import { DiagnosticsSeverity } from "@jsonpath-tools/jsonpath";
-import { Checkbox, DefaultMantineColor, Group, Table, ThemeIcon } from "@mantine/core";
+import { Checkbox, DefaultMantineColor, Table, ThemeIcon } from "@mantine/core";
 import { IconAlertTriangleFilled, IconExclamationCircleFilled } from "@tabler/icons-react";
 import { memo, ReactNode, useMemo, useState } from "react";
 import PanelShell from "../panel-shell";
@@ -29,7 +29,7 @@ const DiagnosticsPanel = memo(({
     return (
         <PanelShell
             toolbar={
-                <Group gap="xs">
+                <>
                     <Checkbox
                         variant="outline"
                         defaultChecked
@@ -42,7 +42,7 @@ const DiagnosticsPanel = memo(({
                         label={`Warnings (${warningCount})`}
                         onChange={e => setFilters({ ...filters, showWarnings: e.currentTarget.checked })}
                     />
-                </Group>
+                </>
             }
         >
             <DiagnosticsView diagnostics={filteredDiagnostics} onSelectedDiagnosticsChanged={onSelectedDiagnosticsChanged} />

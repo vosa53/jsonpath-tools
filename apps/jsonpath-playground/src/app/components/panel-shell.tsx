@@ -13,7 +13,7 @@ export default function PanelShell({
 }) {
     return (
         <Flex direction="column" h="100%">
-            <Flex style={{ minHeight: "50px" }} align="center" p="xs">
+            <Flex style={{ minHeight: "50px", whiteSpace: "nowrap", overflowX: "auto" }} align="center" p="xs" gap="xs">
                 {toolbar}
             </Flex>
             <Divider />

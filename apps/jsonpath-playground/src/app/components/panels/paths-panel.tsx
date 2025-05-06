@@ -1,4 +1,4 @@
-import { ActionIcon, Group, Select, Tooltip } from "@mantine/core";
+import { ActionIcon, Select, Tooltip } from "@mantine/core";
 import { memo } from "react";
 import JSONEditor from "../code-editors/json-editor";
 import PanelShell from "../panel-shell";
@@ -21,7 +21,7 @@ const PathsPanel = memo(({
     return (
         <PanelShell
             toolbar={
-                <Group gap="xs" w="100%">
+                <>
                     <Tooltip label="Path Format">
                         <Select
                             size="xs"
@@ -39,7 +39,7 @@ const PathsPanel = memo(({
                             <IconFileDownload style={{ width: "70%", height: "70%" }} stroke={1.5} />
                         </ActionIcon>
                     </Tooltip>
-                </Group>
+                </>
             }
         >
             <JSONEditor value={pathsText} readonly onValueChanged={() => { }} />

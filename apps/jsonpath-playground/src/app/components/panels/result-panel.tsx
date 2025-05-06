@@ -33,7 +33,7 @@ const ResultPanel = memo(({
     return (
         <PanelShell
             toolbar={
-                <Group gap="xs" w="100%">
+                <>
                     <Modal opened={modalOpened} onClose={close} title={"Edit Replacement"} size="xl">
                         <ReplacementEditor
                             replacement={operation.replacement}
@@ -63,7 +63,7 @@ const ResultPanel = memo(({
                             <IconFileDownload style={{ width: "70%", height: "70%" }} stroke={1.5} />
                         </ActionIcon>
                     </Tooltip>
-                </Group>
+                </>
             }
         >
             <JSONEditor value={resultText} readonly onValueChanged={() => { }} />

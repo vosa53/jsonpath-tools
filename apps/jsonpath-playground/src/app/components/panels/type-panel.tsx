@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Group, Menu, Select, Tooltip } from "@mantine/core";
+import { ActionIcon, Button, Menu, Select, Tooltip } from "@mantine/core";
 import { IconChevronDown, IconFileUpload } from "@tabler/icons-react";
 import { memo } from "react";
 import JSONEditor from "../code-editors/json-editor";
@@ -20,7 +20,7 @@ const TypePanel = memo(({
     return (
         <PanelShell
             toolbar={
-                <Group gap="xs" w="100%">
+                <>
                     <Tooltip label="Schema Format">
                         <Select
                             size="xs"
@@ -61,7 +61,7 @@ const TypePanel = memo(({
                             ))}
                         </Menu.Dropdown>
                     </Menu>
-                </Group>
+                </>
             }
         >
             {

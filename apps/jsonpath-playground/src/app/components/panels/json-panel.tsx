@@ -31,7 +31,7 @@ const JSONPanel = memo(({
     return (
         <PanelShell
             toolbar={
-                <Group gap="xs" w="100%">
+                <>
                     <Tooltip label="Previous Result">
                         <ActionIcon variant="default" aria-label="Previous Result" disabled={paths.length === 0} onClick={() => onCurrentPathIndexChanged((paths.length + currentPathIndex - 1) % paths.length)}>
                             <IconArrowUp style={{ width: "70%", height: "70%" }} stroke={1.5} />
@@ -62,7 +62,7 @@ const JSONPanel = memo(({
                                 </ActionIcon>
                             </Tooltip>
                         </Popover.Target>
-                        <Popover.Dropdown>
+                        <Popover.Dropdown style={{ maxWidth: "calc(100vw - var(--mantine-spacing-xs))" }}>
                             <Group align="end" gap="xs">
                                 <TextInput label="Normalized Path under the Caret" value={currentNormalizedPath} readOnly flex="1 1 0" />
                                 <CopyButton value={currentNormalizedPath}>
@@ -94,7 +94,7 @@ const JSONPanel = memo(({
                             ))}
                         </Menu.Dropdown>
                     </Menu>
-                </Group>
+                </>
             }
         >
             <JSONEditor
