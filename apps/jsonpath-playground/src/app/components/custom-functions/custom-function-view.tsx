@@ -8,10 +8,12 @@ import { MarkdownView } from "../markdown-view";
  */
 export default function CustomFunctionView({
     customFunction,
-    onEditClick
+    onEditClick,
+    onRemoveClick
 }: {
     customFunction: CustomFunction,
-    onEditClick: () => void
+    onEditClick: () => void,
+    onRemoveClick: () => void
 }) {
     return (
         <Box mb="sm">
@@ -25,7 +27,7 @@ export default function CustomFunctionView({
                     </ActionIcon>
                 </Tooltip>
                 <Tooltip label="Remove Function">
-                    <ActionIcon variant="subtle" aria-label="Remove the Function" size="input-sm">
+                    <ActionIcon variant="subtle" aria-label="Remove the Function" size="input-sm" onClick={onRemoveClick}>
                         <IconTrash size={20} />
                     </ActionIcon>
                 </Tooltip>

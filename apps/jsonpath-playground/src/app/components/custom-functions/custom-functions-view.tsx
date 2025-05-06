@@ -60,6 +60,10 @@ export default function CustomFunctionsView({
                         setIsCreatingNew(false);
                         open();
                     }}
+                    onRemoveClick={() => {
+                        const newCustomFunctions = customFunctions.filter(customFunction => customFunction !== cf);
+                        onCustomFunctionsChanged(newCustomFunctions);
+                    }}
                 />
             ))}
         </div>
