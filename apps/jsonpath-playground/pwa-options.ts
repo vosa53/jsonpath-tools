@@ -3,6 +3,7 @@ import { VitePWAOptions } from "vite-plugin-pwa";
 export const pwaOptions: Partial<VitePWAOptions> = {
     manifest: {
         name: "JSONPath Playground",
+        short_name: "JSONPath Playground",
         description: "Playground for JSONPath (RFC 9535) query language.",
         start_url: "/",
         display: "standalone",
