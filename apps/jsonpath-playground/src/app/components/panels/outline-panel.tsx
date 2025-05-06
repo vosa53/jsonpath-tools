@@ -28,7 +28,7 @@ const OutlinePanel = memo(({
                 </Group>
             }
         >
-            <Box m="sm">
+            <Box p="xs" className={classes.container}>
                 {query !== undefined && <OutlineView tree={query.query} onSelectedNodeChanged={onSelectedNodeChanged} />}
             </Box>
         </PanelShell>
@@ -45,39 +45,38 @@ function OutlineView({
 }) {
     if (tree instanceof SyntaxTreeToken) return (<></>);
     return (
-        <Paper
-            p="xs"
-            className={getClassName(tree)}
-            withBorder
-            onMouseOver={e => {
-                e.stopPropagation();
-                onSelectedNodeChanged(tree);
-            }}
-            onMouseOut={e => {
-                e.stopPropagation();
-                onSelectedNodeChanged(null);
-            }}
-            style={{ minWidth: "300px" }}
-        >
-            <TreeLabel tree={tree} />
-            {tree instanceof SyntaxTreeNode && tree.children.length > 0 && (
-                <Stack className={classes.children} mt="xs" bg="var(--mantine-color-body)" gap="xs">
-                    {tree.children.map((c, i) => (
-                        <OutlineView key={i} tree={c} onSelectedNodeChanged={onSelectedNodeChanged} />
-                    ))}
-                </Stack>
-            )}
-        </Paper>
+        <div className={classes.node}>
+            <Paper
+                className={getClassName(tree)}
+                p="xs"
+                withBorder
+                onMouseOver={e => {
+                    e.stopPropagation();
+                    onSelectedNodeChanged(tree);
+                }}
+                onMouseOut={e => {
+                    e.stopPropagation();
+                    onSelectedNodeChanged(null);
+                }}
+            >
+                <TreeLabel tree={tree} />
+                {tree instanceof SyntaxTreeNode && tree.children.length > 0 && (
+                    <Stack className={classes.children} mt="xs" gap="xs">
+                        {tree.children.map((c, i) => (
+                            <OutlineView key={i} tree={c} onSelectedNodeChanged={onSelectedNodeChanged} />
+                        ))}
+                    </Stack>
+                )}
+            </Paper>
+        </div>
     );
 }
 
 function TreeLabel({ tree }: { tree: SyntaxTree }) {
     return (
-        <Group className={classes.node}>
-            <div style={{ fontWeight: "500" }}>
-                <MarkdownView markdown={getLabel(tree)} />
-            </div>
-        </Group>
+        <div className={classes.label}>
+            <MarkdownView markdown={getLabel(tree)} />
+        </div>
     );
 }
 

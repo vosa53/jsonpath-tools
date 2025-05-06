@@ -1,5 +1,17 @@
+.container {
+    width: 100%;
+    min-width: fit-content;
+}
+
 .node {
-    width: fit-content;
+    min-width: fit-content;
+    border-radius: var(--mantine-radius-default);
+    background: var(--mantine-color-body);
+}
+
+.label {
+    font-weight: 500;
+    white-space: nowrap;
 }
 
 .children {
