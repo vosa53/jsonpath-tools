@@ -3,6 +3,7 @@ import { SimpleRPC, SimpleRPCTopic } from "./simple-rpc";
 
 describe("Simple RPC", () => {
     it("Basic test", async () => {
+        // eslint-disable-next-line prefer-const
         let clientRPC: SimpleRPC<TestHandlerClient>;
         const serverRPC = new SimpleRPC<TestHandlerServer>(d => clientRPC.receive(d), t => new TestHandlerServer(t));
         clientRPC = new SimpleRPC(d => serverRPC.receive(d), t => new TestHandlerClient(t));
