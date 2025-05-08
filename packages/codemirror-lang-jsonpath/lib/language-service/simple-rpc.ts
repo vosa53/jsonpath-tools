@@ -39,9 +39,10 @@ export class SimpleRPC<THandler> {
      * @internal 
      */
     sendRequest<TData, TResponse>(type: string, topicID: string, data: TData): Promise<TResponse> {
-        const message = this.sendMessage(type, topicID, data);
         return new Promise((resolve, reject) => {
-            this.messageIDToPromiseActions.set(message.id, { resolve, reject});
+            const messageID = crypto.randomUUID();
+            this.messageIDToPromiseActions.set(messageID, { resolve, reject});
+            this.sendMessage(type, messageID, topicID, data);
         });
     }
 
@@ -49,13 +50,13 @@ export class SimpleRPC<THandler> {
      * @internal 
      */
     sendNotification<TData>(type: string, topicID: string, data: TData): void {
-        this.sendMessage(type, topicID, data);
+        this.sendMessage(type, crypto.randomUUID(), topicID, data);
     }
 
-    private sendMessage(type: string, topicID: string, data: any): SimpleRPCMessage {
+    private sendMessage(type: string, id: string, topicID: string, data: any): SimpleRPCMessage {
         const message: SimpleRPCMessage = {
             type: type,
-            id: crypto.randomUUID(),
+            id: id,
             topicID: topicID,
             data: data
         };

@@ -1,6 +1,6 @@
 {
     "name": "@jsonpath-tools/jsonpath",
-    "version": "0.4.2-alpha",
+    "version": "0.4.3-alpha",
     "author": "Jan Jörka",
     "license": "MIT",
     "description": "JSONPath (RFC 9535) query evaluation, analysis and editor services.",
