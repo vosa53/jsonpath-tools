@@ -42,7 +42,7 @@ const jsonPathHoverTooltip = hoverTooltip(async (view, pos, side) => {
 const jsonPathTooltipRangeDecoration = Decoration.mark({ class: "cmjp-tooltip-range" });
 
 const jsonPathTooltipDecorations = EditorView.decorations.from(jsonPathHoverTooltip.active, t => {
-    return Decoration.set(t.map(t => jsonPathTooltipRangeDecoration.range(t.pos, t.end)));
+    return Decoration.set(t.filter(t => t.pos !== t.end).map(t => jsonPathTooltipRangeDecoration.range(t.pos, t.end)));
 });
 
 const jsonPathTooltipBaseTheme = EditorView.baseTheme({
